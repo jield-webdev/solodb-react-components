@@ -15,7 +15,7 @@ import { RunTypeEnum } from "@/modules/run/interfaces/run";
 import LogAssistElement from "@/modules/run/components/step/view/element/logAssistElement";
 import { useQueries } from "@tanstack/react-query";
 import getEcnList from "@/modules/equipment/api/module/listEcn";
-import Moment from "react-moment";
+import { formatDateTime } from "@/utils/datetime";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
 import GetEquipment from "@/modules/equipment/api/getEquipment";
 import MonitorCard from "@/modules/monitor/components/monitor/monitorCard";
@@ -255,13 +255,13 @@ const StepDashboard = () => {
                   <Card.Footer>
                     {ecn.date_created && (
                       <>
-                        Created by <Moment format={"DD-MM-YY H:m"}>{ecn.date_created}</Moment> by {ecn.owner.full_name}
+                        Created by {formatDateTime(ecn.date_created, "DD-MM-YY H:m")} by {ecn.owner.full_name}
                       </>
                     )}
                     {ecn.last_update && (
                       <>
                         {" "}
-                        &middot; Updated by <Moment format={"DD-MM-YY H:m"}>{ecn.last_update}</Moment> by{" "}
+                        &middot; Updated by {formatDateTime(ecn.last_update, "DD-MM-YY H:m")} by{" "}
                         {ecn.owner.full_name}
                       </>
                     )}

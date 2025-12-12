@@ -7,7 +7,7 @@ import { RunPart } from "@/modules/run/interfaces/run/runPart";
 import { RunStep } from "@/modules/run/interfaces/runStep";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
-import Moment from "react-moment";
+import { formatDateTime } from "@/utils/datetime";
 import RunStepPartComment from "@/modules/run/components/step/view/element/parts/element/runStepPartComment";
 
 const RunStepPartProductionTableRow = ({
@@ -104,7 +104,7 @@ const RunStepPartProductionTableRow = ({
       </td>
       <td>{runStepPart.latest_action?.type.name}</td>
       <td>
-        <Moment format={"DD-MM-YY HH:mm"}>{runStepPart.latest_action?.date_created}</Moment>
+        {formatDateTime(runStepPart.latest_action?.date_created, "DD-MM-YY HH:mm")}
       </td>
       <td>
         <Dropdown align="end">

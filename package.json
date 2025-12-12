@@ -2,14 +2,14 @@
   "name": "solodb-react-components",
   "version": "1.0.0",
   "type": "module",
-  "main": "./dist/solodb-react-components.umd.js",
-  "module": "./dist/solodb-react-components.es.js",
-  "types": "./dist/index.d.ts",
+  "repository": "jield-webdev/solodb-react-components",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/solodb-react-components.es.js",
-      "require": "./dist/solodb-react-components.umd.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
@@ -17,20 +17,47 @@
   ],
   "scripts": {
     "build": "tsc && vite build",
-    "compile": "tsc",
     "dev": "cd example && yarn dev",
     "example:install": "cd example && yarn install"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@tanstack/react-query": "~5.90.11",
     "@tanstack/react-table": "^8.21.3",
+    "axios": "^1.13.2",
+    "goldstein-client-dashboard": "*",
+    "moment": "^2.30.1",
+    "moment-timezone": "^0.6.0",
+    "qrcode.react": "^4.2.0",
+    "react": "^18 || ^19",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^18 || ^19",
+    "react-dropzone": "^14.3.8",
+    "react-google-charts": "^5.2.1",
+    "react-hook-form": "^7.67.0",
+    "react-intersection-observer": "^10.0.0",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.9.6",
+    "react-select": "^5.10.2",
+    "yet-another-react-lightbox": "^3.25.0"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-commonjs": "^1.0.3",
+    "@tanstack/react-query": "~5.90.11",
+    "@tanstack/react-query-devtools": "~5.91.1",
+    "@tanstack/react-table": "^8.21.3",
+    "@types/node": "^22",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-react": "^5.1.1",
     "axios": "^1.13.2",
     "goldstein-client-dashboard": "https://github.com/jield-webdev/goldstein-client-dashboard.git",
     "moment": "^2.30.1",
     "moment-timezone": "^0.6.0",
+    "prettier": "^3.7.3",
+    "prop-types": "^15.8.1",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
-    "react-axios": "2.0.6",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.0",
     "react-dropzone": "^14.3.8",
@@ -38,23 +65,12 @@
     "react-hook-form": "^7.67.0",
     "react-intersection-observer": "^10.0.0",
     "react-markdown": "^10.1.0",
-    "react-moment": "^1.1.3",
-    "react-nl2br": "^1.0.4",
     "react-router-dom": "^7.9.6",
     "react-select": "^5.10.2",
-    "yet-another-react-lightbox": "^3.25.0"
-  },
-  "devDependencies": {
-    "@originjs/vite-plugin-commonjs": "^1.0.3",
-    "@tanstack/react-query-devtools": "~5.91.1",
-    "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3",
-    "@types/react-router-dom": "^5.3.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "prettier": "^3.7.3",
     "typescript": "^5.9.3",
     "vite": "^7.2.4",
-    "vite-plugin-dts": "^4.3.0"
+    "vite-plugin-dts": "^4.3.0",
+    "yet-another-react-lightbox": "^3.25.0"
   },
-  "packageManager": "yarn@4.12.0"
+  "packageManager": "yarn@5.12.0"
 }

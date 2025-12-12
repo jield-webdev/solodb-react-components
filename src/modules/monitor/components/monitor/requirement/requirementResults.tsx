@@ -5,7 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { MonitorRequirement } from "@/modules/monitor/interfaces/monitorRequirement";
 import ListMonitorRequirementResults from "@/modules/monitor/api/measurement/listMonitorRequirementResults";
 import axios from "axios";
-import Moment from "react-moment";
+import { formatDateTime } from "@/utils/datetime";
 import { File } from "@/modules/core/interfaces/file";
 import ListMonitorStepFiles from "@/modules/monitor/api/step/listMonitorStepFiles";
 import Config from "@/constants/config";
@@ -222,7 +222,7 @@ export default function RequirementResults({ requirement }: { requirement: Monit
                       <small className={"text-muted"}>{result.id}</small>
                     </th>
                     <td>
-                      <Moment format={"DD-MM-YY HH:mm"}>{result.date_created}</Moment>
+                      {formatDateTime(result.date_created, "DD-MM-YY HH:mm")}
                     </td>
 
                     {targetQuery.data?.items.map((target, index) => {
@@ -313,7 +313,7 @@ export default function RequirementResults({ requirement }: { requirement: Monit
                         </span>
                       </div>
                       <small className={"text-muted"}>
-                        <Moment format={"DD-MM-YY HH:mm"}>{file.date_created}</Moment>
+                        {formatDateTime(file.date_created, "DD-MM-YY HH:mm")}
                       </small>
                     </li>
                   );

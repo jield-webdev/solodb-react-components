@@ -23,7 +23,6 @@ export default defineConfig({
     alias: {
       "@": path.join(__dirname, "./src"),
       "@modules": path.join(__dirname, "./src/modules"),
-      "@routes": path.join(__dirname, "./src/routes"),
       "@constants": path.join(__dirname, "./src/constants"),
     },
   },
@@ -36,8 +35,8 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
       name: "SoloDBReactComponents",
-      formats: ["es", "umd"],
-      fileName: (format) => `solodb-react-components.${format}.js`,
+      formats: ["es", "cjs"],
+      fileName: (format) => (format === "cjs" ? "index.cjs" : "index.js"),
     },
     // Rollup options
     rollupOptions: {

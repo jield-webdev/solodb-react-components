@@ -4,7 +4,7 @@ import { Card } from "react-bootstrap";
 import { Monitor } from "@/modules/monitor/interfaces/monitor";
 import ListMonitorRequirements from "@/modules/monitor/api/listMonitorRequirements";
 import { Link, useParams } from "react-router-dom";
-import Moment from "react-moment";
+import { formatDateTime } from "@/utils/datetime";
 
 export default function MonitorCard({ monitor }: { monitor: Monitor }) {
   const { environment } = useParams();
@@ -49,7 +49,7 @@ export default function MonitorCard({ monitor }: { monitor: Monitor }) {
             {requirement.title}
             {requirement.latest_result && (
               <>
-                Latest measurement: <Moment format={"DD-MM-YY HH:mm"}>{requirement.latest_result.date_created}</Moment>
+                Latest measurement: {formatDateTime(requirement.latest_result.date_created, "DD-MM-YY HH:mm")}
               </>
             )}
           </Card.Text>

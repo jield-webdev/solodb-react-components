@@ -1,7 +1,7 @@
 import { File } from "@/modules/core/interfaces/file";
 import Config from "@/constants/config";
 import { Badge, Button, ListGroup, Table } from "react-bootstrap";
-import Moment from "react-moment";
+import { formatDateTime } from "@/utils/datetime";
 import React, { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ListRunStepFiles from "@/modules/run/api/step/listRunStepFiles";
@@ -133,7 +133,7 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
                   {formatFileSize(file.size)}
                 </td>
                 <td>
-                  <Moment format="DD-MM-YY HH:mm">{file.date_created}</Moment>
+                  {formatDateTime(file.date_created, "DD-MM-YY HH:mm")}
                 </td>
               </tr>
             ))}
