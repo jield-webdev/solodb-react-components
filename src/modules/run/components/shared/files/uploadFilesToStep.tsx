@@ -1,7 +1,7 @@
 import { File } from "@/modules/core/interfaces/file";
-import Config from "@/constants/config";
+import { GetServerUri } from "@/modules/core/functions/getServerUri";
 import { Badge, Button, ListGroup, Table } from "react-bootstrap";
-import Moment from "react-moment";
+import { formatDateTime } from "@/utils/datetime";
 import React, { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ListRunStepFiles from "@/modules/run/api/step/listRunStepFiles";
@@ -120,7 +120,7 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
                   <small className="text-muted">{i + 1}</small>
                 </td>
                 <td>
-                  <a href={`${Config.SERVER_URI}${file.url}`}>{file.name}</a>
+                  <a href={`${GetServerUri()}${file.url}`}>{file.name}</a>
                   {file.has_run_step_loggings && <Badge className="ms-1 bg-primary">Logging</Badge>}
                 </td>
                 <td>
@@ -133,7 +133,7 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
                   {formatFileSize(file.size)}
                 </td>
                 <td>
-                  <Moment format="DD-MM-YY HH:mm">{file.date_created}</Moment>
+                  {formatDateTime(file.date_created, "DD-MM-YY HH:mm")}
                 </td>
               </tr>
             ))}

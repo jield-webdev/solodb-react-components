@@ -5,7 +5,7 @@ import { EquipmentModuleIssue } from "@/modules/equipment/interfaces/equipment/m
 import { EquipmentModuleIssueAttachment } from "@/modules/equipment/interfaces/equipment/module/issue/equipmentModuleIssueAttachment";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
 import ReactMarkdown from "react-markdown";
-import Moment from "react-moment";
+import { formatDateTime } from "@/utils/datetime";
 
 export default function IssueCard({
   issue,
@@ -74,9 +74,7 @@ export default function IssueCard({
           {currentIssue.date_created && (
             <ListGroup.Item className="d-flex align-items-center">
               <span className="text-muted">Created:</span>
-              <Moment format="DD-MM-YY HH:mm" className="ms-1">
-                {currentIssue.date_created}
-              </Moment>
+              <span className="ms-1">{formatDateTime(currentIssue.date_created, "DD-MM-YY HH:mm")}</span>
             </ListGroup.Item>
           )}
 
@@ -91,9 +89,7 @@ export default function IssueCard({
             <ListGroup.Item className="d-flex align-items-center">
               <span className="text-muted">Updated:</span>
               <span className="ms-1">{currentIssue.updated_by.full_name}</span>
-              <Moment format="(DD-MM-YY HH:mm)" className="ms-1">
-                {currentIssue.last_update}
-              </Moment>
+              <span className="ms-1">({formatDateTime(currentIssue.last_update, "DD-MM-YY HH:mm")})</span>
             </ListGroup.Item>
           )}
         </ListGroup>

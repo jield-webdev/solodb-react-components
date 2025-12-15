@@ -1,4 +1,4 @@
-import Moment from "react-moment";
+import { formatDateTime } from "@/utils/datetime";
 import React, { useContext } from "react";
 import { EquipmentContext } from "@/modules/equipment/contexts/equipmentContext";
 import { useQueries } from "@tanstack/react-query";
@@ -62,7 +62,7 @@ export default function EquipmentHeader() {
                 <i className="fa fa-calendar-o text-white pe-2" aria-hidden="true"></i>
                 Active reservation
                 <br />
-                Until <Moment format={"DD-MM-YY HH:mm"}>{reservation.end}</Moment> by {reservation.user.full_name}
+                Until {formatDateTime(reservation.end, "DD-MM-YY HH:mm")} by {reservation.user.full_name}
               </div>
             );
           })}
@@ -79,7 +79,7 @@ export default function EquipmentHeader() {
                 <i className="fa fa-calendar-o text-white pe-2" aria-hidden="true"></i>
                 Next reservation
                 <br />
-                <Moment format={"DD-MM-YY HH:mm"}>{reservation.start}</Moment>
+                {formatDateTime(reservation.start, "DD-MM-YY HH:mm")}
                 <br />
                 {reservation.user.full_name}
               </div>

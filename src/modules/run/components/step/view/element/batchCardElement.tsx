@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Card, Form, InputGroup } from "react-bootstrap";
-import nl2br from "react-nl2br";
+import { TextWithLineBreaks } from "@/utils/text";
 import { Run } from "@/modules/run/interfaces/run";
 import { BatchCard } from "@/modules/run/interfaces/run/batchCard";
 import DateFormat from "@/modules/partial/dateFormat";
@@ -54,7 +54,7 @@ const BatchCardElement = ({ run }: { run: Run }) => {
         <Card className={"rounded my-4"}>
           <Card.Body>
             <Card.Title className="text-muted">Batch card</Card.Title>
-            <Card.Text>{batchCard && <span className={"text-danger fs-3"}>{nl2br(batchCard.content)}</span>}</Card.Text>
+            <Card.Text>{batchCard && <span className={"text-danger fs-3"}><TextWithLineBreaks text={batchCard.content} /></span>}</Card.Text>
           </Card.Body>
 
           <Card.Footer className={"d-flex justify-content-between align-items-center"}>

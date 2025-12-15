@@ -15,6 +15,7 @@ import { useInView } from "react-intersection-observer";
 import EquipmentTable from "./setup/equipmentTable";
 import FilterFormBar from "./setup/filterFormBar";
 import { FilterBadges } from "./setup/filterBadges";
+import { GetServerUri } from "@/modules/core/functions/getServerUri";
 
 export function populateFilterData(filterFormData: FilterFormData): FilterData {
   let facet: { [fieldsetName: string]: { values: string[] } } = {};
@@ -32,6 +33,8 @@ export function populateFilterData(filterFormData: FilterFormData): FilterData {
 export default function SetupUpdateEquipment() {
   const { id, environment } = useParams();
   const { ref, inView } = useInView();
+
+  console.log(GetServerUri());
 
   const [equipmentSort, setEquipmentSort] = useState<{ order: string; direction?: "asc" | "desc" }>({
     order: "default",

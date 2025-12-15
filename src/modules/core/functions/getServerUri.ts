@@ -1,5 +1,5 @@
-import Config from "@/constants/config";
+import { getServerUri } from "@/modules/core/config/runtimeConfig";
 
 export const GetServerUri = () => {
-  return Config.SERVER_URI;
+  return getServerUri();
 };

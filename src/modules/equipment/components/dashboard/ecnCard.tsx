@@ -3,7 +3,7 @@ import { Equipment } from "@/modules/equipment/interfaces/equipment";
 import { EquipmentModuleEcnAttachment } from "@/modules/equipment/interfaces/equipment/module/ecn/equipmentModuleEcnAttachment";
 import { EquipmentModuleEcn } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleEcn";
 import { Badge, Button, Card, ListGroup } from "react-bootstrap";
-import Moment from "react-moment";
+import { formatDateTime } from "@/utils/datetime";
 import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
 import ReactMarkdown from "react-markdown";
 
@@ -74,9 +74,7 @@ export default function EcnCard({
           {currentEcn.date_created && (
             <ListGroup.Item className="d-flex align-items-center">
               <span className="text-muted">Created:</span>
-              <Moment format="DD-MM-YY HH:mm" className="ms-1">
-                {currentEcn.date_created}
-              </Moment>
+              <span className="ms-1">{formatDateTime(currentEcn.date_created, "DD-MM-YY HH:mm")}</span>
             </ListGroup.Item>
           )}
 
@@ -91,9 +89,7 @@ export default function EcnCard({
             <ListGroup.Item className="d-flex align-items-center">
               <span className="text-muted">Updated:</span>
               <span className="ms-1">{currentEcn.updated_by.full_name}</span>
-              <Moment format="(DD-MM-YY HH:mm)" className="ms-1">
-                {currentEcn.last_update}
-              </Moment>
+              <span className="ms-1">({formatDateTime(currentEcn.last_update, "DD-MM-YY HH:mm")})</span>
             </ListGroup.Item>
           )}
         </ListGroup>
