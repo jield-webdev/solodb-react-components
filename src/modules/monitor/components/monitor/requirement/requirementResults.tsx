@@ -8,7 +8,7 @@ import axios from "axios";
 import { formatDateTime } from "@/utils/datetime";
 import { File } from "@/modules/core/interfaces/file";
 import ListMonitorStepFiles from "@/modules/monitor/api/step/listMonitorStepFiles";
-import Config from "../../../../../../example/src/constants/config";
+import Config from "@/constants/config";
 import ListMonitorRequirementTargets from "@/modules/monitor/api/requirement/listMonitorRequirementTargets";
 import RequirementChart from "@/modules/monitor/components/monitor/requirement/requirementChart";
 import PaginationLinks from "@/modules/partial/paginationLinks";

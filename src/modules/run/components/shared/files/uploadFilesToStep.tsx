@@ -1,5 +1,5 @@
 import { File } from "@/modules/core/interfaces/file";
-import Config from "../../../../../../example/src/constants/config";
+import Config from "@/constants/config";
 import { Badge, Button, ListGroup, Table } from "react-bootstrap";
 import { formatDateTime } from "@/utils/datetime";
 import React, { useMemo, useState } from "react";
