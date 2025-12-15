@@ -23,7 +23,6 @@ export default defineConfig({
     alias: {
       "@": path.join(__dirname, "./src"),
       "@modules": path.join(__dirname, "./src/modules"),
-      "@constants": path.join(__dirname, "./src/constants"),
     },
   },
 

@@ -1,5 +1,5 @@
 import { File } from "@/modules/core/interfaces/file";
-import Config from "@/constants/config";
+import { GetServerUri } from "@/modules/core/functions/getServerUri";
 import { Badge, Button, ListGroup, Table } from "react-bootstrap";
 import { formatDateTime } from "@/utils/datetime";
 import React, { useMemo, useState } from "react";
@@ -120,7 +120,7 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
                   <small className="text-muted">{i + 1}</small>
                 </td>
                 <td>
-                  <a href={`${Config.SERVER_URI}${file.url}`}>{file.name}</a>
+                  <a href={`${GetServerUri()}${file.url}`}>{file.name}</a>
                   {file.has_run_step_loggings && <Badge className="ms-1 bg-primary">Logging</Badge>}
                 </td>
                 <td>

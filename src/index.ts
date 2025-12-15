@@ -59,6 +59,9 @@ export { EmphasizedParametersContext } from "@/modules/run/contexts/emphasizedPa
 // Hooks
 export { useAuth } from "@/modules/core/hooks/useAuth";
 
+// Runtime configuration
+export { initSolodbComponents } from "@/modules/core/config/runtimeConfig";
+
 // Types/Interfaces - Export key interfaces that consumers might need
 export type { User } from "@/modules/core/interfaces/user";
 export type { Equipment } from "@/modules/equipment/interfaces/equipment";

@@ -33,6 +33,7 @@ export { RunContext } from './modules/run/contexts/runContext';
 export { RunStepContext } from './modules/run/contexts/runStepContext';
 export { EmphasizedParametersContext } from './modules/run/contexts/emphasizedParametersContext';
 export { useAuth } from './modules/core/hooks/useAuth';
+export { initSolodbComponents } from './modules/core/config/runtimeConfig';
 export type { User } from './modules/core/interfaces/user';
 export type { Equipment } from './modules/equipment/interfaces/equipment';
 export type { Monitor } from './modules/monitor/interfaces/monitor';
