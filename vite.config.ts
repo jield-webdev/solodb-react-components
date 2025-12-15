@@ -4,6 +4,7 @@ import path from "path";
 import dts from "vite-plugin-dts";
 
 // https://vitejs.dev/config/
+// @ts-ignore
 export default defineConfig({
   // Plugins configuration
   plugins: [
@@ -63,5 +64,26 @@ export default defineConfig({
     sourcemap: true,
     // Target modern browsers
     target: "es2020",
+  },
+  // Vitest configuration
+  // @ts-ignore
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: [path.resolve(__dirname, "src/setupTests.ts")],
+    coverage: {
+      reporter: ["text", "html"],
+      provider: "v8",
+      reportsDirectory: "coverage",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/main.tsx",
+        "src/routes/**",
+        "src/**/interfaces/**",
+        "src/**/contexts/**",
+        "src/**/providers/**",
+        "dist/**",
+      ],
+    },
   },
 });
