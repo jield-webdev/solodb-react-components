@@ -84,6 +84,5 @@
     "vite-plugin-dts": "^4.3.0",
     "vitest": "^2.1.8",
     "yet-another-react-lightbox": "^3.25.0"
-  },
-  "packageManager": "yarn@5.12.0"
+  }
 }
