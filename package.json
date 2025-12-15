@@ -23,6 +23,9 @@
     "dev": "cd example && yarn dev",
     "example:install": "cd example && yarn install"
   },
+  "dependencies": {
+    "goldstein-client-dashboard": "https://github.com/jield-webdev/goldstein-client-dashboard.git"
+  },
   "peerDependencies": {
     "@tanstack/react-query": "~5.90.11",
     "@tanstack/react-table": "^8.21.3",

@@ -1,1 +1,1 @@
-export default function GoldsteinEquipmentDashboard(): import("react/jsx-runtime").JSX.Element;
+export default function GoldsteinEquipmentDashboardWrapper(): import("react/jsx-runtime").JSX.Element;

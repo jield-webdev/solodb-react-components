@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { GoldsteinClientDashboard, useGoldsteinClientDataContext } from "goldstein-client-dashboard";
+import { GoldsteinClientDashboard, GoldsteinDataProvider, useGoldsteinClientDataContext } from "goldstein-client-dashboard";
 
 let SEVER_ENDPOINT = document.getElementById("root")?.dataset.goldsteinEndpoint ?? "";
 
-export default function GoldsteinEquipmentDashboard() {
+function GoldsteinEquipmentDashboard() {
   const { id } = useParams();
   const { setGoldsteinData } = useGoldsteinClientDataContext();
 
@@ -32,4 +32,18 @@ export default function GoldsteinEquipmentDashboard() {
   }, [id, setGoldsteinData]);
 
   return <GoldsteinClientDashboard />;
+}
+
+export default function GoldsteinEquipmentDashboardWrapper() {
+  return (
+    <GoldsteinDataProvider
+      defaultData={{
+        goldsteinFQDN: "",
+        associationType: "",
+        associationID: 0,
+      }}
+    >
+      <GoldsteinEquipmentDashboard />
+    </GoldsteinDataProvider>
+  );
 }
