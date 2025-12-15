@@ -41,7 +41,15 @@ export default defineConfig({
     // Rollup options
     rollupOptions: {
       // Externalize peer dependencies so they're not bundled
-      external: ["react", "react-dom", "react-router-dom", "@tanstack/react-query"],
+      // Note: also externalize the automatic JSX runtime to avoid resolving it during library build
+      external: [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "@tanstack/react-query",
+        "react/jsx-runtime",
+        "react/jsx-dev-runtime",
+      ],
       output: {
         // Provide global variables for UMD build
         globals: {
