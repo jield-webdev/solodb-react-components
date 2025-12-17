@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { Run } from "@/modules/run/interfaces/run";
+import { Run } from "solodb-typescript-core";
 
 interface RunContext {
   run: Run;

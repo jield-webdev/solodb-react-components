@@ -1,5 +1,4 @@
 import { Button, Table } from "react-bootstrap";
-import { Equipment, EquipmentGrade } from "@/modules/equipment/interfaces/equipment";
 import { useParams } from "react-router-dom";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
@@ -10,8 +9,8 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { FilterData } from "@/modules/core/interfaces/filter";
 import EditSortingPropertiesModal from "./editSortingPropertiesModal";
+import { Equipment, EquipmentGrade, FilterData } from "solodb-typescript-core";
 
 enum SetupEquipmentState {
   NOT_IN_SETUP,

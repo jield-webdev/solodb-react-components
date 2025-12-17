@@ -2,9 +2,8 @@ import { formatDateTime } from "@/utils/datetime";
 import React, { useContext } from "react";
 import { EquipmentContext } from "@/modules/equipment/contexts/equipmentContext";
 import { useQueries } from "@tanstack/react-query";
-import ListReservations from "@/modules/equipment/api/module/listReservations";
-import ListModules from "@/modules/equipment/api/module/listModules";
 import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
+import { listModules, listReservations } from "solodb-typescript-core";
 
 export default function EquipmentHeader() {
   const { equipment } = useContext(EquipmentContext);
@@ -13,19 +12,19 @@ export default function EquipmentHeader() {
     queries: [
       {
         queryKey: ["activeReservationQuery", equipment],
-        queryFn: () => ListReservations({ equipment: equipment, which: "active" }),
+        queryFn: () => listReservations({ equipment: equipment, which: "active" }),
       },
       {
         queryKey: ["upcomingReservationQuery", equipment],
         queryFn: () =>
-          ListReservations({
+          listReservations({
             equipment: equipment,
             which: "upcoming",
           }),
       },
       {
         queryKey: ["modules", equipment],
-        queryFn: () => ListModules({ equipment: equipment }),
+        queryFn: () => listModules({ equipment: equipment }),
       },
     ],
   });

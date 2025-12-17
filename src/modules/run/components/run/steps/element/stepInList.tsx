@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
-import { RunStep } from "@/modules/run/interfaces/runStep";
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
 import StepDetails from "@/modules/run/components/run/steps/element/stepDetails";
 import { PartsBadgesResearchRun } from "@/modules/run/components/shared/parts/partsBadgesResearchRun";
-import { Requirement } from "@/modules/run/interfaces/requirement";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { Run, RunTypeEnum } from "@/modules/run/interfaces/run";
 import { PartBadgesProductionRun } from "@/modules/run/components/shared/parts/partsBadgesProductionRun";
-import { EquipmentModule } from "@/modules/equipment/interfaces/equipment/equipmentModule";
+import { Run, RunStep, RunPart, RunStepPart, Requirement, EquipmentModule, RunTypeEnum } from "solodb-typescript-core";
 
 export default function StepInList({
   run,

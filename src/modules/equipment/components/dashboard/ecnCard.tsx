@@ -1,11 +1,9 @@
 import React, { JSX, useState } from "react";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
-import { EquipmentModuleEcnAttachment } from "@/modules/equipment/interfaces/equipment/module/ecn/equipmentModuleEcnAttachment";
-import { EquipmentModuleEcn } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleEcn";
 import { Badge, Button, Card, ListGroup } from "react-bootstrap";
 import { formatDateTime } from "@/utils/datetime";
 import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
 import ReactMarkdown from "react-markdown";
+import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from "solodb-typescript-core";
 
 export default function EcnCard({
   ecn,

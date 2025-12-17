@@ -1,11 +1,8 @@
 import React, { JSX, useState } from "react";
-import { EquipmentModuleIssue } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleIssue";
 import moment from "moment";
-import { EquipmentModule } from "@/modules/equipment/interfaces/equipment/equipmentModule";
-import { EquipmentModuleIssueAttachment } from "@/modules/equipment/interfaces/equipment/module/issue/equipmentModuleIssueAttachment";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
 import ReactMarkdown from "react-markdown";
+import { Equipment, EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from "solodb-typescript-core";
 
 function IssueTableRow({
   issue,

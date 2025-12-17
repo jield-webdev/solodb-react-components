@@ -1,11 +1,7 @@
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
 import React, { useEffect, useState } from "react";
-import { RunStep } from "@/modules/run/interfaces/runStep";
 import { Badge, Button } from "react-bootstrap";
 import axios from "axios";
-import { RunStepPartActionEnum } from "@/modules/run/enum/runStepPartActionEnum";
-import SetRunStepPartAction from "@/modules/run/api/step/part/setRunStepPartAction";
+import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep, setRunStepPartAction as SetRunStepPartAction } from "solodb-typescript-core";
 
 export default function RunPartStepPart({
   runPart,

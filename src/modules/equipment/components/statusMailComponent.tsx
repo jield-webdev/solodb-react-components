@@ -1,21 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { Alert } from "react-bootstrap";
-import ListEquipment from "@/modules/equipment/api/listEquipment";
 import { StatusMailContext } from "@/modules/equipment/contexts/statusMailContext";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
 import StatusMailEquipmentElement from "@/modules/equipment/components/status-mail/statusMailEquipmentElement";
-import ListModules from "@/modules/equipment/api/module/listModules";
-import ListEcn from "@/modules/equipment/api/module/listEcn";
-import ListIssues from "@/modules/equipment/api/module/listIssues";
-import ListLocationMessages from "@/modules/location/api/listLocationMessages";
 import StatusMailMessageElement from "@/modules/equipment/components/status-mail/statusMailMessageElement";
-import ListEcnAttachments from "@/modules/equipment/api/module/ecn/listEcnAttachments";
-import ListIssueAttachments from "@/modules/equipment/api/module/issue/listIssueAttachments";
-import { ClassificationsOptionEnum } from "@/modules/equipment/interfaces/statusMail";
 import IssueTable from "@/modules/equipment/components/partial/issueTable";
-import ListReservations from "@/modules/equipment/api/module/listReservations";
 import SendStatusMailButton from "@/modules/equipment/components/partial/sendStatusMail";
+import { Equipment, listEquipment, listModules, listEcn, listIssues, listLocationMessages, listEcnAttachments, listIssueAttachments, listReservations, ClassificationsOptionEnum } from "solodb-typescript-core";
 
 export default function StatusMailComponent() {
   let { statusMail } = useContext(StatusMailContext);
@@ -28,39 +19,39 @@ export default function StatusMailComponent() {
     queries: [
       {
         queryKey: ["equipment", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => ListEquipment({ statusMail: statusMail }),
+        queryFn: () => listEquipment({ statusMail: statusMail }),
       },
       {
         queryKey: ["module", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => ListModules({ statusMail: statusMail }),
+        queryFn: () => listModules({ statusMail: statusMail }),
       },
       {
         queryKey: ["ecn", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => ListEcn({ statusMail: statusMail }),
+        queryFn: () => listEcn({ statusMail: statusMail }),
       },
       {
         queryKey: ["issue", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => ListIssues({ statusMail: statusMail }),
+        queryFn: () => listIssues({ statusMail: statusMail }),
       },
       {
         queryKey: ["messages", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => ListLocationMessages({ statusMail: statusMail }),
+        queryFn: () => listLocationMessages({ statusMail: statusMail }),
       },
       {
         queryKey: ["ecn", "attachment", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => ListEcnAttachments({ statusMail: statusMail }),
+        queryFn: () => listEcnAttachments({ statusMail: statusMail }),
       },
       {
         queryKey: ["issue", "attachment", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => ListIssueAttachments({ statusMail: statusMail }),
+        queryFn: () => listIssueAttachments({ statusMail: statusMail }),
       },
       {
         queryKey: ["reservation", "active", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => ListReservations({ which: "active" }),
+        queryFn: () => listReservations({ which: "active" }),
       },
       {
         queryKey: ["reservation", "upcoming", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => ListReservations({ which: "upcoming" }),
+        queryFn: () => listReservations({ which: "upcoming" }),
       },
     ],
   });

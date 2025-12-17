@@ -2,17 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import CardRead from "@/modules/admin/components/goldsteinClientDashboard/cardReadedValue";
 import UserAuthenticated from "@/modules/admin/components/goldsteinClientDashboard/userAuthenticated";
 import EquipmentConnected from "@/modules/admin/components/goldsteinClientDashboard/equipmentConnected";
-import {
-  ClientToServerMessage,
-  dataListener,
-  getWebSocket,
-  ReadData,
-  sendWsMessage,
-  UpdateListeningData,
-  WSPackage,
-} from "@/modules/core/api/wsHelper";
-import { ClientStatus, getClientsStatus, Status } from "@/modules/core/api/notifications";
 import { Table } from "react-bootstrap";
+import { ClientStatus, getClientsStatus, Status } from "@/modules/admin/functions/goldstein/notifications";
+import { ClientToServerMessage, dataListener, getWebSocket, ReadData, sendWsMessage, UpdateListeningData, WSPackage } from "@/modules/admin/api/goldstein/wsHelper";
 
 const clientTypes = ["all", "equipment", "not_set"];
 

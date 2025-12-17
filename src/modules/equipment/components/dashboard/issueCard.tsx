@@ -1,11 +1,9 @@
 import React, { JSX, useState } from "react";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
 import { Badge, Button, Card, ListGroup } from "react-bootstrap";
-import { EquipmentModuleIssue } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleIssue";
-import { EquipmentModuleIssueAttachment } from "@/modules/equipment/interfaces/equipment/module/issue/equipmentModuleIssueAttachment";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
 import ReactMarkdown from "react-markdown";
 import { formatDateTime } from "@/utils/datetime";
+import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from "solodb-typescript-core";
 
 export default function IssueCard({
   issue,

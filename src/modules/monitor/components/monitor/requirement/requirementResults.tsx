@@ -2,21 +2,15 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { keepPreviousData, useQueries } from "@tanstack/react-query";
 import { Alert, Badge, Col, Row, Table } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
-import { MonitorRequirement } from "@/modules/monitor/interfaces/monitorRequirement";
-import ListMonitorRequirementResults from "@/modules/monitor/api/measurement/listMonitorRequirementResults";
 import axios from "axios";
 import { formatDateTime } from "@/utils/datetime";
-import { File } from "@/modules/core/interfaces/file";
-import ListMonitorStepFiles from "@/modules/monitor/api/step/listMonitorStepFiles";
 import { GetServerUri } from "@/modules/core/functions/getServerUri";
-import ListMonitorRequirementTargets from "@/modules/monitor/api/requirement/listMonitorRequirementTargets";
 import RequirementChart from "@/modules/monitor/components/monitor/requirement/requirementChart";
 import PaginationLinks from "@/modules/partial/paginationLinks";
 import AddResultModal from "@/modules/monitor/components/monitor/requirement/addResultModal";
 import AddStepParameterValueModal from "@/modules/monitor/components/monitor/requirement/addStepParameterValueModal";
-import ListMonitorRequirementResultMonitorStepParameterValues from "@/modules/monitor/api/measurement/result/listMonitorRequirementResultMonitorStepParameterValues";
-import { MonitorStepParameter } from "@/modules/monitor/interfaces/monitor/step/parameter";
 import EditStepParameterValueModal from "@/modules/monitor/components/monitor/requirement/editStepParameterValueModal";
+import { listMonitorRequirementResultMonitorStepParameterValues, listMonitorRequirementResults, listMonitorRequirementTargets, listMonitorStepFiles, MonitorRequirement, MonitorStepParameter, File } from "solodb-typescript-core";
 
 export default function RequirementResults({ requirement }: { requirement: MonitorRequirement }) {
   const AMOUNT_OF_FILES = 11;
@@ -32,7 +26,7 @@ export default function RequirementResults({ requirement }: { requirement: Monit
       {
         queryKey: ["requirement", "files", requirement.step, AMOUNT_OF_FILES],
         queryFn: () =>
-          ListMonitorStepFiles({
+          listMonitorStepFiles({
             step: requirement.step,
             pageSize: AMOUNT_OF_FILES,
             order: "date-created",
@@ -41,12 +35,12 @@ export default function RequirementResults({ requirement }: { requirement: Monit
       },
       {
         queryKey: ["requirement", "target", requirement],
-        queryFn: () => ListMonitorRequirementTargets({ requirement: requirement }),
+        queryFn: () => listMonitorRequirementTargets({ requirement: requirement }),
       },
       {
         queryKey: ["requirement", "results", requirement, page, pageSize],
         queryFn: () =>
-          ListMonitorRequirementResults({
+          listMonitorRequirementResults({
             requirement: requirement,
             pageSize: pageSize,
             order: "date-created",
@@ -58,7 +52,7 @@ export default function RequirementResults({ requirement }: { requirement: Monit
       {
         queryKey: ["requirement", "monitor_step_parameters", requirement, page, pageSize],
         queryFn: () =>
-          ListMonitorRequirementResultMonitorStepParameterValues({
+          listMonitorRequirementResultMonitorStepParameterValues({
             requirement: requirement,
             pageSize: pageSize,
             order: "date-created",

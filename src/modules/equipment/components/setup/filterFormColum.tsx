@@ -1,4 +1,4 @@
-import { Fieldset, FieldsetElement, FilterData, FilterFormData } from "@/modules/core/interfaces/filter";
+import { Fieldset, FieldsetElement, FilterData, FilterFormData } from "solodb-typescript-core";
 import { populateFilterData } from "../setupUpdateEquipment";
 
 function getValueOptions(element: FieldsetElement): Record<string, string> | undefined {

@@ -1,18 +1,14 @@
-import { Room } from "@/modules/room/interfaces/room";
 import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, Col, Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
 import axios from "axios";
 import LocationSelectFormElement from "@/modules/chemical/form/locationSelectFormElement";
 import ChemicalSelectFormElement from "@/modules/chemical/form/chemicalSelectFormElement";
-import { Location } from "@/modules/room/interfaces/location";
-import GetLocation from "@/modules/room/api/getLocation";
 import { QRCodeSVG } from "qrcode.react";
-import ListChemicalContainerExternalLabels from "@/modules/chemical/api/listChemicalContainerExternalLabels";
-import { ChemicalContainer } from "@/modules/chemical/interfaces/chemical/chemicalContainer";
 import UserFormElement from "@/modules/core/form/element/userFormElement";
 import { AuthContext } from "@/modules/core/contexts/authContext";
 import { useParams } from "react-router-dom";
+import { ChemicalContainer, getLocation, Room, Location, listChemicalContainerExternalLabels } from "solodb-typescript-core";
 
 type Inputs = {
   location: number;
@@ -126,7 +122,7 @@ export default function RegisterBarcodeElement({
       return;
     }
     //We have a location, call the API to find all information about it
-    GetLocation({ id: locationId }).then((location) => {
+    getLocation({ id: locationId }).then((location) => {
       setLocation(location);
     });
   }, [locationId]);
@@ -153,7 +149,7 @@ export default function RegisterBarcodeElement({
           const locationId = extractLabelNumber(scannedCode);
           if (null !== locationId) {
             //We have a location, call the API to find all information about it
-            GetLocation({ id: locationId }).then((location) => {
+            getLocation({ id: locationId }).then((location) => {
               setLocation(location);
             });
 
@@ -181,7 +177,7 @@ export default function RegisterBarcodeElement({
     (values as any).user = values.owner.value;
 
     //First check if we already have a container with this barcode (should not be the case)
-    const existingBarcode = await ListChemicalContainerExternalLabels({
+    const existingBarcode = await listChemicalContainerExternalLabels({
       qrCodeContent: barcode,
     });
 

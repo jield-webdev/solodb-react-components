@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Criterion from "./Criterion";
 import axios from "axios";
-import { ServiceEventReportResult } from "@/modules/service/interfaces/service/event/report/serviceEventReportResult";
+import { ServiceEventReportResult } from "solodb-typescript-core";
 
 // Cache structure: { [category: string]: { values: Record<number, any>, errors: Record<number, string> } }
 type FormCache = Record<

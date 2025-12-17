@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, InputGroup, Modal, Toast, ToastContainer } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { MonitorRequirement } from "@/modules/monitor/interfaces/monitorRequirement";
 import axios from "axios";
-import { MonitorMeasurementResult } from "@/modules/monitor/interfaces/measurement/monitorMeasurementResult";
-import { MonitorStepParameter } from "@/modules/monitor/interfaces/monitor/step/parameter";
-import ListMonitorStepParameters from "@/modules/monitor/api/step/listMonitorStepParameters";
-import ListMonitorRequirementResultMonitorStepParameterValues from "@/modules/monitor/api/measurement/result/listMonitorRequirementResultMonitorStepParameterValues";
-import ListEquipmentModuleParameters from "@/modules/equipment/api/module/listEquipmentModuleParameters";
+import { MonitorRequirement, MonitorMeasurementResult, MonitorStepParameter, listEquipmentModuleParameters, listMonitorRequirementResultMonitorStepParameterValues, listMonitorStepParameters } from "solodb-typescript-core";
 
 interface FormValues {
   id: number;
@@ -47,15 +42,15 @@ const AddStepParameterValueModal = ({
   useEffect(() => {
     async function populate() {
       //We have to know with monitor step parameters are available for this requirement, and which have been already chosen
-      const monitorStepParameterValues = await ListMonitorRequirementResultMonitorStepParameterValues({
+      const monitorStepParameterValues = await listMonitorRequirementResultMonitorStepParameterValues({
         result: result,
       });
 
-      const response = await ListMonitorStepParameters({
+      const response = await listMonitorStepParameters({
         requirement: requirement,
       });
       //Fetch also all the parameters from the equipment, we have to filter on them, and only show these who are selected on the tool
-      const equipmentModuleParameters = await ListEquipmentModuleParameters({
+      const equipmentModuleParameters = await listEquipmentModuleParameters({
         module: requirement.step.process_module.module,
       });
 

@@ -1,15 +1,12 @@
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
 import React, { useContext } from "react";
 import { Card, Col, Row } from "react-bootstrap";
-import { RunStep } from "@/modules/run/interfaces/runStep";
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
 import { RunStepParametersTable } from "@/modules/run/components/shared/parameters/runStepParametersTable";
 import { EmphasizedParametersContext } from "@/modules/run/contexts/emphasizedParametersContext";
 import UploadFilesToStep from "@/modules/run/components/shared/files/uploadFilesToStep";
 import RunPartsResearchRun from "@/modules/run/components/step/view/element/parts/runPartsResearchRun";
 import RunPartsProductionRun from "@/modules/run/components/step/view/element/parts/runPartsProductionRun";
 import { RunContext } from "@/modules/run/contexts/runContext";
-import { RunTypeEnum } from "@/modules/run/interfaces/run";
+import { RunStep, RunStepPart, RunPart, RunTypeEnum } from "solodb-typescript-core";
 
 export default function StepDetails({
   step,

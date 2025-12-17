@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, InputGroup, Modal, Toast, ToastContainer } from "react-bootstrap";
 import { useFieldArray, useForm } from "react-hook-form";
-import { MonitorRequirementTarget } from "@/modules/monitor/interfaces/requirement/monitorRequirementTarget";
-import { MonitorRequirement } from "@/modules/monitor/interfaces/monitorRequirement";
 import axios from "axios";
+import { MonitorRequirement, MonitorRequirementTarget } from "solodb-typescript-core";
 
 interface ResultField {
   id: number;

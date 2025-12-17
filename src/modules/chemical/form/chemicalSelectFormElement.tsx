@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { Button, Form, Row } from "react-bootstrap";
-import ListChemicals from "@/modules/chemical/api/listChemicals";
 import { Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 import axios from "axios";
-import { Chemical } from "@/modules/chemical/interfaces/chemical";
 import CreateChemicalModal from "@/modules/chemical/components/modal/createChemicalModal";
 import { customStyles } from "@/modules/core/form/element/userFormElement";
+import { Chemical, listChemicals } from "solodb-typescript-core";
 
 type Inputs = Omit<Chemical, "id">;
 
@@ -30,7 +29,7 @@ export default function ChemicalSelectFormElement({
 
   const loadOptions = (inputValue: string, callback: any) => {
     try {
-      const response = ListChemicals({ query: inputValue });
+      const response = listChemicals({ query: inputValue });
       response.then((response) => {
         const options = response.items.map((chemical) => ({
           value: chemical.id,

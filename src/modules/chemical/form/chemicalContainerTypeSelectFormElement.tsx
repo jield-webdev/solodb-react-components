@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
-import ListChemicalContainerTypes from "@/modules/chemical/api/listChemicalContainerTypes";
 import { customStyles } from "@/modules/core/form/element/userFormElement";
+import { listChemicalContainerTypes } from "solodb-typescript-core";
 
 export default function ChemicalContainerTypeSelectFormElement({ control, errors }: { control: any; errors: any }) {
   const [optionsCache, setOptionsCache] = useState<Record<string, { value: number; label: string }>>({});
 
   const loadOptions = (inputValue: string, callback: any) => {
     try {
-      const response = ListChemicalContainerTypes({ query: inputValue });
+      const response = listChemicalContainerTypes({ query: inputValue });
       response.then((response) => {
         const options = response.items.map((containerType) => ({
           value: containerType.id,

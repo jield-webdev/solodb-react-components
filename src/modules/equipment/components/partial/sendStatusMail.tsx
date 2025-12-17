@@ -1,7 +1,7 @@
 import { Button } from "react-bootstrap";
-import { StatusMail } from "@/modules/equipment/interfaces/statusMail";
 import axios from "axios";
 import { useState } from "react";
+import { StatusMail } from "solodb-typescript-core";
 
 export default function SendStatusMailButton({ statusMail }: { statusMail: StatusMail }) {
   const [isLoading, setIsLoading] = useState(false);

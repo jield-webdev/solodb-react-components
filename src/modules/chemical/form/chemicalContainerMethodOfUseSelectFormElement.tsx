@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Form, InputGroup } from "react-bootstrap";
 import { Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
-import ListChemicalContainerMethodsOfUse from "@/modules/chemical/api/listChemicalContainerMethodsOfUse";
 import { customStyles } from "@/modules/core/form/element/userFormElement";
+import { listChemicalContainerMethodsOfUse } from "solodb-typescript-core";
 
 export default function ChemicalContainerMethodOfUseSelectFormElement({
   control,
@@ -16,7 +16,7 @@ export default function ChemicalContainerMethodOfUseSelectFormElement({
 
   const loadOptions = (inputValue: string, callback: any) => {
     try {
-      const response = ListChemicalContainerMethodsOfUse({
+      const response = listChemicalContainerMethodsOfUse({
         query: inputValue,
       });
       response.then((response) => {

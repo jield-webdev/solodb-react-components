@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from "react";
 import RoomSelectElement from "@/modules/chemical/form/roomSelectElement";
 import BarcodeScanElement from "@/modules/chemical/components/chemical/barcodeScanElement";
-import { ChemicalContainerExternalLabel } from "@/modules/chemical/interfaces/chemical/container/chemicalContainerExternalLabel";
-import ListChemicalContainerExternalLabels from "@/modules/chemical/api/listChemicalContainerExternalLabels";
 import { Alert, Table } from "react-bootstrap";
 import RegisterBarcodeElement from "@/modules/chemical/components/chemical/registerBarcodeElement";
 import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { QRCodeSVG } from "qrcode.react";
-import { Room } from "@/modules/room/interfaces/room";
-import { Location } from "@/modules/room/interfaces/location";
-import GetLocation from "@/modules/room/api/getLocation";
-import GetRoom from "@/modules/room/api/getRoom";
 import RegisterContainerElement from "@/modules/chemical/components/chemical/registerContainerElement";
-import GetChemicalContainer from "@/modules/chemical/api/getChemicalContainer";
-import { ChemicalContainer } from "@/modules/chemical/interfaces/chemical/chemicalContainer";
+import { ChemicalContainer, ChemicalContainerExternalLabel, getChemicalContainer, getLocation, getRoom, listChemicalContainerExternalLabels, Room } from "solodb-typescript-core";
 
 export default function ChemicalIntakeElement() {
   const { environment } = useParams();
@@ -63,7 +56,7 @@ export default function ChemicalIntakeElement() {
   useEffect(() => {
     const roomId = new URLSearchParams(window.location.search).get("room");
     if (roomId) {
-      GetRoom({ id: parseInt(roomId) }).then((loadedRoom) => {
+      getRoom({ id: parseInt(roomId) }).then((loadedRoom) => {
         setRoom(loadedRoom);
         setHasExternalLabelling(loadedRoom.building.site.has_external_chemical_labelling);
 
@@ -75,7 +68,7 @@ export default function ChemicalIntakeElement() {
   useEffect(() => {
     const locationId = new URLSearchParams(window.location.search).get("location");
     if (locationId) {
-      GetLocation({ id: parseInt(locationId) }).then((location) => {
+      getLocation({ id: parseInt(locationId) }).then((location) => {
         setLocation(location);
         setRoom(location.zone_group.room);
         setHasExternalLabelling(location.zone_group.room.building.site.has_external_chemical_labelling);
@@ -103,7 +96,7 @@ export default function ChemicalIntakeElement() {
 
         // Fetch the container directly
         const containerId = barcodeValue.split("/cc/")[1];
-        GetChemicalContainer({ id: parseInt(containerId) }).then((container) => {
+        getChemicalContainer({ id: parseInt(containerId) }).then((container) => {
           setFoundContainer(container);
         });
       }
@@ -161,7 +154,7 @@ export default function ChemicalIntakeElement() {
   async function findChemicalContainers({ barcode }: { barcode: string }) {
     try {
       // Example API call to fetch chemical container external labels
-      const response = await ListChemicalContainerExternalLabels({
+      const response = await listChemicalContainerExternalLabels({
         qrCodeContent: barcode,
       });
 

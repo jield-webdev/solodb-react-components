@@ -2,20 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
-import { EquipmentModule } from "@/modules/equipment/interfaces/equipment/equipmentModule";
-import ListModules from "@/modules/equipment/api/module/listModules";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
-import {
-  EquipmentModuleIssue,
-  EquipmentModuleIssueStatus,
-  EquipmentModuleIssueType,
-} from "@/modules/equipment/interfaces/equipment/module/equipmentModuleIssue";
-import { EquipmentModuleIssueAttachment } from "@/modules/equipment/interfaces/equipment/module/issue/equipmentModuleIssueAttachment";
 import axios from "axios";
 import UserFormElement from "@/modules/core/form/element/userFormElement";
 import { AuthContext } from "@/modules/core/contexts/authContext";
-import { fileToBase64 } from "@/modules/core/functions/fileToBase64";
-import { IssueAttachmentPostType } from "@/modules/equipment/interfaces/issueAttachmentPost";
+import { Equipment, EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleIssueStatus, EquipmentModuleIssueType, listModules } from "solodb-typescript-core";
 
 interface IssueModalFormProps {
   equipment: Equipment;
@@ -76,7 +66,7 @@ const IssueModalForm: React.FC<IssueModalFormProps> = ({ equipment, showModal, o
         if (!equipment?.id) return;
 
         try {
-          const response = await ListModules({
+          const response = await listModules({
             equipment: equipment,
           });
           setModules(response.items || []);
@@ -141,7 +131,7 @@ const IssueModalForm: React.FC<IssueModalFormProps> = ({ equipment, showModal, o
           await Promise.all(
             filesToUpload.map(async (file) => {
               const base64Content = await fileToBase64(file);
-              const attachement: IssueAttachmentPostType = {
+              const attachement: any = {
                 issue_id: ecnId,
                 filename: file.name,
                 type: file.type,
@@ -205,7 +195,7 @@ const IssueModalForm: React.FC<IssueModalFormProps> = ({ equipment, showModal, o
         if (!equipment?.id) return;
 
         try {
-          const response = await ListModules({
+          const response = await listModules({
             equipment: equipment,
           });
           setModules(response.items || []);

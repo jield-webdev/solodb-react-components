@@ -3,16 +3,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
-import { EquipmentModule } from "@/modules/equipment/interfaces/equipment/equipmentModule";
-import ListModules from "@/modules/equipment/api/module/listModules";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
-import { EquipmentModuleEcn } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleEcn";
-import { EquipmentModuleEcnAttachment } from "@/modules/equipment/interfaces/equipment/module/ecn/equipmentModuleEcnAttachment";
 import axios from "axios";
 import UserFormElement from "@/modules/core/form/element/userFormElement";
 import { AuthContext } from "@/modules/core/contexts/authContext";
-import { fileToBase64 } from "@/modules/core/functions/fileToBase64";
-import { EcnAttachmentPostType } from "@/modules/equipment/interfaces/ecnAttachmentPost";
+import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, listModules } from "solodb-typescript-core";
 
 interface EcnModalFormProps {
   equipment: Equipment;
@@ -65,7 +59,7 @@ const EcnModalForm: React.FC<EcnModalFormProps> = ({ equipment, showModal, onClo
         if (!equipment?.id) return;
 
         try {
-          const response = await ListModules({
+          const response = await listModules({
             equipment: equipment,
           });
           setModules(response.items || []);
@@ -104,7 +98,7 @@ const EcnModalForm: React.FC<EcnModalFormProps> = ({ equipment, showModal, onClo
           await Promise.all(
             filesToUpload.map(async (file) => {
               const base64Content = await fileToBase64(file);
-              const attachement: EcnAttachmentPostType = {
+              const attachement: any = {
                 ecn_id: ecnId,
                 filename: file.name,
                 type: file.type,

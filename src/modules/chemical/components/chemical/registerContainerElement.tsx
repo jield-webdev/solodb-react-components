@@ -1,14 +1,10 @@
-import { Room } from "@/modules/room/interfaces/room";
 import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, Col, Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
 import axios from "axios";
 import LocationSelectFormElement from "@/modules/chemical/form/locationSelectFormElement";
 import ChemicalSelectFormElement from "@/modules/chemical/form/chemicalSelectFormElement";
-import { Location } from "@/modules/room/interfaces/location";
-import GetLocation from "@/modules/room/api/getLocation";
 import { QRCodeSVG } from "qrcode.react";
-import { ChemicalContainer } from "@/modules/chemical/interfaces/chemical/chemicalContainer";
 import ChemicalContainerTypeSelectFormElement from "@/modules/chemical/form/chemicalContainerTypeSelectFormElement";
 import UserFormElement from "@/modules/core/form/element/userFormElement";
 import { AuthContext } from "@/modules/core/contexts/authContext";
@@ -18,6 +14,7 @@ import {
   extractLabelNumber,
   scannedCodeIsLocationCode,
 } from "@/modules/chemical/components/chemical/registerBarcodeElement";
+import { ChemicalContainer, getLocation, Room, Location } from "solodb-typescript-core";
 
 type Inputs = {
   location: number;
@@ -78,7 +75,7 @@ export default function RegisterContainerElement({
       return;
     }
     //We have a location, call the API to find all information about it
-    GetLocation({ id: locationId }).then((location) => {
+    getLocation({ id: locationId }).then((location) => {
       setLocation(location);
     });
   }, [locationId]);
@@ -104,7 +101,7 @@ export default function RegisterContainerElement({
           const locationId = extractLabelNumber(scannedCode);
           if (null !== locationId) {
             //We have a location, call the API to find all information about it
-            GetLocation({ id: locationId }).then((location) => {
+            getLocation({ id: locationId }).then((location) => {
               setLocation(location);
             });
 

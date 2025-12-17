@@ -1,7 +1,7 @@
 import React from "react";
 import Pagination from "react-bootstrap/Pagination";
-import { ApiFormattedResponse } from "@/modules/core/interfaces/response";
 import { Button, Form } from "react-bootstrap";
+import { ApiFormattedResponse } from "solodb-typescript-core";
 
 const PaginationLinks = ({
   data,

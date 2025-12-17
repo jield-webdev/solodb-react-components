@@ -3,11 +3,9 @@ import { Button, Form, Modal } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
 import Select, { StylesConfig } from "react-select";
 import axios from "axios";
-import { LocationMessage } from "@/modules/location/interfaces/locationMessage";
-import { Room } from "@/modules/room/interfaces/room";
-import { MessageType } from "@/modules/location/interfaces/message/messageType";
 import UserFormElement from "@/modules/core/form/element/userFormElement";
 import { StatusMailContext } from "@/modules/equipment/contexts/statusMailContext";
+import { LocationMessage, MessageType, Room } from "solodb-typescript-core";
 
 interface MessageModalFormProps {
   showModal: boolean;

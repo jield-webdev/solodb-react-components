@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { User } from "@/modules/core/interfaces/user";
+import { User } from "solodb-typescript-core";
 
 interface AuthContext {
   user: User | null;

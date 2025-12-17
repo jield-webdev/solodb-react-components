@@ -1,11 +1,9 @@
 import React, { JSX, useState } from "react";
-import { EquipmentModuleEcn } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleEcn";
 import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
 import { Badge, Button } from "react-bootstrap";
-import { EquipmentModuleEcnAttachment } from "@/modules/equipment/interfaces/equipment/module/ecn/equipmentModuleEcnAttachment";
 import moment from "moment";
 import ReactMarkdown from "react-markdown";
+import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from "solodb-typescript-core";
 
 export default function EcnElement({
   ecn,

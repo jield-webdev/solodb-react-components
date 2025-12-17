@@ -3,18 +3,11 @@ import { keepPreviousData, useQueries, useQueryClient } from "@tanstack/react-qu
 import { Table } from "react-bootstrap";
 
 import { RunContext } from "@/modules/run/contexts/runContext";
-import ListRunSteps from "@/modules/run/api/listRunSteps";
-import ListRunParts from "@/modules/run/api/listRunParts";
-import ListRunStepParts from "@/modules/run/api/step/listRunStepParts";
-import { RunStep } from "@/modules/run/interfaces/runStep";
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
 import PaginationLinks from "@/modules/partial/paginationLinks";
 import { EmphasizedParametersContext } from "@/modules/run/contexts/emphasizedParametersContext";
-import ListRequirements from "@/modules/run/api/listRequirements";
-import { Requirement } from "@/modules/run/interfaces/requirement";
 import StepInList from "@/modules/run/components/run/steps/element/stepInList";
 import RequirementStepInList from "@/modules/run/components/run/steps/element/requirementStepInList";
+import { listRunSteps, listRunParts, listRunStepParts, listRequirements, RunStep, RunPart, RunStepPart, Requirement } from "solodb-typescript-core";
 
 export default function RunStepsElement() {
   const { run } = useContext(RunContext);
@@ -30,20 +23,20 @@ export default function RunStepsElement() {
     queries: [
       {
         queryKey: ["runSteps", JSON.stringify(run), page],
-        queryFn: () => ListRunSteps({ run, page, pageSize }),
+        queryFn: () => listRunSteps({ run, page, pageSize }),
         placeholderData: keepPreviousData,
       },
       {
         queryKey: ["runParts", JSON.stringify(run)],
-        queryFn: () => ListRunParts({ run }),
+        queryFn: () => listRunParts({ run }),
       },
       {
         queryKey: ["runStepParts", JSON.stringify(run)],
-        queryFn: () => ListRunStepParts({ run }),
+        queryFn: () => listRunStepParts({ run }),
       },
       {
         queryKey: ["requirements", JSON.stringify(run)],
-        queryFn: () => ListRequirements({ run: run }),
+        queryFn: () => listRequirements({ run: run }),
       },
     ],
   });

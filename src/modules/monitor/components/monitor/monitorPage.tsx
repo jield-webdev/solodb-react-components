@@ -1,9 +1,8 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
-import getMonitor from "@/modules/monitor/api/getMonitor";
-import ListMonitorRequirements from "@/modules/monitor/api/listMonitorRequirements";
 import RequirementResults from "@/modules/monitor/components/monitor/requirement/requirementResults";
+import { getMonitor, listMonitorRequirements } from "solodb-typescript-core";
 
 export default function MonitorPage() {
   let { id } = useParams();
@@ -17,7 +16,7 @@ export default function MonitorPage() {
       },
       {
         queryKey: ["requirements", id],
-        queryFn: () => ListMonitorRequirements({ monitorId: parseInt(id!) }),
+        queryFn: () => listMonitorRequirements({ monitorId: parseInt(id!) }),
       },
     ],
   });

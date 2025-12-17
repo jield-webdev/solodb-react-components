@@ -2,17 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
-import { Requirement } from "@/modules/run/interfaces/requirement";
 import { Badge } from "react-bootstrap";
 import RequirementDetails from "@/modules/run/components/run/steps/element/requirementDetails";
-import ListMeasurementResults from "@/modules/run/api/measurement/listResults";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { MeasurementResultsBadges } from "@/modules/run/components/shared/requirement/measurementResultsBadge";
-import { RunStep } from "@/modules/run/interfaces/runStep";
-import { EquipmentModule } from "@/modules/equipment/interfaces/equipment/equipmentModule";
-import { MeasurementResult } from "@/modules/run/interfaces/measurement/result";
+import { Requirement, RunStep, RunPart, RunStepPart, EquipmentModule, MeasurementResult, listMeasurementResults } from "solodb-typescript-core";
 
 export default function RequirementStepInList({
   requirement,
@@ -46,7 +40,7 @@ export default function RequirementStepInList({
     queries: [
       {
         queryKey: ["requirement", "measurementResults", JSON.stringify(requirement.measurement.id)],
-        queryFn: () => ListMeasurementResults({ measurement: requirement.measurement }),
+        queryFn: () => listMeasurementResults({ measurement: requirement.measurement }),
       },
     ],
   });

@@ -1,24 +1,17 @@
 import React, { JSX, useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import ListRuns from "@/modules/run/api/listRuns";
 import { Alert, Button, Col, Container, Row, Table } from "react-bootstrap";
-import ListEcn from "@/modules/equipment/api/module/listEcn";
-import ListMonitors from "@/modules/monitor/api/listMonitors";
 import MonitorCard from "@/modules/monitor/components/monitor/monitorCard";
 import LogAssistElement from "@/modules/run/components/step/view/element/logAssistElement";
 import { EquipmentContext } from "@/modules/equipment/contexts/equipmentContext";
-import { Run } from "@/modules/run/interfaces/run";
-import ListEcnAttachments from "@/modules/equipment/api/module/ecn/listEcnAttachments";
-import ListModules from "@/modules/equipment/api/module/listModules";
-import ListIssueAttachments from "@/modules/equipment/api/module/issue/listIssueAttachments";
-import ListIssues from "@/modules/equipment/api/module/listIssues";
 import IssueCard from "@/modules/equipment/components/dashboard/issueCard";
 import EcnCard from "@/modules/equipment/components/dashboard/ecnCard";
 import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
 import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
 import ListEquipmentReport from "@/modules/service/components/equipmentReports/ListEquipmentReport";
+import { listEcn, listEcnAttachments, listIssueAttachments, listIssues, listModules, listMonitors, listRuns, Run } from "solodb-typescript-core";
 
 export default function EquipmentDashboard() {
   const { environment } = useParams();
@@ -38,35 +31,35 @@ export default function EquipmentDashboard() {
         {
           queryKey: ["runs", equipment.name, environment],
           queryFn: () =>
-            ListRuns({
+            listRuns({
               firstUnfinishedStepEquipment: equipment,
               environment: environment,
             }),
         },
         {
           queryKey: ["monitors", equipment.name],
-          queryFn: () => ListMonitors({ equipment: equipment }),
+          queryFn: () => listMonitors({ equipment: equipment }),
         },
         {
           queryKey: ["ecn", equipment.name],
-          queryFn: () => ListEcn({ equipment: equipment }),
+          queryFn: () => listEcn({ equipment: equipment }),
         },
 
         {
           queryKey: ["issue", equipment.name],
-          queryFn: () => ListIssues({ equipment: equipment }),
+          queryFn: () => listIssues({ equipment: equipment }),
         },
         {
           queryKey: ["module", equipment.name],
-          queryFn: () => ListModules({ equipment: equipment }),
+          queryFn: () => listModules({ equipment: equipment }),
         },
         {
           queryKey: ["ecn", "attachment", equipment.name],
-          queryFn: () => ListEcnAttachments({ equipment: equipment }),
+          queryFn: () => listEcnAttachments({ equipment: equipment }),
         },
         {
           queryKey: ["issue", "attachment", equipment.name],
-          queryFn: () => ListIssueAttachments({ equipment: equipment }),
+          queryFn: () => listIssueAttachments({ equipment: equipment }),
         },
       ],
     });

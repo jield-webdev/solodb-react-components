@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { Monitor } from "@/modules/monitor/interfaces/monitor";
+import { Monitor } from "solodb-typescript-core";
 
 interface MonitorContext {
   monitor: Monitor;

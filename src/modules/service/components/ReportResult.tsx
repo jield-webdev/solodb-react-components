@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import ListReportResult from "@/modules/service/api/getReportResult";
-import { ServiceEventReportResult } from "@/modules/service/interfaces/service/event/report/serviceEventReportResult";
-import { ServiceEventReport } from "@/modules/service/interfaces/service/event/serviceEventReport";
 import Category from "@/modules/service/components/report/Category";
-import getServiceEventReport from "@/modules/service/api/getServiceEventReport";
+import { getServiceEventReport, listReportResult, ServiceEventReport, ServiceEventReportResult } from "solodb-typescript-core";
 
 export default function ReportResults() {
   const { id } = useParams<{ id: string }>();
@@ -21,7 +18,7 @@ export default function ReportResults() {
     if (!id) return;
 
     // Fetch results
-    ListReportResult({ id: Number(id) }).then((data) => {
+    listReportResult({ id: Number(id) }).then((data) => {
       const grouped = data.reduce(
         (acc: Record<string, ServiceEventReportResult[]>, item) => {
           const categoryObj = item.criterion_version.type.category;

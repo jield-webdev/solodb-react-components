@@ -1,7 +1,7 @@
-import { Fieldset, FieldsetElement, FilterData, FilterFormData } from "@/modules/core/interfaces/filter";
 import { populateFilterData } from "../setupUpdateEquipment";
 import { NavDropdown } from "react-bootstrap";
 import React from "react";
+import { Fieldset, FieldsetElement, FilterData, FilterFormData } from "solodb-typescript-core";
 
 function getValueOptions(element: FieldsetElement): Record<string, string> | undefined {
   return element.value_options ?? element.options?.value_options;
