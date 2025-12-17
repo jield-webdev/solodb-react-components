@@ -1,4 +1,4 @@
-import { RunStepPart } from '../../../../../../interfaces/step/runStepPart';
+import { RunStepPart } from 'solodb-typescript-core';
 declare const RunStepPartComment: ({ runStepPart, setRunStepPart, editable, }: {
     runStepPart: RunStepPart;
     setRunStepPart: (runStepPart: RunStepPart) => void;

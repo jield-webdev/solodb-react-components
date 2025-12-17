@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
+import { Equipment } from "solodb-typescript-core";
 
 interface EquipmentContext {
   equipment: Equipment;

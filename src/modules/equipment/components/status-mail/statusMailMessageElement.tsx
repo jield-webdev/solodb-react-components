@@ -1,8 +1,8 @@
-import { LocationMessage } from "@/modules/location/interfaces/locationMessage";
 import MessageElement from "@/modules/equipment/components/partial/messageElement";
 import MessageModalForm from "@/modules/equipment/components/partial/messageModalForm";
 import { JSX, useState } from "react";
 import { Button } from "react-bootstrap";
+import { LocationMessage } from "solodb-typescript-core";
 
 export default function StatusMailMessageElement({
   messageList,

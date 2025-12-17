@@ -1,9 +1,9 @@
 import React, { JSX, useState } from "react";
-import { LocationMessage } from "@/modules/location/interfaces/locationMessage";
 import MessageModalForm from "@/modules/equipment/components/partial/messageModalForm";
 import { Badge, Button } from "react-bootstrap";
 import moment from "moment";
 import ReactMarkdown from "react-markdown";
+import { LocationMessage } from "solodb-typescript-core";
 
 export default function MessageElement({ message }: { message: LocationMessage }) {
   const [modalElement, setModalElement] = useState<JSX.Element | null>(null);

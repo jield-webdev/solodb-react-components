@@ -1,6 +1,4 @@
-import { RunStepPart } from '../../../../../../interfaces/step/runStepPart';
-import { RunPart } from '../../../../../../interfaces/run/runPart';
-import { RunStep } from '../../../../../../interfaces/runStep';
+import { RunPart, RunStepPart, RunStep } from 'solodb-typescript-core';
 declare const RunStepPartProductionBadge: ({ runPart, runStepParts, runStep, reloadFn, }: {
     runPart: RunPart;
     runStepParts: RunStepPart[];

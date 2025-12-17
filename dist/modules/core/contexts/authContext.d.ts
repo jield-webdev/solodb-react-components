@@ -1,4 +1,4 @@
-import { User } from '../interfaces/user';
+import { User } from 'solodb-typescript-core';
 interface AuthContext {
     user: User | null;
     setUser: (user: User | null) => void;

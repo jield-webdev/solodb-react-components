@@ -1,5 +1,4 @@
-import { Room } from '../../../room/interfaces/room';
-import { Location } from '../../../room/interfaces/location';
+import { Room, Location } from 'solodb-typescript-core';
 export default function RegisterContainerElement({ room, resetForm, location, setLocation, }: {
     room: Room;
     resetForm: () => void;

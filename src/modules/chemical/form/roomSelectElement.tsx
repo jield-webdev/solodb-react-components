@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import ListRooms from "@/modules/room/api/listRooms";
-import { Room } from "@/modules/room/interfaces/room";
 import { useParams } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import { Controller } from "react-hook-form";
+import { listRooms, Room } from "solodb-typescript-core";
 
 interface RoomSelectElementProps {
   control: any;
@@ -18,7 +17,7 @@ export default function RoomSelectElement({ control, name }: RoomSelectElementPr
   useEffect(() => {
     async function fetchRooms() {
       try {
-        const response = await ListRooms({
+        const response = await listRooms({
           environment: environment,
           withLocations: true,
         });

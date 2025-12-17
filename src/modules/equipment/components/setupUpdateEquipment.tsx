@@ -1,21 +1,17 @@
 import { useInfiniteQuery, useQueries, useQueryClient } from "@tanstack/react-query";
-import ListEquipment from "@/modules/equipment/api/listEquipment";
+import { Equipment, Facet, Filter, FilterData, FilterFormData, getFilter, getSetup, listEquipment } from "solodb-typescript-core";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
 import SelectedEquipmentTable from "./setup/selectedEquipmentTable";
-import GetSetup from "@/modules/equipment/api/getSetup";
 import { useParams } from "react-router-dom";
-import { Setup } from "@/modules/equipment/interfaces/setup";
 import axios from "axios";
 import SearchBox from "./setup/searchBox";
-import GetFilter from "@/modules/core/api/getFilter";
 import FilterFormColumn from "./setup/filterFormColum";
-import { Facet, Filter, FilterData, FilterFormData } from "@/modules/core/interfaces/filter";
 import { useInView } from "react-intersection-observer";
 import EquipmentTable from "./setup/equipmentTable";
 import FilterFormBar from "./setup/filterFormBar";
 import { FilterBadges } from "./setup/filterBadges";
 import { GetServerUri } from "@/modules/core/functions/getServerUri";
+import { Setup } from "solodb-typescript-core/dist/equipment/interfaces/setup";
 
 export function populateFilterData(filterFormData: FilterFormData): FilterData {
   let facet: { [fieldsetName: string]: { values: string[] } } = {};
@@ -50,11 +46,11 @@ export default function SetupUpdateEquipment() {
     queries: [
       {
         queryKey: ["setup"],
-        queryFn: () => GetSetup({ id: Number(id) }),
+        queryFn: () => getSetup({ id: Number(id) }),
       },
       {
         queryKey: ["filter", JSON.stringify(filter)],
-        queryFn: () => GetFilter({ service: "equipment", formResult: filter, environment: environment }),
+        queryFn: () => getFilter({ service: "equipment", formResult: filter, environment: environment }),
       },
     ],
   });
@@ -120,7 +116,7 @@ export default function SetupUpdateEquipment() {
   } = useInfiniteQuery({
     queryKey: ["equipment", searchQuery, JSON.stringify(filter), JSON.stringify(equipmentSort)],
     queryFn: async ({ pageParam }) => {
-      const res = await ListEquipment({
+      const res = await listEquipment({
         environment: environment,
         page: pageParam,
         pageSize,

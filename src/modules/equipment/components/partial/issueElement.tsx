@@ -1,14 +1,9 @@
 import React, { JSX, useState } from "react";
-import {
-  EquipmentModuleIssue,
-  EquipmentModuleIssueType,
-} from "@/modules/equipment/interfaces/equipment/module/equipmentModuleIssue";
 import { Badge, Button } from "react-bootstrap";
-import { EquipmentModuleIssueAttachment } from "@/modules/equipment/interfaces/equipment/module/issue/equipmentModuleIssueAttachment";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
 import moment from "moment/moment";
 import ReactMarkdown from "react-markdown";
+import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleIssueType } from "solodb-typescript-core";
 
 export default function IssueElement({
   issue,

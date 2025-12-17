@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
-import { RunStepChecklistItem } from "@/modules/run/interfaces/step/runStepChecklistItem";
+import { RunStepChecklistItem } from "solodb-typescript-core";
 
 const ChecklistModal = ({
   checklistItem,

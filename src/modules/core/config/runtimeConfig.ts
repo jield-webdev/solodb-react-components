@@ -11,5 +11,5 @@ export function initSolodbComponents(partial: Partial<RuntimeConfig>) {
 }
 
 export function getServerUri() {
-  return cfg.serverUri;
+  return cfg.serverUri + "/api";
 }

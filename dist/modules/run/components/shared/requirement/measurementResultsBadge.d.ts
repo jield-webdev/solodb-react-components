@@ -1,8 +1,4 @@
-import { MeasurementResult } from '../../../interfaces/measurement/result';
-import { Requirement } from '../../../interfaces/requirement';
-import { RunPart } from '../../../interfaces/run/runPart';
-import { RunStep } from '../../../interfaces/runStep';
-import { RunStepPart } from '../../../interfaces/step/runStepPart';
+import { Requirement, RunStep, MeasurementResult, RunPart, RunStepPart } from 'solodb-typescript-core';
 export declare const MeasurementResultsBadges: ({ requirement, step, measurementResults, parts, stepParts, }: {
     requirement: Requirement;
     step: RunStep;

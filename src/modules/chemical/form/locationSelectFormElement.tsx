@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, Col, Form, Row } from "react-bootstrap";
 import { QRCodeSVG } from "qrcode.react";
 import { Controller } from "react-hook-form";
-import { Room } from "@/modules/room/interfaces/room";
-import { Location } from "@/modules/room/interfaces/location";
-import ListLocations from "@/modules/room/api/listLocations"; // Import the QR code generator
+import { listLocations, Location, Room } from "solodb-typescript-core";
 
 interface LocationSelectorWithQRProps {
   control: any; // React Hook Form's `control`
@@ -20,7 +18,7 @@ export default function LocationSelectorWithQR({ control, name, room }: Location
   useEffect(() => {
     async function fetchLocations() {
       try {
-        const response = await ListLocations({ room: room, pageSize: 1000 }); // Fetch locations with a page size of 1000
+        const response = await listLocations({ room: room, pageSize: 1000 }); // Fetch locations with a page size of 1000
         setLocations(response.items);
         setLoading(false);
       } catch (e) {

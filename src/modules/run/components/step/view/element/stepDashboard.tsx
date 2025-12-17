@@ -11,29 +11,21 @@ import PriorityBadge from "@/modules/run/components/step/view/element/priorityBa
 import RunStepSimpleList from "@/modules/run/components/step/view/element/runStepSimpleList";
 import RunChangelogButton from "@/modules/run/components/step/view/element/run-changelog/runChangelogButton";
 import StepOverviewButton from "@/modules/run/components/step/view/element/step-overview/stepOverviewButton";
-import { RunTypeEnum } from "@/modules/run/interfaces/run";
 import LogAssistElement from "@/modules/run/components/step/view/element/logAssistElement";
 import { useQueries } from "@tanstack/react-query";
-import getEcnList from "@/modules/equipment/api/module/listEcn";
 import { formatDateTime } from "@/utils/datetime";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
-import GetEquipment from "@/modules/equipment/api/getEquipment";
 import MonitorCard from "@/modules/monitor/components/monitor/monitorCard";
-import ListMonitors from "@/modules/monitor/api/listMonitors";
 import Rework from "@/modules/run/components/step/view/element/rework";
 import { Link, useParams } from "react-router-dom";
 import RunPartsProductionRun from "@/modules/run/components/step/view/element/parts/runPartsProductionRun";
 import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
-import GetEquipmentModule from "@/modules/equipment/api/module/getEquipmentModule";
 import ReactMarkdown from "react-markdown";
 import { RunStepParametersTable } from "@/modules/run/components/shared/parameters/runStepParametersTable";
 import UploadFilesToStep from "@/modules/run/components/shared/files/uploadFilesToStep";
-import ListRequirements from "@/modules/run/api/listRequirements";
-import RequirementElement from "./step-overview/requirementElement";
-import ListRunParts from "@/modules/run/api/listRunParts";
-import ListRunStepParts from "@/modules/run/api/step/listRunStepParts";
 import RequirementValuesWithPartTable from "../../../shared/requirement/requirementValuesWithPartTable";
 import RequirementValuesByStep from "../../../shared/requirement/requirementValuesByStep";
+import { listMonitors, getEquipmentModule, listRequirements, RunTypeEnum, listEcn } from "solodb-typescript-core";
 
 const StepDashboard = () => {
   const { environment } = useParams();
@@ -46,24 +38,24 @@ const StepDashboard = () => {
       {
         queryKey: ["monitors", runStep.process_module.module.equipment],
         queryFn: () =>
-          ListMonitors({
+          listMonitors({
             equipment: runStep.process_module.module.equipment,
           }),
       },
       {
         queryKey: ["ecn", runStep.process_module.module],
-        queryFn: () => getEcnList({ module: runStep.process_module.module }),
+        queryFn: () => listEcn({ module: runStep.process_module.module }),
       },
       {
         queryKey: ["equipmentModule", runStep.process_module.module],
         queryFn: () =>
-          GetEquipmentModule({
+          getEquipmentModule({
             id: runStep.process_module.module.id,
           }),
       },
       {
         queryKey: ["requirement", runStep.id],
-        queryFn: () => ListRequirements({ run: run, step: runStep }),
+        queryFn: () => listRequirements({ run: run, step: runStep }),
       },
     ],
   });

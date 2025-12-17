@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import HoldCodeModal from "@/modules/run/components/step/view/element/hold-code/holdCodeModal";
-import { HoldCode as HoldCodeInterface } from "@/modules/run/interfaces/run/holdCode";
+import { HoldCode as HoldCodeInterface } from "solodb-typescript-core";
 import { Badge } from "react-bootstrap";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
 

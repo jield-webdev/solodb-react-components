@@ -1,9 +1,8 @@
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
-import { RunStepPartActionEnum } from "@/modules/run/enum/runStepPartActionEnum";
 import React, { useState } from "react";
-import SetRunStepPartAction from "@/modules/run/api/step/part/setRunStepPartAction";
 import { Button } from "react-bootstrap";
 import RunStepPartComment from "@/modules/run/components/step/view/element/parts/element/runStepPartComment";
+import { RunStepPart, setRunStepPartAction as SetRunStepPartAction } from "solodb-typescript-core";
+import { RunStepPartActionEnum } from "solodb-typescript-core";
 
 const RunStepPartTableRow = ({
   runStepPart,

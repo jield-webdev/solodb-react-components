@@ -2,7 +2,7 @@ import React from "react";
 import { StatusMailContext } from "@/modules/equipment/contexts/statusMailContext";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import GetStatusMail from "@/modules/equipment/api/getStatusMail";
+import { getStatusMail } from "solodb-typescript-core";
 
 export default function StatusMailProvider({ children }: { children: React.ReactNode }) {
   const { id } = useParams();
@@ -10,7 +10,7 @@ export default function StatusMailProvider({ children }: { children: React.React
   //Use a query to fetch the statusMail
   const statusMailQuery = useQuery({
     queryKey: ["statusMail", id],
-    queryFn: () => GetStatusMail({ id: parseInt(id!) }),
+    queryFn: () => getStatusMail({ id: parseInt(id!) }),
     enabled: !!id,
   });
 

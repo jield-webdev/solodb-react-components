@@ -1,10 +1,9 @@
 import React from "react";
 import { useQueries } from "@tanstack/react-query";
 import { Card } from "react-bootstrap";
-import { Monitor } from "@/modules/monitor/interfaces/monitor";
-import ListMonitorRequirements from "@/modules/monitor/api/listMonitorRequirements";
 import { Link, useParams } from "react-router-dom";
 import { formatDateTime } from "@/utils/datetime";
+import { Monitor, listMonitorRequirements } from "solodb-typescript-core";
 
 export default function MonitorCard({ monitor }: { monitor: Monitor }) {
   const { environment } = useParams();
@@ -13,7 +12,7 @@ export default function MonitorCard({ monitor }: { monitor: Monitor }) {
     queries: [
       {
         queryKey: ["requirement", monitor],
-        queryFn: () => ListMonitorRequirements({ monitorId: monitor.id }),
+        queryFn: () => listMonitorRequirements({ monitorId: monitor.id }),
       },
     ],
   });

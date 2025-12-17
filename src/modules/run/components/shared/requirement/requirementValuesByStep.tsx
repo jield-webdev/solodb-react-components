@@ -1,11 +1,8 @@
-import { MeasurementResult } from "@/modules/run/interfaces/measurement/result";
-import { Requirement } from "@/modules/run/interfaces/requirement";
 import { Button } from "react-bootstrap";
 import { FillValueModal } from "./fillValueModal";
 import { useEffect, useState } from "react";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import ListMeasurementResults from "@/modules/run/api/measurement/listResults";
-import { MeasurementResultValue } from "@/modules/run/interfaces/measurement/result/value";
+import { Requirement, MeasurementResult, MeasurementResultValue, listMeasurementResults } from "solodb-typescript-core";
 
 export default function RequirementValuesByStep({
   requirement,
@@ -29,7 +26,7 @@ export default function RequirementValuesByStep({
     queries: [
       {
         queryKey: ["requirement", "measurementResults", requirement.measurement.id],
-        queryFn: async () => await ListMeasurementResults({ measurement: requirement.measurement }),
+        queryFn: async () => await listMeasurementResults({ measurement: requirement.measurement }),
         enabled: !measurementResults || measurementResults.length === 0,
         retry: 1,
       },

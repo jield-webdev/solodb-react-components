@@ -1,5 +1,5 @@
 import React from "react";
-import listUsers from "@/modules/core/api/listUsers";
+import { listUsers } from "solodb-typescript-core";
 import AsyncSelect from "react-select/async";
 import { Controller } from "react-hook-form";
 import { Form } from "react-bootstrap";

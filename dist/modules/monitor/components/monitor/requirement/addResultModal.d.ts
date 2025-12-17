@@ -1,5 +1,4 @@
-import { MonitorRequirementTarget } from '../../../interfaces/requirement/monitorRequirementTarget';
-import { MonitorRequirement } from '../../../interfaces/monitorRequirement';
+import { MonitorRequirement, MonitorRequirementTarget } from 'solodb-typescript-core';
 declare const AddResultModal: ({ requirement, targets, refetchResults, }: {
     requirement: MonitorRequirement;
     targets: MonitorRequirementTarget[];

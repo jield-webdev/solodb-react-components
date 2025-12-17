@@ -1,5 +1,4 @@
-import { RunStep } from '../../../../../interfaces/runStep';
-import { Run } from '../../../../../interfaces/run';
+import { Run, RunStep } from 'solodb-typescript-core';
 declare const StepDetails: ({ run, runStep, showOnlyEmphasizedParameters, }: {
     run: Run;
     runStep: RunStep;

@@ -1,11 +1,10 @@
 import React, { useContext, useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
-import { Changelog } from "@/modules/run/interfaces/run/changelog";
 import DateFormat from "@/modules/partial/dateFormat";
-import ListRunChangelog from "@/modules/run/api/listRunChangelog";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import PaginationLinks from "@/modules/partial/paginationLinks";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import { listRunChangelog, Changelog } from "solodb-typescript-core";
 
 const RunChangelogModal = ({
   show,
@@ -19,7 +18,7 @@ const RunChangelogModal = ({
 
   const { isPending, isLoading, isError, error, data, isFetching, isPlaceholderData } = useQuery({
     queryKey: ["run_changelog", run, page],
-    queryFn: () => ListRunChangelog({ run: run, page: page }),
+    queryFn: () => listRunChangelog({ run: run, page: page }),
     placeholderData: keepPreviousData,
   });
 

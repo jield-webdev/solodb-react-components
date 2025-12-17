@@ -1,6 +1,4 @@
-import { EquipmentModuleIssue } from '../../interfaces/equipment/module/equipmentModuleIssue';
-import { EquipmentModuleIssueAttachment } from '../../interfaces/equipment/module/issue/equipmentModuleIssueAttachment';
-import { Equipment } from '../../interfaces/equipment';
+import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from 'solodb-typescript-core';
 export default function IssueElement({ issue, equipment, issueAttachments, reloadQueryFn, expanded, }: {
     issue: EquipmentModuleIssue;
     equipment: Equipment;

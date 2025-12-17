@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { configureAxiosHeaders } from "@/modules/core/functions/configureAxiosHeaders";
-import GetMe from "@/modules/core/api/getMe";
-import { User } from "@/modules/core/interfaces/user";
+import { configureAxiosHeaders, getMe, User } from "solodb-typescript-core";
+import { getServerUri } from "@/modules/core/config/runtimeConfig";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -14,7 +13,7 @@ export const useAuth = () => {
     const bearerToken = domContainer?.dataset.jwt ?? "";
 
     // Configure axios headers (if token is empty, it will clear auth header)
-    configureAxiosHeaders(bearerToken);
+    configureAxiosHeaders(bearerToken, getServerUri());
 
     // If there is no token, we cannot fetch the user — stop loading early
     if (!bearerToken) {
@@ -28,7 +27,7 @@ export const useAuth = () => {
     }
     hasFetchedRef.current = true;
 
-    GetMe()
+    getMe()
       .then(setUser)
       .finally(() => setIsLoadingUser(false));
   }, []);

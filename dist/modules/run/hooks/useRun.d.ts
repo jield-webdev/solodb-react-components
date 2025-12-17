@@ -1,4 +1,4 @@
-import { Run } from '../interfaces/run';
+import { Run } from 'solodb-typescript-core';
 export declare const useRun: () => {
     run: Run | null;
     reloadRun: () => void;

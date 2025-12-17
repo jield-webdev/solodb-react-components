@@ -1,10 +1,8 @@
-import { RunStepParameter } from "@/modules/run/interfaces/step/runStepParameter";
 import { Alert, Table } from "react-bootstrap";
 import { RunStepParameterEditButton } from "@/modules/run/components/shared/parameters/runStepParameterEditButton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import ListRunStepParameters from "@/modules/run/api/step/listRunStepParameters";
 import React from "react";
-import { RunStep } from "@/modules/run/interfaces/runStep";
+import { RunStep, listRunStepParameters, RunStepParameter } from "solodb-typescript-core";
 
 export const RunStepParametersTable = ({
   runStep,
@@ -19,7 +17,7 @@ export const RunStepParametersTable = ({
 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["runStepParameters", runStep.id],
-    queryFn: () => ListRunStepParameters({ runStep: runStep }),
+    queryFn: () => listRunStepParameters({ runStep: runStep }),
   });
 
   const queryClient = useQueryClient();

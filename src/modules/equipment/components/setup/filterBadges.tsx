@@ -1,5 +1,5 @@
-import { FilterData, FilterFormData } from "@/modules/core/interfaces/filter";
 import React, { useEffect, useState } from "react";
+import { FilterData, FilterFormData } from "solodb-typescript-core";
 
 function cleanFilterData(data: FilterData): FilterData {
   let cleanedData = { ...data };

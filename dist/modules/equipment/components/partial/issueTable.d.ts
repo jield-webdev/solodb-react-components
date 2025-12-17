@@ -1,6 +1,4 @@
-import { EquipmentModuleIssue } from '../../interfaces/equipment/module/equipmentModuleIssue';
-import { EquipmentModule } from '../../interfaces/equipment/equipmentModule';
-import { EquipmentModuleIssueAttachment } from '../../interfaces/equipment/module/issue/equipmentModuleIssueAttachment';
+import { EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from 'solodb-typescript-core';
 interface IssueTableProps {
     issues: EquipmentModuleIssue[];
     modules: EquipmentModule[];

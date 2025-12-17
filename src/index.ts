@@ -63,8 +63,4 @@ export { useAuth } from "@/modules/core/hooks/useAuth";
 export { initSolodbComponents } from "@/modules/core/config/runtimeConfig";
 
 // Types/Interfaces - Export key interfaces that consumers might need
-export type { User } from "@/modules/core/interfaces/user";
-export type { Equipment } from "@/modules/equipment/interfaces/equipment";
-export type { Monitor } from "@/modules/monitor/interfaces/monitor";
-export type { Run } from "@/modules/run/interfaces/run";
-export type { RunStep } from "@/modules/run/interfaces/runStep";
+export type { User, Equipment, Monitor, Run, RunStep } from "solodb-typescript-core";

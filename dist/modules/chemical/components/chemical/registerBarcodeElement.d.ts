@@ -1,5 +1,4 @@
-import { Room } from '../../../room/interfaces/room';
-import { Location } from '../../../room/interfaces/location';
+import { Room, Location } from 'solodb-typescript-core';
 /**
  * Checks if a string ends with "/l/" followed by an integer
  * @param {string} url - The URL to check

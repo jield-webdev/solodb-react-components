@@ -1,5 +1,5 @@
 import React from "react";
-import { ServiceEventReportResult } from "@/modules/service/interfaces/service/event/report/serviceEventReportResult";
+import { ServiceEventReportResult } from "solodb-typescript-core";
 
 export default function Criterion({
   result,

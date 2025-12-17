@@ -1,6 +1,4 @@
-import { EquipmentModuleEcn } from '../../interfaces/equipment/module/equipmentModuleEcn';
-import { Equipment } from '../../interfaces/equipment';
-import { EquipmentModuleEcnAttachment } from '../../interfaces/equipment/module/ecn/equipmentModuleEcnAttachment';
+import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from 'solodb-typescript-core';
 export default function EcnElement({ ecn, equipment, ecnAttachments, reloadQueryFn, expanded, }: {
     ecn: EquipmentModuleEcn;
     equipment: Equipment;

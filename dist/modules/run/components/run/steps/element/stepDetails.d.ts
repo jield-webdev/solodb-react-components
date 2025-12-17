@@ -1,6 +1,4 @@
-import { RunStepPart } from '../../../../interfaces/step/runStepPart';
-import { RunStep } from '../../../../interfaces/runStep';
-import { RunPart } from '../../../../interfaces/run/runPart';
+import { RunStep, RunStepPart, RunPart } from 'solodb-typescript-core';
 export default function StepDetails({ step, stepParts, parts, refetchFn, }: {
     step: RunStep;
     stepParts: RunStepPart[];

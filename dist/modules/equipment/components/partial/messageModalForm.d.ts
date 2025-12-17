@@ -1,5 +1,5 @@
 import { default as React } from 'react';
-import { LocationMessage } from '../../../location/interfaces/locationMessage';
+import { LocationMessage } from 'solodb-typescript-core';
 interface MessageModalFormProps {
     showModal: boolean;
     onClose: (message: LocationMessage | undefined) => void;

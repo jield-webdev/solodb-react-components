@@ -1,8 +1,4 @@
-import { RunStepPart } from '../../../../interfaces/step/runStepPart';
-import { RunStep } from '../../../../interfaces/runStep';
-import { RunPart } from '../../../../interfaces/run/runPart';
-import { Requirement } from '../../../../interfaces/requirement';
-import { MeasurementResult } from '../../../../interfaces/measurement/result';
+import { Requirement, RunStep, RunStepPart, RunPart, MeasurementResult } from 'solodb-typescript-core';
 export default function RequirementDetails({ requirement, step, stepParts, parts, measurementResults, refetchFn, }: {
     requirement: Requirement;
     step: RunStep;

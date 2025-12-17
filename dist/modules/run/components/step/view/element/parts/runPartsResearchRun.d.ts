@@ -1,6 +1,4 @@
-import { RunStepPart } from '../../../../../interfaces/step/runStepPart';
-import { RunStep } from '../../../../../interfaces/runStep';
-import { Run } from '../../../../../interfaces/run';
+import { Run, RunStep, RunStepPart } from 'solodb-typescript-core';
 declare const RunPartsResearchRun: ({ run, runStep, runStepParts, editable, refetchFn, }: {
     run: Run;
     runStep: RunStep;

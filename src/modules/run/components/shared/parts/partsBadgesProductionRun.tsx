@@ -1,7 +1,5 @@
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
-import { RunStep } from "@/modules/run/interfaces/runStep";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
 import RunPartProductionBadge from "@/modules/run/components/step/view/element/parts/element/runPartProductionBadge";
+import { RunStep, RunPart, RunStepPart } from "solodb-typescript-core";
 
 export const PartBadgesProductionRun = ({
   runStep,

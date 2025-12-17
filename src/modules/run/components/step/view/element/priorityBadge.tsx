@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Priority as PriorityInterface } from "@/modules/run/interfaces/run/priority";
+import { Priority as PriorityInterface } from "solodb-typescript-core";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
 
 const PriorityBadge = () => {

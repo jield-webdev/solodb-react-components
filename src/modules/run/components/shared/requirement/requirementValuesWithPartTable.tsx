@@ -1,17 +1,9 @@
-import { MeasurementResult } from "@/modules/run/interfaces/measurement/result";
-import { Requirement } from "@/modules/run/interfaces/requirement";
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
-import { RunStep } from "@/modules/run/interfaces/runStep";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
 import { Alert, Button, Spinner, Table } from "react-bootstrap";
 import { useContext, useEffect, useState } from "react";
 import { FillValueModal } from "@/modules/run/components/shared/requirement/fillValueModal";
-import ListMeasurementResults from "@/modules/run/api/measurement/listResults";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import ListRunParts from "@/modules/run/api/listRunParts";
-import ListRunStepParts from "@/modules/run/api/step/listRunStepParts";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
-import { MeasurementResultValue } from "@/modules/run/interfaces/measurement/result/value";
+import { listMeasurementResults, listRunParts, listRunStepParts, MeasurementResult, MeasurementResultValue, Requirement, RunPart, RunStep, RunStepPart } from "solodb-typescript-core";
 
 export default function RequirementValuesWithPartTable({
   requirement,
@@ -43,19 +35,19 @@ export default function RequirementValuesWithPartTable({
     queries: [
       {
         queryKey: ["runParts", `${run?.id ?? "unknown"}`],
-        queryFn: async () => await ListRunParts({ run }),
+        queryFn: async () => await listRunParts({ run }),
         enabled: !parts || parts.length === 0,
         retry: 1,
       },
       {
         queryKey: ["runStepParts", `${step?.run_id ?? "unknown"}`, `${step?.id ?? "unknown"}`],
-        queryFn: async () => await ListRunStepParts({ step: requirement.requirement_for_step ?? requirement.step }),
+        queryFn: async () => await listRunStepParts({ step: requirement.requirement_for_step ?? requirement.step }),
         enabled: !stepParts || stepParts.length === 0,
         retry: 1,
       },
       {
         queryKey: ["requirement", "measurementResults", requirement.measurement.id],
-        queryFn: async () => await ListMeasurementResults({ measurement: requirement.measurement }),
+        queryFn: async () => await listMeasurementResults({ measurement: requirement.measurement }),
         enabled: !measurementResults || measurementResults.length === 0,
         retry: 1,
       },

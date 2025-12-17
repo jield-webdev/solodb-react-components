@@ -1,19 +1,13 @@
 import React, { JSX, useEffect, useState } from "react";
-import { Equipment } from "@/modules/equipment/interfaces/equipment";
 import "./equipment.css";
-import { EquipmentModuleIssue } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleIssue";
-import { EquipmentModuleEcn } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleEcn";
 import EcnElement from "@/modules/equipment/components/partial/ecnElement";
 import IssueElement from "@/modules/equipment/components/partial/issueElement";
 import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
 import { ButtonGroup, Card, Col, Dropdown, DropdownButton, Row } from "react-bootstrap";
-import { EquipmentModule } from "@/modules/equipment/interfaces/equipment/equipmentModule";
 import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
-import { EquipmentModuleIssueAttachment } from "@/modules/equipment/interfaces/equipment/module/issue/equipmentModuleIssueAttachment";
-import { EquipmentModuleEcnAttachment } from "@/modules/equipment/interfaces/equipment/module/ecn/equipmentModuleEcnAttachment";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
-import { EquipmentModuleReservation } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleReservation";
 import ReservationElement from "@/modules/equipment/components/partial/reservationElement";
+import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleReservation } from "solodb-typescript-core";
 
 export default function StatusMailEquipmentElement({
   equipment,

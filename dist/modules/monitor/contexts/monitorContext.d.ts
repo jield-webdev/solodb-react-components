@@ -1,4 +1,4 @@
-import { Monitor } from '../interfaces/monitor';
+import { Monitor } from 'solodb-typescript-core';
 interface MonitorContext {
     monitor: Monitor;
     reloadMonitor: () => void;

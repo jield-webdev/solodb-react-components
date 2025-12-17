@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Button, Card, Form, InputGroup } from "react-bootstrap";
 import { TextWithLineBreaks } from "@/utils/text";
-import { Run } from "@/modules/run/interfaces/run";
-import { BatchCard } from "@/modules/run/interfaces/run/batchCard";
 import DateFormat from "@/modules/partial/dateFormat";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import { Run, BatchCard } from "solodb-typescript-core";
 
 type Inputs = {
   content: string;

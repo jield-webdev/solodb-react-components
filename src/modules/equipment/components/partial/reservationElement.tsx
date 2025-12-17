@@ -1,6 +1,6 @@
 import { Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { EquipmentModuleReservation } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleReservation";
 import moment from "moment";
+import { EquipmentModuleReservation } from "solodb-typescript-core";
 
 export default function ReservationElement({
   reservations,

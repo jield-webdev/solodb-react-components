@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { Equipment } from "../../interfaces/equipment";
-import ListModules from "../../api/module/listModules";
 import ModuleStatusElement from "../partial/moduleStatusElement";
+import { Equipment, listModules } from "solodb-typescript-core";
 
 export const EquipmentModuleStatusWrapper = ({ equipment }: { equipment: Equipment }) => {
   const moduleQuery = useQuery({
     queryKey: ["module", equipment.id],
-    queryFn: () => ListModules({ equipment: equipment }),
+    queryFn: () => listModules({ equipment: equipment }),
   });
   if (moduleQuery.isLoading || moduleQuery.isFetching) {
     return (

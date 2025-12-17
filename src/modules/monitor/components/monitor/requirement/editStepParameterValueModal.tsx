@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, InputGroup, Modal, Toast, ToastContainer } from "react-bootstrap";
 import { useFieldArray, useForm } from "react-hook-form";
-import { MonitorRequirementTarget } from "@/modules/monitor/interfaces/requirement/monitorRequirementTarget";
-import { MonitorRequirement } from "@/modules/monitor/interfaces/monitorRequirement";
 import axios from "axios";
-import { MonitorMeasurementResult } from "@/modules/monitor/interfaces/measurement/monitorMeasurementResult";
-import { MonitorStepParameter } from "@/modules/monitor/interfaces/monitor/step/parameter";
-import ListMonitorStepParameters from "@/modules/monitor/api/step/listMonitorStepParameters";
-import { MonitorResultStepParameterValue } from "@/modules/monitor/interfaces/measurement/result/monitorResultStepParameterValue";
+import { MonitorResultStepParameterValue } from "solodb-typescript-core";
 
 interface FormValues {
   value: string;

@@ -1,16 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import { RunStep } from "@/modules/run/interfaces/runStep";
 import { Table } from "react-bootstrap";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import ListRunSteps from "@/modules/run/api/listRunSteps";
 import PaginationLinks from "@/modules/partial/paginationLinks";
 import StepElement from "@/modules/run/components/step/view/element/step-overview/stepElement";
-import ListRunParts from "@/modules/run/api/listRunParts";
-import ListRunStepParts from "@/modules/run/api/step/listRunStepParts";
-import ListRequirements from "@/modules/run/api/listRequirements";
-import { Requirement } from "@/modules/run/interfaces/requirement";
 import RequirementElement from "@/modules/run/components/step/view/element/step-overview/requirementElement";
+import { listRunParts, listRunStepParts, listRunSteps, listRequirements, Requirement, RunStep } from "solodb-typescript-core";
 
 const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: number; hideLabel?: boolean }) => {
   const { runStep, run } = useContext(RunStepContext);
@@ -26,26 +21,26 @@ const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: nu
 
   const runPartsQuery = useQuery({
     queryKey: ["runParts", `${runId}`],
-    queryFn: () => ListRunParts({ run }),
+    queryFn: () => listRunParts({ run }),
     enabled: !!runId,
   });
 
   const runStepPartsQuery = useQuery({
     queryKey: ["runStepParts", `${runId}`],
-    queryFn: () => ListRunStepParts({ run }),
+    queryFn: () => listRunStepParts({ run }),
     enabled: !!runId,
   });
 
   const runStepsQuery = useQuery({
     queryKey: ["runSteps", runId, page, pageSize],
-    queryFn: () => ListRunSteps({ run, page, pageSize }),
+    queryFn: () => listRunSteps({ run, page, pageSize }),
     enabled: !!runId,
     placeholderData: keepPreviousData,
   });
 
   const requirementsQuery = useQuery({
     queryKey: ["requirements", runId],
-    queryFn: () => ListRequirements({ run }),
+    queryFn: () => listRequirements({ run }),
     enabled: !!runId,
     placeholderData: keepPreviousData,
   });

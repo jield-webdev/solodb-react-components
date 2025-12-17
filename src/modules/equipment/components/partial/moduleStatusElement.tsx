@@ -2,10 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form"; // react-hook-form for managing form
 import axios from "axios"; // axios for server calls
 import { Badge, Button, Form, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { EquipmentStatus } from "@/modules/equipment/interfaces/equipmentStatus";
-import ListEquipmentStatus from "@/modules/equipment/api/listEquipmentStatus";
-import { EquipmentModuleStatus } from "@/modules/equipment/interfaces/equipment/module/equipmentModuleStatus";
-import { EquipmentModule } from "@/modules/equipment/interfaces/equipment/equipmentModule";
+import { EquipmentModule, EquipmentModuleStatus, EquipmentStatus, listEquipmentStatus } from "solodb-typescript-core";
 
 type Inputs = {
   status: string;
@@ -49,7 +46,7 @@ export default function ModuleStatusElement({ module, refetchFn = () => {} }: { 
     if (showModal) {
       async function fetchStatusOptions() {
         try {
-          const response = await ListEquipmentStatus();
+          const response = await listEquipmentStatus();
           setStatusOptions(response.items);
         } catch (error) {
           console.error("Failed to fetch status options:", error);

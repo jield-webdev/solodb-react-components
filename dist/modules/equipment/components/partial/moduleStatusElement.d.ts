@@ -1,4 +1,4 @@
-import { EquipmentModule } from '../../interfaces/equipment/equipmentModule';
+import { EquipmentModule } from 'solodb-typescript-core';
 export default function ModuleStatusElement({ module, refetchFn }: {
     module: EquipmentModule;
     refetchFn?: () => void;

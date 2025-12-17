@@ -1,4 +1,4 @@
-import { RunStepChecklistItem } from '../../../../../interfaces/step/runStepChecklistItem';
+import { RunStepChecklistItem } from 'solodb-typescript-core';
 declare const ChecklistItemElement: ({ checklistItem, refetch, }: {
     checklistItem: RunStepChecklistItem;
     refetch: () => void;
