@@ -1,7 +1,4 @@
-import { Requirement } from '../../../interfaces/requirement';
-import { RunPart } from '../../../interfaces/run/runPart';
-import { RunStepPart } from '../../../interfaces/step/runStepPart';
-import { MeasurementResult } from '../../../interfaces/measurement/result';
+import { Requirement, MeasurementResult, RunPart, RunStepPart } from 'solodb-typescript-core';
 export declare const FillValueModal: ({ requirement, result, show, setShow, refetchFn, part, stepPart, }: {
     requirement: Requirement;
     result?: MeasurementResult;

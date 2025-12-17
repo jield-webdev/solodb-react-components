@@ -1,4 +1,4 @@
-import { Chemical } from '../../interfaces/chemical';
+import { Chemical } from 'solodb-typescript-core';
 declare const CreateChemicalModal: ({ show, setShow, onChemicalCreate, }: {
     show: boolean;
     setShow: (set: boolean) => void;

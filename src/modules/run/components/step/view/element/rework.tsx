@@ -1,15 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, Form } from "react-bootstrap";
-import { RunStep } from "@/modules/run/interfaces/runStep";
-import { TemplateStep as TemplateStep } from "@/modules/template/interfaces/templateStep";
 import { useQueries } from "@tanstack/react-query";
-import ListTemplates from "@/modules/template/api/listTemplates";
-import { Template } from "@/modules/template/interfaces/template";
-import ListRunSteps from "@/modules/run/api/listRunSteps";
-import getTemplateSteps from "@/modules/template/api/getTemplateSteps";
-import { Recipe } from "@/modules/process/interfaces/module/recipe";
 import axios from "axios";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import { Template, Recipe, getTemplateSteps, RunStep, TemplateStep, listRunSteps, listTemplates } from "solodb-typescript-core";
 
 const Rework = () => {
   const { runStep, run } = useContext(RunStepContext);
@@ -33,12 +27,12 @@ const Rework = () => {
     queries: [
       {
         queryKey: ["templates", reworkRecipes],
-        queryFn: () => ListTemplates({ reworkRecipes: reworkRecipes }),
+        queryFn: () => listTemplates({ reworkRecipes: reworkRecipes }),
         enabled: showForm && reworkRecipes.length > 0,
       },
       {
         queryKey: ["run_steps", runStep.id],
-        queryFn: () => ListRunSteps({ run: run, page: 1, pageSize: 1000 }),
+        queryFn: () => listRunSteps({ run: run, page: 1, pageSize: 1000 }),
         enabled: showForm,
       },
       {

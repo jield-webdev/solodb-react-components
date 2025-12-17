@@ -1,5 +1,5 @@
-import { FilterData, FilterFormData } from '../../../core/interfaces/filter';
 import { default as React } from 'react';
+import { FilterData, FilterFormData } from 'solodb-typescript-core';
 export declare function FilterBadges({ searchQuery, filter, filterForm, setFilterFn, }: {
     searchQuery: string | undefined;
     filter: FilterData | null;

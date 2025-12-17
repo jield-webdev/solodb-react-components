@@ -1,13 +1,11 @@
-import { File } from "@/modules/core/interfaces/file";
 import { GetServerUri } from "@/modules/core/functions/getServerUri";
 import { Badge, Button, ListGroup, Table } from "react-bootstrap";
 import { formatDateTime } from "@/utils/datetime";
 import React, { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import ListRunStepFiles from "@/modules/run/api/step/listRunStepFiles";
-import { RunStep } from "@/modules/run/interfaces/runStep";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
+import { RunStep, listRunStepFiles, File } from "solodb-typescript-core";
 
 const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';
@@ -25,7 +23,7 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
 
   const { data, isLoading } = useQuery({
     queryKey: ["files", runStep.id],
-    queryFn: () => ListRunStepFiles({ step: runStep }),
+    queryFn: () => listRunStepFiles({ step: runStep }),
   });
 
   const queryClient = useQueryClient();

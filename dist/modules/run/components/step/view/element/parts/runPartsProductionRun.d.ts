@@ -1,7 +1,4 @@
-import { RunPart } from '../../../../../interfaces/run/runPart';
-import { RunStep } from '../../../../../interfaces/runStep';
-import { Run } from '../../../../../interfaces/run';
-import { RunStepPart } from '../../../../../interfaces/step/runStepPart';
+import { Run, RunStep, RunStepPart, RunPart } from 'solodb-typescript-core';
 declare const RunPartsProductionRun: ({ run, runStep, runStepParts, runParts, refetchFn, }: {
     run: Run;
     runStep: RunStep;

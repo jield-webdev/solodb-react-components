@@ -1,5 +1,4 @@
-import { MeasurementResult } from '../../../interfaces/measurement/result';
-import { Requirement } from '../../../interfaces/requirement';
+import { Requirement, MeasurementResult } from 'solodb-typescript-core';
 export default function RequirementValuesByStep({ requirement, measurementResults, refetchFn, editOnly, }: {
     requirement: Requirement;
     measurementResults?: MeasurementResult[];

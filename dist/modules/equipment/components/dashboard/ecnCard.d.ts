@@ -1,6 +1,4 @@
-import { Equipment } from '../../interfaces/equipment';
-import { EquipmentModuleEcnAttachment } from '../../interfaces/equipment/module/ecn/equipmentModuleEcnAttachment';
-import { EquipmentModuleEcn } from '../../interfaces/equipment/module/equipmentModuleEcn';
+import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from 'solodb-typescript-core';
 export default function EcnCard({ ecn, equipment, ecnAttachments, reloadQueryFn, }: {
     ecn: EquipmentModuleEcn;
     equipment: Equipment;

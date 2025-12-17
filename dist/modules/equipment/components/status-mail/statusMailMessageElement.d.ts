@@ -1,4 +1,4 @@
-import { LocationMessage } from '../../../location/interfaces/locationMessage';
+import { LocationMessage } from 'solodb-typescript-core';
 export default function StatusMailMessageElement({ messageList, refetchFn, }: {
     messageList: LocationMessage[];
     refetchFn: () => void;

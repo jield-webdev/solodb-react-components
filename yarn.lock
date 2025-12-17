@@ -5361,10 +5361,10 @@ __metadata:
 
 "solodb-typescript-core@https://github.com/jield-webdev/solodb-typescript-core.git":
   version: 1.0.0
-  resolution: "solodb-typescript-core@https://github.com/jield-webdev/solodb-typescript-core.git#commit=af1b0d9b427e849725c4cb293e62b61e39716f0f"
+  resolution: "solodb-typescript-core@https://github.com/jield-webdev/solodb-typescript-core.git#commit=b9f25e1bc203aaa062c404f114a2a60a800c24db"
   dependencies:
     axios: "npm:^1.13.2"
-  checksum: 10c0/bce66e61fb0e31350a51594d3dcc60b9580a603ab5bb2eccf36b9db27f3618dbbb7c45b35b62aa6a7007bdc2de2b49cfcb30fc4ba54e6cd981d78294ba9bd28f
+  checksum: 10c0/ac00a5ed5c64e78b20111f44d93d3c397eb7a60f0671504c20381b4d2a579dc830caaed63fcd40f86dcfc3b740da6d5604622bd599afecc698fef42814d4bbec
   languageName: node
   linkType: hard
 

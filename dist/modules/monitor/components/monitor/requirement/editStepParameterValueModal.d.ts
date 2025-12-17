@@ -1,4 +1,4 @@
-import { MonitorResultStepParameterValue } from '../../../interfaces/measurement/result/monitorResultStepParameterValue';
+import { MonitorResultStepParameterValue } from 'solodb-typescript-core';
 declare const EditStepParameterValueModal: ({ monitorResultStepParameterValue, refetchMonitorStepParameterValues, }: {
     monitorResultStepParameterValue: MonitorResultStepParameterValue;
     refetchMonitorStepParameterValues: () => void;

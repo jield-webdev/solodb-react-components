@@ -1,13 +1,11 @@
 import React, { useContext, useRef } from "react";
 import { Alert, Button, ListGroup } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { RunStepChecklistItem } from "@/modules/run/interfaces/step/runStepChecklistItem";
 import axios from "axios";
-import { RunStep } from "@/modules/run/interfaces/runStep";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
 import { useQuery } from "@tanstack/react-query";
-import ListRunStepChecklistItems from "@/modules/run/api/step/listRunStepChecklistItems";
 import ChecklistItemElement from "@/modules/run/components/step/view/element/checklist/checklistItemElement";
+import { listRunStepChecklistItems, RunStep, RunStepChecklistItem } from "solodb-typescript-core";
 
 const RunStepChecklist = () => {
   let navigate = useNavigate();
@@ -19,7 +17,7 @@ const RunStepChecklist = () => {
   //Grab the checklist, via a tanstack query
   const { data, error, isLoading, refetch } = useQuery({
     queryKey: ["checklist", runStep.id],
-    queryFn: () => ListRunStepChecklistItems({ runStep: runStep }),
+    queryFn: () => listRunStepChecklistItems({ runStep: runStep }),
   });
 
   if (isLoading) {

@@ -1,4 +1,4 @@
-import { ServiceEventReportResult } from '../../interfaces/service/event/report/serviceEventReportResult';
+import { ServiceEventReportResult } from 'solodb-typescript-core';
 export default function Criterion({ result, value, onChange, error, onSubmit, saving, }: {
     result: ServiceEventReportResult;
     value: any;

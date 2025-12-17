@@ -1,5 +1,4 @@
-import { Run } from '../../../../../interfaces/run';
-import { HoldCode as RunHoldCode } from '../../../../../interfaces/run/holdCode';
+import { Run, HoldCode as RunHoldCode } from 'solodb-typescript-core';
 declare const HoldCodeModal: ({ run, show, setShow, runHoldCode, setRunHoldCode, }: {
     run: Run;
     show: boolean;

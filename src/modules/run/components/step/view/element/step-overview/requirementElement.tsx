@@ -3,13 +3,10 @@ import { Badge } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 import DateFormat from "@/modules/partial/dateFormat";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
-import { Requirement } from "@/modules/run/interfaces/requirement";
-import { useQueries, useQueryClient } from "@tanstack/react-query";
-import ListMeasurementResults from "@/modules/run/api/measurement/listResults";
+import { useQueries } from "@tanstack/react-query";
 import { MeasurementResultsBadges } from "@/modules/run/components/shared/requirement/measurementResultsBadge";
 import RequirementDetails from "@/modules/run/components/step/view/element/step-overview/requirementDetails";
+import { listMeasurementResults, Requirement, RunPart, RunStepPart } from "solodb-typescript-core";
 
 export default function RequirementElement({
   requirement,
@@ -33,7 +30,7 @@ export default function RequirementElement({
     queries: [
       {
         queryKey: ["requirement", "measurementResults", JSON.stringify(requirement.measurement.id)],
-        queryFn: () => ListMeasurementResults({ measurement: requirement.measurement }),
+        queryFn: () => listMeasurementResults({ measurement: requirement.measurement }),
       },
     ],
   });

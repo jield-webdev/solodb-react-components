@@ -1,3 +1,3 @@
-import { FilterData, FilterFormData } from '../../core/interfaces/filter';
+import { FilterData, FilterFormData } from 'solodb-typescript-core';
 export declare function populateFilterData(filterFormData: FilterFormData): FilterData;
 export default function SetupUpdateEquipment(): import("react/jsx-runtime").JSX.Element;

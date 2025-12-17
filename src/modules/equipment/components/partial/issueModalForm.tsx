@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import UserFormElement from "@/modules/core/form/element/userFormElement";
 import { AuthContext } from "@/modules/core/contexts/authContext";
-import { Equipment, EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleIssueStatus, EquipmentModuleIssueType, listModules } from "solodb-typescript-core";
+import { Equipment, EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleIssueStatus, EquipmentModuleIssueType, fileToBase64, listModules } from "solodb-typescript-core";
 
 interface IssueModalFormProps {
   equipment: Equipment;

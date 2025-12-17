@@ -1,5 +1,4 @@
-import { MonitorRequirement } from '../../../interfaces/monitorRequirement';
-import { MonitorMeasurementResult } from '../../../interfaces/measurement/monitorMeasurementResult';
+import { MonitorRequirement, MonitorMeasurementResult } from 'solodb-typescript-core';
 declare const AddStepParameterValueModal: ({ requirement, result, refetchMonitorStepParameterValues, }: {
     requirement: MonitorRequirement;
     result: MonitorMeasurementResult;

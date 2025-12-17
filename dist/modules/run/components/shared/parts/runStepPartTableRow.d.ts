@@ -1,4 +1,4 @@
-import { RunStepPart } from '../../../interfaces/step/runStepPart';
+import { RunStepPart } from 'solodb-typescript-core';
 declare const RunStepPartTableRow: ({ runStepPart, editable, reloadFn, }: {
     runStepPart: RunStepPart;
     editable?: boolean;

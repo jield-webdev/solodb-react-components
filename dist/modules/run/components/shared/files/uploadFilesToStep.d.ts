@@ -1,4 +1,4 @@
-import { RunStep } from '../../../interfaces/runStep';
+import { RunStep } from 'solodb-typescript-core';
 export default function UploadFilesToStep({ runStep, refetchFn }: {
     runStep: RunStep;
     refetchFn?: () => void;

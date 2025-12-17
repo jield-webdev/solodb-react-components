@@ -1,10 +1,7 @@
-import { Requirement } from "@/modules/run/interfaces/requirement";
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
 import axios from "axios";
 import { Alert, Button, Form, Modal, Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
-import { MeasurementResult } from "@/modules/run/interfaces/measurement/result";
+import { Requirement, MeasurementResult, RunPart, RunStepPart } from "solodb-typescript-core";
 
 export const FillValueModal = ({
   requirement,

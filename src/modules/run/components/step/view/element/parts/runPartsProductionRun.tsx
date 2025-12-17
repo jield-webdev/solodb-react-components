@@ -1,13 +1,8 @@
 import React, { useMemo } from "react";
 import { Table } from "react-bootstrap";
 import { useQueries } from "@tanstack/react-query";
-import ListRunParts from "@/modules/run/api/listRunParts";
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
 import RunPartProductionTableRow from "@/modules/run/components/step/view/element/parts/element/runPartProductionTableRow";
-import ListRunStepParts from "@/modules/run/api/step/listRunStepParts";
-import { RunStep } from "@/modules/run/interfaces/runStep";
-import { Run } from "@/modules/run/interfaces/run";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
+import { Run, RunStep, RunStepPart, RunPart, listRunParts, listRunStepParts } from "solodb-typescript-core";
 
 const RunPartsProductionRun = ({
   run,
@@ -26,12 +21,12 @@ const RunPartsProductionRun = ({
     queries: [
       {
         queryKey: ["runParts", run],
-        queryFn: () => ListRunParts({ run: run }),
+        queryFn: () => listRunParts({ run: run }),
         enabled: !runParts, // don't fetch if runParts prop provided
       },
       {
         queryKey: ["runStepParts", runStep],
-        queryFn: () => ListRunStepParts({ step: runStep }),
+        queryFn: () => listRunStepParts({ step: runStep }),
         enabled: !runStepParts, // don't fetch if runStepParts prop provided
       },
     ],

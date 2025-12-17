@@ -1,8 +1,8 @@
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import { RunStepPart } from "solodb-typescript-core";
 
 type Inputs = {
   comment: string | null;

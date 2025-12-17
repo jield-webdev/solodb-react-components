@@ -1,6 +1,4 @@
-import { Equipment } from '../../interfaces/equipment';
-import { EquipmentModuleIssue } from '../../interfaces/equipment/module/equipmentModuleIssue';
-import { EquipmentModuleIssueAttachment } from '../../interfaces/equipment/module/issue/equipmentModuleIssueAttachment';
+import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from 'solodb-typescript-core';
 export default function IssueCard({ issue, equipment, issueAttachments, reloadQueryFn, }: {
     issue: EquipmentModuleIssue;
     equipment: Equipment;

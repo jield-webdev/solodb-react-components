@@ -1,4 +1,4 @@
-import { RunStepChecklistItem } from '../../../../../interfaces/step/runStepChecklistItem';
+import { RunStepChecklistItem } from 'solodb-typescript-core';
 declare const ChecklistModal: ({ checklistItem, show, setModalShow, mutation, }: {
     checklistItem: RunStepChecklistItem;
     show: boolean;

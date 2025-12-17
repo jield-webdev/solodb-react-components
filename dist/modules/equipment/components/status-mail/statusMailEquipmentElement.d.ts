@@ -1,10 +1,4 @@
-import { Equipment } from '../../interfaces/equipment';
-import { EquipmentModuleIssue } from '../../interfaces/equipment/module/equipmentModuleIssue';
-import { EquipmentModuleEcn } from '../../interfaces/equipment/module/equipmentModuleEcn';
-import { EquipmentModule } from '../../interfaces/equipment/equipmentModule';
-import { EquipmentModuleIssueAttachment } from '../../interfaces/equipment/module/issue/equipmentModuleIssueAttachment';
-import { EquipmentModuleEcnAttachment } from '../../interfaces/equipment/module/ecn/equipmentModuleEcnAttachment';
-import { EquipmentModuleReservation } from '../../interfaces/equipment/module/equipmentModuleReservation';
+import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleReservation } from 'solodb-typescript-core';
 export default function StatusMailEquipmentElement({ equipment, modules, issues, issueAttachments, ecnNotes, ecnAttachments, reloadQueryFn, showIssues, reservations, }: {
     equipment: Equipment;
     modules: EquipmentModule[];

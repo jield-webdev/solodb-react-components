@@ -1,6 +1,4 @@
-import { RunPart } from '../../../interfaces/run/runPart';
-import { RunStep } from '../../../interfaces/runStep';
-import { RunStepPart } from '../../../interfaces/step/runStepPart';
+import { RunStep, RunPart, RunStepPart } from 'solodb-typescript-core';
 export declare const PartsBadgesResearchRun: ({ step, parts, stepParts, }: {
     step: RunStep;
     parts: RunPart[];

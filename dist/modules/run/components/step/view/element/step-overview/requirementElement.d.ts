@@ -1,6 +1,4 @@
-import { RunPart } from '../../../../../interfaces/run/runPart';
-import { RunStepPart } from '../../../../../interfaces/step/runStepPart';
-import { Requirement } from '../../../../../interfaces/requirement';
+import { Requirement, RunPart, RunStepPart } from 'solodb-typescript-core';
 export default function RequirementElement({ requirement, runParts, runStepParts, hideLabel, firstInGroup, }: {
     requirement: Requirement;
     runParts: RunPart[];

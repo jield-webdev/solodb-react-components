@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
-import ListRunStepParts from "@/modules/run/api/step/listRunStepParts";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
 import RunStepPartTableRow from "@/modules/run/components/shared/parts/runStepPartTableRow";
-import { RunStep } from "@/modules/run/interfaces/runStep";
-import { Run } from "@/modules/run/interfaces/run";
+import { listRunStepParts, Run, RunStep, RunStepPart } from "solodb-typescript-core";
 
 const RunPartsResearchRun = ({
   run,
@@ -24,7 +21,7 @@ const RunPartsResearchRun = ({
 
   const { isLoading, isError, error, data } = useQuery({
     queryKey: ["stepParts", runStep],
-    queryFn: () => ListRunStepParts({ step: runStep }),
+    queryFn: () => listRunStepParts({ step: runStep }),
     enabled: !runStepParts, // Only run the query if runStepParts is not provided
   });
 

@@ -1,5 +1,4 @@
-import { MonitorRequirementTarget } from '../../../interfaces/requirement/monitorRequirementTarget';
-import { MonitorMeasurementResult } from '../../../interfaces/measurement/monitorMeasurementResult';
+import { MonitorRequirementTarget, MonitorMeasurementResult } from 'solodb-typescript-core';
 export default function RequirementChart({ target, results, }: {
     target: MonitorRequirementTarget;
     results: MonitorMeasurementResult[];

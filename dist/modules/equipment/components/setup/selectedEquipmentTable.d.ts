@@ -1,5 +1,5 @@
-import { Equipment } from '../../interfaces/equipment';
-import { Setup } from '../../interfaces/setup';
+import { Setup } from 'solodb-typescript-core/dist/equipment/interfaces/setup';
+import { Equipment } from 'solodb-typescript-core';
 export default function SelectedEquipmentTable({ setup, equipmentList, removeEquipment, refetchQueries, }: {
     setup: Setup;
     equipmentList: Equipment[];

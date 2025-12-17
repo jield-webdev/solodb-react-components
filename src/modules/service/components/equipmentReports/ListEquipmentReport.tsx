@@ -2,7 +2,7 @@ import { useQueries } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Alert, Table } from "react-bootstrap";
-import { Service } from "solodb-typescript-core";
+import { listServices, Service } from "solodb-typescript-core";
 
 export default function ListEquipmentReport() {
   const { id } = useParams<{ id: string }>();
@@ -12,7 +12,7 @@ export default function ListEquipmentReport() {
     queries: [
       {
         queryKey: ["service", "equipment", id],
-        queryFn: () => listService({ equipmentId: Number(id) }),
+        queryFn: () => listServices({ equipmentId: Number(id) }),
       },
     ],
   });

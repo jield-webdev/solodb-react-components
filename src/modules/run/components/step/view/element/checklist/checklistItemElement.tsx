@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Button, ListGroup } from "react-bootstrap";
-import { RunStepChecklistItem } from "@/modules/run/interfaces/step/runStepChecklistItem";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import DateFormat from "@/modules/partial/dateFormat";
 import ChecklistModal from "@/modules/run/components/step/view/element/checklist/checklistModal";
+import { RunStepChecklistItem } from "solodb-typescript-core";
 
 const ChecklistItemElement = ({
   checklistItem,

@@ -1,12 +1,8 @@
 import React from "react";
-import { RunStep } from "@/modules/run/interfaces/runStep";
-import { MeasurementResult } from "@/modules/run/interfaces/measurement/result";
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
-import { Requirement } from "@/modules/run/interfaces/requirement";
 import RequirementValuesWithPartTable from "@/modules/run/components/shared/requirement/requirementValuesWithPartTable";
 import { Link, useParams } from "react-router-dom";
 import { Table } from "react-bootstrap";
+import { Requirement, RunStep, RunStepPart, RunPart, MeasurementResult } from "solodb-typescript-core";
 
 export default function RequirementDetails({
   requirement,

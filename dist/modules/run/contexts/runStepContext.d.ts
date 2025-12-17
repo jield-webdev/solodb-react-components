@@ -1,6 +1,5 @@
-import { RunStep } from '../interfaces/runStep';
 import { ModalProperties } from '../../core/interfaces/modalProperties';
-import { Run } from '../interfaces/run';
+import { RunStep, Run } from 'solodb-typescript-core';
 interface RunStepContext {
     runStep: RunStep;
     setRunStep: (runStep: RunStep) => void;

@@ -1,14 +1,10 @@
-import { RunStepPart } from "@/modules/run/interfaces/step/runStepPart";
-import { RunStepPartActionEnum } from "@/modules/run/enum/runStepPartActionEnum";
 import React, { useEffect, useState } from "react";
-import SetRunStepPartAction from "@/modules/run/api/step/part/setRunStepPartAction";
 import { Button, Dropdown } from "react-bootstrap";
-import { RunPart } from "@/modules/run/interfaces/run/runPart";
-import { RunStep } from "@/modules/run/interfaces/runStep";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDateTime } from "@/utils/datetime";
 import RunStepPartComment from "@/modules/run/components/step/view/element/parts/element/runStepPartComment";
+import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep, setRunStepPartAction as SetRunStepPartAction } from "solodb-typescript-core";
 
 const RunStepPartProductionTableRow = ({
   runPart,

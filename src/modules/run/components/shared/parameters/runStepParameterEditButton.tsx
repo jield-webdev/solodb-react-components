@@ -1,7 +1,6 @@
-import { StepParameterValue } from "@/modules/run/interfaces/step/parameter/stepParameterValue";
-import { RunStepParameter } from "@/modules/run/interfaces/step/runStepParameter";
 import axios from "axios";
 import { useState } from "react";
+import { RunStepParameter, StepParameterValue } from "solodb-typescript-core";
 
 export const RunStepParameterEditButton = ({ parameter, value, refetchFn }: {parameter: RunStepParameter; value: StepParameterValue; refetchFn: () => void }) => {
   const [showEdit, setShowEdit] = useState<boolean>(false);

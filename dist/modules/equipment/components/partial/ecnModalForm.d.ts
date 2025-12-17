@@ -1,7 +1,5 @@
 import { default as React } from 'react';
-import { Equipment } from '../../interfaces/equipment';
-import { EquipmentModuleEcn } from '../../interfaces/equipment/module/equipmentModuleEcn';
-import { EquipmentModuleEcnAttachment } from '../../interfaces/equipment/module/ecn/equipmentModuleEcnAttachment';
+import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from 'solodb-typescript-core';
 interface EcnModalFormProps {
     equipment: Equipment;
     showModal: boolean;

@@ -1,8 +1,4 @@
-import { RunStep } from '../../../../../interfaces/runStep';
-import { RunPart } from '../../../../../interfaces/run/runPart';
-import { RunStepPart } from '../../../../../interfaces/step/runStepPart';
-import { Requirement } from '../../../../../interfaces/requirement';
-import { Run } from '../../../../../interfaces/run';
+import { Requirement, Run, RunPart, RunStep, RunStepPart } from 'solodb-typescript-core';
 declare const StepElement: ({ run, monitoredBy, runStep, runParts, runStepParts, hideLabel, firstInGroup, }: {
     run: Run;
     monitoredBy: Requirement | undefined;
