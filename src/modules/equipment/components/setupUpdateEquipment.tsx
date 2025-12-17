@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQueries, useQueryClient } from "@tanstack/react-query";
-import ListEquipment from "@/modules/equipment/api/listEquipment";
+import { listEquipment } from "solodb-typescript-core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Equipment } from "@/modules/equipment/interfaces/equipment";
 import SelectedEquipmentTable from "./setup/selectedEquipmentTable";
@@ -120,7 +120,7 @@ export default function SetupUpdateEquipment() {
   } = useInfiniteQuery({
     queryKey: ["equipment", searchQuery, JSON.stringify(filter), JSON.stringify(equipmentSort)],
     queryFn: async ({ pageParam }) => {
-      const res = await ListEquipment({
+      const res = await listEquipment({
         environment: environment,
         page: pageParam,
         pageSize,

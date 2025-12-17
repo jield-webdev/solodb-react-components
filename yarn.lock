@@ -5333,6 +5333,7 @@ __metadata:
     react-markdown: "npm:^10.1.0"
     react-router-dom: "npm:^7.9.6"
     react-select: "npm:^5.10.2"
+    solodb-typescript-core: "https://github.com/jield-webdev/solodb-typescript-core.git"
     typescript: "npm:^5.9.3"
     vite: "npm:^7.2.4"
     vite-plugin-dts: "npm:^4.3.0"
@@ -5341,8 +5342,6 @@ __metadata:
   peerDependencies:
     "@tanstack/react-query": ~5.90.11
     "@tanstack/react-table": ^8.21.3
-    axios: ^1.13.2
-    goldstein-client-dashboard: "*"
     moment: ^2.30.1
     moment-timezone: ^0.6.0
     qrcode.react: ^4.2.0
@@ -5359,6 +5358,15 @@ __metadata:
     yet-another-react-lightbox: ^3.25.0
   languageName: unknown
   linkType: soft
+
+"solodb-typescript-core@https://github.com/jield-webdev/solodb-typescript-core.git":
+  version: 1.0.0
+  resolution: "solodb-typescript-core@https://github.com/jield-webdev/solodb-typescript-core.git#commit=af1b0d9b427e849725c4cb293e62b61e39716f0f"
+  dependencies:
+    axios: "npm:^1.13.2"
+  checksum: 10c0/bce66e61fb0e31350a51594d3dcc60b9580a603ab5bb2eccf36b9db27f3618dbbb7c45b35b62aa6a7007bdc2de2b49cfcb30fc4ba54e6cd981d78294ba9bd28f
+  languageName: node
+  linkType: hard
 
 "source-map-js@npm:^1.2.0, source-map-js@npm:^1.2.1":
   version: 1.2.1
