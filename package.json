@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "axios": "^1.13.2",
-    "goldstein-client-dashboard": "https://github.com/jield-webdev/goldstein-client-dashboard.git",
     "solodb-typescript-core": "https://github.com/jield-webdev/solodb-typescript-core.git"
   },
   "peerDependencies": {
