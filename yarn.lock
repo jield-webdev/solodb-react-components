@@ -1445,10 +1445,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.90.12":
-  version: 5.90.12
-  resolution: "@tanstack/query-core@npm:5.90.12"
-  checksum: 10c0/60d5dd23d7801118d6ef84a3d76e798aaf6eb851ee5227629a1dc798fa01ac9560580553413208fcc8a003fb12a89e83d6dd1f38ebc3bd9b6e8838cfaaa45fef
+"@tanstack/query-core@npm:5.90.16":
+  version: 5.90.16
+  resolution: "@tanstack/query-core@npm:5.90.16"
+  checksum: 10c0/f6a4827feeed2b4118323056bbda8d5099823202d1f29b538204ae2591be4e80f2946f3311eed30fefe866643f431c04b560457f03415d40caf2f353ba1efac0
   languageName: node
   linkType: hard
 
@@ -1472,13 +1472,13 @@ __metadata:
   linkType: hard
 
 "@tanstack/react-query@npm:~5.90.11":
-  version: 5.90.12
-  resolution: "@tanstack/react-query@npm:5.90.12"
+  version: 5.90.16
+  resolution: "@tanstack/react-query@npm:5.90.16"
   dependencies:
-    "@tanstack/query-core": "npm:5.90.12"
+    "@tanstack/query-core": "npm:5.90.16"
   peerDependencies:
     react: ^18 || ^19
-  checksum: 10c0/da01ec2819d301e4be89731e82d3f091fa4f1ab2745be324e5166f9df77e2aaf1c362b0fa61aab226bb01634873f1a00562f7d7f405867fe23bdd47fe4d00fda
+  checksum: 10c0/03bd2aa23187003b45dc3d4b465a68f19806369283487a004acd6dd2ad8ba1fa0ec343da616cb1c43c342609202d0776fee68867246caa5ad6915f090539c168
   languageName: node
   linkType: hard
 
@@ -3309,17 +3309,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"goldstein-client-dashboard@https://github.com/jield-webdev/goldstein-client-dashboard.git":
-  version: 1.0.0
-  resolution: "goldstein-client-dashboard@https://github.com/jield-webdev/goldstein-client-dashboard.git#commit=5cbdd57241e813d7121aa75cebbc3ccf190d1e26"
-  peerDependencies:
-    "@tanstack/react-query": ^5.81.5
-    react: ^19.1.0
-    react-dom: ^19.1.0
-  checksum: 10c0/cc0186ff510f1a1ea17d3e1b7dedcfa66df412242f14ba6eb10a58cc5ca730f776d20707a6e7c3ee8c10652d5d3bab9588788584ae0b8d27751c6f7832abf48d
-  languageName: node
-  linkType: hard
-
 "gopd@npm:^1.2.0":
   version: 1.2.0
   resolution: "gopd@npm:1.2.0"
@@ -4788,6 +4777,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-dom@npm:^19.2.3":
+  version: 19.2.3
+  resolution: "react-dom@npm:19.2.3"
+  dependencies:
+    scheduler: "npm:^0.27.0"
+  peerDependencies:
+    react: ^19.2.3
+  checksum: 10c0/dc43f7ede06f46f3acc16ee83107c925530de9b91d1d0b3824583814746ff4c498ea64fd65cd83aba363205268adff52e2827c582634ae7b15069deaeabc4892
+  languageName: node
+  linkType: hard
+
 "react-dropzone@npm:^14.3.8":
   version: 14.3.8
   resolution: "react-dropzone@npm:14.3.8"
@@ -4877,20 +4877,20 @@ __metadata:
   linkType: hard
 
 "react-router-dom@npm:^7.9.6":
-  version: 7.10.1
-  resolution: "react-router-dom@npm:7.10.1"
+  version: 7.12.0
+  resolution: "react-router-dom@npm:7.12.0"
   dependencies:
-    react-router: "npm:7.10.1"
+    react-router: "npm:7.12.0"
   peerDependencies:
     react: ">=18"
     react-dom: ">=18"
-  checksum: 10c0/e0d0f8176974567321ae6eda319064e4207339b930422cc5efb4e39214e065a698f3c706a9fdb41a4e6e0a1f79c91fe1122a5a960eb30430aaed34a658e336ed
+  checksum: 10c0/48cb6e5d47e9aa91dd3982555bb84512d7048a7d1fc676a182c444d470f00b3cf9bef311c1c0f8fbc711c95cc5b3dde39b26cf8ec7feb3ebaf21a00e4cef6816
   languageName: node
   linkType: hard
 
-"react-router@npm:7.10.1":
-  version: 7.10.1
-  resolution: "react-router@npm:7.10.1"
+"react-router@npm:7.12.0":
+  version: 7.12.0
+  resolution: "react-router@npm:7.12.0"
   dependencies:
     cookie: "npm:^1.0.1"
     set-cookie-parser: "npm:^2.6.0"
@@ -4900,7 +4900,7 @@ __metadata:
   peerDependenciesMeta:
     react-dom:
       optional: true
-  checksum: 10c0/e114a319603ccf0394f616f954ee3f53bec04636a2f13383b1e941b8fa6c1c64b71b60527e3db8e7f971dcfaaeb9a82bd7c2ddd884a718694e589403e6975d52
+  checksum: 10c0/abde366f716cb3961a5a390c278375c0591bace5773e1b4420001f0a913b4dd53d490e7dea866acebcac2c0fa07378aa83702769d449449027406ed517a8ea00
   languageName: node
   linkType: hard
 
@@ -4936,6 +4936,13 @@ __metadata:
     react: ">=16.6.0"
     react-dom: ">=16.6.0"
   checksum: 10c0/2ba754ba748faefa15f87c96dfa700d5525054a0141de8c75763aae6734af0740e77e11261a1e8f4ffc08fd9ab78510122e05c21c2d79066c38bb6861a886c82
+  languageName: node
+  linkType: hard
+
+"react@npm:^19.2.3":
+  version: 19.2.3
+  resolution: "react@npm:19.2.3"
+  checksum: 10c0/094220b3ba3a76c1b668f972ace1dd15509b157aead1b40391d1c8e657e720c201d9719537375eff08f5e0514748c0319063392a6f000e31303aafc4471f1436
   languageName: node
   linkType: hard
 
@@ -5206,6 +5213,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"scheduler@npm:^0.27.0":
+  version: 0.27.0
+  resolution: "scheduler@npm:0.27.0"
+  checksum: 10c0/4f03048cb05a3c8fddc45813052251eca00688f413a3cee236d984a161da28db28ba71bd11e7a3dd02f7af84ab28d39fb311431d3b3772fed557945beb00c452
+  languageName: node
+  linkType: hard
+
 "semver@npm:^6.3.1":
   version: 6.3.1
   resolution: "semver@npm:6.3.1"
@@ -5318,14 +5332,15 @@ __metadata:
     "@vitejs/plugin-react": "npm:^5.1.1"
     "@vitest/coverage-v8": "npm:^2.1.8"
     axios: "npm:^1.13.2"
-    goldstein-client-dashboard: "https://github.com/jield-webdev/goldstein-client-dashboard.git"
     jsdom: "npm:^26.0.0"
     moment: "npm:^2.30.1"
     moment-timezone: "npm:^0.6.0"
     prettier: "npm:^3.7.3"
     prop-types: "npm:^15.8.1"
     qrcode.react: "npm:^4.2.0"
+    react: "npm:^19.2.3"
     react-bootstrap: "npm:^2.10.10"
+    react-dom: "npm:^19.2.3"
     react-dropzone: "npm:^14.3.8"
     react-google-charts: "npm:^5.2.1"
     react-hook-form: "npm:^7.67.0"
@@ -5340,22 +5355,11 @@ __metadata:
     vitest: "npm:^2.1.8"
     yet-another-react-lightbox: "npm:^3.25.0"
   peerDependencies:
-    "@tanstack/react-query": ~5.90.11
-    "@tanstack/react-table": ^8.21.3
-    moment: ^2.30.1
-    moment-timezone: ^0.6.0
-    qrcode.react: ^4.2.0
-    react: ^18 || ^19
-    react-bootstrap: ^2.10.10
-    react-dom: ^18 || ^19
-    react-dropzone: ^14.3.8
-    react-google-charts: ^5.2.1
-    react-hook-form: ^7.67.0
-    react-intersection-observer: ^10.0.0
-    react-markdown: ^10.1.0
-    react-router-dom: ^7.9.6
-    react-select: ^5.10.2
-    yet-another-react-lightbox: ^3.25.0
+    "@tanstack/react-query": ^5.90
+    "@tanstack/react-table": ^8.21
+    react: ^19
+    react-dom: ^19
+    react-router-dom: ^7.9
   languageName: unknown
   linkType: soft
 
