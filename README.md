@@ -10,33 +10,13 @@ Reusable React components, providers, and hooks for building SoloDB-powered appl
 - TypeScript types exported for key domain entities
 - Example app included for local development and integration testing
 
-## Installation
-
-```bash
-yarn add solodb-react-components
-# or
-npm install solodb-react-components
-```
-
 ### Peer dependencies
 
 This library relies on the following peer dependencies in your app:
 
-- react (18 or 19) and react-dom (18 or 19)
+- react (19) and react-dom (19)
 - @tanstack/react-query ~5.90
 - @tanstack/react-table ^8
-- axios ^1.13
-- moment ^2.30 and moment-timezone ^0.6
-- react-router-dom ^7
-- react-bootstrap ^2
-- react-hook-form ^7
-- qrcode.react ^4
-- react-google-charts ^5
-- react-intersection-observer ^10
-- react-markdown ^10
-- react-dropzone ^14
-- react-select ^5
-- yet-another-react-lightbox ^3
 
 Ensure these are installed in your application. Refer to `package.json` for the full list and exact versions.
 
@@ -59,7 +39,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider, EquipmentProvider } from "solodb-react-components";
+import { AuthProvider, EquipmentProvider } from "@jield/solodb-react-components";
 
 const qc = new QueryClient();
 
