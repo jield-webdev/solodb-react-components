@@ -838,6 +838,55 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jield/solodb-react-components@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@jield/solodb-react-components@workspace:."
+  dependencies:
+    "@originjs/vite-plugin-commonjs": "npm:^1.0.3"
+    "@tanstack/react-query": "npm:~5.90.11"
+    "@tanstack/react-query-devtools": "npm:~5.91.1"
+    "@tanstack/react-table": "npm:^8.21.3"
+    "@testing-library/jest-dom": "npm:^6.6.3"
+    "@testing-library/react": "npm:^16.2.0"
+    "@testing-library/user-event": "npm:^14.6.1"
+    "@types/node": "npm:^22"
+    "@types/react": "npm:^19.2.7"
+    "@types/react-dom": "npm:^19.2.3"
+    "@types/react-router-dom": "npm:^5.3.3"
+    "@vitejs/plugin-react": "npm:^5.1.1"
+    "@vitest/coverage-v8": "npm:^2.1.8"
+    axios: "npm:^1.13.2"
+    jsdom: "npm:^26.0.0"
+    moment: "npm:^2.30.1"
+    moment-timezone: "npm:^0.6.0"
+    prettier: "npm:^3.7.3"
+    prop-types: "npm:^15.8.1"
+    qrcode.react: "npm:^4.2.0"
+    react: "npm:^19.2.3"
+    react-bootstrap: "npm:^2.10.10"
+    react-dom: "npm:^19.2.3"
+    react-dropzone: "npm:^14.3.8"
+    react-google-charts: "npm:^5.2.1"
+    react-hook-form: "npm:^7.67.0"
+    react-intersection-observer: "npm:^10.0.0"
+    react-markdown: "npm:^10.1.0"
+    react-router-dom: "npm:^7.9.6"
+    react-select: "npm:^5.10.2"
+    solodb-typescript-core: "https://github.com/jield-webdev/solodb-typescript-core.git"
+    typescript: "npm:^5.9.3"
+    vite: "npm:^7.2.4"
+    vite-plugin-dts: "npm:^4.3.0"
+    vitest: "npm:^2.1.8"
+    yet-another-react-lightbox: "npm:^3.25.0"
+  peerDependencies:
+    "@tanstack/react-query": ^5.90
+    "@tanstack/react-table": ^8.21
+    react: ^19
+    react-dom: ^19
+    react-router-dom: ^7.9
+  languageName: unknown
+  linkType: soft
+
 "@jridgewell/gen-mapping@npm:^0.3.12, @jridgewell/gen-mapping@npm:^0.3.5":
   version: 0.3.13
   resolution: "@jridgewell/gen-mapping@npm:0.3.13"
@@ -5313,55 +5362,6 @@ __metadata:
   checksum: 10c0/2805a43a1c4bcf9ebf6e018268d87b32b32b06fbbc1f9282573583acc155860dc361500f89c73bfbb157caa1b4ac78059eac0ef15d1811eb0ca75e0bdadbc9d2
   languageName: node
   linkType: hard
-
-"solodb-react-components@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "solodb-react-components@workspace:."
-  dependencies:
-    "@originjs/vite-plugin-commonjs": "npm:^1.0.3"
-    "@tanstack/react-query": "npm:~5.90.11"
-    "@tanstack/react-query-devtools": "npm:~5.91.1"
-    "@tanstack/react-table": "npm:^8.21.3"
-    "@testing-library/jest-dom": "npm:^6.6.3"
-    "@testing-library/react": "npm:^16.2.0"
-    "@testing-library/user-event": "npm:^14.6.1"
-    "@types/node": "npm:^22"
-    "@types/react": "npm:^19.2.7"
-    "@types/react-dom": "npm:^19.2.3"
-    "@types/react-router-dom": "npm:^5.3.3"
-    "@vitejs/plugin-react": "npm:^5.1.1"
-    "@vitest/coverage-v8": "npm:^2.1.8"
-    axios: "npm:^1.13.2"
-    jsdom: "npm:^26.0.0"
-    moment: "npm:^2.30.1"
-    moment-timezone: "npm:^0.6.0"
-    prettier: "npm:^3.7.3"
-    prop-types: "npm:^15.8.1"
-    qrcode.react: "npm:^4.2.0"
-    react: "npm:^19.2.3"
-    react-bootstrap: "npm:^2.10.10"
-    react-dom: "npm:^19.2.3"
-    react-dropzone: "npm:^14.3.8"
-    react-google-charts: "npm:^5.2.1"
-    react-hook-form: "npm:^7.67.0"
-    react-intersection-observer: "npm:^10.0.0"
-    react-markdown: "npm:^10.1.0"
-    react-router-dom: "npm:^7.9.6"
-    react-select: "npm:^5.10.2"
-    solodb-typescript-core: "https://github.com/jield-webdev/solodb-typescript-core.git"
-    typescript: "npm:^5.9.3"
-    vite: "npm:^7.2.4"
-    vite-plugin-dts: "npm:^4.3.0"
-    vitest: "npm:^2.1.8"
-    yet-another-react-lightbox: "npm:^3.25.0"
-  peerDependencies:
-    "@tanstack/react-query": ^5.90
-    "@tanstack/react-table": ^8.21
-    react: ^19
-    react-dom: ^19
-    react-router-dom: ^7.9
-  languageName: unknown
-  linkType: soft
 
 "solodb-typescript-core@https://github.com/jield-webdev/solodb-typescript-core.git":
   version: 1.0.0
