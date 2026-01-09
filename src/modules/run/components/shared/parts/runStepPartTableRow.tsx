@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import RunStepPartComment from "@/modules/run/components/step/view/element/parts/element/runStepPartComment";
 import { RunStepPart, setRunStepPartAction as SetRunStepPartAction } from "solodb-typescript-core";
@@ -8,13 +8,21 @@ const RunStepPartTableRow = ({
   runStepPart,
   editable = true,
   reloadFn,
+  partIsSelected,
+  setPartAsSelected,
 }: {
   runStepPart: RunStepPart;
   editable?: boolean;
   reloadFn?: () => void;
+  partIsSelected?: boolean;
+  setPartAsSelected?: (partID: number) => void;
 }) => {
   //Create a state for the runStepPart (and avoid name conflicts with the prop)
   const [runStepPartState, setRunStepPart] = useState<RunStepPart>(runStepPart);
+
+  useEffect(() => {
+    setRunStepPart(runStepPart);
+  }, [runStepPart]);
 
   const isProcessed = runStepPartState.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
   const isFailed = runStepPartState.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING;
@@ -66,7 +74,17 @@ const RunStepPartTableRow = ({
         {runStepPartState.part.short_label}
         {runStepPartState.part.label && runStepPartState.part.label.trim().length > 0
           ? ` (${runStepPartState.part.label})`
-          : ""}
+          : ""}{" "}
+        {setPartAsSelected && partIsSelected !== undefined && (
+          <input
+            type="checkbox"
+            name="tomato"
+            checked={partIsSelected}
+            onChange={() => {
+              setPartAsSelected(runStepPartState.id);
+            }}
+          />
+        )}
       </td>
       <td className={"text-center"}>{runStepPartState.latest_action?.type.name}</td>
       {editable && (

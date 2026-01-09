@@ -11,11 +11,15 @@ const RunStepPartProductionTableRow = ({
   runStepParts,
   runStep,
   refetchFn = () => {},
+  partIsSelected,
+  setPartAsSelected,
 }: {
   runPart: RunPart;
   runStepParts: RunStepPart[];
   runStep: RunStep;
   refetchFn?: () => void;
+  partIsSelected?: boolean;
+  setPartAsSelected?: (partID: number) => void;
 }) => {
   const [runStepPart, setRunStepPart] = useState<RunStepPart | undefined>(undefined);
   const queryClient = useQueryClient();
@@ -97,10 +101,20 @@ const RunStepPartProductionTableRow = ({
       <td>
         Part {runStepPart.part.short_label}
         {runStepPart.part.label && runStepPart.part.label.trim().length > 0 ? ` (${runStepPart.part.label})` : ""}
+        {setPartAsSelected && partIsSelected !== undefined && (
+          <input
+            type="checkbox"
+            name="tomato"
+            checked={partIsSelected}
+            onChange={() => {
+              setPartAsSelected(runStepPart.id);
+            }}
+          />
+        )}
       </td>
       <td>{runStepPart.latest_action?.type.name}</td>
       <td>
-        {formatDateTime(runStepPart.latest_action?.date_created, "DD-MM-YY HH:mm")}
+        <>{formatDateTime(runStepPart.latest_action?.date_created, "DD-MM-YY HH:mm")}</>
       </td>
       <td>
         <Dropdown align="end">
