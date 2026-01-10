@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, Col, Form, Row } from "react-bootstrap";
 import { QRCodeSVG } from "qrcode.react";
 import { Controller } from "react-hook-form";
-import { listLocations, Location, Room } from "solodb-typescript-core";
+import { listLocations, Location, Room } from "@jield/solodb-typescript-core";
 
 interface LocationSelectorWithQRProps {
   control: any; // React Hook Form's `control`

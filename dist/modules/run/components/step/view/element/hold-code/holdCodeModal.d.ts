@@ -1,4 +1,4 @@
-import { Run, HoldCode as RunHoldCode } from 'solodb-typescript-core';
+import { Run, HoldCode as RunHoldCode } from '@jield/solodb-typescript-core';
 declare const HoldCodeModal: ({ run, show, setShow, runHoldCode, setRunHoldCode, }: {
     run: Run;
     show: boolean;

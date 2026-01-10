@@ -6,7 +6,7 @@ import { RunStepContext } from "@/modules/run/contexts/runStepContext";
 import { useQueries } from "@tanstack/react-query";
 import { MeasurementResultsBadges } from "@/modules/run/components/shared/requirement/measurementResultsBadge";
 import RequirementDetails from "@/modules/run/components/step/view/element/step-overview/requirementDetails";
-import { listMeasurementResults, Requirement, RunPart, RunStepPart } from "solodb-typescript-core";
+import { listMeasurementResults, Requirement, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 
 export default function RequirementElement({
   requirement,

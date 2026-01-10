@@ -1,4 +1,4 @@
-import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleReservation } from 'solodb-typescript-core';
+import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleReservation } from '@jield/solodb-typescript-core';
 export default function StatusMailEquipmentElement({ equipment, modules, issues, issueAttachments, ecnNotes, ecnAttachments, reloadQueryFn, showIssues, reservations, }: {
     equipment: Equipment;
     modules: EquipmentModule[];

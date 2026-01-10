@@ -1,4 +1,4 @@
-import { ServiceEventReportResult } from 'solodb-typescript-core';
+import { ServiceEventReportResult } from '@jield/solodb-typescript-core';
 export default function Category({ categoryId, label, results, }: {
     categoryId: string | number;
     label: string;

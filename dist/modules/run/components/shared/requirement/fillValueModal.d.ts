@@ -1,4 +1,4 @@
-import { Requirement, MeasurementResult, RunPart, RunStepPart } from 'solodb-typescript-core';
+import { Requirement, MeasurementResult, RunPart, RunStepPart } from '@jield/solodb-typescript-core';
 export declare const FillValueModal: ({ requirement, result, show, setShow, refetchFn, part, stepPart, }: {
     requirement: Requirement;
     result?: MeasurementResult;

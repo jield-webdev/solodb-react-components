@@ -4,7 +4,7 @@ import { TextWithLineBreaks } from "@/utils/text";
 import DateFormat from "@/modules/partial/dateFormat";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { Run, BatchCard } from "solodb-typescript-core";
+import { Run, BatchCard } from "@jield/solodb-typescript-core";
 
 type Inputs = {
   content: string;

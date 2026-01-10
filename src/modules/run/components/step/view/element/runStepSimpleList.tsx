@@ -5,7 +5,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import PaginationLinks from "@/modules/partial/paginationLinks";
 import StepElement from "@/modules/run/components/step/view/element/step-overview/stepElement";
 import RequirementElement from "@/modules/run/components/step/view/element/step-overview/requirementElement";
-import { listRunParts, listRunStepParts, listRunSteps, listRequirements, Requirement, RunStep } from "solodb-typescript-core";
+import { listRunParts, listRunStepParts, listRunSteps, listRequirements, Requirement, RunStep } from "@jield/solodb-typescript-core";
 
 const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: number; hideLabel?: boolean }) => {
   const { runStep, run } = useContext(RunStepContext);

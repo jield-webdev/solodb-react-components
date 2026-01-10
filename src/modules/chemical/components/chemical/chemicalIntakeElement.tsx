@@ -7,7 +7,16 @@ import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { QRCodeSVG } from "qrcode.react";
 import RegisterContainerElement from "@/modules/chemical/components/chemical/registerContainerElement";
-import { Location, ChemicalContainer, ChemicalContainerExternalLabel, getChemicalContainer, getLocation, getRoom, listChemicalContainerExternalLabels, Room } from "solodb-typescript-core";
+import {
+  Location,
+  ChemicalContainer,
+  ChemicalContainerExternalLabel,
+  getChemicalContainer,
+  getLocation,
+  getRoom,
+  listChemicalContainerExternalLabels,
+  Room,
+} from "@jield/solodb-typescript-core";
 
 export default function ChemicalIntakeElement() {
   const { environment } = useParams();

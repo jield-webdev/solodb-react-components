@@ -1,4 +1,4 @@
-import { Requirement, Run, RunPart, RunStep, RunStepPart } from 'solodb-typescript-core';
+import { Requirement, Run, RunPart, RunStep, RunStepPart } from '@jield/solodb-typescript-core';
 declare const StepElement: ({ run, monitoredBy, runStep, runParts, runStepParts, hideLabel, firstInGroup, }: {
     run: Run;
     monitoredBy: Requirement | undefined;

@@ -7,7 +7,7 @@ import PaginationLinks from "@/modules/partial/paginationLinks";
 import { EmphasizedParametersContext } from "@/modules/run/contexts/emphasizedParametersContext";
 import StepInList from "@/modules/run/components/run/steps/element/stepInList";
 import RequirementStepInList from "@/modules/run/components/run/steps/element/requirementStepInList";
-import { listRunSteps, listRunParts, listRunStepParts, listRequirements, RunStep, RunPart, RunStepPart, Requirement } from "solodb-typescript-core";
+import { listRunSteps, listRunParts, listRunStepParts, listRequirements, RunStep, RunPart, RunStepPart, Requirement } from "@jield/solodb-typescript-core";
 
 export default function RunStepsElement() {
   const { run } = useContext(RunContext);

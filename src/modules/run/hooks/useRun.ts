@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Run, getRun } from "solodb-typescript-core";
+import { Run, getRun } from "@jield/solodb-typescript-core";
 
 export const useRun = () => {
   const [run, setRun] = useState<Run | null>(null);

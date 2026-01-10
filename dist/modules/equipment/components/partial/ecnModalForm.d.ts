@@ -1,5 +1,5 @@
 import { default as React } from 'react';
-import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from 'solodb-typescript-core';
+import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from '@jield/solodb-typescript-core';
 interface EcnModalFormProps {
     equipment: Equipment;
     showModal: boolean;

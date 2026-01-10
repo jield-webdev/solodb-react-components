@@ -4,7 +4,7 @@ import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import DateFormat from "@/modules/partial/dateFormat";
 import ChecklistModal from "@/modules/run/components/step/view/element/checklist/checklistModal";
-import { RunStepChecklistItem } from "solodb-typescript-core";
+import { RunStepChecklistItem } from "@jield/solodb-typescript-core";
 
 const ChecklistItemElement = ({
   checklistItem,

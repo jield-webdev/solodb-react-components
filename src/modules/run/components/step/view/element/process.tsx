@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import { RunStep } from "solodb-typescript-core";
+import { RunStep } from "@jield/solodb-typescript-core";
 
 const Process = ({ runStep }: { runStep: RunStep }) => {
   const { environment } = useParams();

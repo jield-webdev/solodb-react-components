@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Equipment, getEquipment } from "solodb-typescript-core";
+import { Equipment, getEquipment } from "@jield/solodb-typescript-core";
 
 export const useEquipment = () => {
   const [equipment, setEquipment] = useState<Equipment | null>(null);

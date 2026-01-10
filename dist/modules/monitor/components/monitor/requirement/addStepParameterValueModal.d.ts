@@ -1,4 +1,4 @@
-import { MonitorRequirement, MonitorMeasurementResult } from 'solodb-typescript-core';
+import { MonitorRequirement, MonitorMeasurementResult } from '@jield/solodb-typescript-core';
 declare const AddStepParameterValueModal: ({ requirement, result, refetchMonitorStepParameterValues, }: {
     requirement: MonitorRequirement;
     result: MonitorMeasurementResult;

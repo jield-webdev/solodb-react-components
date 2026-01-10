@@ -1,5 +1,14 @@
 import { useInfiniteQuery, useQueries, useQueryClient } from "@tanstack/react-query";
-import { Equipment, Facet, Filter, FilterData, FilterFormData, getFilter, getSetup, listEquipment } from "solodb-typescript-core";
+import {
+  Equipment,
+  Facet,
+  Filter,
+  FilterData,
+  FilterFormData,
+  getFilter,
+  getSetup,
+  listEquipment,
+} from "@jield/solodb-typescript-core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import SelectedEquipmentTable from "./setup/selectedEquipmentTable";
 import { useParams } from "react-router-dom";
@@ -11,7 +20,7 @@ import EquipmentTable from "./setup/equipmentTable";
 import FilterFormBar from "./setup/filterFormBar";
 import { FilterBadges } from "./setup/filterBadges";
 import { GetServerUri } from "@/modules/core/functions/getServerUri";
-import { Setup } from "solodb-typescript-core/dist/equipment/interfaces/setup";
+import { Setup } from "@jield/solodb-typescript-core/dist/equipment/interfaces/setup";
 
 export function populateFilterData(filterFormData: FilterFormData): FilterData {
   let facet: { [fieldsetName: string]: { values: string[] } } = {};
@@ -171,11 +180,12 @@ export default function SetupUpdateEquipment() {
   useEffect(() => {
     if (!setup) return;
 
-    const originalIds = setup.setup_equipment.map((e) => e.id).sort((a, b) => a - b);
+    const originalIds = setup.setup_equipment.map((e: { id: number }) => e.id).sort((a: number, b: number) => a - b);
     const currentIds = Array.from(selectedEquipmentMap.keys()).sort((a, b) => a - b);
 
     const isEqual =
-      originalIds.length === currentIds.length && originalIds.every((id, index) => id === currentIds[index]);
+      originalIds.length === currentIds.length &&
+      originalIds.every((id: number, index: number) => id === currentIds[index]);
 
     if (isEqual) {
       return;

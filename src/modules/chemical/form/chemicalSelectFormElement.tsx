@@ -5,7 +5,7 @@ import AsyncSelect from "react-select/async";
 import axios from "axios";
 import CreateChemicalModal from "@/modules/chemical/components/modal/createChemicalModal";
 import { customStyles } from "@/modules/core/form/element/userFormElement";
-import { Chemical, listChemicals } from "solodb-typescript-core";
+import { Chemical, listChemicals } from "@jield/solodb-typescript-core";
 
 type Inputs = Omit<Chemical, "id">;
 

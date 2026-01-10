@@ -1,4 +1,4 @@
-import { RunPart, RunStepPart, RunStep } from 'solodb-typescript-core';
+import { RunPart, RunStepPart, RunStep } from '@jield/solodb-typescript-core';
 declare const RunStepPartProductionTableRow: ({ runPart, runStepParts, runStep, refetchFn, partIsSelected, setPartAsSelected, }: {
     runPart: RunPart;
     runStepParts: RunStepPart[];

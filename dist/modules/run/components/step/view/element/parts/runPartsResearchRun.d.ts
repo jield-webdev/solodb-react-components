@@ -1,4 +1,4 @@
-import { Run, RunStep, RunStepPart, RunStepPartActionEnum } from 'solodb-typescript-core';
+import { Run, RunStep, RunStepPart, RunStepPartActionEnum } from '@jield/solodb-typescript-core';
 declare const RunPartsResearchRun: ({ run, runStep, runStepParts, editable, refetchFn, }: {
     run: Run;
     runStep: RunStep;

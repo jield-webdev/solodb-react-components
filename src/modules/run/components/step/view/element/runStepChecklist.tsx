@@ -5,7 +5,7 @@ import axios from "axios";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
 import { useQuery } from "@tanstack/react-query";
 import ChecklistItemElement from "@/modules/run/components/step/view/element/checklist/checklistItemElement";
-import { listRunStepChecklistItems, RunStep, RunStepChecklistItem } from "solodb-typescript-core";
+import { listRunStepChecklistItems, RunStep, RunStepChecklistItem } from "@jield/solodb-typescript-core";
 
 const RunStepChecklist = () => {
   let navigate = useNavigate();

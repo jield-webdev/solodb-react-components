@@ -3,7 +3,7 @@ import MessageModalForm from "@/modules/equipment/components/partial/messageModa
 import { Badge, Button } from "react-bootstrap";
 import moment from "moment";
 import ReactMarkdown from "react-markdown";
-import { LocationMessage } from "solodb-typescript-core";
+import { LocationMessage } from "@jield/solodb-typescript-core";
 
 export default function MessageElement({ message }: { message: LocationMessage }) {
   const [modalElement, setModalElement] = useState<JSX.Element | null>(null);

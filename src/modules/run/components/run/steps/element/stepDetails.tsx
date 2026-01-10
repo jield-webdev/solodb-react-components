@@ -6,7 +6,7 @@ import UploadFilesToStep from "@/modules/run/components/shared/files/uploadFiles
 import RunPartsResearchRun from "@/modules/run/components/step/view/element/parts/runPartsResearchRun";
 import RunPartsProductionRun from "@/modules/run/components/step/view/element/parts/runPartsProductionRun";
 import { RunContext } from "@/modules/run/contexts/runContext";
-import { RunStep, RunStepPart, RunPart, RunTypeEnum } from "solodb-typescript-core";
+import { RunStep, RunStepPart, RunPart, RunTypeEnum } from "@jield/solodb-typescript-core";
 
 export default function StepDetails({
   step,

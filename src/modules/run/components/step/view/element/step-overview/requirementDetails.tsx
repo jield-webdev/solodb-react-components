@@ -2,7 +2,7 @@ import React from "react";
 import RequirementValuesWithPartTable from "@/modules/run/components/shared/requirement/requirementValuesWithPartTable";
 import { Link, useParams } from "react-router-dom";
 import { Table } from "react-bootstrap";
-import { Requirement, RunStep, RunStepPart, RunPart, MeasurementResult } from "solodb-typescript-core";
+import { Requirement, RunStep, RunStepPart, RunPart, MeasurementResult } from "@jield/solodb-typescript-core";
 
 export default function RequirementDetails({
   requirement,

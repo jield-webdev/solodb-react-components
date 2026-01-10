@@ -1,7 +1,7 @@
 import React from "react";
 import RunPartsResearchRun from "@/modules/run/components/step/view/element/parts/runPartsResearchRun";
 import { RunStepParametersTable } from "@/modules/run/components/shared/parameters/runStepParametersTable";
-import { Run, RunStep } from "solodb-typescript-core";
+import { Run, RunStep } from "@jield/solodb-typescript-core";
 
 const StepDetails = ({
   run,

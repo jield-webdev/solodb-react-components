@@ -1,4 +1,4 @@
-import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from 'solodb-typescript-core';
+import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from '@jield/solodb-typescript-core';
 export default function EcnElement({ ecn, equipment, ecnAttachments, reloadQueryFn, expanded, }: {
     ecn: EquipmentModuleEcn;
     equipment: Equipment;

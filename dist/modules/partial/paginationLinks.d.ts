@@ -1,4 +1,4 @@
-import { ApiFormattedResponse } from 'solodb-typescript-core';
+import { ApiFormattedResponse } from '@jield/solodb-typescript-core';
 declare const PaginationLinks: ({ data, setPage, setPageSize, pageSize, isPlaceholderData, }: {
     data: ApiFormattedResponse<any> | undefined;
     setPage: (page: (old: number) => number) => void;

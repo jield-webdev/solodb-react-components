@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import ModuleStatusElement from "../partial/moduleStatusElement";
-import { Equipment, listModules } from "solodb-typescript-core";
+import { Equipment, listModules } from "@jield/solodb-typescript-core";
 
 export const EquipmentModuleStatusWrapper = ({ equipment }: { equipment: Equipment }) => {
   const moduleQuery = useQuery({

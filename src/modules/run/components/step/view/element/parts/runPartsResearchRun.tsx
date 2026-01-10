@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Dropdown, Table } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
 import RunStepPartTableRow from "@/modules/run/components/shared/parts/runStepPartTableRow";
-import { listRunStepParts, Run, RunStep, RunStepPart, RunStepPartActionEnum } from "solodb-typescript-core";
+import { listRunStepParts, Run, RunStep, RunStepPart, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 
 const RunPartsResearchRun = ({
   run,

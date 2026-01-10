@@ -3,7 +3,7 @@ import { Badge, Button, Card, ListGroup } from "react-bootstrap";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
 import ReactMarkdown from "react-markdown";
 import { formatDateTime } from "@/utils/datetime";
-import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from "solodb-typescript-core";
+import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from "@jield/solodb-typescript-core";
 
 export default function IssueCard({
   issue,

@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { StatusMail } from "solodb-typescript-core";
+import { StatusMail } from "@jield/solodb-typescript-core";
 
 interface StatusMailContext {
   statusMail: StatusMail;

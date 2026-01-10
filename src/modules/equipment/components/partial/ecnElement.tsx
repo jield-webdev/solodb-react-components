@@ -3,7 +3,7 @@ import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
 import { Badge, Button } from "react-bootstrap";
 import moment from "moment";
 import ReactMarkdown from "react-markdown";
-import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from "solodb-typescript-core";
+import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from "@jield/solodb-typescript-core";
 
 export default function EcnElement({
   ecn,

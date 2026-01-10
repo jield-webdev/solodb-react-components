@@ -1,4 +1,4 @@
-import { Requirement, MeasurementResult } from 'solodb-typescript-core';
+import { Requirement, MeasurementResult } from '@jield/solodb-typescript-core';
 export default function RequirementValuesByStep({ requirement, measurementResults, refetchFn, editOnly, }: {
     requirement: Requirement;
     measurementResults?: MeasurementResult[];

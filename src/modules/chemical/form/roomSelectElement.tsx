@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import { Controller } from "react-hook-form";
-import { listRooms, Room } from "solodb-typescript-core";
+import { listRooms, Room } from "@jield/solodb-typescript-core";
 
 interface RoomSelectElementProps {
   control: any;
@@ -36,7 +36,7 @@ export default function RoomSelectElement({ control, name }: RoomSelectElementPr
 
   return (
     <div>
-      <h3>Select a lab</h3>
+      <h3>Choose a lab</h3>
       <Form.Group className="mb-3" controlId="chemical.roomSelect">
         <Controller
           name={name}

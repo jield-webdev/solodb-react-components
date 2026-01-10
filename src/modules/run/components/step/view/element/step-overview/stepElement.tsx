@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import DateFormat from "@/modules/partial/dateFormat";
 import { RunStepContext } from "@/modules/run/contexts/runStepContext";
 import { PartsBadgesResearchRun } from "@/modules/run/components/shared/parts/partsBadgesResearchRun";
-import { Requirement, Run, RunPart, RunStep, RunStepPart } from "solodb-typescript-core";
+import { Requirement, Run, RunPart, RunStep, RunStepPart } from "@jield/solodb-typescript-core";
 
 const StepElement = ({
   run,

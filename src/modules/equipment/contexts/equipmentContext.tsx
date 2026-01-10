@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { Equipment } from "solodb-typescript-core";
+import { Equipment } from "@jield/solodb-typescript-core";
 
 interface EquipmentContext {
   equipment: Equipment;

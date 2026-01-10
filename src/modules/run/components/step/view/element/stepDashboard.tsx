@@ -25,7 +25,7 @@ import { RunStepParametersTable } from "@/modules/run/components/shared/paramete
 import UploadFilesToStep from "@/modules/run/components/shared/files/uploadFilesToStep";
 import RequirementValuesWithPartTable from "../../../shared/requirement/requirementValuesWithPartTable";
 import RequirementValuesByStep from "../../../shared/requirement/requirementValuesByStep";
-import { listMonitors, getEquipmentModule, listRequirements, RunTypeEnum, listEcn } from "solodb-typescript-core";
+import { listMonitors, getEquipmentModule, listRequirements, RunTypeEnum, listEcn } from "@jield/solodb-typescript-core";
 
 const StepDashboard = () => {
   const { environment } = useParams();

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getMonitor, Monitor } from "solodb-typescript-core";
+import { getMonitor, Monitor } from "@jield/solodb-typescript-core";
 
 export const useMonitor = () => {
   const [monitor, setMonitor] = useState<Monitor | null>(null);

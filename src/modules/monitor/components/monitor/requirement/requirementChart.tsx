@@ -1,6 +1,6 @@
 import React from "react";
 import { Chart as GoogleChart } from "react-google-charts";
-import { MonitorRequirementTarget, MonitorMeasurementResult } from "solodb-typescript-core";
+import { MonitorRequirementTarget, MonitorMeasurementResult } from "@jield/solodb-typescript-core";
 
 export default function RequirementChart({
   target,

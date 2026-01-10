@@ -1,9 +1,9 @@
 import React from "react";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import axios from "axios";
-import { Run } from "solodb-typescript-core";
-import { HoldCode as RunHoldCode } from "solodb-typescript-core";
-import { RunHoldCode as HoldCode } from "solodb-typescript-core";
+import { Run } from "@jield/solodb-typescript-core";
+import { HoldCode as RunHoldCode } from "@jield/solodb-typescript-core";
+import { RunHoldCode as HoldCode } from "@jield/solodb-typescript-core";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 

@@ -1,4 +1,4 @@
-import { Requirement, RunPart, RunStepPart } from 'solodb-typescript-core';
+import { Requirement, RunPart, RunStepPart } from '@jield/solodb-typescript-core';
 export default function RequirementElement({ requirement, runParts, runStepParts, hideLabel, firstInGroup, }: {
     requirement: Requirement;
     runParts: RunPart[];
