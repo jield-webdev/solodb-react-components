@@ -16,7 +16,7 @@ import {
   ChemicalHeaderElement,
   GoldsteinClientsDashboard,
   ReportResults,
-} from "solodb-react-components";
+} from "@jield/solodb-react-components";
 import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
@@ -57,7 +57,7 @@ const ROUTES = {
 
 // Lazy-loaded components
 const ChemicalIntakeElement = lazy(() =>
-  import("solodb-react-components").then((module) => ({ default: module.ChemicalIntakeElement }))
+  import("@jield/solodb-react-components").then((module) => ({ default: module.ChemicalIntakeElement }))
 );
 
 // Not Found component

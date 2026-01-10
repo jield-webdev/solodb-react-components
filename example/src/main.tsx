@@ -4,7 +4,7 @@ import PageRoutes from "./routes/pageRoutes";
 import { BrowserRouter } from "react-router-dom";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider, initSolodbComponents } from "solodb-react-components";
+import { AuthProvider, initSolodbComponents } from "@jield/solodb-react-components";
 const queryClient = new QueryClient();
 
 // Initialize library runtime configuration
