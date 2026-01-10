@@ -1,0 +1,9 @@
+import { EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from '../../../../../../solodb-typescript-core/src/index.ts';
+interface IssueTableProps {
+    issues: EquipmentModuleIssue[];
+    modules: EquipmentModule[];
+    issueAttachments: EquipmentModuleIssueAttachment[];
+    reloadQueryFn: (key: string[]) => void;
+}
+export default function IssueTable({ issues, modules, issueAttachments, reloadQueryFn }: IssueTableProps): import("react/jsx-runtime").JSX.Element;
+export {};
