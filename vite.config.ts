@@ -21,33 +21,10 @@ export default defineConfig({
   // Resolve configuration
   resolve: {
     // Path aliases for cleaner imports
-    alias: [
-      { find: "@", replacement: path.join(__dirname, "./src") },
-      { find: "@modules", replacement: path.join(__dirname, "./src/modules") },
-      {
-        find: /^@jield\/solodb-typescript-core$/,
-        replacement: path.resolve(__dirname, "../solodb-typescript-core/src/index.ts"),
-      },
-      {
-        find: /^@jield\/solodb-typescript-core\/(.*)$/,
-        replacement: path.resolve(__dirname, "../solodb-typescript-core/src/$1"),
-      },
-      // Resolve internal @/ imports from the core library
-      {
-        find: /^@\/(.*)/,
-        replacement: path.join(__dirname, "../solodb-typescript-core/src/$1"),
-        customResolver(updatedId, importer) {
-          if (importer?.includes("solodb-typescript-core")) {
-            return path.resolve(__dirname, "../solodb-typescript-core/src", updatedId.replace(/^@\//, ""));
-          }
-          return path.resolve(__dirname, "src", updatedId.replace(/^@\//, ""));
-        },
-      },
-    ],
-  },
-
-  optimizeDeps: {
-    exclude: ["@jield/solodb-typescript-core"],
+    alias: {
+      "@": path.join(__dirname, "./src"),
+      "@modules": path.join(__dirname, "./src/modules"),
+    },
   },
 
   // Build configuration for library mode
