@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { ModalProperties } from "@/modules/core/interfaces/modalProperties";
+import { ModalProperties } from "@jield/solodb-react-components/modules/core/interfaces/modalProperties";
 import { RunStep, Run } from "@jield/solodb-typescript-core";
 
 interface RunStepContext {

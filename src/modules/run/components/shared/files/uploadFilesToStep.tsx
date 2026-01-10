@@ -1,6 +1,6 @@
-import { GetServerUri } from "@/modules/core/functions/getServerUri";
+import { GetServerUri } from "@jield/solodb-react-components/modules/core/functions/getServerUri";
 import { Badge, Button, ListGroup, Table } from "react-bootstrap";
-import { formatDateTime } from "@/utils/datetime";
+import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import React, { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";

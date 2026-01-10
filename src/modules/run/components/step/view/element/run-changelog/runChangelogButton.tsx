@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
-import RunChangelogModal from "@/modules/run/components/step/view/element/run-changelog/runChangelogModal";
+import RunChangelogModal from "@jield/solodb-react-components/modules/run/components/step/view/element/run-changelog/runChangelogModal";
 
 const RunChangelogButton = ({ size }: { size?: "lg" | "sm" | undefined }) => {
   const [modalShow, setModalShow] = useState<boolean>(false);

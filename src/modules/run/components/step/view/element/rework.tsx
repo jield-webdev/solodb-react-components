@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, Form } from "react-bootstrap";
 import { useQueries } from "@tanstack/react-query";
 import axios from "axios";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { Template, Recipe, getTemplateSteps, RunStep, TemplateStep, listRunSteps, listTemplates } from "@jield/solodb-typescript-core";
 
 const Rework = () => {

@@ -2,9 +2,9 @@ import React, { useContext, useRef } from "react";
 import { Alert, Button, ListGroup } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { useQuery } from "@tanstack/react-query";
-import ChecklistItemElement from "@/modules/run/components/step/view/element/checklist/checklistItemElement";
+import ChecklistItemElement from "@jield/solodb-react-components/modules/run/components/step/view/element/checklist/checklistItemElement";
 import { listRunStepChecklistItems, RunStep, RunStepChecklistItem } from "@jield/solodb-typescript-core";
 
 const RunStepChecklist = () => {

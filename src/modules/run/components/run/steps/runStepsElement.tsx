@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { keepPreviousData, useQueries, useQueryClient } from "@tanstack/react-query";
 import { Table } from "react-bootstrap";
 
-import { RunContext } from "@/modules/run/contexts/runContext";
-import PaginationLinks from "@/modules/partial/paginationLinks";
-import { EmphasizedParametersContext } from "@/modules/run/contexts/emphasizedParametersContext";
-import StepInList from "@/modules/run/components/run/steps/element/stepInList";
-import RequirementStepInList from "@/modules/run/components/run/steps/element/requirementStepInList";
+import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
+import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
+import { EmphasizedParametersContext } from "@jield/solodb-react-components/modules/run/contexts/emphasizedParametersContext";
+import StepInList from "@jield/solodb-react-components/modules/run/components/run/steps/element/stepInList";
+import RequirementStepInList from "@jield/solodb-react-components/modules/run/components/run/steps/element/requirementStepInList";
 import { listRunSteps, listRunParts, listRunStepParts, listRequirements, RunStep, RunPart, RunStepPart, Requirement } from "@jield/solodb-typescript-core";
 
 export default function RunStepsElement() {

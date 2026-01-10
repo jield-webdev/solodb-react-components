@@ -1,6 +1,6 @@
 import React, { JSX, useState } from "react";
 import { Badge, Button } from "react-bootstrap";
-import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
+import IssueModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/issueModalForm";
 import moment from "moment/moment";
 import ReactMarkdown from "react-markdown";
 import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleIssueType } from "@jield/solodb-typescript-core";

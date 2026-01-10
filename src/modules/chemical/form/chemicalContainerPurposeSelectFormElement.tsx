@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Form, InputGroup } from "react-bootstrap";
 import { Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
-import { customStyles } from "@/modules/core/form/element/userFormElement";
+import { customStyles } from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
 import { listChemicalContainerPurposes } from "@jield/solodb-typescript-core";
 
 export default function ChemicalContainerPurposeSelectFormElement({ control, errors }: { control: any; errors: any }) {

@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { Alert } from "react-bootstrap";
-import { StatusMailContext } from "@/modules/equipment/contexts/statusMailContext";
-import StatusMailEquipmentElement from "@/modules/equipment/components/status-mail/statusMailEquipmentElement";
-import StatusMailMessageElement from "@/modules/equipment/components/status-mail/statusMailMessageElement";
-import IssueTable from "@/modules/equipment/components/partial/issueTable";
-import SendStatusMailButton from "@/modules/equipment/components/partial/sendStatusMail";
+import { StatusMailContext } from "@jield/solodb-react-components/modules/equipment/contexts/statusMailContext";
+import StatusMailEquipmentElement from "@jield/solodb-react-components/modules/equipment/components/status-mail/statusMailEquipmentElement";
+import StatusMailMessageElement from "@jield/solodb-react-components/modules/equipment/components/status-mail/statusMailMessageElement";
+import IssueTable from "@jield/solodb-react-components/modules/equipment/components/partial/issueTable";
+import SendStatusMailButton from "@jield/solodb-react-components/modules/equipment/components/partial/sendStatusMail";
 import { Equipment, listEquipment, listModules, listEcn, listIssues, listLocationMessages, listEcnAttachments, listIssueAttachments, listReservations, ClassificationsOptionEnum } from "@jield/solodb-typescript-core";
 
 export default function StatusMailComponent() {

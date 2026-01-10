@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { useQueries } from "@tanstack/react-query";
-import RequirementResults from "@/modules/monitor/components/monitor/requirement/requirementResults";
+import RequirementResults from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/requirementResults";
 import { getMonitor, listMonitorRequirements } from "@jield/solodb-typescript-core";
 
 export default function MonitorPage() {

@@ -1,15 +1,15 @@
-import { GoldsteinDataProvider, useGoldsteinClientDataContext } from "@/modules/admin/context/goldstein/DataContext";
+import { GoldsteinDataProvider, useGoldsteinClientDataContext } from "@jield/solodb-react-components/modules/admin/context/goldstein/DataContext";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getWebSocket, dataListener, WSPackage, ClientToServerMessage, sendWsMessage, UpdateListeningData, ReadData } from "../../admin/api/goldstein/wsHelper";
 import { getClientsStatus, Status } from "../../admin/functions/goldstein/notifications";
-import EquipmentUsable from "@/modules/equipment/components/goldsteinEquipmentDashboard/states/equipmentUsable";
-import NoUserInCard from "@/modules/equipment/components/goldsteinEquipmentDashboard/states/noUserInCard";
-import NullNotifications from "@/modules/equipment/components/goldsteinEquipmentDashboard/states/nullNotifications";
-import ServerError from "@/modules/equipment/components/goldsteinEquipmentDashboard/states/serverError";
-import UserNotAuthorized from "@/modules/equipment/components/goldsteinEquipmentDashboard/states/userNotAuthorized";
-import WaitingCardDetection from "@/modules/equipment/components/goldsteinEquipmentDashboard/states/waitingCardDetection";
+import EquipmentUsable from "@jield/solodb-react-components/modules/equipment/components/goldsteinEquipmentDashboard/states/equipmentUsable";
+import NoUserInCard from "@jield/solodb-react-components/modules/equipment/components/goldsteinEquipmentDashboard/states/noUserInCard";
+import NullNotifications from "@jield/solodb-react-components/modules/equipment/components/goldsteinEquipmentDashboard/states/nullNotifications";
+import ServerError from "@jield/solodb-react-components/modules/equipment/components/goldsteinEquipmentDashboard/states/serverError";
+import UserNotAuthorized from "@jield/solodb-react-components/modules/equipment/components/goldsteinEquipmentDashboard/states/userNotAuthorized";
+import WaitingCardDetection from "@jield/solodb-react-components/modules/equipment/components/goldsteinEquipmentDashboard/states/waitingCardDetection";
 
 const MOCK_API_TOKEN = "mock-token";
 const NOTIFICATION_TTL = 10;

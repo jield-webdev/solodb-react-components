@@ -1,10 +1,10 @@
 import React, { useContext, useState } from "react";
 import { Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
-import StepDetails from "@/modules/run/components/step/view/element/step-overview/stepDetails";
+import StepDetails from "@jield/solodb-react-components/modules/run/components/step/view/element/step-overview/stepDetails";
 import { Link, useParams } from "react-router-dom";
-import DateFormat from "@/modules/partial/dateFormat";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
-import { PartsBadgesResearchRun } from "@/modules/run/components/shared/parts/partsBadgesResearchRun";
+import DateFormat from "@jield/solodb-react-components/modules/partial/dateFormat";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
+import { PartsBadgesResearchRun } from "@jield/solodb-react-components/modules/run/components/shared/parts/partsBadgesResearchRun";
 import { Requirement, Run, RunPart, RunStep, RunStepPart } from "@jield/solodb-typescript-core";
 
 const StepElement = ({

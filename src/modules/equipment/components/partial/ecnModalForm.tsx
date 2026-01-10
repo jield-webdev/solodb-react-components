@@ -4,8 +4,8 @@ import { Button, Form, Modal } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import UserFormElement from "@/modules/core/form/element/userFormElement";
-import { AuthContext } from "@/modules/core/contexts/authContext";
+import UserFormElement from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
+import { AuthContext } from "@jield/solodb-react-components/modules/core/contexts/authContext";
 import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, fileToBase64, listModules } from "@jield/solodb-typescript-core";
 
 interface EcnModalFormProps {

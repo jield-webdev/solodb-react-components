@@ -1,9 +1,9 @@
 import { useQueries, UseQueryResult, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import { listStatusOptions, StatusOption } from "@/modules/admin/functions/goldstein/listStatusOptions";
-import { listGoldsteinEquipmentModules } from "@/modules/admin/functions/goldstein/listModules";
-import { Module } from "@/modules/admin/functions/goldstein/listModules";
-import { useGoldsteinClientDataContext } from "@/modules/admin/context/goldstein/DataContext";
+import { listStatusOptions, StatusOption } from "@jield/solodb-react-components/modules/admin/functions/goldstein/listStatusOptions";
+import { listGoldsteinEquipmentModules } from "@jield/solodb-react-components/modules/admin/functions/goldstein/listModules";
+import { Module } from "@jield/solodb-react-components/modules/admin/functions/goldstein/listModules";
+import { useGoldsteinClientDataContext } from "@jield/solodb-react-components/modules/admin/context/goldstein/DataContext";
 
 // Create a client
 const queryClient = new QueryClient();

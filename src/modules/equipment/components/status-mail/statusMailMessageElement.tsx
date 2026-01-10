@@ -1,5 +1,5 @@
-import MessageElement from "@/modules/equipment/components/partial/messageElement";
-import MessageModalForm from "@/modules/equipment/components/partial/messageModalForm";
+import MessageElement from "@jield/solodb-react-components/modules/equipment/components/partial/messageElement";
+import MessageModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/messageModalForm";
 import { JSX, useState } from "react";
 import { Button } from "react-bootstrap";
 import { LocationMessage } from "@jield/solodb-typescript-core";

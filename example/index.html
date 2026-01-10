@@ -7,13 +7,13 @@
   <title>SoloDB Components - Example App</title>
 
   <link
-    href="https://demo.solodb.net/assets/css/app-dev-onelab.css"
+    href="%VITE_BASE_URL%/assets/css/app-dev-onelab.css"
     media="all"
     rel="stylesheet"
     type="text/css"
   />
   <link
-    href="https://demo.solodb.net/assets/css/custom-dev-onelab.css"
+    href="%VITE_BASE_URL%/assets/css/custom-dev-onelab.css"
     media="all"
     rel="stylesheet"
     type="text/css"
@@ -28,8 +28,8 @@
 </head>
 
 <body class="d-flex flex-column h-100">
-<div data-goldstein-endpoint="go-server.lan:50443"
-     data-jwt="jwt_bearer_token"
+<div data-goldstein-endpoint="%VITE_GOLDSTEIN_ENDPOINT%"
+     data-jwt="%VITE_JWT_TOKEN%"
      id="root"></div>
 
 <script src="/src/main.tsx" type="module"></script>

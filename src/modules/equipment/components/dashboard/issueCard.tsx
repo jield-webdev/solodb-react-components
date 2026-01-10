@@ -1,8 +1,8 @@
 import React, { JSX, useState } from "react";
 import { Badge, Button, Card, ListGroup } from "react-bootstrap";
-import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
+import IssueModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/issueModalForm";
 import ReactMarkdown from "react-markdown";
-import { formatDateTime } from "@/utils/datetime";
+import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from "@jield/solodb-typescript-core";
 
 export default function IssueCard({

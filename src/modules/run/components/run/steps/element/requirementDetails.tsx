@@ -1,8 +1,8 @@
 import React from "react";
 import { Card, Col, Row, Table } from "react-bootstrap";
-import UploadFilesToStep from "@/modules/run/components/shared/files/uploadFilesToStep";
+import UploadFilesToStep from "@jield/solodb-react-components/modules/run/components/shared/files/uploadFilesToStep";
 import { Link, useParams } from "react-router-dom";
-import RequirementValuesWithPartTable from "@/modules/run/components/shared/requirement/requirementValuesWithPartTable";
+import RequirementValuesWithPartTable from "@jield/solodb-react-components/modules/run/components/shared/requirement/requirementValuesWithPartTable";
 import RequirementValuesByStep from "../../../shared/requirement/requirementValuesByStep";
 import { Requirement, RunStep, RunStepPart, RunPart, MeasurementResult } from "@jield/solodb-typescript-core";
 

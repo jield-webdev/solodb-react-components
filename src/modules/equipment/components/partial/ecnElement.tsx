@@ -1,5 +1,5 @@
 import React, { JSX, useState } from "react";
-import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
+import EcnModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/ecnModalForm";
 import { Badge, Button } from "react-bootstrap";
 import moment from "moment";
 import ReactMarkdown from "react-markdown";

@@ -3,8 +3,8 @@ import { Button, Form, Row } from "react-bootstrap";
 import { Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 import axios from "axios";
-import CreateChemicalModal from "@/modules/chemical/components/modal/createChemicalModal";
-import { customStyles } from "@/modules/core/form/element/userFormElement";
+import CreateChemicalModal from "@jield/solodb-react-components/modules/chemical/components/modal/createChemicalModal";
+import { customStyles } from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
 import { Chemical, listChemicals } from "@jield/solodb-typescript-core";
 
 type Inputs = Omit<Chemical, "id">;

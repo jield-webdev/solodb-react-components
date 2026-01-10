@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EmphasizedParametersContext } from "@/modules/run/contexts/emphasizedParametersContext";
+import { EmphasizedParametersContext } from "@jield/solodb-react-components/modules/run/contexts/emphasizedParametersContext";
 
 export default function EmphasizedParametersProvider({ children }: { children: React.ReactNode }) {
   const [showOnlyEmphasizedParameters, setShowOnlyEmphasizedParameters] = useState<boolean>(false);

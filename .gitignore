@@ -29,3 +29,8 @@ dist-ssr
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# env
+.env
+.env.*
+!.env.example

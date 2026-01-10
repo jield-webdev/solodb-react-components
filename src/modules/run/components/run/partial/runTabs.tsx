@@ -1,7 +1,7 @@
 import { Nav } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 import { useContext } from "react";
-import { RunContext } from "@/modules/run/contexts/runContext";
+import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 
 export default function RunTabs(props: { className?: string }) {
   const { run, reloadRun } = useContext(RunContext);

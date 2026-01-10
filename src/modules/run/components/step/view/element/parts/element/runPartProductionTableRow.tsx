@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Button, Dropdown } from "react-bootstrap";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
-import { formatDateTime } from "@/utils/datetime";
-import RunStepPartComment from "@/modules/run/components/step/view/element/parts/element/runStepPartComment";
+import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
+import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/element/runStepPartComment";
 import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep, setRunStepPartAction as SetRunStepPartAction } from "@jield/solodb-typescript-core";
 
 const RunStepPartProductionTableRow = ({

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { RunContext } from "@/modules/run/contexts/runContext";
+import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 
 export default function RunInformationElement() {
   const { run } = useContext(RunContext);

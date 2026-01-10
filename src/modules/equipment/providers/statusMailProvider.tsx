@@ -1,5 +1,5 @@
 import React from "react";
-import { StatusMailContext } from "@/modules/equipment/contexts/statusMailContext";
+import { StatusMailContext } from "@jield/solodb-react-components/modules/equipment/contexts/statusMailContext";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getStatusMail } from "@jield/solodb-typescript-core";

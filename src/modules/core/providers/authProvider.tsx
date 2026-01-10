@@ -1,5 +1,5 @@
-import { AuthContext } from "@/modules/core/contexts/authContext";
-import { useAuth } from "@/modules/core/hooks/useAuth";
+import { AuthContext } from "@jield/solodb-react-components/modules/core/contexts/authContext";
+import { useAuth } from "@jield/solodb-react-components/modules/core/hooks/useAuth";
 import { ReactNode } from "react";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

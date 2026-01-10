@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, Col, Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
 import axios from "axios";
-import LocationSelectFormElement from "@/modules/chemical/form/locationSelectFormElement";
-import ChemicalSelectFormElement from "@/modules/chemical/form/chemicalSelectFormElement";
+import LocationSelectFormElement from "@jield/solodb-react-components/modules/chemical/form/locationSelectFormElement";
+import ChemicalSelectFormElement from "@jield/solodb-react-components/modules/chemical/form/chemicalSelectFormElement";
 import { QRCodeSVG } from "qrcode.react";
-import UserFormElement from "@/modules/core/form/element/userFormElement";
-import { AuthContext } from "@/modules/core/contexts/authContext";
+import UserFormElement from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
+import { AuthContext } from "@jield/solodb-react-components/modules/core/contexts/authContext";
 import { useParams } from "react-router-dom";
 import { ChemicalContainer, getLocation, Room, Location, listChemicalContainerExternalLabels } from "@jield/solodb-typescript-core";
 

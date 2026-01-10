@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SERVER_DNS } from "@/modules/admin/components/goldsteinClientsDashboard";
+import { SERVER_DNS } from "@jield/solodb-react-components/modules/admin/components/goldsteinClientsDashboard";
 
 export default function UserAuthenticated({ user_id }: { user_id: number }) {
   const [userName, setUserName] = useState<string>("");
