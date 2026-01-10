@@ -6,7 +6,7 @@ import { Badge } from "react-bootstrap";
 import RequirementDetails from "@/modules/run/components/run/steps/element/requirementDetails";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { MeasurementResultsBadges } from "@/modules/run/components/shared/requirement/measurementResultsBadge";
-import { Requirement, RunStep, RunPart, RunStepPart, EquipmentModule, MeasurementResult, listMeasurementResults } from "solodb-typescript-core";
+import { Requirement, RunStep, RunPart, RunStepPart, EquipmentModule, MeasurementResult, listMeasurementResults } from "@jield/solodb-typescript-core";
 
 export default function RequirementStepInList({
   requirement,

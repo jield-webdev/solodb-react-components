@@ -8,7 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 import UserFormElement from "@/modules/core/form/element/userFormElement";
 import { AuthContext } from "@/modules/core/contexts/authContext";
 import { useParams } from "react-router-dom";
-import { ChemicalContainer, getLocation, Room, Location, listChemicalContainerExternalLabels } from "solodb-typescript-core";
+import { ChemicalContainer, getLocation, Room, Location, listChemicalContainerExternalLabels } from "@jield/solodb-typescript-core";
 
 type Inputs = {
   location: number;

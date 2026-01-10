@@ -5,7 +5,7 @@ import React, { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
-import { RunStep, listRunStepFiles, File } from "solodb-typescript-core";
+import { RunStep, listRunStepFiles, File } from "@jield/solodb-typescript-core";
 
 const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';

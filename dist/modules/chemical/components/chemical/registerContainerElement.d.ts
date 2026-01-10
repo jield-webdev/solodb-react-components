@@ -1,4 +1,4 @@
-import { Room, Location } from 'solodb-typescript-core';
+import { Room, Location } from '@jield/solodb-typescript-core';
 export default function RegisterContainerElement({ room, resetForm, location, setLocation, }: {
     room: Room;
     resetForm: () => void;

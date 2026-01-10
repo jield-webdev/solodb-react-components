@@ -11,7 +11,7 @@ import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
 import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
 import ListEquipmentReport from "@/modules/service/components/equipmentReports/ListEquipmentReport";
-import { listEcn, listEcnAttachments, listIssueAttachments, listIssues, listModules, listMonitors, listRuns, Run } from "solodb-typescript-core";
+import { listEcn, listEcnAttachments, listIssueAttachments, listIssues, listModules, listMonitors, listRuns, Run } from "@jield/solodb-typescript-core";
 
 export default function EquipmentDashboard() {
   const { environment } = useParams();

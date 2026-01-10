@@ -4,7 +4,7 @@ import UploadFilesToStep from "@/modules/run/components/shared/files/uploadFiles
 import { Link, useParams } from "react-router-dom";
 import RequirementValuesWithPartTable from "@/modules/run/components/shared/requirement/requirementValuesWithPartTable";
 import RequirementValuesByStep from "../../../shared/requirement/requirementValuesByStep";
-import { Requirement, RunStep, RunStepPart, RunPart, MeasurementResult } from "solodb-typescript-core";
+import { Requirement, RunStep, RunStepPart, RunPart, MeasurementResult } from "@jield/solodb-typescript-core";
 
 export default function RequirementDetails({
   requirement,

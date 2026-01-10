@@ -1,4 +1,4 @@
-import { Run, RunStep, RunPart, RunStepPart, Requirement } from 'solodb-typescript-core';
+import { Run, RunStep, RunPart, RunStepPart, Requirement } from '@jield/solodb-typescript-core';
 export default function StepInList({ run, step, parts, stepParts, monitoredBy, refetchFn, }: {
     run: Run;
     step: RunStep;

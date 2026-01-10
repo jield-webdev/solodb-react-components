@@ -10,7 +10,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import EditSortingPropertiesModal from "./editSortingPropertiesModal";
-import { Equipment, EquipmentGrade, FilterData } from "solodb-typescript-core";
+import { Equipment, EquipmentGrade, FilterData } from "@jield/solodb-typescript-core";
 
 enum SetupEquipmentState {
   NOT_IN_SETUP,

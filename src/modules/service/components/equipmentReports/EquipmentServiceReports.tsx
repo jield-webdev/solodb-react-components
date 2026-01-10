@@ -2,7 +2,7 @@ import { useQueries } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Alert, Table } from "react-bootstrap";
-import { Service, listServices } from "solodb-typescript-core";
+import { Service, listServices } from "@jield/solodb-typescript-core";
 
 export default function ListEquipmentReport() {
   const { id } = useParams<{ id: string }>();

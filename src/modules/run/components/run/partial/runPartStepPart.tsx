@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Badge, Button } from "react-bootstrap";
 import axios from "axios";
-import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep, setRunStepPartAction as SetRunStepPartAction } from "solodb-typescript-core";
+import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep, setRunStepPartAction as SetRunStepPartAction } from "@jield/solodb-typescript-core";
 
 export default function RunPartStepPart({
   runPart,

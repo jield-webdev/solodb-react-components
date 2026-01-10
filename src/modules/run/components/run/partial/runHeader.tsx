@@ -1,7 +1,7 @@
 import BatchCardElement from "@/modules/run/components/step/view/element/batchCardElement";
 import React, { useContext } from "react";
 import { RunContext } from "@/modules/run/contexts/runContext";
-import { RunTypeEnum } from "solodb-typescript-core";
+import { RunTypeEnum } from "@jield/solodb-typescript-core";
 
 export default function RunHeader() {
   const { run } = useContext(RunContext);

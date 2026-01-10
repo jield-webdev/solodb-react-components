@@ -2,7 +2,7 @@ import { Alert, Table } from "react-bootstrap";
 import { RunStepParameterEditButton } from "@/modules/run/components/shared/parameters/runStepParameterEditButton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-import { RunStep, listRunStepParameters, RunStepParameter } from "solodb-typescript-core";
+import { RunStep, listRunStepParameters, RunStepParameter } from "@jield/solodb-typescript-core";
 
 export const RunStepParametersTable = ({
   runStep,

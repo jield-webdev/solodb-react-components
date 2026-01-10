@@ -14,7 +14,7 @@ import {
   extractLabelNumber,
   scannedCodeIsLocationCode,
 } from "@/modules/chemical/components/chemical/registerBarcodeElement";
-import { ChemicalContainer, getLocation, Room, Location } from "solodb-typescript-core";
+import { ChemicalContainer, getLocation, Room, Location } from "@jield/solodb-typescript-core";
 
 type Inputs = {
   location: number;

@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { EquipmentContext } from "@/modules/equipment/contexts/equipmentContext";
 import { useQueries } from "@tanstack/react-query";
 import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
-import { listModules, listReservations } from "solodb-typescript-core";
+import { listModules, listReservations } from "@jield/solodb-typescript-core";
 
 export default function EquipmentHeader() {
   const { equipment } = useContext(EquipmentContext);

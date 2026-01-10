@@ -5,7 +5,7 @@ import StepDetails from "@/modules/run/components/run/steps/element/stepDetails"
 import { PartsBadgesResearchRun } from "@/modules/run/components/shared/parts/partsBadgesResearchRun";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { PartBadgesProductionRun } from "@/modules/run/components/shared/parts/partsBadgesProductionRun";
-import { Run, RunStep, RunPart, RunStepPart, Requirement, EquipmentModule, RunTypeEnum } from "solodb-typescript-core";
+import { Run, RunStep, RunPart, RunStepPart, Requirement, EquipmentModule, RunTypeEnum } from "@jield/solodb-typescript-core";
 
 export default function StepInList({
   run,

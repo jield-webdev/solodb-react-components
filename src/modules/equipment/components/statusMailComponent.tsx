@@ -6,7 +6,7 @@ import StatusMailEquipmentElement from "@/modules/equipment/components/status-ma
 import StatusMailMessageElement from "@/modules/equipment/components/status-mail/statusMailMessageElement";
 import IssueTable from "@/modules/equipment/components/partial/issueTable";
 import SendStatusMailButton from "@/modules/equipment/components/partial/sendStatusMail";
-import { Equipment, listEquipment, listModules, listEcn, listIssues, listLocationMessages, listEcnAttachments, listIssueAttachments, listReservations, ClassificationsOptionEnum } from "solodb-typescript-core";
+import { Equipment, listEquipment, listModules, listEcn, listIssues, listLocationMessages, listEcnAttachments, listIssueAttachments, listReservations, ClassificationsOptionEnum } from "@jield/solodb-typescript-core";
 
 export default function StatusMailComponent() {
   let { statusMail } = useContext(StatusMailContext);

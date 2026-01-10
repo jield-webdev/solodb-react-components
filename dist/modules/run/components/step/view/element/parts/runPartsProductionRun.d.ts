@@ -1,4 +1,4 @@
-import { Run, RunStep, RunStepPart, RunPart } from 'solodb-typescript-core';
+import { Run, RunStep, RunStepPart, RunPart } from '@jield/solodb-typescript-core';
 declare const RunPartsProductionRun: ({ run, runStep, runStepParts, runParts, refetchFn, }: {
     run: Run;
     runStep: RunStep;

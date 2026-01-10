@@ -2,7 +2,7 @@ import { Button } from "react-bootstrap";
 import { FillValueModal } from "./fillValueModal";
 import { useEffect, useState } from "react";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { Requirement, MeasurementResult, MeasurementResultValue, listMeasurementResults } from "solodb-typescript-core";
+import { Requirement, MeasurementResult, MeasurementResultValue, listMeasurementResults } from "@jield/solodb-typescript-core";
 
 export default function RequirementValuesByStep({
   requirement,

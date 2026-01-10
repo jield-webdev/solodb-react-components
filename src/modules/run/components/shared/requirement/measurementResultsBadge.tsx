@@ -1,5 +1,5 @@
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { Requirement, RunStep, MeasurementResult, RunPart, RunStepPart } from "solodb-typescript-core";
+import { Requirement, RunStep, MeasurementResult, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 
 export const MeasurementResultsBadges = ({
   requirement,

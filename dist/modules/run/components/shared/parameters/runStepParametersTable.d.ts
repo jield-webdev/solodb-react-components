@@ -1,4 +1,4 @@
-import { RunStep } from 'solodb-typescript-core';
+import { RunStep } from '@jield/solodb-typescript-core';
 export declare const RunStepParametersTable: ({ runStep, showOnlyEmphasizedParameters, editableParameters, refetchFn, }: {
     runStep: RunStep;
     showOnlyEmphasizedParameters: boolean;

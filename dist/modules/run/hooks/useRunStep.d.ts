@@ -1,4 +1,4 @@
-import { RunStep, Run } from 'solodb-typescript-core';
+import { RunStep, Run } from '@jield/solodb-typescript-core';
 export declare const useRunStep: () => {
     run: Run | null;
     runStep: RunStep | null;

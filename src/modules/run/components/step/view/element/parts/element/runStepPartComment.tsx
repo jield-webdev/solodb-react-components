@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { RunStepPart } from "solodb-typescript-core";
+import { RunStepPart } from "@jield/solodb-typescript-core";
 
 type Inputs = {
   comment: string | null;

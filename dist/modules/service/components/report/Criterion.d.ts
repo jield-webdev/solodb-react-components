@@ -1,4 +1,4 @@
-import { ServiceEventReportResult } from 'solodb-typescript-core';
+import { ServiceEventReportResult } from '@jield/solodb-typescript-core';
 export default function Criterion({ result, value, onChange, error, onSubmit, saving, }: {
     result: ServiceEventReportResult;
     value: any;

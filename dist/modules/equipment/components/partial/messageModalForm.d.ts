@@ -1,5 +1,5 @@
 import { default as React } from 'react';
-import { LocationMessage } from 'solodb-typescript-core';
+import { LocationMessage } from '@jield/solodb-typescript-core';
 interface MessageModalFormProps {
     showModal: boolean;
     onClose: (message: LocationMessage | undefined) => void;

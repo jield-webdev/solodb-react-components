@@ -1,4 +1,4 @@
-import { FilterData, FilterFormData } from 'solodb-typescript-core';
+import { FilterData, FilterFormData } from '@jield/solodb-typescript-core';
 export default function FilterFormColumn({ filterForm, filter, setFilterFn, }: {
     filterForm: FilterFormData;
     filter: FilterData | undefined;

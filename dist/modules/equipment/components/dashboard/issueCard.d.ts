@@ -1,4 +1,4 @@
-import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from 'solodb-typescript-core';
+import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from '@jield/solodb-typescript-core';
 export default function IssueCard({ issue, equipment, issueAttachments, reloadQueryFn, }: {
     issue: EquipmentModuleIssue;
     equipment: Equipment;

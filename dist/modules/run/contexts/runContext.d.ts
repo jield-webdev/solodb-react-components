@@ -1,4 +1,4 @@
-import { Run } from 'solodb-typescript-core';
+import { Run } from '@jield/solodb-typescript-core';
 interface RunContext {
     run: Run;
     reloadRun: () => void;

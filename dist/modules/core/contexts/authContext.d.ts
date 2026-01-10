@@ -1,4 +1,4 @@
-import { User } from 'solodb-typescript-core';
+import { User } from '@jield/solodb-typescript-core';
 interface AuthContext {
     user: User | null;
     setUser: (user: User | null) => void;

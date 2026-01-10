@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Form, InputGroup, Modal, Toast, ToastContainer } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { MonitorRequirement, MonitorMeasurementResult, MonitorStepParameter, listEquipmentModuleParameters, listMonitorRequirementResultMonitorStepParameterValues, listMonitorStepParameters } from "solodb-typescript-core";
+import { MonitorRequirement, MonitorMeasurementResult, MonitorStepParameter, listEquipmentModuleParameters, listMonitorRequirementResultMonitorStepParameterValues, listMonitorStepParameters } from "@jield/solodb-typescript-core";
 
 interface FormValues {
   id: number;

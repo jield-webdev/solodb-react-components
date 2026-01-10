@@ -34,4 +34,4 @@ export { RunStepContext } from './modules/run/contexts/runStepContext';
 export { EmphasizedParametersContext } from './modules/run/contexts/emphasizedParametersContext';
 export { useAuth } from './modules/core/hooks/useAuth';
 export { initSolodbComponents } from './modules/core/config/runtimeConfig';
-export type { User, Equipment, Monitor, Run, RunStep } from 'solodb-typescript-core';
+export type { User, Equipment, Monitor, Run, RunStep } from '@jield/solodb-typescript-core';

@@ -56,7 +56,9 @@ const ROUTES = {
 };
 
 // Lazy-loaded components
-const ChemicalIntakeElement = lazy(() => import("solodb-react-components").then(module => ({ default: module.ChemicalIntakeElement })));
+const ChemicalIntakeElement = lazy(() =>
+  import("solodb-react-components").then((module) => ({ default: module.ChemicalIntakeElement }))
+);
 
 // Not Found component
 const NotFound = () => (

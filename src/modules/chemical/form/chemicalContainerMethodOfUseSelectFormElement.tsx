@@ -3,7 +3,7 @@ import { Form, InputGroup } from "react-bootstrap";
 import { Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 import { customStyles } from "@/modules/core/form/element/userFormElement";
-import { listChemicalContainerMethodsOfUse } from "solodb-typescript-core";
+import { listChemicalContainerMethodsOfUse } from "@jield/solodb-typescript-core";
 
 export default function ChemicalContainerMethodOfUseSelectFormElement({
   control,

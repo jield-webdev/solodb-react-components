@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Dropdown } from "react-bootstrap";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
-import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep, setRunStepPartAction as  SetRunStepPartAction } from "solodb-typescript-core";
+import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep, setRunStepPartAction as  SetRunStepPartAction } from "@jield/solodb-typescript-core";
 
 const RunStepPartProductionBadge = ({
   runPart,

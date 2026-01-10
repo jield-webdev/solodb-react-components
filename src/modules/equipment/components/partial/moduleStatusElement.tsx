@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form"; // react-hook-form for managing form
 import axios from "axios"; // axios for server calls
 import { Badge, Button, Form, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { EquipmentModule, EquipmentModuleStatus, EquipmentStatus, listEquipmentStatus } from "solodb-typescript-core";
+import { EquipmentModule, EquipmentModuleStatus, EquipmentStatus, listEquipmentStatus } from "@jield/solodb-typescript-core";
 
 type Inputs = {
   status: string;

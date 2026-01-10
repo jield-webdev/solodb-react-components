@@ -1,4 +1,4 @@
-import { Equipment } from 'solodb-typescript-core';
+import { Equipment } from '@jield/solodb-typescript-core';
 interface EquipmentContext {
     equipment: Equipment;
     reloadEquipment: () => void;

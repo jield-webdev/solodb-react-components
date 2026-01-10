@@ -3,7 +3,7 @@ import { Badge, Button, Card, ListGroup } from "react-bootstrap";
 import { formatDateTime } from "@/utils/datetime";
 import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
 import ReactMarkdown from "react-markdown";
-import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from "solodb-typescript-core";
+import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from "@jield/solodb-typescript-core";
 
 export default function EcnCard({
   ecn,

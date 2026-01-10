@@ -1,4 +1,4 @@
-import { LocationMessage } from 'solodb-typescript-core';
+import { LocationMessage } from '@jield/solodb-typescript-core';
 export default function StatusMailMessageElement({ messageList, refetchFn, }: {
     messageList: LocationMessage[];
     refetchFn: () => void;

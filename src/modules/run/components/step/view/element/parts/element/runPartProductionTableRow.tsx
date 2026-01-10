@@ -4,7 +4,7 @@ import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDateTime } from "@/utils/datetime";
 import RunStepPartComment from "@/modules/run/components/step/view/element/parts/element/runStepPartComment";
-import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep, setRunStepPartAction as SetRunStepPartAction } from "solodb-typescript-core";
+import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep, setRunStepPartAction as SetRunStepPartAction } from "@jield/solodb-typescript-core";
 
 const RunStepPartProductionTableRow = ({
   runPart,

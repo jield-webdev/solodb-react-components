@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { Equipment, FilterData } from 'solodb-typescript-core';
+import { Equipment, FilterData } from '@jield/solodb-typescript-core';
 export default function EquipmentTable({ equipmentList, currentFilter, setEquipmentSort, addEquipment, }: {
     equipmentList: Equipment[];
     currentFilter: FilterData | undefined;

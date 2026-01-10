@@ -2,7 +2,7 @@ import React from "react";
 import { StatusMailContext } from "@/modules/equipment/contexts/statusMailContext";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import { getStatusMail } from "solodb-typescript-core";
+import { getStatusMail } from "@jield/solodb-typescript-core";
 
 export default function StatusMailProvider({ children }: { children: React.ReactNode }) {
   const { id } = useParams();

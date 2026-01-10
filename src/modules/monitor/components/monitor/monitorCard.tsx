@@ -3,7 +3,7 @@ import { useQueries } from "@tanstack/react-query";
 import { Card } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 import { formatDateTime } from "@/utils/datetime";
-import { Monitor, listMonitorRequirements } from "solodb-typescript-core";
+import { Monitor, listMonitorRequirements } from "@jield/solodb-typescript-core";
 
 export default function MonitorCard({ monitor }: { monitor: Monitor }) {
   const { environment } = useParams();

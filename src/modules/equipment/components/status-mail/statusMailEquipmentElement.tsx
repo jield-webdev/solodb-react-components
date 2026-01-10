@@ -7,7 +7,7 @@ import { ButtonGroup, Card, Col, Dropdown, DropdownButton, Row } from "react-boo
 import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
 import ReservationElement from "@/modules/equipment/components/partial/reservationElement";
-import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleReservation } from "solodb-typescript-core";
+import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleReservation } from "@jield/solodb-typescript-core";
 
 export default function StatusMailEquipmentElement({
   equipment,

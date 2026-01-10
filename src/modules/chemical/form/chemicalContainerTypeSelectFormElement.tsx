@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Controller } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 import { customStyles } from "@/modules/core/form/element/userFormElement";
-import { listChemicalContainerTypes } from "solodb-typescript-core";
+import { listChemicalContainerTypes } from "@jield/solodb-typescript-core";
 
 export default function ChemicalContainerTypeSelectFormElement({ control, errors }: { control: any; errors: any }) {
   const [optionsCache, setOptionsCache] = useState<Record<string, { value: number; label: string }>>({});

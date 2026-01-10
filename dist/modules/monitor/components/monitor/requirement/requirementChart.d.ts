@@ -1,4 +1,4 @@
-import { MonitorRequirementTarget, MonitorMeasurementResult } from 'solodb-typescript-core';
+import { MonitorRequirementTarget, MonitorMeasurementResult } from '@jield/solodb-typescript-core';
 export default function RequirementChart({ target, results, }: {
     target: MonitorRequirementTarget;
     results: MonitorMeasurementResult[];

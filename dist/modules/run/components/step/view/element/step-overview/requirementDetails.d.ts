@@ -1,4 +1,4 @@
-import { Requirement, RunStep, RunStepPart, RunPart, MeasurementResult } from 'solodb-typescript-core';
+import { Requirement, RunStep, RunStepPart, RunPart, MeasurementResult } from '@jield/solodb-typescript-core';
 export default function RequirementDetails({ requirement, step, stepParts, parts, measurementResults, }: {
     requirement: Requirement;
     step: RunStep;

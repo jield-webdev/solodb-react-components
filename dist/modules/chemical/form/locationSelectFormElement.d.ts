@@ -1,4 +1,4 @@
-import { Room } from 'solodb-typescript-core';
+import { Room } from '@jield/solodb-typescript-core';
 interface LocationSelectorWithQRProps {
     control: any;
     name: string;

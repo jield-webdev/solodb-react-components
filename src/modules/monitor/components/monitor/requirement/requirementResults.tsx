@@ -10,7 +10,7 @@ import PaginationLinks from "@/modules/partial/paginationLinks";
 import AddResultModal from "@/modules/monitor/components/monitor/requirement/addResultModal";
 import AddStepParameterValueModal from "@/modules/monitor/components/monitor/requirement/addStepParameterValueModal";
 import EditStepParameterValueModal from "@/modules/monitor/components/monitor/requirement/editStepParameterValueModal";
-import { listMonitorRequirementResultMonitorStepParameterValues, listMonitorRequirementResults, listMonitorRequirementTargets, listMonitorStepFiles, MonitorRequirement, MonitorStepParameter, File } from "solodb-typescript-core";
+import { listMonitorRequirementResultMonitorStepParameterValues, listMonitorRequirementResults, listMonitorRequirementTargets, listMonitorStepFiles, MonitorRequirement, MonitorStepParameter, File } from "@jield/solodb-typescript-core";
 
 export default function RequirementResults({ requirement }: { requirement: MonitorRequirement }) {
   const AMOUNT_OF_FILES = 11;

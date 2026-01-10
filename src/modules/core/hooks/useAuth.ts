@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { configureAxiosHeaders, getMe, User } from "solodb-typescript-core";
+import { configureAxiosHeaders, getMe, User } from "@jield/solodb-typescript-core";
 import { getServerUri } from "@/modules/core/config/runtimeConfig";
 
 export const useAuth = () => {

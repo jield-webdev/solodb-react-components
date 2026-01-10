@@ -1,4 +1,4 @@
-import { RunPart, RunStepPart, RunStep } from 'solodb-typescript-core';
+import { RunPart, RunStepPart, RunStep } from '@jield/solodb-typescript-core';
 export default function RunPartStepPart({ runPart, runStepParts, runStep, }: {
     runPart: RunPart;
     runStepParts: RunStepPart[];

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Alert, Button, Form, Modal, Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { Requirement, MeasurementResult, RunPart, RunStepPart } from "solodb-typescript-core";
+import { Requirement, MeasurementResult, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 
 export const FillValueModal = ({
   requirement,

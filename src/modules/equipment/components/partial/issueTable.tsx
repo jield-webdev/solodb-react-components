@@ -2,7 +2,7 @@ import React, { JSX, useState } from "react";
 import moment from "moment";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
 import ReactMarkdown from "react-markdown";
-import { Equipment, EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from "solodb-typescript-core";
+import { Equipment, EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from "@jield/solodb-typescript-core";
 
 function IssueTableRow({
   issue,

@@ -5,7 +5,7 @@ import Select, { StylesConfig } from "react-select";
 import axios from "axios";
 import UserFormElement from "@/modules/core/form/element/userFormElement";
 import { StatusMailContext } from "@/modules/equipment/contexts/statusMailContext";
-import { LocationMessage, MessageType, Room } from "solodb-typescript-core";
+import { LocationMessage, MessageType, Room } from "@jield/solodb-typescript-core";
 
 interface MessageModalFormProps {
   showModal: boolean;

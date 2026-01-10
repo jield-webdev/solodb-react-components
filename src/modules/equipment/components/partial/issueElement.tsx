@@ -3,7 +3,7 @@ import { Badge, Button } from "react-bootstrap";
 import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
 import moment from "moment/moment";
 import ReactMarkdown from "react-markdown";
-import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleIssueType } from "solodb-typescript-core";
+import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleIssueType } from "@jield/solodb-typescript-core";
 
 export default function IssueElement({
   issue,

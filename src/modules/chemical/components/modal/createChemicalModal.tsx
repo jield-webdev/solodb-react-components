@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import axios from "axios";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Chemical, ChemicalPhysicalStateEnum, ChemicalStandardProductEnum } from "solodb-typescript-core";
+import { Chemical, ChemicalPhysicalStateEnum, ChemicalStandardProductEnum } from "@jield/solodb-typescript-core";
 
 //Infer the types from the Chemical interface
 type Inputs = Omit<Chemical, "id">;

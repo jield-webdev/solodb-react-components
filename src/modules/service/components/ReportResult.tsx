@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Category from "@/modules/service/components/report/Category";
-import { getServiceEventReport, listReportResult, ServiceEventReport, ServiceEventReportResult } from "solodb-typescript-core";
+import { getServiceEventReport, listReportResult, ServiceEventReport, ServiceEventReportResult } from "@jield/solodb-typescript-core";
 
 export default function ReportResults() {
   const { id } = useParams<{ id: string }>();
