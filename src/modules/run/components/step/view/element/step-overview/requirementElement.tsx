@@ -1,11 +1,11 @@
 import React, { useContext, useState } from "react";
 import { Badge } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
-import DateFormat from "@/modules/partial/dateFormat";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import DateFormat from "@jield/solodb-react-components/modules/partial/dateFormat";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { useQueries } from "@tanstack/react-query";
-import { MeasurementResultsBadges } from "@/modules/run/components/shared/requirement/measurementResultsBadge";
-import RequirementDetails from "@/modules/run/components/step/view/element/step-overview/requirementDetails";
+import { MeasurementResultsBadges } from "@jield/solodb-react-components/modules/run/components/shared/requirement/measurementResultsBadge";
+import RequirementDetails from "@jield/solodb-react-components/modules/run/components/step/view/element/step-overview/requirementDetails";
 import { listMeasurementResults, Requirement, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 
 export default function RequirementElement({

@@ -1,6 +1,6 @@
 import React from "react";
-import { useMonitor } from "@/modules/monitor/hooks/useMonitor";
-import { MonitorContext } from "@/modules/monitor/contexts/monitorContext";
+import { useMonitor } from "@jield/solodb-react-components/modules/monitor/hooks/useMonitor";
+import { MonitorContext } from "@jield/solodb-react-components/modules/monitor/contexts/monitorContext";
 
 export default function MonitorProvider({ children }: { children: React.ReactNode }) {
   const { monitor, reloadMonitor } = useMonitor();

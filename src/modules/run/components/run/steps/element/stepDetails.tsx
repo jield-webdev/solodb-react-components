@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import { Card, Col, Row } from "react-bootstrap";
-import { RunStepParametersTable } from "@/modules/run/components/shared/parameters/runStepParametersTable";
-import { EmphasizedParametersContext } from "@/modules/run/contexts/emphasizedParametersContext";
-import UploadFilesToStep from "@/modules/run/components/shared/files/uploadFilesToStep";
-import RunPartsResearchRun from "@/modules/run/components/step/view/element/parts/runPartsResearchRun";
-import RunPartsProductionRun from "@/modules/run/components/step/view/element/parts/runPartsProductionRun";
-import { RunContext } from "@/modules/run/contexts/runContext";
+import { RunStepParametersTable } from "@jield/solodb-react-components/modules/run/components/shared/parameters/runStepParametersTable";
+import { EmphasizedParametersContext } from "@jield/solodb-react-components/modules/run/contexts/emphasizedParametersContext";
+import UploadFilesToStep from "@jield/solodb-react-components/modules/run/components/shared/files/uploadFilesToStep";
+import RunPartsResearchRun from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/runPartsResearchRun";
+import RunPartsProductionRun from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/runPartsProductionRun";
+import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 import { RunStep, RunStepPart, RunPart, RunTypeEnum } from "@jield/solodb-typescript-core";
 
 export default function StepDetails({

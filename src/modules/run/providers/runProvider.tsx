@@ -1,6 +1,6 @@
 import React from "react";
-import { useRun } from "@/modules/run/hooks/useRun";
-import { RunContext } from "@/modules/run/contexts/runContext";
+import { useRun } from "@jield/solodb-react-components/modules/run/hooks/useRun";
+import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 
 export default function RunProvider({ children }: { children: React.ReactNode }) {
   const { run, reloadRun } = useRun();

@@ -1,9 +1,9 @@
 import React, { useContext, useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
-import DateFormat from "@/modules/partial/dateFormat";
+import DateFormat from "@jield/solodb-react-components/modules/partial/dateFormat";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import PaginationLinks from "@/modules/partial/paginationLinks";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { listRunChangelog, Changelog } from "@jield/solodb-typescript-core";
 
 const RunChangelogModal = ({

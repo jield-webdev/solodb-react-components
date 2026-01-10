@@ -2,7 +2,7 @@ import React from "react";
 import { useQueries } from "@tanstack/react-query";
 import { Card } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
-import { formatDateTime } from "@/utils/datetime";
+import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import { Monitor, listMonitorRequirements } from "@jield/solodb-typescript-core";
 
 export default function MonitorCard({ monitor }: { monitor: Monitor }) {

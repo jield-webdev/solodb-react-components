@@ -1,8 +1,8 @@
-import { formatDateTime } from "@/utils/datetime";
+import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import React, { useContext } from "react";
-import { EquipmentContext } from "@/modules/equipment/contexts/equipmentContext";
+import { EquipmentContext } from "@jield/solodb-react-components/modules/equipment/contexts/equipmentContext";
 import { useQueries } from "@tanstack/react-query";
-import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
+import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 import { listModules, listReservations } from "@jield/solodb-typescript-core";
 
 export default function EquipmentHeader() {

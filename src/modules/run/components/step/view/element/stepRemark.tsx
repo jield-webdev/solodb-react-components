@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 

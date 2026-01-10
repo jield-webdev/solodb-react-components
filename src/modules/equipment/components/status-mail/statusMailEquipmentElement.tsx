@@ -1,12 +1,12 @@
 import React, { JSX, useEffect, useState } from "react";
 import "./equipment.css";
-import EcnElement from "@/modules/equipment/components/partial/ecnElement";
-import IssueElement from "@/modules/equipment/components/partial/issueElement";
-import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
+import EcnElement from "@jield/solodb-react-components/modules/equipment/components/partial/ecnElement";
+import IssueElement from "@jield/solodb-react-components/modules/equipment/components/partial/issueElement";
+import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 import { ButtonGroup, Card, Col, Dropdown, DropdownButton, Row } from "react-bootstrap";
-import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
-import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
-import ReservationElement from "@/modules/equipment/components/partial/reservationElement";
+import EcnModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/ecnModalForm";
+import IssueModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/issueModalForm";
+import ReservationElement from "@jield/solodb-react-components/modules/equipment/components/partial/reservationElement";
 import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleReservation } from "@jield/solodb-typescript-core";
 
 export default function StatusMailEquipmentElement({

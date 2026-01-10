@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Priority as PriorityInterface } from "@jield/solodb-typescript-core";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 
 const PriorityBadge = () => {
   const { run } = useContext(RunStepContext);

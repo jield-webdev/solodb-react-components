@@ -1,8 +1,8 @@
 import { Alert, Button, Spinner, Table } from "react-bootstrap";
 import { useContext, useEffect, useState } from "react";
-import { FillValueModal } from "@/modules/run/components/shared/requirement/fillValueModal";
+import { FillValueModal } from "@jield/solodb-react-components/modules/run/components/shared/requirement/fillValueModal";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { listMeasurementResults, listRunParts, listRunStepParts, MeasurementResult, MeasurementResultValue, Requirement, RunPart, RunStep, RunStepPart } from "@jield/solodb-typescript-core";
 
 export default function RequirementValuesWithPartTable({

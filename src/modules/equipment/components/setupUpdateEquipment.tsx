@@ -19,7 +19,7 @@ import { useInView } from "react-intersection-observer";
 import EquipmentTable from "./setup/equipmentTable";
 import FilterFormBar from "./setup/filterFormBar";
 import { FilterBadges } from "./setup/filterBadges";
-import { GetServerUri } from "@/modules/core/functions/getServerUri";
+import { GetServerUri } from "@jield/solodb-react-components/modules/core/functions/getServerUri";
 import { Setup } from "@jield/solodb-typescript-core/dist/equipment/interfaces/setup";
 
 export function populateFilterData(filterFormData: FilterFormData): FilterData {

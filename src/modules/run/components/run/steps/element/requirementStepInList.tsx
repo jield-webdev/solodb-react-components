@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
+import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 import { Badge } from "react-bootstrap";
-import RequirementDetails from "@/modules/run/components/run/steps/element/requirementDetails";
+import RequirementDetails from "@jield/solodb-react-components/modules/run/components/run/steps/element/requirementDetails";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { MeasurementResultsBadges } from "@/modules/run/components/shared/requirement/measurementResultsBadge";
+import { MeasurementResultsBadges } from "@jield/solodb-react-components/modules/run/components/shared/requirement/measurementResultsBadge";
 import { Requirement, RunStep, RunPart, RunStepPart, EquipmentModule, MeasurementResult, listMeasurementResults } from "@jield/solodb-typescript-core";
 
 export default function RequirementStepInList({

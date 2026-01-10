@@ -1,5 +1,5 @@
 import React, { JSX, useState } from "react";
-import MessageModalForm from "@/modules/equipment/components/partial/messageModalForm";
+import MessageModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/messageModalForm";
 import { Badge, Button } from "react-bootstrap";
 import moment from "moment";
 import ReactMarkdown from "react-markdown";

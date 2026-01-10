@@ -3,8 +3,8 @@ import { Button, Form, Modal } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
 import Select, { StylesConfig } from "react-select";
 import axios from "axios";
-import UserFormElement from "@/modules/core/form/element/userFormElement";
-import { StatusMailContext } from "@/modules/equipment/contexts/statusMailContext";
+import UserFormElement from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
+import { StatusMailContext } from "@jield/solodb-react-components/modules/equipment/contexts/statusMailContext";
 import { LocationMessage, MessageType, Room } from "@jield/solodb-typescript-core";
 
 interface MessageModalFormProps {

@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
-import HoldCodeModal from "@/modules/run/components/step/view/element/hold-code/holdCodeModal";
+import HoldCodeModal from "@jield/solodb-react-components/modules/run/components/step/view/element/hold-code/holdCodeModal";
 import { HoldCode as HoldCodeInterface } from "@jield/solodb-typescript-core";
 import { Badge } from "react-bootstrap";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 
 const HoldCodeBadge = () => {
   const { run } = useContext(RunStepContext);

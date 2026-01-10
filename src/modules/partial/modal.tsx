@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 
 const InputModal = () => {
   const [modalShow, setModalShow] = useState<boolean>(false);

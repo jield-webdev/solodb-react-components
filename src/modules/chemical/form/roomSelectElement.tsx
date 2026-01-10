@@ -36,7 +36,7 @@ export default function RoomSelectElement({ control, name }: RoomSelectElementPr
 
   return (
     <div>
-      <h3>Choose a lab</h3>
+      <h3>Choose a labs</h3>
       <Form.Group className="mb-3" controlId="chemical.roomSelect">
         <Controller
           name={name}

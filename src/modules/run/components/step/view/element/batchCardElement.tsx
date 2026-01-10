@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Card, Form, InputGroup } from "react-bootstrap";
-import { TextWithLineBreaks } from "@/utils/text";
-import DateFormat from "@/modules/partial/dateFormat";
+import { TextWithLineBreaks } from "@jield/solodb-react-components/utils/text";
+import DateFormat from "@jield/solodb-react-components/modules/partial/dateFormat";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { Run, BatchCard } from "@jield/solodb-typescript-core";

@@ -2,18 +2,18 @@ import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, Col, Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
 import axios from "axios";
-import LocationSelectFormElement from "@/modules/chemical/form/locationSelectFormElement";
-import ChemicalSelectFormElement from "@/modules/chemical/form/chemicalSelectFormElement";
+import LocationSelectFormElement from "@jield/solodb-react-components/modules/chemical/form/locationSelectFormElement";
+import ChemicalSelectFormElement from "@jield/solodb-react-components/modules/chemical/form/chemicalSelectFormElement";
 import { QRCodeSVG } from "qrcode.react";
-import ChemicalContainerTypeSelectFormElement from "@/modules/chemical/form/chemicalContainerTypeSelectFormElement";
-import UserFormElement from "@/modules/core/form/element/userFormElement";
-import { AuthContext } from "@/modules/core/contexts/authContext";
+import ChemicalContainerTypeSelectFormElement from "@jield/solodb-react-components/modules/chemical/form/chemicalContainerTypeSelectFormElement";
+import UserFormElement from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
+import { AuthContext } from "@jield/solodb-react-components/modules/core/contexts/authContext";
 import { useParams } from "react-router-dom";
 import {
   AMOUNT_UNITS,
   extractLabelNumber,
   scannedCodeIsLocationCode,
-} from "@/modules/chemical/components/chemical/registerBarcodeElement";
+} from "@jield/solodb-react-components/modules/chemical/components/chemical/registerBarcodeElement";
 import { ChemicalContainer, getLocation, Room, Location } from "@jield/solodb-typescript-core";
 
 type Inputs = {

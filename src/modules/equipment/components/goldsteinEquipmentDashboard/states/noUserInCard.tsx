@@ -1,5 +1,5 @@
-import { useGoldsteinClientDataContext } from "@/modules/admin/context/goldstein/DataContext";
-import { registerBadge } from "@/modules/admin/functions/goldstein/registerBadge";
+import { useGoldsteinClientDataContext } from "@jield/solodb-react-components/modules/admin/context/goldstein/DataContext";
+import { registerBadge } from "@jield/solodb-react-components/modules/admin/functions/goldstein/registerBadge";
 import React, { useEffect, useState } from "react";
 
 // Define the types for the props

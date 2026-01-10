@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
-import RunStepSimpleList from "@/modules/run/components/step/view/element/runStepSimpleList";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
+import RunStepSimpleList from "@jield/solodb-react-components/modules/run/components/step/view/element/runStepSimpleList";
 
 const StepOverviewModal = ({ show, setModalShow }: { show: boolean; setModalShow: any }) => {
   const { run } = useContext(RunStepContext);

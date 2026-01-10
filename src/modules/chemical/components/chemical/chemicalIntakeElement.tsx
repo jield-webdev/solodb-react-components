@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import RoomSelectElement from "@/modules/chemical/form/roomSelectElement";
-import BarcodeScanElement from "@/modules/chemical/components/chemical/barcodeScanElement";
+import RoomSelectElement from "@jield/solodb-react-components/modules/chemical/form/roomSelectElement";
+import BarcodeScanElement from "@jield/solodb-react-components/modules/chemical/components/chemical/barcodeScanElement";
 import { Alert, Table } from "react-bootstrap";
-import RegisterBarcodeElement from "@/modules/chemical/components/chemical/registerBarcodeElement";
+import RegisterBarcodeElement from "@jield/solodb-react-components/modules/chemical/components/chemical/registerBarcodeElement";
 import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { QRCodeSVG } from "qrcode.react";
-import RegisterContainerElement from "@/modules/chemical/components/chemical/registerContainerElement";
+import RegisterContainerElement from "@jield/solodb-react-components/modules/chemical/components/chemical/registerContainerElement";
 import {
   Location,
   ChemicalContainer,

@@ -1,6 +1,6 @@
 import React from "react";
-import { useEquipment } from "@/modules/equipment/hooks/useEquipment";
-import { EquipmentContext } from "@/modules/equipment/contexts/equipmentContext";
+import { useEquipment } from "@jield/solodb-react-components/modules/equipment/hooks/useEquipment";
+import { EquipmentContext } from "@jield/solodb-react-components/modules/equipment/contexts/equipmentContext";
 
 export default function EquipmentProvider({ children }: { children: React.ReactNode }) {
   const { equipment, reloadEquipment } = useEquipment();

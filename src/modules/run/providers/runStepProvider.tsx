@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useRunStep } from "@/modules/run/hooks/useRunStep";
-import { ModalProperties } from "@/modules/core/interfaces/modalProperties";
-import { RunStepContext } from "@/modules/run/contexts/runStepContext";
+import { useRunStep } from "@jield/solodb-react-components/modules/run/hooks/useRunStep";
+import { ModalProperties } from "@jield/solodb-react-components/modules/core/interfaces/modalProperties";
+import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 
 export default function RunStepProvider({ children }: { children: React.ReactNode }) {
   const { runStep, setRunStep, run, reloadRunStep } = useRunStep();

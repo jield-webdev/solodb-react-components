@@ -1,7 +1,7 @@
 import React, { JSX, useState } from "react";
 import { Badge, Button, Card, ListGroup } from "react-bootstrap";
-import { formatDateTime } from "@/utils/datetime";
-import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
+import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
+import EcnModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/ecnModalForm";
 import ReactMarkdown from "react-markdown";
 import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from "@jield/solodb-typescript-core";
 

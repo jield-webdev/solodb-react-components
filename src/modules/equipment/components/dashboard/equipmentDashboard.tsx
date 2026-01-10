@@ -2,15 +2,15 @@ import React, { JSX, useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { Alert, Button, Col, Container, Row, Table } from "react-bootstrap";
-import MonitorCard from "@/modules/monitor/components/monitor/monitorCard";
-import LogAssistElement from "@/modules/run/components/step/view/element/logAssistElement";
-import { EquipmentContext } from "@/modules/equipment/contexts/equipmentContext";
-import IssueCard from "@/modules/equipment/components/dashboard/issueCard";
-import EcnCard from "@/modules/equipment/components/dashboard/ecnCard";
-import EcnModalForm from "@/modules/equipment/components/partial/ecnModalForm";
-import IssueModalForm from "@/modules/equipment/components/partial/issueModalForm";
-import ModuleStatusElement from "@/modules/equipment/components/partial/moduleStatusElement";
-import ListEquipmentReport from "@/modules/service/components/equipmentReports/ListEquipmentReport";
+import MonitorCard from "@jield/solodb-react-components/modules/monitor/components/monitor/monitorCard";
+import LogAssistElement from "@jield/solodb-react-components/modules/run/components/step/view/element/logAssistElement";
+import { EquipmentContext } from "@jield/solodb-react-components/modules/equipment/contexts/equipmentContext";
+import IssueCard from "@jield/solodb-react-components/modules/equipment/components/dashboard/issueCard";
+import EcnCard from "@jield/solodb-react-components/modules/equipment/components/dashboard/ecnCard";
+import EcnModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/ecnModalForm";
+import IssueModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/issueModalForm";
+import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
+import ListEquipmentReport from "@jield/solodb-react-components/modules/service/components/equipmentReports/ListEquipmentReport";
 import { listEcn, listEcnAttachments, listIssueAttachments, listIssues, listModules, listMonitors, listRuns, Run } from "@jield/solodb-typescript-core";
 
 export default function EquipmentDashboard() {

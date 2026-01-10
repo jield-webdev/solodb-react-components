@@ -1,4 +1,4 @@
-import { NotificationEntry } from "@/modules/admin/functions/goldstein/notifications";
+import { NotificationEntry } from "@jield/solodb-react-components/modules/admin/functions/goldstein/notifications";
 
 export type WSPackage = {
   package_type: number;

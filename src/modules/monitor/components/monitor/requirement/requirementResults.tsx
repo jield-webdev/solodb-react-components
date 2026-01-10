@@ -3,13 +3,13 @@ import { keepPreviousData, useQueries } from "@tanstack/react-query";
 import { Alert, Badge, Col, Row, Table } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
-import { formatDateTime } from "@/utils/datetime";
-import { GetServerUri } from "@/modules/core/functions/getServerUri";
-import RequirementChart from "@/modules/monitor/components/monitor/requirement/requirementChart";
-import PaginationLinks from "@/modules/partial/paginationLinks";
-import AddResultModal from "@/modules/monitor/components/monitor/requirement/addResultModal";
-import AddStepParameterValueModal from "@/modules/monitor/components/monitor/requirement/addStepParameterValueModal";
-import EditStepParameterValueModal from "@/modules/monitor/components/monitor/requirement/editStepParameterValueModal";
+import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
+import { GetServerUri } from "@jield/solodb-react-components/modules/core/functions/getServerUri";
+import RequirementChart from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/requirementChart";
+import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
+import AddResultModal from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/addResultModal";
+import AddStepParameterValueModal from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/addStepParameterValueModal";
+import EditStepParameterValueModal from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/editStepParameterValueModal";
 import { listMonitorRequirementResultMonitorStepParameterValues, listMonitorRequirementResults, listMonitorRequirementTargets, listMonitorStepFiles, MonitorRequirement, MonitorStepParameter, File } from "@jield/solodb-typescript-core";
 
 export default function RequirementResults({ requirement }: { requirement: MonitorRequirement }) {

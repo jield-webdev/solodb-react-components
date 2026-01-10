@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "react-bootstrap";
-import StepOverviewModal from "@/modules/run/components/step/view/element/step-overview/stepOverviewModal";
+import StepOverviewModal from "@jield/solodb-react-components/modules/run/components/step/view/element/step-overview/stepOverviewModal";
 
 const StepOverviewButton = ({ size }: { size?: "lg" | "sm" | undefined }) => {
   const [modalShow, setModalShow] = useState<boolean>(false);

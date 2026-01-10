@@ -1,5 +1,5 @@
 import React from "react";
-import RequirementValuesWithPartTable from "@/modules/run/components/shared/requirement/requirementValuesWithPartTable";
+import RequirementValuesWithPartTable from "@jield/solodb-react-components/modules/run/components/shared/requirement/requirementValuesWithPartTable";
 import { Link, useParams } from "react-router-dom";
 import { Table } from "react-bootstrap";
 import { Requirement, RunStep, RunStepPart, RunPart, MeasurementResult } from "@jield/solodb-typescript-core";

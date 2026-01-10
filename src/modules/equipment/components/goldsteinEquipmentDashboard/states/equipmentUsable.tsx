@@ -1,5 +1,5 @@
 import UpdateStatus from "../actionModules/updateStatus";
-import { parseAssociation } from "@/modules/admin/functions/goldstein/parseAssociation";
+import { parseAssociation } from "@jield/solodb-react-components/modules/admin/functions/goldstein/parseAssociation";
 
 interface EquipmentUsableProps {
   userName: string;
