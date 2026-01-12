@@ -47,6 +47,8 @@ export default defineConfig({
         "react-dom",
         "react-router-dom",
         "@tanstack/react-query",
+        "@tanstack/react-table",
+        "axios",
         "react/jsx-runtime",
         "react/jsx-dev-runtime",
       ],
@@ -57,6 +59,7 @@ export default defineConfig({
           "react-dom": "ReactDOM",
           "react-router-dom": "ReactRouterDOM",
           "@tanstack/react-query": "ReactQuery",
+          "axios": "axios"
         },
       },
     },
