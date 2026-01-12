@@ -6,20 +6,31 @@ on:
       - 'v*'
 
 permissions:
-  id-token: write
   contents: read
+  id-token: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm install 
-      - run: npm run
-      - run: npm test
-      - run: npm publish
+
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          yarn --version
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+
+      - name: Publish to npm 
+        run: npm publish 
