@@ -5,88 +5,97 @@ import dts from "vite-plugin-dts";
 
 // https://vitejs.dev/config/
 // @ts-ignore
-export default defineConfig({
-  // Plugins configuration
-  plugins: [
-    // React plugin (Babel) for fast refresh and JSX transformation
-    react(),
-    // Generate TypeScript declaration files
-    dts({
-      insertTypesEntry: true,
-      include: ["src/**/*"],
-      exclude: ["src/main.tsx", "src/routes/**/*"],
-    }),
-  ],
+export default defineConfig(({ mode }) => {
+  return {
+    // Plugins configuration
+    plugins: [
+      // React plugin (Babel) for fast refresh and JSX transformation
+      react(),
+      // Generate TypeScript declaration files
+      dts({
+        insertTypesEntry: true,
+        include: ["src/**/*"],
+        exclude: ["src/main.tsx", "src/routes/**/*"],
+      }),
+    ],
 
-  // Resolve configuration
-  resolve: {
-    // Path aliases for cleaner imports
-    alias: {
-      "@jield/solodb-react-components": path.join(__dirname, "./src"),
-      // "@modules": path.join(__dirname, "./src/modules"),
+    // Resolve configuration
+    resolve: {
+      // Path aliases for cleaner imports
+      alias:
+        mode === "development"
+          ? {
+              // In development, override the @ alias to point to the main src
+              // Use local source code for these libraries
+              "@jield/solodb-react-components": path.join(__dirname, "./src"),
+              "@jield/solodb-typescript-core": path.join(__dirname, "../solodb-typescript-core/src"),
+            }
+          : {},
+      // Ensure only one copy of React is used (prevents "invalid hook call" errors)
+      dedupe: ["react", "react-dom"],
     },
-  },
 
-  // Build configuration for library mode
-  build: {
-    // Output directory for the build
-    outDir: "dist",
-    // Library mode configuration
-    lib: {
-      entry: path.resolve(__dirname, "src/index.ts"),
-      name: "SoloDBReactComponents",
-      formats: ["es", "cjs"],
-      fileName: (format) => (format === "cjs" ? "index.cjs" : "index.js"),
-    },
-    // Rollup options
-    rollupOptions: {
-      // Externalize peer dependencies so they're not bundled
-      // Note: also externalize the automatic JSX runtime to avoid resolving it during library build
-      external: [
-        "react",
-        "react-dom",
-        "react-router-dom",
-        "@tanstack/react-query",
-        "@tanstack/react-table",
-        "axios",
-        "react/jsx-runtime",
-        "react/jsx-dev-runtime",
-      ],
-      output: {
-        // Provide global variables for UMD build
-        globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
-          "react-router-dom": "ReactRouterDOM",
-          "@tanstack/react-query": "ReactQuery",
-          "axios": "axios"
+    // Build configuration for library mode
+    build: {
+      // Output directory for the build
+      outDir: "dist",
+      // Library mode configuration
+      lib: {
+        entry: path.resolve(__dirname, "src/index.ts"),
+        name: "SoloDBReactComponents",
+        formats: ["es", "cjs"],
+        fileName: (format) => (format === "cjs" ? "index.cjs" : "index.js"),
+      },
+      // Rollup options
+      rollupOptions: {
+        // Externalize peer dependencies so they're not bundled
+        // Note: also externalize the automatic JSX runtime to avoid resolving it during library build
+        external: [
+          "react",
+          "react-dom",
+          "react-router-dom",
+          "@tanstack/react-query",
+          "@tanstack/react-table",
+          "axios",
+          "react/jsx-runtime",
+          "react/jsx-dev-runtime",
+        ],
+        output: {
+          // Provide global variables for UMD build
+          globals: {
+            react: "React",
+            "react-dom": "ReactDOM",
+            "react-router-dom": "ReactRouterDOM",
+            "@tanstack/react-query": "ReactQuery",
+            axios: "axios",
+          },
         },
       },
+      // Generate source maps
+      sourcemap: true,
+      // Target modern browsers
+      target: "es2020",
     },
-    // Generate source maps
-    sourcemap: true,
-    // Target modern browsers
-    target: "es2020",
-  },
-  // Vitest configuration
-  // @ts-ignore
-  test: {
-    environment: "jsdom",
-    globals: true,
-    setupFiles: [path.resolve(__dirname, "src/setupTests.ts")],
-    coverage: {
-      reporter: ["text", "html"],
-      provider: "v8",
-      reportsDirectory: "coverage",
-      include: ["src/**/*.{ts,tsx}"],
-      exclude: [
-        "src/main.tsx",
-        "src/routes/**",
-        "src/**/interfaces/**",
-        "src/**/contexts/**",
-        "src/**/providers/**",
-        "dist/**",
-      ],
+    // Vitest configuration
+    // @ts-ignore
+    test: {
+      environment: "jsdom",
+      globals: true,
+      setupFiles: [path.resolve(__dirname, "src/setupTests.ts")],
+      coverage: {
+        reporter: ["text", "html"],
+        provider: "v8",
+        reportsDirectory: "coverage",
+        include: ["src/**/*.{ts,tsx}"],
+        exclude: [
+          "src/main.tsx",
+          "src/routes/**",
+          "src/**/interfaces/**",
+          "src/**/contexts/**",
+          "src/**/providers/**",
+          "dist/**",
+        ],
+      },
     },
-  },
+  };
 });

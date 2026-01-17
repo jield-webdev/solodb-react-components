@@ -19,7 +19,6 @@ import { useInView } from "react-intersection-observer";
 import EquipmentTable from "./setup/equipmentTable";
 import FilterFormBar from "./setup/filterFormBar";
 import { FilterBadges } from "./setup/filterBadges";
-import { GetServerUri } from "@jield/solodb-react-components/modules/core/functions/getServerUri";
 import { Setup } from "@jield/solodb-typescript-core/dist/equipment/interfaces/setup";
 
 export function populateFilterData(filterFormData: FilterFormData): FilterData {
@@ -38,8 +37,6 @@ export function populateFilterData(filterFormData: FilterFormData): FilterData {
 export default function SetupUpdateEquipment() {
   const { id, environment } = useParams();
   const { ref, inView } = useInView();
-
-  console.log(GetServerUri());
 
   const [equipmentSort, setEquipmentSort] = useState<{ order: string; direction?: "asc" | "desc" }>({
     order: "default",
@@ -72,7 +69,7 @@ export default function SetupUpdateEquipment() {
 
   const isError = queries.some((query) => query.isError);
 
-  const setup = useMemo(() => setupQuery.data as Setup, [setupQuery.data]);
+  const setup = useMemo(() => setupQuery.data as unknown as Setup, [setupQuery.data]);
   const previousFilterFormData = useRef<FilterFormData | undefined>(undefined);
   const filterFormData = useMemo<FilterFormData>(() => {
     if (filterFormQuery.data === undefined) {
