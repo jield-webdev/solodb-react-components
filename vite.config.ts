@@ -22,17 +22,10 @@ export default defineConfig(({ mode }) => {
     // Resolve configuration
     resolve: {
       // Path aliases for cleaner imports
-      alias:
-        mode === "development"
-          ? {
-              // In development, override the @ alias to point to the main src
-              // Use local source code for these libraries
-              "@jield/solodb-react-components": path.join(__dirname, "./src"),
-              "@jield/solodb-typescript-core": path.join(__dirname, "../solodb-typescript-core/src"),
-            }
-          : {},
-      // Ensure only one copy of React is used (prevents "invalid hook call" errors)
-      dedupe: ["react", "react-dom"],
+      alias: {
+        "@jield/solodb-react-components": path.join(__dirname, "./src"),
+        // "@modules": path.join(__dirname, "./src/modules"),
+      },
     },
 
     // Build configuration for library mode
