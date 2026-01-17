@@ -17,7 +17,9 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@jield/solodb-react-components/*": ["src/*"]
+      "@jield/solodb-react-components/*": ["src/*"],
+      "@jield/solodb-typescript-core": ["../solodb-typescript-core/src/index.ts"],
+      "@jield/solodb-typescript-core/*": ["../solodb-typescript-core/src/*"]
     }
   },
   "include": ["./src"],
