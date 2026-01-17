@@ -6,7 +6,20 @@ import StatusMailEquipmentElement from "@jield/solodb-react-components/modules/e
 import StatusMailMessageElement from "@jield/solodb-react-components/modules/equipment/components/status-mail/statusMailMessageElement";
 import IssueTable from "@jield/solodb-react-components/modules/equipment/components/partial/issueTable";
 import SendStatusMailButton from "@jield/solodb-react-components/modules/equipment/components/partial/sendStatusMail";
-import { Equipment, listEquipment, listModules, listEcn, listIssues, listLocationMessages, listEcnAttachments, listIssueAttachments, listReservations, ClassificationsOptionEnum } from "@jield/solodb-typescript-core";
+import {
+  Equipment,
+  listEquipment,
+  listModules,
+  listEcn,
+  listIssues,
+  listLocationMessages,
+  listEcnAttachments,
+  listIssueAttachments,
+  listReservations,
+  ClassificationsOptionEnum,
+  Area,
+  Facility,
+} from "@jield/solodb-typescript-core";
 
 export default function StatusMailComponent() {
   let { statusMail } = useContext(StatusMailContext);
@@ -93,17 +106,17 @@ export default function StatusMailComponent() {
     equipmentList.sort((a, b) => {
       if (statusMail.classification === ClassificationsOptionEnum.ROOM) {
         return a.room.name.localeCompare(b.room.name);
-      } else if (statusMail.classification === ClassificationsOptionEnum.AREA) {
-        return a.area.localeCompare(b.area);
-      } else if (statusMail.classification === ClassificationsOptionEnum.AREA_PER_FACILITY) {
-        return a.facility.localeCompare(b.facility) || a.area.localeCompare(b.area);
+      } else if (a.area && b.area && statusMail.classification === ClassificationsOptionEnum.AREA) {
+        return a.area.title.localeCompare(b.area.title);
+      } else if (a.area && b.area && statusMail.classification === ClassificationsOptionEnum.AREA_PER_FACILITY) {
+        return a.area.facility.title.localeCompare(b.area.facility.title) || a.area.title.localeCompare(b.area.title);
       }
       return 0;
     });
 
     // Render the equipment list with headers
-    let lastFacility = "";
-    let lastArea = "";
+    let lastFacility: Facility | null;
+    let lastArea: Area | null = null;
     let lastRoom = "";
     return equipmentList.map((equipment, index) => {
       const components = [];
@@ -115,17 +128,19 @@ export default function StatusMailComponent() {
           lastRoom = equipment.room.name;
         }
       } else if (statusMail.classification === ClassificationsOptionEnum.AREA) {
-        if (equipment.area !== lastArea) {
-          components.push(<h2 key={`area-${equipment.area}`}>Area: {equipment.area}</h2>);
+        if (equipment.area && equipment.area !== lastArea) {
+          components.push(<h2 key={`area-${equipment.area.id}`}>Area: {equipment.area.title}</h2>);
           lastArea = equipment.area;
         }
       } else if (statusMail.classification === ClassificationsOptionEnum.AREA_PER_FACILITY) {
-        if (equipment.facility !== lastFacility) {
-          components.push(<h2 key={`facility-${equipment.facility}`}>Facility: {equipment.facility}</h2>);
-          lastFacility = equipment.facility;
+        if (equipment.area && equipment.area.facility !== lastFacility) {
+          components.push(
+            <h2 key={`facility-${equipment.area.facility.id}`}>Facility: {equipment.area.facility.title}</h2>
+          );
+          lastFacility = equipment.area.facility;
         }
-        if (equipment.area !== lastArea) {
-          components.push(<h4 key={`area-${equipment.area}`}>Area: {equipment.area}</h4>);
+        if (equipment.area && equipment.area !== lastArea) {
+          components.push(<h4 key={`area-${equipment.area.id}`}>Area: {equipment.area.title}</h4>);
           lastArea = equipment.area;
         }
       }
