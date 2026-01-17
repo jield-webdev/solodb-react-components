@@ -696,7 +696,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@jield/solodb-react-components@workspace:."
   dependencies:
-    "@jield/solodb-typescript-core": "npm:^1.0.4"
+    "@jield/solodb-typescript-core": "npm:^1.0.5"
     "@originjs/vite-plugin-commonjs": "npm:^1.0.3"
     "@tanstack/react-query": "npm:~5.90.16"
     "@tanstack/react-query-devtools": "npm:~5.91.2"
@@ -743,12 +743,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@jield/solodb-typescript-core@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "@jield/solodb-typescript-core@npm:1.0.4"
+"@jield/solodb-typescript-core@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@jield/solodb-typescript-core@npm:1.0.5"
   peerDependencies:
     axios: ^1.13.2
-  checksum: 10c0/3ee96d2315c6b87c4096edbca6dd190e7486800c1c9d873ec2375fc92c4f390f70d244bfb9eb74f2af85b20e59078c7497550d777feb3169bb986d513f165c29
+  checksum: 10c0/67dec7ae91f33e0ea321c37774dc079a9a1b2a862e75dfda9bbe301b125831c9edd7058463a76557c428f6a5179301fb80d4da0cac5dfdfc20d9bc899660f503
   languageName: node
   linkType: hard
 
