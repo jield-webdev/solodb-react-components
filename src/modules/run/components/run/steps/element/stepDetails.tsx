@@ -6,21 +6,26 @@ import UploadFilesToStep from "@jield/solodb-react-components/modules/run/compon
 import RunPartsResearchRun from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/runPartsResearchRun";
 import RunPartsProductionRun from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/runPartsProductionRun";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
-import { RunStep, RunStepPart, RunPart, RunTypeEnum } from "@jield/solodb-typescript-core";
+import { RunStep, RunStepPart, RunPart, RunTypeEnum, Run } from "@jield/solodb-typescript-core";
 
 export default function StepDetails({
+  run,
   step,
   stepParts,
   parts,
-  refetchFn,
+  refetchFn = () => null,
 }: {
+  run?: Run;
   step: RunStep;
   stepParts: RunStepPart[];
   parts: RunPart[];
-  refetchFn: (keys: any[]) => void;
+  refetchFn?: (keys: any[]) => void;
 }) {
   const { showOnlyEmphasizedParameters } = useContext(EmphasizedParametersContext);
-  const { run } = useContext(RunContext);
+
+  if (!run) {
+    run = useContext(RunContext).run;
+  }
 
   return (
     <Card className="p-4 my-3">

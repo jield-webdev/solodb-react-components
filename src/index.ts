@@ -26,6 +26,9 @@ export { default as RunStepsElement } from "@jield/solodb-react-components/modul
 export { default as RunInformationElement } from "@jield/solodb-react-components/modules/run/components/run/steps/runInformationElement";
 export { default as RunStepHeaderElement } from "@jield/solodb-react-components/modules/run/components/step/runStepHeaderElement";
 export { default as RunStepExecuteElement } from "@jield/solodb-react-components/modules/run/components/step/view/runStepExecuteElement";
+export { default as StepDetails } from "@jield/solodb-react-components/modules/run/components/run/steps/element/stepDetails";
+export { default as RunStepChecklist } from "@jield/solodb-react-components/modules/run/components/step/view/element/runStepChecklist";
+export { default as RunStepExecuteMinimal } from "@jield/solodb-react-components/modules/run/components/step/execute/runStepExecuteMinimal";
 
 // Run Providers
 export { default as RunProvider } from "@jield/solodb-react-components/modules/run/providers/runProvider";

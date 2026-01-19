@@ -5,13 +5,37 @@ import axios from "axios";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { useQuery } from "@tanstack/react-query";
 import ChecklistItemElement from "@jield/solodb-react-components/modules/run/components/step/view/element/checklist/checklistItemElement";
-import { listRunStepChecklistItems, RunStep, RunStepChecklistItem } from "@jield/solodb-typescript-core";
+import { listRunStepChecklistItems, Run, RunStep, RunStepChecklistItem } from "@jield/solodb-typescript-core";
 
-const RunStepChecklist = () => {
+export default function RunStepChecklist({
+  run,
+  runStep,
+  reloadRunStep = () => null,
+  nextStepBtn = true,
+}: {
+  run?: Run;
+  runStep?: RunStep;
+  reloadRunStep?: () => void;
+  nextStepBtn?: boolean;
+}) {
   let navigate = useNavigate();
   const { environment } = useParams();
 
-  const { runStep, reloadRunStep, run } = useContext(RunStepContext);
+  if (!run) {
+    run = useContext(RunStepContext).run;
+  }
+  if (!runStep) {
+    runStep = useContext(RunStepContext).runStep;
+  }
+
+  if (!reloadRunStep) {
+    reloadRunStep = useContext(RunStepContext).reloadRunStep; 
+  }
+
+  if (!runStep || !reloadRunStep || !run) {
+      return <>Please set RunStepContext in RunStepChecklist</>
+  }
+
   let canFinishOperation = useRef<boolean>(false);
 
   //Grab the checklist, via a tanstack query
@@ -112,7 +136,7 @@ const RunStepChecklist = () => {
         </div>
 
         <div className={"d-flex gap-2"}>
-          {runStep.next_step_id && (
+          {nextStepBtn && runStep.next_step_id && (
             <div>
               <Link to={`/${environment}/operator/run/step/${runStep.next_step_id}`} className={"btn btn-secondary"}>
                 Next step
@@ -123,5 +147,4 @@ const RunStepChecklist = () => {
       </div>
     </>
   );
-};
-export default RunStepChecklist;
+}
