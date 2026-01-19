@@ -107,9 +107,9 @@ export default function EquipmentTable({
                 <span className="badge bg-info badge-inactive">In Fixed setup {equipment.fixed_setup?.name}</span>
               )}{" "}
               {equipment.is_in_active_setup && !equipment.is_in_fixed_setup && (
-                <span className="badge bg-info badge-active">In active {equipment.active_setup?.name}</span>
+                <span className="badge bg-info badge-active">In use in {equipment.active_setup?.name}</span>
               )}{" "}
-              {!equipment.has_setup_equipment && (
+              {!equipment.is_in_fixed_setup && (
                 <button onClick={() => addEquipment(equipment)} className="btn btn-outline-success btn-sm">
                   <i className="fa fa-plus" /> Add to setup
                 </button>
