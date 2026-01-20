@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext, useRef, useState, useEffect } from "react";
 import { Alert, Button, ListGroup } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -20,6 +20,18 @@ export default function RunStepChecklist({
 }) {
   let navigate = useNavigate();
   const { environment } = useParams();
+
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (statusMessage) {
+      const timer = setTimeout(() => {
+        setStatusMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [statusMessage]);
 
   if (!run) {
     run = useContext(RunStepContext).run;
@@ -49,24 +61,32 @@ export default function RunStepChecklist({
   }
 
   function finishOperation(runStep: RunStep) {
+    setStatusMessage("Moving out...");
+    setIsProcessing(true);
+    setTimeout(() => setIsProcessing(false), 1000);
     axios
       .create()
       .patch<RunStep>("update/run/step/finish/" + runStep.id, {})
       .then((response) => {
+        setStatusMessage("Operation finished");
         if (movePage && response.data.next_step_id !== null) {
           navigate(`/${environment}/operator/run/step/${response.data.next_step_id}`);
-       } else {
-            // @ts-ignore
-            reloadRunStep();
+        } else {
+          // @ts-ignore
+          reloadRunStep();
         }
       });
   }
 
   function skipOperation(runStep: RunStep) {
+    setStatusMessage("Skipping...");
+    setIsProcessing(true);
+    setTimeout(() => setIsProcessing(false), 1000);
     axios
       .create()
       .patch("update/run/step/skip/" + runStep.id, {})
       .then(() => {
+        setStatusMessage("Operation skipped");
         // @ts-ignore
         reloadRunStep();
         if (runStep.next_step_id !== null) {
@@ -76,10 +96,14 @@ export default function RunStepChecklist({
   }
 
   function unSkipOperation(runStep: RunStep) {
+    setStatusMessage("Unskipping...");
+    setIsProcessing(true);
+    setTimeout(() => setIsProcessing(false), 1000);
     axios
       .create()
       .patch("update/run/step/un-skip/" + runStep.id, {})
       .then(() => {
+        setStatusMessage("Operation unskipped");
         // @ts-ignore
         reloadRunStep();
       });
@@ -114,27 +138,27 @@ export default function RunStepChecklist({
       )}
 
       <div className={"d-flex justify-content-between mt-3"}>
-        <div className={"d-flex gap-2"}>
+        <div className={"d-flex gap-2 align-items-center"}>
           {canFinishOperation.current && (
             <div>
-              <Button variant={"success"} onClick={() => finishOperation(runStep)}>
-                Move out
+              <Button variant={"success"} onClick={() => finishOperation(runStep)} disabled={isProcessing}>
+                {statusMessage === "Operation finished" || statusMessage === "Moving out..." ? statusMessage : "Move out"}
               </Button>
             </div>
           )}
 
           {run.access.edit && !runStep.is_skipped && (
             <div>
-              <Button variant={"primary"} onClick={() => skipOperation(runStep)}>
-                Skip operation
+              <Button variant={"primary"} onClick={() => skipOperation(runStep)} disabled={isProcessing}>
+                {statusMessage === "Operation skipped" || statusMessage === "Skipping..." ? statusMessage : "Skip operation"}
               </Button>
             </div>
           )}
 
           {run.access.edit && runStep.is_skipped && (
             <div>
-              <Button variant={"warning"} onClick={() => unSkipOperation(runStep)}>
-                Unskip operation
+              <Button variant={"warning"} onClick={() => unSkipOperation(runStep)} disabled={isProcessing}>
+                {statusMessage === "Operation unskipped" || statusMessage === "Unskipping..." ? statusMessage : "Unskip operation"}
               </Button>
             </div>
           )}
