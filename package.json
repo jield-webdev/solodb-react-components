@@ -1,6 +1,6 @@
 {
   "name": "@jield/solodb-react-components",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "type": "module",
   "repository": "jield-webdev/solodb-react-components",
   "main": "./dist/index.cjs",
