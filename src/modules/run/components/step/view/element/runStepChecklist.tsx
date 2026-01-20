@@ -10,13 +10,13 @@ import { listRunStepChecklistItems, Run, RunStep, RunStepChecklistItem } from "@
 export default function RunStepChecklist({
   run,
   runStep,
-  reloadRunStep = () => null,
-  nextStepBtn = true,
+  reloadRunStep,
+  movePage = true,
 }: {
   run?: Run;
   runStep?: RunStep;
   reloadRunStep?: () => void;
-  nextStepBtn?: boolean;
+  movePage?: boolean;
 }) {
   let navigate = useNavigate();
   const { environment } = useParams();
@@ -29,7 +29,7 @@ export default function RunStepChecklist({
   }
 
   if (!reloadRunStep) {
-    reloadRunStep = useContext(RunStepContext).reloadRunStep; 
+    reloadRunStep = useContext(RunStepContext).reloadRunStep ?? (() => null); 
   }
 
   if (!runStep || !reloadRunStep || !run) {
@@ -53,8 +53,11 @@ export default function RunStepChecklist({
       .create()
       .patch<RunStep>("update/run/step/finish/" + runStep.id, {})
       .then((response) => {
-        if (response.data.next_step_id !== null) {
+        if (movePage && response.data.next_step_id !== null) {
           navigate(`/${environment}/operator/run/step/${response.data.next_step_id}`);
+       } else {
+            // @ts-ignore
+            reloadRunStep();
         }
       });
   }
@@ -64,6 +67,7 @@ export default function RunStepChecklist({
       .create()
       .patch("update/run/step/skip/" + runStep.id, {})
       .then(() => {
+        // @ts-ignore
         reloadRunStep();
         if (runStep.next_step_id !== null) {
           // navigate(`/${environment}/operator/run/step/${runStep.next_step_id}`);
@@ -76,6 +80,7 @@ export default function RunStepChecklist({
       .create()
       .patch("update/run/step/un-skip/" + runStep.id, {})
       .then(() => {
+        // @ts-ignore
         reloadRunStep();
       });
   }
@@ -136,7 +141,7 @@ export default function RunStepChecklist({
         </div>
 
         <div className={"d-flex gap-2"}>
-          {nextStepBtn && runStep.next_step_id && (
+          {movePage && runStep.next_step_id && (
             <div>
               <Link to={`/${environment}/operator/run/step/${runStep.next_step_id}`} className={"btn btn-secondary"}>
                 Next step

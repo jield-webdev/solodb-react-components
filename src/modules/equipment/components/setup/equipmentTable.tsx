@@ -12,12 +12,6 @@ import {
 import EditSortingPropertiesModal from "./editSortingPropertiesModal";
 import { Equipment, EquipmentGrade, FilterData } from "@jield/solodb-typescript-core";
 
-enum SetupEquipmentState {
-  NOT_IN_SETUP,
-  IN_SETUP,
-  MAIN_EQUIPMENT_IN_SETUP,
-}
-
 export default function EquipmentTable({
   equipmentList,
   currentFilter,
@@ -59,18 +53,6 @@ export default function EquipmentTable({
       setShowEquipmentProperties(false);
     }
   }, [currentFilter, equipmentList]);
-
-  const getSetupEquipmentState = (equipment: Equipment): SetupEquipmentState => {
-    if (equipment.is_main_in_setup) {
-      return SetupEquipmentState.MAIN_EQUIPMENT_IN_SETUP;
-    }
-
-    if (equipment.has_setup) {
-      return SetupEquipmentState.IN_SETUP;
-    }
-
-    return SetupEquipmentState.NOT_IN_SETUP;
-  };
 
   /*
    * TanStack Table
@@ -115,17 +97,20 @@ export default function EquipmentTable({
         header: "",
         enableSorting: false,
         cell: ({ row }) => {
-          const eq = row.original;
-          const reserved = isReserved(eq);
-          const setupState = getSetupEquipmentState(eq);
+          const equipment = row.original;
+          const reserved = isReserved(equipment);
 
           return (
             <>
               {reserved && <span className="badge bg-info badge-inactive">RESERVED</span>}{" "}
-              {setupState === 1 && <span className="badge bg-info badge-inactive">IN SETUP</span>}{" "}
-              {setupState === 2 && <span className="badge bg-info badge-inactive">MAIN IN SETUP</span>}{" "}
-              {!reserved && setupState === 0 && (
-                <button onClick={() => addEquipment(eq)} className="btn btn-outline-success btn-sm">
+              {equipment.is_in_fixed_setup && (
+                <span className="badge bg-info badge-inactive">In Fixed setup {equipment.fixed_setup?.name}</span>
+              )}{" "}
+              {equipment.is_in_active_setup && !equipment.is_in_fixed_setup && (
+                <span className="badge bg-info badge-active">In active {equipment.active_setup?.name}</span>
+              )}{" "}
+              {!equipment.has_setup_equipment && (
+                <button onClick={() => addEquipment(equipment)} className="btn btn-outline-success btn-sm">
                   <i className="fa fa-plus" /> Add to setup
                 </button>
               )}
