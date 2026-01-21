@@ -3,13 +3,30 @@ import { Button, Form } from "react-bootstrap";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import { RunStep } from "@jield/solodb-typescript-core";
 
 type Inputs = {
   remark: string;
 };
 
-const StepRemark = () => {
-  const { runStep, setRunStep } = useContext(RunStepContext);
+export default function StepRemark({ runStep, reloadRunStep }: { runStep: RunStep, reloadRunStep?: () => void }) {
+  let setRunStep: (runStep: RunStep) => void = (() => null);
+
+  if (!runStep) {
+    runStep = useContext(RunStepContext).runStep;
+    setRunStep = useContext(RunStepContext).setRunStep ?? (() => null);
+  } 
+
+  if (reloadRunStep !== undefined) {
+    setRunStep = (runStep: RunStep) => {
+        reloadRunStep();
+    }
+  }
+
+  if (!runStep) {
+    return <>Please set RunStepContext for StepRemark</>;
+  }
+
   const [showForm, setShowForm] = useState<boolean>(false);
   const [canUpdateRemark, setCanUpdateRemark] = useState<boolean>(!runStep.is_finished);
 
@@ -63,6 +80,4 @@ const StepRemark = () => {
       </Button>
     </Form>
   );
-};
-
-export default StepRemark;
+}
