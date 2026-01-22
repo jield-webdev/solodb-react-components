@@ -9,7 +9,7 @@ type Inputs = {
   remark: string;
 };
 
-export default function StepRemark({ runStep, reloadRunStep }: { runStep: RunStep, reloadRunStep?: () => void }) {
+export default function StepRemark({ runStep, reloadRunStep }: { runStep?: RunStep, reloadRunStep?: () => void }) {
   let setRunStep: (runStep: RunStep) => void = (() => null);
 
   if (!runStep) {
@@ -18,7 +18,7 @@ export default function StepRemark({ runStep, reloadRunStep }: { runStep: RunSte
   } 
 
   if (reloadRunStep !== undefined) {
-    setRunStep = (runStep: RunStep) => {
+    setRunStep = (_runStep: RunStep) => {
         reloadRunStep();
     }
   }
