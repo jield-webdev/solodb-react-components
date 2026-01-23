@@ -4,14 +4,9 @@ import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function SelectRunWithQrScanner({
-  setRun,
-  runsList,
-}: {
-  setRun: (run: Run) => void;
-  runsList: Run[];
-}) {
-  const { control, watch, reset } = useForm<{
+export default function SelectRunWithQrScanner({ setRun, runsList }: { setRun: (run: Run) => void; runsList: Run[] }) {
+  const [showInput, setShowInput] = useState<boolean>(false);
+  const { control, watch, reset, setFocus } = useForm<{
     barcode: string;
   }>({
     defaultValues: {
@@ -28,13 +23,13 @@ export default function SelectRunWithQrScanner({
         return;
       }
 
-      // When the barcode contains /r/ it is a run 
+      // When the barcode contains /r/ it is a run
       if (barcodeValue?.includes("/r/")) {
         const runId = barcodeValue.split("/r/")[1];
         const foundRun = runsList.find((run) => run.id === Number(runId));
         if (foundRun !== undefined) {
-            setRun(foundRun);
-            resetForm();
+          setRun(foundRun);
+          startForm();
         }
       }
     }, 1000);
@@ -60,8 +55,8 @@ export default function SelectRunWithQrScanner({
 
       if (event.key === "Enter") {
         // Perform actions on Enter key
-        if (scannedCode === "reset-form") {
-          resetForm(); // Reset the form
+        if (scannedCode === "start-form") {
+          startForm(); // Start the form
         }
         scannedCode = ""; // Reset the scanned code after processing
       } else {
@@ -75,16 +70,18 @@ export default function SelectRunWithQrScanner({
     };
   }, [reset]);
 
-  const resetForm = () => {
+  const startForm = () => {
+    setShowInput(true);
+    setFocus("barcode");
     reset({ barcode: "" });
   };
 
   return (
     <div className="d-flex flex-column justify-content-between">
-      <BarcodeScanElement control={control} />
+      {showInput && <BarcodeScanElement control={control} />}
       <div className="d-flex flex-column">
-        <QRCodeSVG value={"reset-form"} size={100} className={"float-end"} onClick={() => resetForm()} />
-        <span className={"text-muted"}>Reset form</span>
+        <QRCodeSVG value={"start-form"} size={100} className={"float-end"} onClick={() => startForm()} />
+        <span className={"text-muted"}>Start QR</span>
       </div>
     </div>
   );
