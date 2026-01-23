@@ -28,7 +28,9 @@ export { default as RunStepHeaderElement } from "@jield/solodb-react-components/
 export { default as RunStepExecuteElement } from "@jield/solodb-react-components/modules/run/components/step/view/runStepExecuteElement";
 export { default as StepDetails } from "@jield/solodb-react-components/modules/run/components/run/steps/element/stepDetails";
 export { default as RunStepChecklist } from "@jield/solodb-react-components/modules/run/components/step/view/element/runStepChecklist";
-export { default as RunStepExecuteMinimal } from "@jield/solodb-react-components/modules/run/components/step/execute/runStepExecuteMinimal";
+export { default as RunStepExecuteMinimal } from "@jield/solodb-react-components/modules/run/components/step/view/runStepExecuteMinimal";
+export { default as SelectRunWithQrScanner } from "@jield/solodb-react-components/modules/run/components/shared/qr-scanner/selectRunWithQrScanner";
+
 
 // Run Providers
 export { default as RunProvider } from "@jield/solodb-react-components/modules/run/providers/runProvider";
