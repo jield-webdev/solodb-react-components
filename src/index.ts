@@ -7,6 +7,7 @@ export { default as GoldsteinEquipmentDashboard } from "@jield/solodb-react-comp
 export { default as StatusMailComponent } from "@jield/solodb-react-components/modules/equipment/components/statusMailComponent";
 export { default as EquipmentDashboard } from "@jield/solodb-react-components/modules/equipment/components/dashboard/equipmentDashboard";
 export { default as EquipmentHeaderElement } from "@jield/solodb-react-components/modules/equipment/components/equipmentHeaderElement";
+export { default as ModuleStatusElement } from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 
 // Equipment Providers
 export { default as EquipmentProvider } from "@jield/solodb-react-components/modules/equipment/providers/equipmentProvider";

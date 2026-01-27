@@ -1,7 +1,7 @@
 import { Run, RunStep } from "@jield/solodb-typescript-core";
 import { RunStepParametersTable } from "../../shared/parameters/runStepParametersTable";
-import RunStepChecklist from "./element/runStepChecklist";
 import StepRemark from "./element/stepRemark";
+import RunStepChecklistExecute from "./element/runStepChecklistExecute";
 
 export default function RunStepExecuteMinimal({
   run,
@@ -23,7 +23,7 @@ export default function RunStepExecuteMinimal({
       <div className="d-flex flex-row flex-wrap gap-2">
         <div className="badge d-block p-2 flex-grow-1">
           <h3 className="mb-2 text-start">Checklist</h3>
-          <RunStepChecklist run={run} runStep={runStep} reloadRunStep={reloadRunStepFn} movePage={false} />
+          <RunStepChecklistExecute run={run} runStep={runStep} reloadRunStep={reloadRunStepFn} />
         </div>
         <div className="badge text-dark p-2">
           <h3 className="mb-2 text-start">Remark</h3>

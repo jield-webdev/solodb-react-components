@@ -11,12 +11,10 @@ export default function RunStepChecklist({
   run,
   runStep,
   reloadRunStep,
-  movePage = true,
 }: {
   run?: Run;
   runStep?: RunStep;
   reloadRunStep?: () => void;
-  movePage?: boolean;
 }) {
   let navigate = useNavigate();
   const { environment } = useParams();
@@ -69,7 +67,7 @@ export default function RunStepChecklist({
       .patch<RunStep>("update/run/step/finish/" + runStep.id, {})
       .then((response) => {
         setStatusMessage("Operation finished");
-        if (movePage && response.data.next_step_id !== null) {
+        if (response.data.next_step_id !== null) {
           navigate(`/${environment}/operator/run/step/${response.data.next_step_id}`);
         } else {
           // @ts-ignore
@@ -165,7 +163,7 @@ export default function RunStepChecklist({
         </div>
 
         <div className={"d-flex gap-2"}>
-          {movePage && runStep.next_step_id && (
+          {runStep.next_step_id && (
             <div>
               <Link to={`/${environment}/operator/run/step/${runStep.next_step_id}`} className={"btn btn-secondary"}>
                 Next step
