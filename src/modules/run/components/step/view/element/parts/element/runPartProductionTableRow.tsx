@@ -4,7 +4,13 @@ import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/element/runStepPartComment";
-import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep, setRunStepPartAction as SetRunStepPartAction } from "@jield/solodb-typescript-core";
+import {
+  RunStepPartActionEnum,
+  RunPart,
+  RunStepPart,
+  RunStep,
+  setRunStepPartAction as SetRunStepPartAction,
+} from "@jield/solodb-typescript-core";
 
 const RunStepPartProductionTableRow = ({
   runPart,
@@ -81,6 +87,16 @@ const RunStepPartProductionTableRow = ({
         <td>
           Part {runPart.short_label}
           {runPart.label && runPart.label.trim().length > 0 ? ` (${runPart.label})` : ""}
+          {setPartAsSelected && (
+            <input
+              type="checkbox"
+              name="tomato"
+              checked={partIsSelected}
+              onChange={() => {
+                setPartAsSelected(runPart.id);
+              }}
+            />
+          )}
         </td>
         <td colSpan={2}></td>
         <td>
@@ -101,13 +117,13 @@ const RunStepPartProductionTableRow = ({
       <td>
         Part {runStepPart.part.short_label}
         {runStepPart.part.label && runStepPart.part.label.trim().length > 0 ? ` (${runStepPart.part.label})` : ""}
-        {setPartAsSelected && partIsSelected !== undefined && (
+        {setPartAsSelected && (
           <input
             type="checkbox"
             name="tomato"
             checked={partIsSelected}
             onChange={() => {
-              setPartAsSelected(runStepPart.id);
+              setPartAsSelected(runPart.id);
             }}
           />
         )}
