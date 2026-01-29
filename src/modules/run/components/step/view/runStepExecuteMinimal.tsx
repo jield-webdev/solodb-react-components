@@ -18,7 +18,7 @@ export default function RunStepExecuteMinimal({
   return (
     <>
       <div style={{ overflow: "visible" }}>
-          <h3 className="mb-2 text-start">Parts</h3>
+        <h3 className="mb-2 text-start">Parts</h3>
         <RunPartsProductionRun run={run} runStep={runStep} />
       </div>
       <div className="d-flex flex-row flex-wrap gap-2">
@@ -26,9 +26,21 @@ export default function RunStepExecuteMinimal({
           <h3 className="mb-2 text-start">Parameters</h3>
           <RunStepParametersTable runStep={runStep} showOnlyEmphasizedParameters={showOnlyEmphasizedParameters} />
         </div>
-        <div className="badge text-dark p-2">
-          <h3 className="mb-2 text-start">Remark</h3>
-          <StepRemark runStep={runStep} reloadRunStep={reloadRunStepFn} />
+        <div className="d-flex flex-column gap-2">
+          <div className="badge text-dark p-2 text-start">
+            <h3 className="mb-2 text-start">Remark</h3>
+            <StepRemark runStep={runStep} reloadRunStep={reloadRunStepFn} />
+          </div>
+          {runStep.has_instructions && runStep.instructions && (
+            <div className="badge text-dark p-2 text-start">
+              <h3 className="mb-2 text-start">Instructions</h3>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: runStep.instructions,
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
       <div className="d-flex flex-row flex-wrap gap-2">
