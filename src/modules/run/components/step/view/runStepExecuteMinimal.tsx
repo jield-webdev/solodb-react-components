@@ -3,6 +3,7 @@ import StepRemark from "./element/stepRemark";
 import RunStepChecklistExecute from "./element/runStepChecklistExecute";
 import RunPartsProductionRun from "./element/parts/runPartsProductionRun";
 import { RunStepParametersTable } from "../../shared/parameters/runStepParametersTable";
+import UploadFilesToStep from "../../shared/files/uploadFilesToStep";
 
 export default function RunStepExecuteMinimal({
   run,
@@ -17,7 +18,7 @@ export default function RunStepExecuteMinimal({
 }) {
   return (
     <>
-      <div style={{ overflow: "visible" }}>
+      <div>
         <h3 className="mb-2 text-start">Parts</h3>
         <RunPartsProductionRun run={run} runStep={runStep} />
       </div>
@@ -27,7 +28,7 @@ export default function RunStepExecuteMinimal({
           <RunStepParametersTable runStep={runStep} showOnlyEmphasizedParameters={showOnlyEmphasizedParameters} />
         </div>
         <div className="d-flex flex-column gap-2">
-          <div className="badge text-dark p-2 text-start">
+          <div className="badge p-2 text-start">
             <h3 className="mb-2 text-start">Remark</h3>
             <StepRemark runStep={runStep} reloadRunStep={reloadRunStepFn} />
           </div>
@@ -47,6 +48,10 @@ export default function RunStepExecuteMinimal({
         <div className="badge d-block p-2 flex-grow-1">
           <h3 className="mb-2 text-start">Checklist</h3>
           <RunStepChecklistExecute run={run} runStep={runStep} reloadRunStep={reloadRunStepFn} />
+        </div>
+        <div className="badge d-block p-2 flex-grow-1">
+          <h3 className="mb-2 text-start">Step files</h3>
+          <UploadFilesToStep runStep={runStep} />
         </div>
       </div>
     </>
