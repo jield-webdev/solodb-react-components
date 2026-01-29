@@ -13,7 +13,7 @@ import {
   RunStepPartActionEnum,
   setRunStepPartAction,
 } from "@jield/solodb-typescript-core";
-import { getAvailableRunStepPartActions } from "./runPartsResearchRun";
+import { getAvailableRunStepPartActions } from "@jield/solodb-react-components/utils/run/getRunStepPartActions";
 
 const RunPartsProductionRun = ({
   run,
@@ -244,8 +244,7 @@ const RunPartsProductionRun = ({
     <React.Fragment>
       {leveledParts.length > 0 && (
         <>
-          <h3>Available parts</h3>
-          <Table size={"sm"} striped hover responsive className={"align-middle"}>
+          <Table size={"sm"} striped hover>
             <thead>
               <tr>
                 <th>Part</th>

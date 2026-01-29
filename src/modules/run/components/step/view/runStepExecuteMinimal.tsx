@@ -18,6 +18,7 @@ export default function RunStepExecuteMinimal({
   return (
     <>
       <div style={{ overflow: "visible" }}>
+          <h3 className="mb-2 text-start">Parts</h3>
         <RunPartsProductionRun run={run} runStep={runStep} />
       </div>
       <div className="d-flex flex-row flex-wrap gap-2">
