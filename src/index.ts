@@ -7,6 +7,7 @@ export { default as GoldsteinEquipmentDashboard } from "@jield/solodb-react-comp
 export { default as StatusMailComponent } from "@jield/solodb-react-components/modules/equipment/components/statusMailComponent";
 export { default as EquipmentDashboard } from "@jield/solodb-react-components/modules/equipment/components/dashboard/equipmentDashboard";
 export { default as EquipmentHeaderElement } from "@jield/solodb-react-components/modules/equipment/components/equipmentHeaderElement";
+export { default as ModuleStatusElement } from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 
 // Equipment Providers
 export { default as EquipmentProvider } from "@jield/solodb-react-components/modules/equipment/providers/equipmentProvider";
@@ -29,6 +30,7 @@ export { default as RunStepExecuteElement } from "@jield/solodb-react-components
 export { default as StepDetails } from "@jield/solodb-react-components/modules/run/components/run/steps/element/stepDetails";
 export { default as RunStepChecklist } from "@jield/solodb-react-components/modules/run/components/step/view/element/runStepChecklist";
 export { default as RunStepExecuteMinimal } from "@jield/solodb-react-components/modules/run/components/step/view/runStepExecuteMinimal";
+export { default as BatchCardElement } from "@jield/solodb-react-components/modules/run/components/step/view/element/batchCardElement";
 export { default as SelectRunWithQrScanner } from "@jield/solodb-react-components/modules/run/components/shared/qr-scanner/selectRunWithQrScanner";
 
 

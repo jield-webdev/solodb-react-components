@@ -25,7 +25,13 @@ import { RunStepParametersTable } from "@jield/solodb-react-components/modules/r
 import UploadFilesToStep from "@jield/solodb-react-components/modules/run/components/shared/files/uploadFilesToStep";
 import RequirementValuesWithPartTable from "../../../shared/requirement/requirementValuesWithPartTable";
 import RequirementValuesByStep from "../../../shared/requirement/requirementValuesByStep";
-import { listMonitors, getEquipmentModule, listRequirements, RunTypeEnum, listEcn } from "@jield/solodb-typescript-core";
+import {
+  listMonitors,
+  getEquipmentModule,
+  listRequirements,
+  RunTypeEnum,
+  listEcn,
+} from "@jield/solodb-typescript-core";
 
 const StepDashboard = () => {
   const { environment } = useParams();
@@ -75,7 +81,7 @@ const StepDashboard = () => {
       .forEach((q, idx) => {
         console.error("StepDashboard query error", { index: idx, error: q.error, runStep: runStep, run });
       });
-      return <>Error fetching data</>
+    return <>Error fetching data</>;
   }
 
   if (isLoading) {
@@ -136,17 +142,20 @@ const StepDashboard = () => {
                 editOnly={false}
               />
               <h4>Measurements for whole step</h4>
-              <RequirementValuesByStep
-                requirement={requirementQuery.data.items[0]}
-                editOnly={false}
-              />
+              <RequirementValuesByStep requirement={requirementQuery.data.items[0]} editOnly={false} />
             </>
           )}
           {requirementQuery.data?.items.length != 1 && run.run_type === RunTypeEnum.RESEARCH && (
-            <RunPartsResearchRun run={run} runStep={runStep} />
+            <>
+              <h3>Available parts</h3>
+              <RunPartsResearchRun run={run} runStep={runStep} />
+            </>
           )}
           {requirementQuery.data?.items.length != 1 && run.run_type === RunTypeEnum.PRODUCTION && (
-            <RunPartsProductionRun run={run} runStep={runStep} />
+            <>
+              <h3>Available parts</h3>
+              <RunPartsProductionRun run={run} runStep={runStep} />
+            </>
           )}
           <Row className={"py-4"}>
             <Col>
@@ -253,8 +262,7 @@ const StepDashboard = () => {
                     {ecn.last_update && (
                       <>
                         {" "}
-                        &middot; Updated by {formatDateTime(ecn.last_update, "DD-MM-YY H:m")} by{" "}
-                        {ecn.owner.full_name}
+                        &middot; Updated by {formatDateTime(ecn.last_update, "DD-MM-YY H:m")} by {ecn.owner.full_name}
                       </>
                     )}
                   </Card.Footer>

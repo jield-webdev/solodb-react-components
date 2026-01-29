@@ -1,9 +1,19 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Dropdown, Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/element/runPartProductionTableRow";
-import { Run, RunStep, RunStepPart, RunPart, listRunParts, listRunStepParts, RunStepPartActionEnum, setRunStepPartAction } from "@jield/solodb-typescript-core";
-import { getAvailableRunStepPartActions } from "./runPartsResearchRun";
+import {
+  Run,
+  RunStep,
+  RunStepPart,
+  RunPart,
+  listRunParts,
+  listRunStepParts,
+  RunStepPartActionEnum,
+  setRunStepPartAction,
+} from "@jield/solodb-typescript-core";
+import { getAvailableRunStepPartActions } from "@jield/solodb-react-components/utils/run/getRunStepPartActions";
 
 const RunPartsProductionRun = ({
   run,
@@ -49,18 +59,23 @@ const RunPartsProductionRun = ({
     [runStepParts, runStepPartsQuery.data]
   );
 
+  const leveledParts = useMemo(
+    () => runPartsData.filter((part) => part.part_level === runStep.part_level),
+    [runPartsData]
+  );
+
   // to handle what parts are selected in order to perform multi actions on them
   const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
 
   useEffect(() => {
-    for (const part of runStepPartsData) {
-      setSelectedParts((prev) => {
-        const next = new Map(prev);
-        next.set(part.id, false);
-        return next;
-      });
-    }
-  }, [runStepPartsData]);
+    setSelectedParts((prev) => {
+      const next = new Map<number, boolean>();
+      for (const part of leveledParts) {
+        next.set(part.id, prev.get(part.id) ?? false);
+      }
+      return next;
+    });
+  }, [leveledParts]);
 
   const setPartAsSelected = (partID: number) => {
     setSelectedParts((prev) => {
@@ -97,12 +112,10 @@ const RunPartsProductionRun = ({
     return <div className="text-danger">Error loading run parts.</div>;
   }
 
-  const leveledParts = runPartsData.filter((part) => part.part_level === runStep.part_level);
-
   const performActionToSelectedParts = (action: RunStepPartActionEnum) => {
     const stepPartsFiltered = runStepPartsData
       .filter((stepPart) => leveledParts.find((p) => p.id == stepPart.part.id))
-      .filter((part) => selectedParts.get(part.id));
+      .filter((part) => selectedParts.get(part.part.id));
 
     stepPartsFiltered.forEach((runPart) => {
       if (getAvailableRunStepPartActions(runPart).some((a) => a === action)) {
@@ -117,13 +130,45 @@ const RunPartsProductionRun = ({
   };
 
   const renderAvailableActions = () => {
-    const stepPartsFiltered = runStepPartsData
-      .filter((stepPart) => leveledParts.find((p) => p.id == stepPart.part.id))
-      .filter((part) => selectedParts.get(part.id));
+    const selectedRunParts = leveledParts.filter((part) => selectedParts.get(part.id));
 
-    if (!stepPartsFiltered || stepPartsFiltered.length === 0) {
+    if (!selectedRunParts || selectedRunParts.length === 0) {
       return null;
     }
+
+    const stepPartsFiltered = runStepPartsData
+      .filter((stepPart) => leveledParts.find((p) => p.id == stepPart.part.id))
+      .filter((part) => selectedParts.get(part.part.id));
+
+    const hasInitAction = selectedRunParts.some(
+      (runPart) =>
+        !runStepPartsData.find(
+          (runStepPart) => runStepPart.part.id === runPart.id && runStepPart.step.id === runStep.id
+        )
+    );
+
+    const initSelectedParts = () => {
+      const partsToInit = selectedRunParts.filter(
+        (runPart) =>
+          !runStepPartsData.find(
+            (runStepPart) => runStepPart.part.id === runPart.id && runStepPart.step.id === runStep.id
+          )
+      );
+
+      Promise.all(
+        partsToInit.map((runPart) =>
+          axios.post("/create/run/step/part", {
+            run_part_id: runPart.id,
+            run_step_id: runStep.id,
+          })
+        )
+      ).then(() => {
+        queryClient.refetchQueries({ queryKey: ["runStepParts", runStep.id] });
+        if (refetchFn) {
+          refetchFn();
+        }
+      });
+    };
 
     const actionSet = new Set<RunStepPartActionEnum>();
 
@@ -132,7 +177,7 @@ const RunPartsProductionRun = ({
       actionsForPart.forEach((action) => actionSet.add(action));
     });
 
-    if (actionSet.size === 0) {
+    if (actionSet.size === 0 && !hasInitAction) {
       return null;
     }
 
@@ -142,6 +187,15 @@ const RunPartsProductionRun = ({
           Actions
         </Dropdown.Toggle>
         <Dropdown.Menu>
+          {hasInitAction && (
+            <Dropdown.Item
+              onClick={() => {
+                initSelectedParts();
+              }}
+            >
+              Init
+            </Dropdown.Item>
+          )}
           {actionSet.has(RunStepPartActionEnum.START_PROCESSING) && (
             <Dropdown.Item
               onClick={() => {
@@ -190,8 +244,7 @@ const RunPartsProductionRun = ({
     <React.Fragment>
       {leveledParts.length > 0 && (
         <>
-          <h3>Available parts</h3>
-          <Table size={"sm"} striped hover responsive className={"align-middle"}>
+          <Table size={"sm"} striped hover>
             <thead>
               <tr>
                 <th>Part</th>
@@ -209,12 +262,7 @@ const RunPartsProductionRun = ({
                   runStepParts={runStepPartsData}
                   refetchFn={refetchFn}
                   key={i}
-                  partIsSelected={selectedParts.get(
-                    runStepPartsData?.find(
-                      (runStepPart: RunStepPart) =>
-                        runStepPart.part.id === runPart.id && runStepPart.step.id === runStep.id
-                    )?.id ?? 0
-                  )}
+                  partIsSelected={selectedParts.get(runPart.id) ?? false}
                   setPartAsSelected={setPartAsSelected}
                 />
               ))}

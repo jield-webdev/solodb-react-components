@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import ChecklistItemElement from "@jield/solodb-react-components/modules/run/components/step/view/element/checklist/checklistItemElement";
 import { listRunStepChecklistItems, Run, RunStep, RunStepChecklistItem } from "@jield/solodb-typescript-core";
 
-export default function RunStepChecklist({
+export default function RunStepChecklistExecute({
   run,
   runStep,
   reloadRunStep,
@@ -16,9 +16,6 @@ export default function RunStepChecklist({
   runStep?: RunStep;
   reloadRunStep?: () => void;
 }) {
-  let navigate = useNavigate();
-  const { environment } = useParams();
-
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
@@ -38,8 +35,9 @@ export default function RunStepChecklist({
     runStep = useContext(RunStepContext).runStep;
   }
 
+  const contextReloadFn = useContext(RunStepContext).reloadRunStep; 
   if (!reloadRunStep) {
-    reloadRunStep = useContext(RunStepContext).reloadRunStep ?? (() => null); 
+    reloadRunStep =  contextReloadFn ?? (() => null); 
   }
 
   if (!runStep || !reloadRunStep || !run) {
@@ -67,41 +65,6 @@ export default function RunStepChecklist({
       .patch<RunStep>("update/run/step/finish/" + runStep.id, {})
       .then((response) => {
         setStatusMessage("Operation finished");
-        if (response.data.next_step_id !== null) {
-          navigate(`/${environment}/operator/run/step/${response.data.next_step_id}`);
-        } else {
-          // @ts-ignore
-          reloadRunStep();
-        }
-      });
-  }
-
-  function skipOperation(runStep: RunStep) {
-    setStatusMessage("Skipping...");
-    setIsProcessing(true);
-    setTimeout(() => setIsProcessing(false), 1000);
-    axios
-      .create()
-      .patch("update/run/step/skip/" + runStep.id, {})
-      .then(() => {
-        setStatusMessage("Operation skipped");
-        // @ts-ignore
-        reloadRunStep();
-        if (runStep.next_step_id !== null) {
-          // navigate(`/${environment}/operator/run/step/${runStep.next_step_id}`);
-        }
-      });
-  }
-
-  function unSkipOperation(runStep: RunStep) {
-    setStatusMessage("Unskipping...");
-    setIsProcessing(true);
-    setTimeout(() => setIsProcessing(false), 1000);
-    axios
-      .create()
-      .patch("update/run/step/un-skip/" + runStep.id, {})
-      .then(() => {
-        setStatusMessage("Operation unskipped");
         // @ts-ignore
         reloadRunStep();
       });
@@ -142,32 +105,6 @@ export default function RunStepChecklist({
               <Button variant={"success"} onClick={() => finishOperation(runStep)} disabled={isProcessing}>
                 {statusMessage === "Operation finished" || statusMessage === "Moving out..." ? statusMessage : "Move out"}
               </Button>
-            </div>
-          )}
-
-          {run.access.edit && !runStep.is_skipped && (
-            <div>
-              <Button variant={"primary"} onClick={() => skipOperation(runStep)} disabled={isProcessing}>
-                {statusMessage === "Operation skipped" || statusMessage === "Skipping..." ? statusMessage : "Skip operation"}
-              </Button>
-            </div>
-          )}
-
-          {run.access.edit && runStep.is_skipped && (
-            <div>
-              <Button variant={"warning"} onClick={() => unSkipOperation(runStep)} disabled={isProcessing}>
-                {statusMessage === "Operation unskipped" || statusMessage === "Unskipping..." ? statusMessage : "Unskip operation"}
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <div className={"d-flex gap-2"}>
-          {runStep.next_step_id && (
-            <div>
-              <Link to={`/${environment}/operator/run/step/${runStep.next_step_id}`} className={"btn btn-secondary"}>
-                Next step
-              </Link>
             </div>
           )}
         </div>
