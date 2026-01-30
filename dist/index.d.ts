@@ -19,6 +19,7 @@ export { default as RunStepExecuteElement } from './modules/run/components/step/
 export { default as StepDetails } from './modules/run/components/run/steps/element/stepDetails';
 export { default as RunStepChecklist } from './modules/run/components/step/view/element/runStepChecklist';
 export { default as RunStepExecuteMinimal } from './modules/run/components/step/view/runStepExecuteMinimal';
+export { default as BatchCardElement } from './modules/run/components/step/view/element/batchCardElement';
 export { default as SelectRunWithQrScanner } from './modules/run/components/shared/qr-scanner/selectRunWithQrScanner';
 export { default as RunProvider } from './modules/run/providers/runProvider';
 export { default as RunStepProvider } from './modules/run/providers/runStepProvider';

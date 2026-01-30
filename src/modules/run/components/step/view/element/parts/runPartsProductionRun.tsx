@@ -12,8 +12,8 @@ import {
   listRunStepParts,
   RunStepPartActionEnum,
   setRunStepPartAction,
+  getAvailableRunStepPartActions,
 } from "@jield/solodb-typescript-core";
-import { getAvailableRunStepPartActions } from "@jield/solodb-react-components/utils/run/getRunStepPartActions";
 
 const RunPartsProductionRun = ({
   run,
