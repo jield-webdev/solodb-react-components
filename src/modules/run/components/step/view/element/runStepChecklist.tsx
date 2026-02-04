@@ -1,22 +1,35 @@
 import React, { useContext, useRef, useState, useEffect } from "react";
 import { Alert, Button, ListGroup } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { useQuery } from "@tanstack/react-query";
 import ChecklistItemElement from "@jield/solodb-react-components/modules/run/components/step/view/element/checklist/checklistItemElement";
-import { listRunStepChecklistItems, Run, RunStep, RunStepChecklistItem } from "@jield/solodb-typescript-core";
+import {
+  listRunStepChecklistItems,
+  Run,
+  RunStep,
+  RunStepChecklistItem,
+  finishStep,
+} from "@jield/solodb-typescript-core";
+
+const statusMessages = {
+  movingOut: "Moving out...",
+  skipping: "Skipping...",
+  unskipping: "Unskipping...",
+  operationFinished: "Operation finished",
+  operationSkipped: "Operation skipped",
+  operationUnskipped: "Operation unskipped",
+} as const;
 
 export default function RunStepChecklist({
   run,
   runStep,
   reloadRunStep,
-  movePage = true,
 }: {
   run?: Run;
   runStep?: RunStep;
   reloadRunStep?: () => void;
-  movePage?: boolean;
 }) {
   let navigate = useNavigate();
   const { environment } = useParams();
@@ -40,12 +53,13 @@ export default function RunStepChecklist({
     runStep = useContext(RunStepContext).runStep;
   }
 
+  const contextReloadFn = useContext(RunStepContext).reloadRunStep;
   if (!reloadRunStep) {
-    reloadRunStep = useContext(RunStepContext).reloadRunStep ?? (() => null); 
+    reloadRunStep = contextReloadFn ?? (() => null);
   }
 
   if (!runStep || !reloadRunStep || !run) {
-      return <>Please set RunStepContext in RunStepChecklist</>
+    return <>Please set RunStepContext in RunStepChecklist</>;
   }
 
   let canFinishOperation = useRef<boolean>(false);
@@ -61,32 +75,29 @@ export default function RunStepChecklist({
   }
 
   function finishOperation(runStep: RunStep) {
-    setStatusMessage("Moving out...");
+    setStatusMessage(statusMessages.movingOut);
     setIsProcessing(true);
     setTimeout(() => setIsProcessing(false), 1000);
-    axios
-      .create()
-      .patch<RunStep>("update/run/step/finish/" + runStep.id, {})
-      .then((response) => {
-        setStatusMessage("Operation finished");
-        if (movePage && response.data.next_step_id !== null) {
-          navigate(`/${environment}/operator/run/step/${response.data.next_step_id}`);
-        } else {
-          // @ts-ignore
-          reloadRunStep();
-        }
-      });
+    finishStep(runStep).then((response: AxiosResponse<RunStep>) => {
+      setStatusMessage(statusMessages.operationFinished);
+      if (response.data.next_step_id !== null) {
+        navigate(`/${environment}/operator/run/step/${response.data.next_step_id}`);
+      } else {
+        // @ts-ignore
+        reloadRunStep();
+      }
+    });
   }
 
   function skipOperation(runStep: RunStep) {
-    setStatusMessage("Skipping...");
+    setStatusMessage(statusMessages.skipping);
     setIsProcessing(true);
     setTimeout(() => setIsProcessing(false), 1000);
     axios
       .create()
       .patch("update/run/step/skip/" + runStep.id, {})
       .then(() => {
-        setStatusMessage("Operation skipped");
+        setStatusMessage(statusMessages.operationSkipped);
         // @ts-ignore
         reloadRunStep();
         if (runStep.next_step_id !== null) {
@@ -96,14 +107,14 @@ export default function RunStepChecklist({
   }
 
   function unSkipOperation(runStep: RunStep) {
-    setStatusMessage("Unskipping...");
+    setStatusMessage(statusMessages.unskipping);
     setIsProcessing(true);
     setTimeout(() => setIsProcessing(false), 1000);
     axios
       .create()
       .patch("update/run/step/un-skip/" + runStep.id, {})
       .then(() => {
-        setStatusMessage("Operation unskipped");
+        setStatusMessage(statusMessages.operationUnskipped);
         // @ts-ignore
         reloadRunStep();
       });
@@ -142,7 +153,9 @@ export default function RunStepChecklist({
           {canFinishOperation.current && (
             <div>
               <Button variant={"success"} onClick={() => finishOperation(runStep)} disabled={isProcessing}>
-                {statusMessage === "Operation finished" || statusMessage === "Moving out..." ? statusMessage : "Move out"}
+                {statusMessage === statusMessages.operationFinished || statusMessage === statusMessages.movingOut
+                  ? statusMessage
+                  : "Move out"}
               </Button>
             </div>
           )}
@@ -150,7 +163,9 @@ export default function RunStepChecklist({
           {run.access.edit && !runStep.is_skipped && (
             <div>
               <Button variant={"primary"} onClick={() => skipOperation(runStep)} disabled={isProcessing}>
-                {statusMessage === "Operation skipped" || statusMessage === "Skipping..." ? statusMessage : "Skip operation"}
+                {statusMessage === statusMessages.operationSkipped || statusMessage === statusMessages.skipping
+                  ? statusMessage
+                  : "Skip operation"}
               </Button>
             </div>
           )}
@@ -158,14 +173,16 @@ export default function RunStepChecklist({
           {run.access.edit && runStep.is_skipped && (
             <div>
               <Button variant={"warning"} onClick={() => unSkipOperation(runStep)} disabled={isProcessing}>
-                {statusMessage === "Operation unskipped" || statusMessage === "Unskipping..." ? statusMessage : "Unskip operation"}
+                {statusMessage === statusMessages.operationUnskipped || statusMessage === statusMessages.unskipping
+                  ? statusMessage
+                  : "Unskip operation"}
               </Button>
             </div>
           )}
         </div>
 
         <div className={"d-flex gap-2"}>
-          {movePage && runStep.next_step_id && (
+          {runStep.next_step_id && (
             <div>
               <Link to={`/${environment}/operator/run/step/${runStep.next_step_id}`} className={"btn btn-secondary"}>
                 Next step

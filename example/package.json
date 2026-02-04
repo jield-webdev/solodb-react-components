@@ -7,7 +7,7 @@
     "dev": "vite"
   },
   "dependencies": {
-    "@jield/solodb-react-components": "1.0.3",
+    "@jield/solodb-react-components": "link:..",
     "@tanstack/react-query": "~5.90.16",
     "@tanstack/react-table": "^8.21.3",
     "react": "^19.2.3",

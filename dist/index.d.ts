@@ -4,6 +4,7 @@ export { default as GoldsteinEquipmentDashboard } from './modules/equipment/comp
 export { default as StatusMailComponent } from './modules/equipment/components/statusMailComponent';
 export { default as EquipmentDashboard } from './modules/equipment/components/dashboard/equipmentDashboard';
 export { default as EquipmentHeaderElement } from './modules/equipment/components/equipmentHeaderElement';
+export { default as ModuleStatusElement } from './modules/equipment/components/partial/moduleStatusElement';
 export { default as EquipmentProvider } from './modules/equipment/providers/equipmentProvider';
 export { default as StatusMailProvider } from './modules/equipment/providers/statusMailProvider';
 export { default as MonitorCard } from './modules/monitor/components/monitor/monitorCard';
@@ -17,7 +18,9 @@ export { default as RunStepHeaderElement } from './modules/run/components/step/r
 export { default as RunStepExecuteElement } from './modules/run/components/step/view/runStepExecuteElement';
 export { default as StepDetails } from './modules/run/components/run/steps/element/stepDetails';
 export { default as RunStepChecklist } from './modules/run/components/step/view/element/runStepChecklist';
-export { default as RunStepExecuteMinimal } from './modules/run/components/step/execute/runStepExecuteMinimal';
+export { default as RunStepExecuteMinimal } from './modules/run/components/step/view/runStepExecuteMinimal';
+export { default as BatchCardElement } from './modules/run/components/step/view/element/batchCardElement';
+export { default as SelectRunWithQrScanner } from './modules/run/components/shared/qr-scanner/selectRunWithQrScanner';
 export { default as RunProvider } from './modules/run/providers/runProvider';
 export { default as RunStepProvider } from './modules/run/providers/runStepProvider';
 export { default as EmphasizedParametersProvider } from './modules/run/providers/emphasizedParametersProvider';

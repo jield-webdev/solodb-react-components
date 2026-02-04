@@ -8,11 +8,11 @@ import { useDropzone } from "react-dropzone";
 import { RunStep, listRunStepFiles, File } from "@jield/solodb-typescript-core";
 
 const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 Bytes';
-  
+  if (bytes === 0) return "0 Bytes";
+
   const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
 };
@@ -126,13 +126,10 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
                     className="fa fa-trash-o remove-file handle"
                     style={{ cursor: "pointer" }}
                     onClick={() => onClickDeleteFile(file)}
-                  />
-                  {" "}
+                  />{" "}
                   {formatFileSize(file.size)}
                 </td>
-                <td>
-                  {formatDateTime(file.date_created, "DD-MM-YY HH:mm")}
-                </td>
+                <td>{formatDateTime(file.date_created, "DD-MM-YY HH:mm")}</td>
               </tr>
             ))}
           </tbody>
@@ -160,11 +157,12 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
       )}
 
       {/* Upload button */}
-      <Button className="mt-3" onClick={handleUpload} disabled={selectedFiles.length === 0}>
-        Upload Selected Files
-      </Button>
-
-      <p className="mt-2 text-muted">{uploadStatus}</p>
+      <div className="text-start">
+        <Button className="mt-3" onClick={handleUpload} disabled={selectedFiles.length === 0}>
+          Upload Selected Files
+        </Button>
+        <p className="mt-2 text-muted">{uploadStatus}</p>
+      </div>
     </div>
   );
 }
