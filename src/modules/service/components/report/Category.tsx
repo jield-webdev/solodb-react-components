@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Criterion from "./Criterion";
 import axios from "axios";
 import { ServiceEventReportResult } from "@jield/solodb-typescript-core";
 
-// Cache structure: { [category: string]: { values: Record<number, any>, errors: Record<number, string> } }
 type FormCache = Record<
   string,
   {
@@ -26,7 +25,7 @@ export default function Category({
   const [errors, setErrors] = useState<Record<number, string>>({});
   const [savingById, setSavingById] = useState<Record<number, boolean>>({});
 
-  // Initialize or restore form state when category changes
+  // Initialise or restore form state when category changes
   useEffect(() => {
     const cacheKey = String(categoryId);
     // Create or update cache entry if it doesn't exist
@@ -128,7 +127,7 @@ export default function Category({
   }, []);
 
   return (
-    <div>
+    <React.Fragment>
       <legend>{label}</legend>
       {results.map((result) => {
         return (
@@ -143,6 +142,6 @@ export default function Category({
           />
         );
       })}
-    </div>
+    </React.Fragment>
   );
 }

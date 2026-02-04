@@ -24,7 +24,7 @@ export default function Criterion({
 
   return (
     <div
-      className={`form-group mb-3 p-3 rounded ${criterionVersion.highlighted ? "border border-warning" : ""}`}
+      className={`form-group mb-3 rounded ${criterionVersion.highlighted ? "border border-warning" : ""}`}
       style={wrapperStyle}
     >
       <label htmlFor={`result-${result.id}`} className="form-label">

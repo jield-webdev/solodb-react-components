@@ -1,7 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Category from "@jield/solodb-react-components/modules/service/components/report/Category";
-import { getServiceEventReport, listReportResult, ServiceEventReport, ServiceEventReportResult } from "@jield/solodb-typescript-core";
+import {
+  getServiceEventReport,
+  listReportResult,
+  ServiceEventReport,
+  ServiceEventReportResult,
+} from "@jield/solodb-typescript-core";
 
 export default function ReportResults() {
   const { id } = useParams<{ id: string }>();
@@ -104,59 +109,10 @@ export default function ReportResults() {
     setCurrentCategoryIndex((prev) => Math.min(prev + 1, totalCategories - 1));
   };
 
-  const event = report?.event;
-  const serviceName = event?.service?.name;
-  const placeName = event?.place?.name;
-  const planned = event?.date_planned ? new Date(event.date_planned).toLocaleString() : undefined;
-  const executed = event?.date_executed ? new Date(event.date_executed).toLocaleString() : undefined;
-
   return (
-    <div className="container mt-4">
-      {/* Header with event details */}
-      {event && (
-        <div className="card mb-3">
-          <div className="card-body">
-            <div className="d-flex justify-content-between align-items-start">
-              <div>
-                <h2 className="h4 mb-1">{serviceName || "Service"}</h2>
-                <div className="text-muted small">
-                  Report #{id} • Event #{event.id}
-                  {event.guid ? ` • ${event.guid}` : ""}
-                </div>
-              </div>
-            </div>
-            <div className="row mt-2">
-              {placeName && (
-                <div className="col-md-4">
-                  <div className="fw-semibold">Place</div>
-                  <div>{placeName}</div>
-                </div>
-              )}
-              {planned && (
-                <div className="col-md-4">
-                  <div className="fw-semibold">Planned</div>
-                  <div>{planned}</div>
-                </div>
-              )}
-              {executed && (
-                <div className="col-md-4">
-                  <div className="fw-semibold">Executed</div>
-                  <div>{executed}</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      <Category
-        categoryId={categories[currentCategoryIndex]}
-        label={categoryLabels[categories[currentCategoryIndex]]}
-        results={groupedReports[categories[currentCategoryIndex]]}
-      />
-
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <button className="btn btn-outline-primary" onClick={handlePrev} disabled={currentCategoryIndex === 0}>
+    <React.Fragment>
+      <div className="d-flex justify-content-center align-items-center gap-3 mb-3">
+        <button className="btn btn-sm btn-outline-primary" onClick={handlePrev} disabled={currentCategoryIndex === 0}>
           Previous
         </button>
 
@@ -165,13 +121,19 @@ export default function ReportResults() {
         </div>
 
         <button
-          className="btn btn-outline-primary"
+          className="btn btn-outline-primary btn-sm"
           onClick={handleNext}
           disabled={currentCategoryIndex === totalCategories - 1}
         >
           Next
         </button>
       </div>
-    </div>
+
+      <Category
+        categoryId={categories[currentCategoryIndex]}
+        label={categoryLabels[categories[currentCategoryIndex]]}
+        results={groupedReports[categories[currentCategoryIndex]]}
+      />
+    </React.Fragment>
   );
 }
