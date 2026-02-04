@@ -1,9 +1,14 @@
 import { ServiceEventReportResult } from '@jield/solodb-typescript-core';
-export default function Criterion({ result, value, onChange, error, onSubmit, saving, }: {
+type SaveStatusState = "idle" | "dirty" | "saving" | "saved" | "error";
+type SaveStatus = {
+    state: SaveStatusState;
+    message?: string;
+    savedAt?: number;
+};
+export default function Criterion({ result, status, onAutoSave, onDirty, }: {
     result: ServiceEventReportResult;
-    value: any;
-    onChange: (cv: ServiceEventReportResult, raw: any) => void;
-    error?: string;
-    onSubmit: (cv: ServiceEventReportResult) => void;
-    saving?: boolean;
+    status?: SaveStatus;
+    onAutoSave: (cv: ServiceEventReportResult) => void;
+    onDirty: (resultId: number) => void;
 }): import("react/jsx-runtime").JSX.Element;
+export {};

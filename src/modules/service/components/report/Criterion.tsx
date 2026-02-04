@@ -1,30 +1,80 @@
 import React from "react";
 import { ServiceEventReportResult } from "@jield/solodb-typescript-core";
+import { Controller, useFormContext } from "react-hook-form";
+
+type CriterionValue = string | boolean | string[] | null;
+type FormValues = Record<string, CriterionValue>;
+type SaveStatusState = "idle" | "dirty" | "saving" | "saved" | "error";
+type SaveStatus = {
+  state: SaveStatusState;
+  message?: string;
+  savedAt?: number;
+};
 
 export default function Criterion({
   result,
-  value,
-  onChange,
-  error,
-  onSubmit,
-  saving,
+  status,
+  onAutoSave,
+  onDirty,
 }: {
   result: ServiceEventReportResult;
-  value: any;
-  onChange: (cv: ServiceEventReportResult, raw: any) => void;
-  error?: string;
-  onSubmit: (cv: ServiceEventReportResult) => void;
-  saving?: boolean;
+  status?: SaveStatus;
+  onAutoSave: (cv: ServiceEventReportResult) => void;
+  onDirty: (resultId: number) => void;
 }) {
+  const { control, formState } = useFormContext<FormValues>();
   const criterionVersion = result.criterion_version;
+  const fieldName = String(result.id);
   const wrapperStyle =
     criterionVersion.criterion.background_color && criterionVersion.criterion.has_background_color
       ? { backgroundColor: criterionVersion.criterion.background_color }
       : undefined;
+  const fieldError = formState.errors[fieldName];
+  const errorMessage = (fieldError as { message?: string } | undefined)?.message;
+  const isRequired = criterionVersion.required;
+  const validateRequired = (value: CriterionValue) => {
+    if (!isRequired) {
+      return true;
+    }
+    if (Array.isArray(value)) {
+      return value.length > 0 || "This field is required.";
+    }
+    if (typeof value === "boolean") {
+      return true;
+    }
+    return value !== undefined && value !== null && value !== "" ? true : "This field is required.";
+  };
+
+  const validationClassName = (() => {
+    if (errorMessage) {
+      return "is-invalid";
+    }
+    if (status?.state === "saved") {
+      return "is-valid";
+    }
+    if (status?.state === "dirty") {
+      return "border-warning";
+    }
+    return "";
+  })();
+  const groupValidationClassName = (() => {
+    if (errorMessage) {
+      return "border border-danger rounded p-2";
+    }
+    if (status?.state === "saved") {
+      return "border border-success rounded p-2";
+    }
+    if (status?.state === "dirty") {
+      return "border border-warning rounded p-2";
+    }
+    return "";
+  })();
+  const stringValue = (value: CriterionValue) => (typeof value === "string" ? value : "");
+  const criterionValues = criterionVersion.criterion.values ?? {};
 
   return (
     <div
-      className={`form-group mb-3 p-3 rounded ${criterionVersion.highlighted ? "border border-warning" : ""}`}
+      className={`form-group mb-3 rounded ${criterionVersion.highlighted ? "border border-warning" : ""}`}
       style={wrapperStyle}
     >
       <label htmlFor={`result-${result.id}`} className="form-label">
@@ -32,161 +82,230 @@ export default function Criterion({
         {criterionVersion.required && <span className="text-danger">*</span>}
       </label>
 
-      {(() => {
-        // base props for simple inputs
-        const inputProps = {
-          id: `result-${result.id}`,
-          value: value ?? "",
-          onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-            onChange(result, e.target.value),
-        };
-
-        switch (criterionVersion.criterion.input_type) {
-          case "integer":
-          case "float":
-            return (
-              <input
-                {...inputProps}
-                type="number"
-                step={criterionVersion.criterion.input_type === "float" ? "0.01" : "1"}
-                className={`form-control ${error ? "is-invalid" : ""}`}
-              />
-            );
-
-          case "date":
-            return <input {...inputProps} type="date" className={`form-control ${error ? "is-invalid" : ""}`} />;
-
-          case "text":
-            return <textarea {...inputProps} className={`form-control ${error ? "is-invalid" : ""}`} rows={3} />;
-
-          case "string":
-            return <input {...inputProps} type="text" className={`form-control ${error ? "is-invalid" : ""}`} />;
-
-          case "select":
-            return (
-              <select {...inputProps} className={`form-select ${error ? "is-invalid" : ""}`}>
-                <option value="">-- select --</option>
-                {Object.entries(criterionVersion.criterion.values).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            );
-
-          case "radio": {
-            const { id, value: current, onChange: handle } = inputProps;
-            const strVal = String(current ?? "");
-            return (
-              <div className={`form-check ${error ? "is-invalid" : ""}`}>
-                {Object.entries(criterionVersion.criterion.values).map(([key, label]) => (
-                  <div key={key} className="form-check">
-                    <input
-                      type="radio"
-                      id={`${id}_${key}`}
-                      name={id}
-                      value={key}
-                      checked={strVal === key}
-                      onChange={handle}
-                      className="form-check-input"
-                    />
-                    <label htmlFor={`${id}_${key}`} className="form-check-label">
-                      {label}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            );
-          }
-
-          case "checkbox": {
-            const { id: id, value: current, onChange: _ } = inputProps;
-            // ensure an array
-            const selected: string[] = Array.isArray(current) ? current : [];
-
-            // toggle a single key
-            const toggle = (key: string, checked: boolean) => {
-              const next = checked ? [...selected, key] : selected.filter((k) => k !== key);
-              onChange(result, next);
-            };
-
-            return (
-              <div className={`form-check ${error ? "is-invalid" : ""}`}>
-                {Object.entries(criterionVersion.criterion.values).map(([key, label]) => (
-                  <div key={key} className="form-check">
-                    <input
-                      type="checkbox"
-                      id={`${id}_${key}`}
-                      name={id}
-                      value={key}
-                      checked={selected.includes(key)}
-                      onChange={(e) => toggle(key, e.target.checked)}
-                      className="form-check-input"
-                    />
-                    <label htmlFor={`${id}_${key}`} className="form-check-label">
-                      {label}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            );
-          }
-
-          case "bool": {
-            return (
-              <div className={`form-check form-switch ${error ? "is-invalid" : ""}`}>
+      <Controller
+        name={fieldName}
+        control={control}
+        rules={{ validate: validateRequired }}
+        render={({ field }): React.ReactElement => {
+          switch (criterionVersion.criterion.input_type) {
+            case "integer":
+            case "float":
+              return (
                 <input
-                  type="checkbox"
-                  {...inputProps}
-                  checked={!!value}
-                  onChange={(e) => onChange(result, e.target.checked)}
-                  className="form-check-input"
+                  id={`result-${result.id}`}
+                  type="number"
+                  step={criterionVersion.criterion.input_type === "float" ? "0.01" : "1"}
+                  className={`form-control ${validationClassName}`}
+                  value={stringValue(field.value)}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    onDirty(result.id);
+                  }}
+                  onBlur={() => {
+                    field.onBlur();
+                    onAutoSave(result);
+                  }}
                 />
-              </div>
-            );
-          }
+              );
 
-          case "action": {
-            return (
-              <div className={`d-flex align-items-center ${error ? "is-invalid" : ""}`}>
-                <label className="me-2">Done </label>
-                <div role="group" aria-label={`${result.id}-action`} className="btn-group btn-group-sm">
-                  <button
-                    type="button"
-                    className={`btn ${value ? "btn-primary" : "btn-outline-secondary"}`}
-                    onClick={() => onChange(result, true)}
-                    aria-pressed={value}
-                  >
-                    Yes
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn ${!value ? "btn-primary" : "btn-outline-secondary"}`}
-                    onClick={() => onChange(result, false)}
-                    aria-pressed={!value}
-                  >
-                    No
-                  </button>
+            case "date":
+              return (
+                <input
+                  id={`result-${result.id}`}
+                  type="date"
+                  className={`form-control ${validationClassName}`}
+                  value={stringValue(field.value)}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    onDirty(result.id);
+                  }}
+                  onBlur={() => {
+                    field.onBlur();
+                    onAutoSave(result);
+                  }}
+                />
+              );
+
+            case "text":
+              return (
+                <textarea
+                  id={`result-${result.id}`}
+                  className={`form-control ${validationClassName}`}
+                  rows={3}
+                  value={stringValue(field.value)}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    onDirty(result.id);
+                  }}
+                  onBlur={() => {
+                    field.onBlur();
+                    onAutoSave(result);
+                  }}
+                />
+              );
+
+            case "string":
+              return (
+                <input
+                  id={`result-${result.id}`}
+                  type="text"
+                  className={`form-control ${validationClassName}`}
+                  value={stringValue(field.value)}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    onDirty(result.id);
+                  }}
+                  onBlur={() => {
+                    field.onBlur();
+                    onAutoSave(result);
+                  }}
+                />
+              );
+
+            case "select":
+              return (
+                <select
+                  id={`result-${result.id}`}
+                  className={`form-select ${validationClassName}`}
+                  value={stringValue(field.value)}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    onDirty(result.id);
+                    onAutoSave(result);
+                  }}
+                >
+                  <option value="">-- select --</option>
+                  {Object.entries(criterionValues).map(([key, label]) => (
+                    <option key={key} value={key}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              );
+
+            case "radio": {
+              const current = String(field.value ?? "");
+              return (
+                <div className={`form-check ${groupValidationClassName}`}>
+                  {Object.entries(criterionValues).map(([key, label]) => (
+                    <div key={key} className="form-check">
+                      <input
+                        type="radio"
+                        id={`result-${result.id}_${key}`}
+                        name={`result-${result.id}`}
+                        value={key}
+                        checked={current === key}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          onDirty(result.id);
+                          onAutoSave(result);
+                        }}
+                        className={`form-check-input ${validationClassName}`}
+                      />
+                      <label htmlFor={`result-${result.id}_${key}`} className="form-check-label">
+                        {label}
+                      </label>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            );
-          }
+              );
+            }
 
-          default:
-            return null;
-        }
-      })()}
+            case "checkbox": {
+              const selected: string[] = Array.isArray(field.value) ? field.value : [];
+              const toggle = (key: string, checked: boolean) => {
+                const next = checked ? [...selected, key] : selected.filter((k) => k !== key);
+                field.onChange(next);
+                onDirty(result.id);
+                onAutoSave(result);
+              };
+
+              return (
+                <div className={`form-check ${groupValidationClassName}`}>
+                  {Object.entries(criterionValues).map(([key, label]) => (
+                    <div key={key} className="form-check">
+                      <input
+                        type="checkbox"
+                        id={`result-${result.id}_${key}`}
+                        name={`result-${result.id}`}
+                        value={key}
+                        checked={selected.includes(key)}
+                        onChange={(e) => toggle(key, e.target.checked)}
+                        className={`form-check-input ${validationClassName}`}
+                      />
+                      <label htmlFor={`result-${result.id}_${key}`} className="form-check-label">
+                        {label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+
+            case "bool":
+              return (
+                <div className={`form-check form-switch ${groupValidationClassName}`}>
+                  <input
+                    type="checkbox"
+                    id={`result-${result.id}`}
+                    checked={!!field.value}
+                    onChange={(e) => {
+                      field.onChange(e.target.checked);
+                      onDirty(result.id);
+                      onAutoSave(result);
+                    }}
+                    className={`form-check-input ${validationClassName}`}
+                  />
+                </div>
+              );
+
+            case "action":
+              return (
+                <div className={`d-flex align-items-center ${groupValidationClassName}`}>
+                  <label className="me-2">Done </label>
+                  <div
+                    role="group"
+                    aria-label={`${result.id}-action`}
+                    className="btn-group btn-group-sm"
+                  >
+                    <button
+                      type="button"
+                      className={`btn ${field.value ? "btn-primary" : "btn-outline-secondary"}`}
+                      onClick={() => {
+                        field.onChange(true);
+                        onDirty(result.id);
+                        onAutoSave(result);
+                      }}
+                      aria-pressed={!!field.value}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      type="button"
+                      className={`btn ${!field.value ? "btn-primary" : "btn-outline-secondary"}`}
+                      onClick={() => {
+                        field.onChange(false);
+                        onDirty(result.id);
+                        onAutoSave(result);
+                      }}
+                      aria-pressed={!field.value}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+              );
+
+            default:
+              return <></>;
+          }
+        }}
+      />
 
       {criterionVersion.criterion.help_block && (
         <small className="form-text text-muted">{criterionVersion.criterion.help_block}</small>
       )}
-      {error && <div className="invalid-feedback">{error}</div>}
-
-      <div className="mt-2">
-        <button type="button" className="btn btn-primary btn-sm" onClick={() => onSubmit(result)} disabled={!!saving}>
-          {saving ? "Saving…" : "Save"}
-        </button>
-      </div>
+      {errorMessage && <div className="invalid-feedback">{errorMessage}</div>}
     </div>
   );
 }
