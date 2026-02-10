@@ -11,6 +11,7 @@ import {
   RunStepChecklistItem,
   startStep,
 } from "@jield/solodb-typescript-core";
+import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 
 const statusMessages = {
   movingOut: "Moving out...",
@@ -65,12 +66,14 @@ export default function RunStepChecklistExecute({
   let stepIsStarted = useRef<boolean>(runStep.is_started);
   let stepIsFinished = useRef<boolean>(runStep.is_finished);
 
-  if (stepIsFinished) {
-    return <div>Step is finished</div>
+
+
+  if (stepIsFinished.current) {
+    return <div>Step is finished</div>;
   }
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingComponent message={"Loading..."} />;
   }
 
   function finishOperation(runStep: RunStep) {
@@ -95,7 +98,6 @@ export default function RunStepChecklistExecute({
     });
   }
 
-
   return (
     <>
       {data!.items.length === 0 && <Alert variant={"info"}>No checklist found</Alert>}
@@ -110,7 +112,7 @@ export default function RunStepChecklistExecute({
 
       <div className={"d-flex justify-content-between mt-3"}>
         <div className={"d-flex gap-2 align-items-center"}>
-          {stepIsStarted ? (
+          {stepIsStarted.current ? (
             <div>
               <Button variant={"success"} onClick={() => finishOperation(runStep)} disabled={isProcessing}>
                 {statusMessage !== null ? statusMessage : "Move out"}
@@ -119,7 +121,7 @@ export default function RunStepChecklistExecute({
           ) : (
             <div>
               <Button variant={"success"} onClick={() => startOperation(runStep)} disabled={isProcessing}>
-                {statusMessage !== null ? statusMessage : "Move in"}
+                {statusMessage !== null ? statusMessage : "Start processing"}
               </Button>
             </div>
           )}

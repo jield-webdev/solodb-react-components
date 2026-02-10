@@ -1,20 +1,25 @@
+import React, { ReactNode, Suspense } from "react";
 import { AuthContext } from "@jield/solodb-react-components/modules/core/contexts/authContext";
 import { useAuth } from "@jield/solodb-react-components/modules/core/hooks/useAuth";
-import { ReactNode } from "react";
+import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
+import ErrorBoundary from "@jield/solodb-react-components/modules/core/components/common/ErrorBoundary";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { user, setUser, isLoadingUser } = useAuth();
 
   if (isLoadingUser) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
-        <div className="text-center">
-          <h2>Loading</h2>
-          <p>Loading user…</p>
-        </div>
-      </div>
+      <ErrorBoundary>
+        <LoadingComponent message="Loading user..." />
+      </ErrorBoundary>
     );
   }
 
-  return <AuthContext.Provider value={{ user, setUser, isLoadingUser }}>{children}</AuthContext.Provider>;
+  return (
+    <ErrorBoundary>
+      <AuthContext.Provider value={{ user, setUser, isLoadingUser }}>
+        <Suspense fallback={<LoadingComponent message="Loading..." />}>{children}</Suspense>
+      </AuthContext.Provider>
+    </ErrorBoundary>
+  );
 };

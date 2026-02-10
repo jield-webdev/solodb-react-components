@@ -31,7 +31,7 @@ const BatchCardElement = ({ run }: { run: Run }) => {
     setBatchCard(response.data.batch_card);
   };
 
-  const deleteBatchCard = async (data: boolean) => {
+  const deleteBatchCard = async () => {
     await axios.create().delete("delete/run/batch-card/" + run.id);
     setShowForm(false);
     setBatchCard(undefined);
@@ -43,34 +43,42 @@ const BatchCardElement = ({ run }: { run: Run }) => {
   if (!showForm) {
     if (!batchCard)
       return (
-        <Button variant={"primary"} className={"mb-4"} onClick={() => setShowForm(true)}>
+        <Button variant="outline-primary" className="mb-4" onClick={() => setShowForm(true)}>
           Create Batch Card
         </Button>
       );
 
     return (
       batchCard && (
-        <Card className={"rounded my-4"}>
+        <Card className="rounded my-4 shadow-sm border-0">
           <Card.Body>
-            <Card.Title className="text-muted">Batch card</Card.Title>
-            <Card.Text>{batchCard && <span className={"text-danger fs-3"}><TextWithLineBreaks text={batchCard.content} /></span>}</Card.Text>
+            <div className="d-flex align-items-start justify-content-between gap-3">
+              <Card.Title className="text-danger mb-0">Batch card</Card.Title>
+              <Button
+                variant="outline-primary"
+                size="sm"
+                className="text-nowrap"
+                onClick={() => setShowForm(true)}
+              >
+                Update batch card
+              </Button>
+            </div>
+            <Card.Text className="mt-3 mb-2 fs-5 text-body">
+              {batchCard && <TextWithLineBreaks text={batchCard.content} />}
+            </Card.Text>
           </Card.Body>
 
-          <Card.Footer className={"d-flex justify-content-between align-items-center"}>
-            <div>
-              Created by {batchCard.user.first_name} {batchCard.user.last_name} on{" "}
-              <DateFormat format={"DD-MM-YY"}>{batchCard.date_created}</DateFormat>
+          <Card.Footer className="bg-transparent border-0 pt-0 pb-3">
+            <div className="text-muted small">
+              Created <DateFormat format="DD-MM-YY">{batchCard.date_created}</DateFormat> by{" "}
+              {batchCard.user.first_name} {batchCard.user.last_name}
               {batchCard.last_update && (
                 <span>
-                  {" "}
-                  - Updated on <DateFormat format={"DD-MM-YY H:m"}>{batchCard.last_update}</DateFormat>
+                  {" ("}
+                  Updated <DateFormat format="DD-MM-YY H:m">{batchCard.last_update}</DateFormat>
+                  {")"}
                 </span>
               )}
-            </div>
-            <div>
-              <Button variant={"primary"} size={"sm"} onClick={() => setShowForm(true)}>
-                Update Batch Card
-              </Button>
             </div>
           </Card.Footer>
         </Card>
@@ -89,19 +97,19 @@ const BatchCardElement = ({ run }: { run: Run }) => {
         />
         {errors.content && <Form.Control.Feedback type="invalid">This field is required</Form.Control.Feedback>}
       </InputGroup>
-      <div className={"d-flex gap-2 justify-content-between mt-2"}>
-        <div>
-          <Button variant="primary" type={"submit"} disabled={isSubmitting}>
+      <div className="d-flex flex-column flex-md-row gap-2 justify-content-between mt-2">
+        <div className="d-flex flex-wrap gap-2">
+          <Button variant="primary" type="submit" disabled={isSubmitting} className="text-nowrap">
             {isSubmitting && <span className="spinner-border spinner-border-sm me-1"></span>}
             Save batch card
           </Button>
-          <Button variant="secondary" className={"ms-2"} onClick={() => setShowForm(false)}>
+          <Button variant="secondary" onClick={() => setShowForm(false)}>
             Cancel
           </Button>
         </div>
         {batchCard && (
           <div>
-            <Button variant="danger" className={"ms-auto"} onClick={() => deleteBatchCard(false)}>
+            <Button variant="outline-danger" className="text-nowrap" onClick={deleteBatchCard}>
               Delete batch card
             </Button>
           </div>

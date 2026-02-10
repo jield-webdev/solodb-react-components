@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Badge, Button } from "react-bootstrap";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/element/runStepPartComment";
 import { RunStepPart, setRunStepPartAction as SetRunStepPartAction } from "@jield/solodb-typescript-core";
 import { RunStepPartActionEnum } from "@jield/solodb-typescript-core";
@@ -26,6 +26,35 @@ const RunStepPartTableRow = ({
 
   const isProcessed = runStepPartState.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
   const isFailed = runStepPartState.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING;
+  const cellClassName = runStepPartState.part_processing_failed_in_previous_step
+    ? "table-danger"
+    : isProcessed
+      ? "table-success"
+      : isFailed
+        ? "table-danger"
+        : "";
+
+  const statusMeta = (() => {
+    if (runStepPartState.part_processing_failed_in_previous_step) {
+      return { label: "Blocked", variant: "danger", description: "Failed in previous step" };
+    }
+    if (runStepPartState.actions === 0) {
+      return { label: "Not started", variant: "secondary", description: "No actions yet" };
+    }
+    if (runStepPartState.latest_action?.type.id === RunStepPartActionEnum.START_PROCESSING) {
+      return { label: "In progress", variant: "primary", description: "Processing started" };
+    }
+    if (runStepPartState.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING) {
+      return { label: "Completed", variant: "success", description: "Processing finished" };
+    }
+    if (runStepPartState.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING) {
+      return { label: "Failed", variant: "danger", description: "Processing failed" };
+    }
+    if (runStepPartState.latest_action?.type.id === RunStepPartActionEnum.REWORK) {
+      return { label: "Rework", variant: "warning", description: "Needs rework" };
+    }
+    return { label: "Unknown", variant: "secondary", description: "No status available" };
+  })();
 
   const setRunStepPartAction = ({
     runStepPart,
@@ -51,104 +80,100 @@ const RunStepPartTableRow = ({
       });
   };
 
-  if (runStepPart.part_processing_failed_in_previous_step) {
-    return (
-      <tr className={"table-danger"}>
-        <td>
-          {runStepPart.part.short_label}
-          {runStepPart.part.label && runStepPart.part.label.trim().length > 0 ? ` (${runStepPart.part.label})` : ""}
-        </td>
-        <td colSpan={editable ? 3 : 2}>
-          <span>Processing failed in a previous step</span>
-        </td>
-        <td>
-          <RunStepPartComment runStepPart={runStepPart} setRunStepPart={setRunStepPart} />
-        </td>
-      </tr>
-    );
-  }
-
   return (
-    <tr className={isProcessed ? "table-success" : isFailed ? "table-danger" : ""}>
+    <tr>
+      <td className={cellClassName}></td>
       <td>
-        {runStepPartState.part.short_label}
-        {runStepPartState.part.label && runStepPartState.part.label.trim().length > 0
-          ? ` (${runStepPartState.part.label})`
-          : ""}{" "}
         {setPartAsSelected && partIsSelected !== undefined && (
-          <input
-            type="checkbox"
-            name="tomato"
-            checked={partIsSelected}
-            onChange={() => {
-              setPartAsSelected(runStepPartState.id);
-            }}
-          />
+          <div className={"form-check"}>
+            <input
+              type="checkbox"
+              id={`part-select-${runStepPartState.id}`}
+              name="tomato"
+              className={"form-check-input"}
+              checked={partIsSelected}
+              onChange={() => {
+                setPartAsSelected(runStepPartState.id);
+              }}
+            />
+            <label className={'form-check-label'} htmlFor={`part-select-${runStepPartState.id}`}>
+              {runStepPartState.part.short_label}
+              {runStepPartState.part.label && runStepPartState.part.label.trim().length > 0
+                ? ` (${runStepPartState.part.label})`
+                : ""}
+            </label>
+          </div>
         )}
       </td>
-      <td className={"text-center"}>{runStepPartState.latest_action?.type.name}</td>
-      {editable && (
-        <td className={"text-center"}>
-          <div className={" d-flex gap-2 justify-content-center"}>
-            {runStepPartState.actions === 0 && (
-              <Button
-                onClick={() =>
-                  setRunStepPartAction({
-                    runStepPart: runStepPartState,
-                    runStepPartAction: RunStepPartActionEnum.START_PROCESSING,
-                  })
-                }
-                className={"btn-success btn-sm"}
-              >
-                Start
-              </Button>
-            )}
-            {runStepPartState.actions > 0 &&
-              runStepPartState.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-              runStepPartState.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-                <Button
-                  onClick={() =>
-                    setRunStepPartAction({
-                      runStepPart: runStepPartState,
-                      runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
-                    })
-                  }
-                  className={"btn-primary btn-sm"}
-                >
-                  Finish
-                </Button>
-              )}
-            {runStepPartState.actions > 0 &&
-              runStepPartState.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-              runStepPartState.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-                <Button
-                  onClick={() =>
-                    setRunStepPartAction({
-                      runStepPart: runStepPartState,
-                      runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
-                    })
-                  }
-                  className={"btn-danger btn-sm"}
-                >
-                  Failed
-                </Button>
-              )}
-            {runStepPartState.actions > 0 && (
-              <Button
-                onClick={() =>
-                  setRunStepPartAction({
-                    runStepPart: runStepPartState,
-                    runStepPartAction: RunStepPartActionEnum.REWORK,
-                  })
-                }
-                className={"btn-info btn-sm"}
-              >
-                Rework
-              </Button>
-            )}
+      <td>
+        <div className={"d-flex justify-content-between gap-1"}>
+          <div>
+            <Badge bg={statusMeta.variant}>{statusMeta.label}</Badge>
+            <small className={"text-muted ms-2"}>{statusMeta.description}</small>
           </div>
-        </td>
-      )}
+
+          {editable && (
+            <div className={"d-flex gap-1"}>
+              {runStepPartState.actions === 0 && (
+                <Button
+                  onClick={() =>
+                    setRunStepPartAction({
+                      runStepPart: runStepPartState,
+                      runStepPartAction: RunStepPartActionEnum.START_PROCESSING,
+                    })
+                  }
+                  className={"btn-success btn-sm"}
+                >
+                  Start
+                </Button>
+              )}
+              {runStepPartState.actions > 0 &&
+                runStepPartState.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
+                runStepPartState.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
+                  <Button
+                    onClick={() =>
+                      setRunStepPartAction({
+                        runStepPart: runStepPartState,
+                        runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
+                      })
+                    }
+                    className={"btn-primary btn-sm"}
+                  >
+                    Finish
+                  </Button>
+                )}
+              {runStepPartState.actions > 0 &&
+                runStepPartState.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
+                runStepPartState.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
+                  <Button
+                    onClick={() =>
+                      setRunStepPartAction({
+                        runStepPart: runStepPartState,
+                        runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
+                      })
+                    }
+                    className={"btn-danger btn-sm"}
+                  >
+                    Failed
+                  </Button>
+                )}
+              {runStepPartState.actions > 0 && (
+                <Button
+                  size={"sm"}
+                  onClick={() =>
+                    setRunStepPartAction({
+                      runStepPart: runStepPartState,
+                      runStepPartAction: RunStepPartActionEnum.REWORK,
+                    })
+                  }
+                >
+                  Rework
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      </td>
       <td>
         <RunStepPartComment editable={editable} runStepPart={runStepPart} setRunStepPart={setRunStepPart} />
       </td>

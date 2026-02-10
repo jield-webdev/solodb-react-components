@@ -1,31 +1,30 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { useMonitor } from "@jield/solodb-react-components/modules/monitor/hooks/useMonitor";
 import { MonitorContext } from "@jield/solodb-react-components/modules/monitor/contexts/monitorContext";
+import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
+import ErrorBoundary from "@jield/solodb-react-components/modules/core/components/common/ErrorBoundary";
 
 export default function MonitorProvider({ children }: { children: React.ReactNode }) {
   const { monitor, reloadMonitor } = useMonitor();
 
   if (null === monitor) {
     return (
-      <div className={"d-flex justify-content-center h-100 vh-100 flex-row align-items-center"}>
-        <div className={"d-flex flex-column align-items-center"}>
-          <h1>Loading Monitor</h1>
-          <div className="spinner-border" style={{ width: "3rem", height: "3rem" }} role="status">
-            <span className="visually-hidden">Loading monitor</span>
-          </div>
-        </div>
-      </div>
+      <ErrorBoundary>
+        <LoadingComponent message="Loading monitor..." />
+      </ErrorBoundary>
     );
   }
 
   return (
-    <MonitorContext.Provider
-      value={{
-        monitor,
-        reloadMonitor,
-      }}
-    >
-      {children}
-    </MonitorContext.Provider>
+    <ErrorBoundary>
+      <MonitorContext.Provider
+        value={{
+          monitor,
+          reloadMonitor,
+        }}
+      >
+        <Suspense fallback={<LoadingComponent message="Loading..." />}>{children}</Suspense>
+      </MonitorContext.Provider>
+    </ErrorBoundary>
   );
 }

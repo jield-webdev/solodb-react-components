@@ -45,6 +45,7 @@ const ChecklistItemElement = ({
     return (
       <Button
         className={"float-end"}
+        size={"sm"}
         variant="success"
         onClick={() => {
           mutation.mutate();
@@ -58,7 +59,7 @@ const ChecklistItemElement = ({
   return (
     <ListGroup.Item disabled={checklistItem.is_executed} className={"d-flex justify-content-between align-items-start"}>
       <div className={"d-flex flex-column"}>
-        <span className={"h5"}>{checklistItem.task}</span>
+        {checklistItem.task}
 
         {checklistItem.is_executed && (
           <small>
