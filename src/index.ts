@@ -71,3 +71,5 @@ export { initSolodbComponents } from "@jield/solodb-react-components/modules/cor
 
 // Types/Interfaces - Export key interfaces that consumers might need
 export type { User, Equipment, Monitor, Run, RunStep } from "@jield/solodb-typescript-core";
+
+import "./style/main.css"

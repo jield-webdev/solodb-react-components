@@ -1,8 +1,10 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { StatusMailContext } from "@jield/solodb-react-components/modules/equipment/contexts/statusMailContext";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getStatusMail } from "@jield/solodb-typescript-core";
+import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
+import ErrorBoundary from "@jield/solodb-react-components/modules/core/components/common/ErrorBoundary";
 
 export default function StatusMailProvider({ children }: { children: React.ReactNode }) {
   const { id } = useParams();
@@ -16,24 +18,21 @@ export default function StatusMailProvider({ children }: { children: React.React
 
   if (statusMailQuery.isLoading || statusMailQuery.isFetching) {
     return (
-      <div className={"d-flex justify-content-center h-100 vh-100 flex-row align-items-center"}>
-        <div className={"d-flex flex-column align-items-center"}>
-          <h1>Loading statusMail</h1>
-          <div className="spinner-border" style={{ width: "3rem", height: "3rem" }} role="status">
-            <span className="visually-hidden">Loading status Mail</span>
-          </div>
-        </div>
-      </div>
+      <ErrorBoundary>
+        <LoadingComponent message="Loading status mail..." />
+      </ErrorBoundary>
     );
   }
 
   return (
-    <StatusMailContext.Provider
-      value={{
-        statusMail: statusMailQuery.data!,
-      }}
-    >
-      {children}
-    </StatusMailContext.Provider>
+    <ErrorBoundary>
+      <StatusMailContext.Provider
+        value={{
+          statusMail: statusMailQuery.data!,
+        }}
+      >
+        <Suspense fallback={<LoadingComponent message="Loading..." />}>{children}</Suspense>
+      </StatusMailContext.Provider>
+    </ErrorBoundary>
   );
 }

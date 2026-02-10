@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Dropdown } from "react-bootstrap";
+import { Badge, Button, Dropdown } from "react-bootstrap";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
@@ -85,20 +85,37 @@ const RunStepPartProductionTableRow = ({
     return (
       <tr>
         <td>
-          Part {runPart.short_label}
-          {runPart.label && runPart.label.trim().length > 0 ? ` (${runPart.label})` : ""}
-          {setPartAsSelected && (
-            <input
-              type="checkbox"
-              name="tomato"
-              checked={partIsSelected}
-              onChange={() => {
-                setPartAsSelected(runPart.id);
-              }}
-            />
-          )}
+          <div className={"d-flex align-items-center gap-2"}>
+            <div className={"fw-semibold"}>
+              Part {runPart.short_label}
+              {runPart.label && runPart.label.trim().length > 0 ? ` (${runPart.label})` : ""}
+            </div>
+            {setPartAsSelected && (
+              <>
+                <input
+                  type="checkbox"
+                  id={`part-select-${runPart.id}`}
+                  name="tomato"
+                  className={"form-check-input m-0"}
+                  checked={partIsSelected}
+                  onChange={() => {
+                    setPartAsSelected(runPart.id);
+                  }}
+                />
+                <label className={"visually-hidden"} htmlFor={`part-select-${runPart.id}`}>
+                  Select part
+                </label>
+              </>
+            )}
+          </div>
         </td>
-        <td colSpan={2}></td>
+        <td>
+          <div className={"d-flex flex-column align-items-start gap-1"}>
+            <Badge bg={"secondary"}>Not initialized</Badge>
+            <small className={"text-muted"}>No actions yet</small>
+          </div>
+        </td>
+        <td className={"text-muted"}>-</td>
         <td>
           <Button size={"sm"} variant={"outline-info"} onClick={() => createRunStepPart()}>
             Init
@@ -111,26 +128,74 @@ const RunStepPartProductionTableRow = ({
 
   const isProcessed = runStepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
   const isFailed = runStepPart.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING;
+  const rowClassName = runStepPart.part_processing_failed_in_previous_step
+    ? "table-danger"
+    : isProcessed
+      ? "table-success"
+      : isFailed
+        ? "table-danger"
+        : "";
+  const statusMeta = (() => {
+    if (runStepPart.part_processing_failed_in_previous_step) {
+      return { label: "Blocked", variant: "danger", description: "Failed in previous step" };
+    }
+    if (runStepPart.actions === 0) {
+      return { label: "Not started", variant: "secondary", description: "No actions yet" };
+    }
+    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.START_PROCESSING) {
+      return { label: "In progress", variant: "primary", description: "Processing started" };
+    }
+    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING) {
+      return { label: "Completed", variant: "success", description: "Processing finished" };
+    }
+    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING) {
+      return { label: "Failed", variant: "danger", description: "Processing failed" };
+    }
+    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.REWORK) {
+      return { label: "Rework", variant: "warning", description: "Needs rework" };
+    }
+    return { label: "Unknown", variant: "secondary", description: "No status available" };
+  })();
 
   return (
-    <tr className={isProcessed ? "table-success" : isFailed ? "table-danger" : ""}>
+    <tr className={rowClassName}>
       <td>
-        Part {runStepPart.part.short_label}
-        {runStepPart.part.label && runStepPart.part.label.trim().length > 0 ? ` (${runStepPart.part.label})` : ""}
-        {setPartAsSelected && (
-          <input
-            type="checkbox"
-            name="tomato"
-            checked={partIsSelected}
-            onChange={() => {
-              setPartAsSelected(runPart.id);
-            }}
-          />
-        )}
+        <div className={"d-flex align-items-center gap-2"}>
+          <div className={"fw-semibold"}>
+            Part {runStepPart.part.short_label}
+            {runStepPart.part.label && runStepPart.part.label.trim().length > 0
+              ? ` (${runStepPart.part.label})`
+              : ""}
+          </div>
+          {setPartAsSelected && (
+            <>
+              <input
+                type="checkbox"
+                id={`part-select-${runStepPart.part.id}`}
+                name="tomato"
+                className={"form-check-input m-0"}
+                checked={partIsSelected}
+                onChange={() => {
+                  setPartAsSelected(runPart.id);
+                }}
+              />
+              <label className={"visually-hidden"} htmlFor={`part-select-${runStepPart.part.id}`}>
+                Select part
+              </label>
+            </>
+          )}
+        </div>
       </td>
-      <td>{runStepPart.latest_action?.type.name}</td>
       <td>
-        <>{formatDateTime(runStepPart.latest_action?.date_created, "DD-MM-YY HH:mm")}</>
+        <div className={"d-flex flex-column align-items-start gap-1"}>
+          <Badge bg={statusMeta.variant}>{statusMeta.label}</Badge>
+          <small className={"text-muted"}>{statusMeta.description}</small>
+        </div>
+      </td>
+      <td>
+        <span className={"text-muted"}>
+          {formatDateTime(runStepPart.latest_action?.date_created, "DD-MM-YY HH:mm")}
+        </span>
       </td>
       <td>
         <Dropdown align="end">

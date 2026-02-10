@@ -191,7 +191,6 @@ const StepDashboard = () => {
                 </>
               )}
 
-              <h3>Remark</h3>
               <StepRemark />
 
               <h3 className={"pt-3"}>Rework</h3>
