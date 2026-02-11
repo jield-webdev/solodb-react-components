@@ -1,5 +1,9 @@
 import { RunStep } from '@jield/solodb-typescript-core';
-export default function StepRemark({ runStep, reloadRunStep }: {
+type StepRemarkProps = {
     runStep?: RunStep;
     reloadRunStep?: () => void;
-}): import("react/jsx-runtime").JSX.Element;
+    title?: string;
+    titleClassName?: string;
+};
+export default function StepRemark({ runStep, reloadRunStep, title, titleClassName, }: StepRemarkProps): import("react/jsx-runtime").JSX.Element;
+export {};

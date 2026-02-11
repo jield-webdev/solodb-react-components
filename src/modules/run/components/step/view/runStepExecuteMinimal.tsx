@@ -22,7 +22,7 @@ export default function RunStepExecuteMinimal({
     <>
       <div>
         <h3 className="mb-2 text-start">Parts</h3>
-        {run.run_type === RunTypeEnum.PRODUCTION && <RunPartsProductionRun run={run} runStep={runStep} />}
+        {run.run_type === RunTypeEnum.RESEARCH && <RunPartsProductionRun run={run} runStep={runStep} />}
         {run.run_type === RunTypeEnum.RESEARCH && <RunPartsResearchRun run={run} runStep={runStep} />}
       </div>
 
