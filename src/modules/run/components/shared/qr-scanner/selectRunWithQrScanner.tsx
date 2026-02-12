@@ -4,7 +4,17 @@ import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function SelectRunWithQrScanner({ setRun, runsList }: { setRun: (run: Run) => void; runsList: Run[] }) {
+export default function NavigateInRunWithQrScanner({
+  runsList,
+  setRun,
+  setRunStepPartId,
+  setRunPartId,
+}: {
+  runsList: Run[];
+  setRun: (run: Run) => void;
+  setRunStepPartId?: (stepPart: number) => void;
+  setRunPartId?: (part: number) => void;
+}) {
   const [showInput, setShowInput] = useState<boolean>(false);
   const { control, watch, reset, setFocus } = useForm<{
     barcode: string;
@@ -19,18 +29,40 @@ export default function SelectRunWithQrScanner({ setRun, runsList }: { setRun: (
   useEffect(() => {
     const handler = setTimeout(() => {
       // Ignore processing if the barcode includes /l/'
-      if (barcodeValue?.includes("/l/")) {
+      const type = barcodeValue?.match(/\/([^/]+)\//)?.[1];
+      if (type === "l") {
         return;
       }
 
       // When the barcode contains /r/ it is a run
-      if (barcodeValue?.includes("/r/")) {
-        const runId = barcodeValue.split("/r/")[1];
-        const foundRun = runsList.find((run) => run.id === Number(runId));
-        if (foundRun !== undefined) {
-          setRun(foundRun);
-          startForm();
-        }
+      switch (type) {
+        case "r":
+          const runId = barcodeValue.split("/r/")[1];
+          const foundRun = runsList.find((run) => run.id === Number(runId));
+          console.log(runsList);
+          if (foundRun !== undefined) {
+            setRun(foundRun);
+            startForm();
+          }
+          break;
+        case "sp":
+          if (setRunStepPartId) {
+            const stepPartId = barcodeValue.split("/sp/")[1];
+            if (!isNaN(Number(stepPartId))) {
+                setRunStepPartId(Number(stepPartId));
+            }
+          }
+          break;
+        case "rp":
+          if (setRunPartId) {
+            const runPartId = barcodeValue.split("/rp/")[1];
+            if (!isNaN(Number(runPartId))) {
+                setRunPartId(Number(runPartId));
+            }
+          }
+          break;
+        default:
+          break;
       }
     }, 1000);
 
