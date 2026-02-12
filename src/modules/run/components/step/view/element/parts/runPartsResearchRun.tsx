@@ -1,6 +1,6 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { Dropdown, Table } from "react-bootstrap";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import RunStepPartTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts/runStepPartTableRow";
 import {
   getAvailableRunStepPartActions,
@@ -9,15 +9,19 @@ import {
   RunStep,
   RunStepPart,
   RunStepPartActionEnum,
+  setRunStepPartAction,
 } from "@jield/solodb-typescript-core";
 import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 
-type RunPartsResearchRunProps = {
+type Props = {
   run: Run;
   runStep: RunStep;
   runStepParts?: RunStepPart[];
   editable?: boolean;
   refetchFn?: () => void;
+  toggleRunStepPartRef?: React.RefObject<{
+    setPart: (part: number) => void;
+  } | null>;
 };
 
 const RunPartsResearchRun = ({
@@ -26,10 +30,12 @@ const RunPartsResearchRun = ({
   runStepParts,
   editable = true,
   refetchFn,
-}: RunPartsResearchRunProps) => {
+  toggleRunStepPartRef,
+}: Props) => {
   const [stepParts, setStepParts] = useState<RunStepPart[]>(runStepParts || []);
   const effectiveRefetchFn = refetchFn ?? (() => {});
 
+  const queryClient = useQueryClient();
   const { isLoading, isError, error, data } = useQuery({
     queryKey: ["stepParts", runStep.id],
     queryFn: () => listRunStepParts({ step: runStep }),
@@ -37,6 +43,7 @@ const RunPartsResearchRun = ({
   });
 
   // to handle what parts are selected in order to perform multi actions on them
+  // Here uses RunStepPart for selected parts
   const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
 
   useEffect(() => {
@@ -68,12 +75,23 @@ const RunPartsResearchRun = ({
   }, [runStepParts]);
 
   const setPartAsSelected = useCallback((partID: number) => {
+    console.log(partID);
     setSelectedParts((prev) => {
       const next = new Map(prev);
       next.set(partID, !(prev.get(partID) ?? false));
       return next;
     });
   }, []);
+
+  // handle the optional selected toggle RunStepPart from parent component
+  useImperativeHandle(toggleRunStepPartRef, () => {
+    return {
+      setPart(part: number) {
+        console.log(part);
+        setPartAsSelected(part);
+      },
+    };
+  });
 
   const selectAllParts = useCallback(() => {
     setSelectedParts((prev) => new Map([...prev.keys()].map((key) => [key, true])));
@@ -83,20 +101,88 @@ const RunPartsResearchRun = ({
     setSelectedParts((prev) => new Map([...prev.keys()].map((key) => [key, false])));
   }, []);
 
-  const selectedStepParts = useMemo(
-    () => stepParts.filter((part) => selectedParts.get(part.id)),
-    [stepParts, selectedParts]
-  );
-  const hasSelectedParts = selectedStepParts.length > 0;
+  const performActionToSelectedParts = (action: RunStepPartActionEnum) => {
+    const selectedRunStepParts = stepParts?.filter((part) => selectedParts.get(part.id));
 
-  const actionSet = useMemo(() => {
-    const set = new Set<RunStepPartActionEnum>();
-    selectedStepParts.forEach((stepPart) => {
-      const actionsForPart = getAvailableRunStepPartActions(stepPart);
-      actionsForPart.forEach((action) => set.add(action));
+    if (!selectedRunStepParts || selectedRunStepParts.length === 0) {
+      return null;
+    }
+
+    selectedRunStepParts.forEach((runPart) => {
+      if (getAvailableRunStepPartActions(runPart).some((a) => a === action)) {
+        setRunStepPartAction({ runStepPart: runPart, runStepPartAction: action }).then(() => {
+          queryClient.refetchQueries({ queryKey: ["stepParts", runStep.id] });
+          if (refetchFn) {
+            refetchFn();
+          }
+        });
+      }
     });
-    return set;
-  }, [selectedStepParts]);
+  };
+
+  const renderAvailableActions = () => {
+    const selectedRunStepParts = stepParts?.filter((part) => selectedParts.get(part.id));
+
+    if (!selectedRunStepParts || selectedRunStepParts.length === 0) {
+      return null;
+    }
+
+    const actionSet = new Set<RunStepPartActionEnum>();
+
+    selectedRunStepParts.forEach((stepPart) => {
+      const actionsForPart = getAvailableRunStepPartActions(stepPart);
+      actionsForPart.forEach((action) => actionSet.add(action));
+    });
+
+    return (
+      <Dropdown align="end">
+        <Dropdown.Toggle size="sm" variant="secondary">
+          Actions
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          {actionSet.has(RunStepPartActionEnum.START_PROCESSING) && (
+            <Dropdown.Item
+              onClick={() => {
+                performActionToSelectedParts(RunStepPartActionEnum.START_PROCESSING);
+              }}
+            >
+              Start
+            </Dropdown.Item>
+          )}
+
+          {actionSet.has(RunStepPartActionEnum.FINISH_PROCESSING) && (
+            <Dropdown.Item
+              onClick={() => {
+                performActionToSelectedParts(RunStepPartActionEnum.FINISH_PROCESSING);
+              }}
+            >
+              Finish
+            </Dropdown.Item>
+          )}
+
+          {actionSet.has(RunStepPartActionEnum.FAILED_PROCESSING) && (
+            <Dropdown.Item
+              onClick={() => {
+                performActionToSelectedParts(RunStepPartActionEnum.FAILED_PROCESSING);
+              }}
+            >
+              Failed
+            </Dropdown.Item>
+          )}
+
+          {actionSet.has(RunStepPartActionEnum.REWORK) && (
+            <Dropdown.Item
+              onClick={() => {
+                performActionToSelectedParts(RunStepPartActionEnum.REWORK);
+              }}
+            >
+              Rework
+            </Dropdown.Item>
+          )}
+        </Dropdown.Menu>
+      </Dropdown>
+    );
+  };
 
   if (isLoading) {
     return <LoadingComponent message={"Loading run parts"} />;
@@ -124,20 +210,24 @@ const RunPartsResearchRun = ({
               </tr>
             </thead>
             <tbody>
-              {stepParts.map((stepPart: RunStepPart) => (
-                <RunStepPartTableRow
-                  editable={editable}
-                  runStepPart={stepPart}
-                  key={stepPart.id}
-                  reloadFn={effectiveRefetchFn}
-                  {...(editable
-                    ? {
-                        partIsSelected: selectedParts.get(stepPart.id) ?? false,
-                        setPartAsSelected,
-                      }
-                    : {})}
-                />
-              ))}
+              {stepParts.map((stepPart: RunStepPart) => {
+                const partIsSelected = selectedParts.get(stepPart.id) ?? false;
+
+                return (
+                  <RunStepPartTableRow
+                    editable={editable}
+                    runStepPart={stepPart}
+                    key={stepPart.id}
+                    reloadFn={effectiveRefetchFn}
+                    {...(editable
+                      ? {
+                          partIsSelected,
+                          setPartAsSelected,
+                        }
+                      : {})}
+                  />
+                );
+              })}
             </tbody>
           </Table>
           {editable && (
@@ -150,30 +240,7 @@ const RunPartsResearchRun = ({
                   None
                 </button>
 
-                {hasSelectedParts && actionSet.size > 0 && (
-                  <Dropdown>
-                    <Dropdown.Toggle size="sm" variant="outline-primary">
-                      Actions
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                      {actionSet.has(RunStepPartActionEnum.START_PROCESSING) && (
-                        <Dropdown.Item onClick={() => false}>Start</Dropdown.Item>
-                      )}
-
-                      {actionSet.has(RunStepPartActionEnum.FINISH_PROCESSING) && (
-                        <Dropdown.Item onClick={() => false}>Finish</Dropdown.Item>
-                      )}
-
-                      {actionSet.has(RunStepPartActionEnum.FAILED_PROCESSING) && (
-                        <Dropdown.Item onClick={() => false}>Failed</Dropdown.Item>
-                      )}
-
-                      {actionSet.has(RunStepPartActionEnum.REWORK) && (
-                        <Dropdown.Item onClick={() => false}>Rework</Dropdown.Item>
-                      )}
-                    </Dropdown.Menu>
-                  </Dropdown>
-                )}
+                {selectedParts.values().some((p) => p) && renderAvailableActions()}
               </div>
             </div>
           )}

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { Dropdown, Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -15,19 +15,25 @@ import {
   getAvailableRunStepPartActions,
 } from "@jield/solodb-typescript-core";
 
+type Props = {
+  run: Run;
+  runStep: RunStep;
+  runStepParts?: RunStepPart[];
+  runParts?: RunPart[];
+  refetchFn?: () => void;
+  toggleRunPartRef?: React.RefObject<{
+    setPart: (part: number) => void;
+  } | null>;
+}
+
 const RunPartsProductionRun = ({
   run,
   runStep,
   runStepParts,
   runParts,
   refetchFn = () => {},
-}: {
-  run: Run;
-  runStep: RunStep;
-  runStepParts?: RunStepPart[];
-  runParts?: RunPart[];
-  refetchFn?: () => void;
-}) => {
+  toggleRunPartRef,
+}: Props) => {
   const queryClient = useQueryClient();
   const queries = useQueries({
     queries: [
@@ -65,7 +71,13 @@ const RunPartsProductionRun = ({
   );
 
   // to handle what parts are selected in order to perform multi actions on them
+  // Here uses RunPart for selected parts 
   const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
+
+  // handle the optional selected toggle RunPart 
+  //useImperativeHandle(ref, () => {
+
+  //});
 
   useEffect(() => {
     setSelectedParts((prev) => {
@@ -84,6 +96,16 @@ const RunPartsProductionRun = ({
       return next;
     });
   };
+
+  // handle the optional selected toggle RunPart from parent component
+  useImperativeHandle(toggleRunPartRef, () => {
+    return {
+      setPart(part: number) {
+        console.log(part);
+        setPartAsSelected(part);
+      },
+    };
+  });
 
   const selectAllParts = () => {
     setSelectedParts((prev) => {
