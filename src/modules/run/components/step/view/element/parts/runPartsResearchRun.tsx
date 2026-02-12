@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { Dropdown, Table } from "react-bootstrap";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import RunStepPartTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts/runStepPartTableRow";
@@ -13,12 +13,15 @@ import {
 } from "@jield/solodb-typescript-core";
 import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 
-type RunPartsResearchRunProps = {
+type Props = {
   run: Run;
   runStep: RunStep;
   runStepParts?: RunStepPart[];
   editable?: boolean;
   refetchFn?: () => void;
+  toggleRunStepPartRef?: React.RefObject<{
+    setPart: (part: number) => void;
+  } | null>;
 };
 
 const RunPartsResearchRun = ({
@@ -27,7 +30,8 @@ const RunPartsResearchRun = ({
   runStepParts,
   editable = true,
   refetchFn,
-}: RunPartsResearchRunProps) => {
+  toggleRunStepPartRef,
+}: Props) => {
   const [stepParts, setStepParts] = useState<RunStepPart[]>(runStepParts || []);
   const effectiveRefetchFn = refetchFn ?? (() => {});
 
@@ -39,6 +43,7 @@ const RunPartsResearchRun = ({
   });
 
   // to handle what parts are selected in order to perform multi actions on them
+  // Here uses RunStepPart for selected parts
   const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
 
   useEffect(() => {
@@ -77,6 +82,16 @@ const RunPartsResearchRun = ({
       return next;
     });
   }, []);
+
+  // handle the optional selected toggle RunStepPart from parent component
+  useImperativeHandle(toggleRunStepPartRef, () => {
+    return {
+      setPart(part: number) {
+        console.log(part);
+        setPartAsSelected(part);
+      },
+    };
+  });
 
   const selectAllParts = useCallback(() => {
     setSelectedParts((prev) => new Map([...prev.keys()].map((key) => [key, true])));
