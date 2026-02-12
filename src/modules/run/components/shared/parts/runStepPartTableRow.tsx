@@ -56,6 +56,29 @@ const RunStepPartTableRow = ({
     return { label: "Unknown", variant: "secondary", description: "No status available" };
   })();
 
+  const hasSelectionMode = setPartAsSelected !== undefined && partIsSelected !== undefined;
+  const isPartNotSelected = hasSelectionMode && !partIsSelected;
+  const shouldShowActionButtons = editable && !isPartNotSelected;
+
+  const partLabel = `${runStepPartState.part.short_label}${
+    runStepPartState.part.label && runStepPartState.part.label.trim().length > 0
+      ? ` (${runStepPartState.part.label})`
+      : ""
+  }`;
+
+  const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
+    if (!hasSelectionMode || !setPartAsSelected) {
+      return;
+    }
+
+    const target = event.target as HTMLElement;
+    if (target.closest("button, a, input, textarea, select, option, label")) {
+      return;
+    }
+
+    setPartAsSelected(runStepPartState.id);
+  };
+
   const setRunStepPartAction = ({
     runStepPart,
     runStepPartAction,
@@ -81,38 +104,27 @@ const RunStepPartTableRow = ({
   };
 
   return (
-    <tr>
-      <td className={cellClassName}></td>
-      <td>
-        {setPartAsSelected && partIsSelected !== undefined && (
-          <div className={"form-check"}>
-            <input
-              type="checkbox"
-              id={`part-select-${runStepPartState.id}`}
-              name="tomato"
-              className={"form-check-input"}
-              checked={partIsSelected}
-              onChange={() => {
-                setPartAsSelected(runStepPartState.id);
-              }}
-            />
-            <label className={'form-check-label'} htmlFor={`part-select-${runStepPartState.id}`}>
-              {runStepPartState.part.short_label}
-              {runStepPartState.part.label && runStepPartState.part.label.trim().length > 0
-                ? ` (${runStepPartState.part.label})`
-                : ""}
-            </label>
-          </div>
-        )}
-      </td>
+    <tr
+      className={isPartNotSelected ? "table-secondary text-muted" : undefined}
+      onClick={handleRowClick}
+      style={hasSelectionMode ? { cursor: "pointer" } : undefined}
+    >
+      <td className={isPartNotSelected ? "table-secondary" : cellClassName}></td>
+      <td>{partLabel}</td>
       <td>
         <div className={"d-flex justify-content-between gap-1"}>
           <div>
-            <Badge bg={statusMeta.variant}>{statusMeta.label}</Badge>
-            <small className={"text-muted ms-2"}>{statusMeta.description}</small>
+            {isPartNotSelected ? (
+              <small className={"fst-italic"}>Select the part to perform actions</small>
+            ) : (
+              <>
+                <Badge bg={statusMeta.variant}>{statusMeta.label}</Badge>
+                <small className={"text-muted ms-2"}>{statusMeta.description}</small>
+              </>
+            )}
           </div>
 
-          {editable && (
+          {shouldShowActionButtons && (
             <div className={"d-flex gap-1"}>
               {runStepPartState.actions === 0 && (
                 <Button
@@ -175,7 +187,11 @@ const RunStepPartTableRow = ({
         </div>
       </td>
       <td>
-        <RunStepPartComment editable={editable} runStepPart={runStepPart} setRunStepPart={setRunStepPart} />
+        <RunStepPartComment
+          editable={editable && !isPartNotSelected}
+          runStepPart={runStepPart}
+          setRunStepPart={setRunStepPart}
+        />
       </td>
     </tr>
   );

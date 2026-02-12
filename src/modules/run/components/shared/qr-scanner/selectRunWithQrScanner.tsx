@@ -42,7 +42,7 @@ export default function NavigateInRunWithQrScanner({
           console.log(runsList);
           if (foundRun !== undefined) {
             setRun(foundRun);
-            startForm();
+
           }
           break;
         case "sp":
@@ -64,6 +64,8 @@ export default function NavigateInRunWithQrScanner({
         default:
           break;
       }
+
+      startForm();
     }, 1000);
 
     return () => {

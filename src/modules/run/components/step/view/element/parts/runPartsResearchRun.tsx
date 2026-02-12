@@ -210,20 +210,24 @@ const RunPartsResearchRun = ({
               </tr>
             </thead>
             <tbody>
-              {stepParts.map((stepPart: RunStepPart) => (
-                <RunStepPartTableRow
-                  editable={editable}
-                  runStepPart={stepPart}
-                  key={stepPart.id}
-                  reloadFn={effectiveRefetchFn}
-                  {...(editable
-                    ? {
-                        partIsSelected: selectedParts.get(stepPart.id) ?? false,
-                        setPartAsSelected,
-                      }
-                    : {})}
-                />
-              ))}
+              {stepParts.map((stepPart: RunStepPart) => {
+                const partIsSelected = selectedParts.get(stepPart.id) ?? false;
+
+                return (
+                  <RunStepPartTableRow
+                    editable={editable}
+                    runStepPart={stepPart}
+                    key={stepPart.id}
+                    reloadFn={effectiveRefetchFn}
+                    {...(editable
+                      ? {
+                          partIsSelected,
+                          setPartAsSelected,
+                        }
+                      : {})}
+                  />
+                );
+              })}
             </tbody>
           </Table>
           {editable && (
