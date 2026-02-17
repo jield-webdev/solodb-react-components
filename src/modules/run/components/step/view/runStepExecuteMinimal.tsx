@@ -1,11 +1,12 @@
 import { Run, RunStep, RunTypeEnum } from "@jield/solodb-typescript-core";
 import StepRemark from "./element/stepRemark";
 import RunStepChecklistExecute from "./element/runStepChecklistExecute";
-import RunPartsProductionRun from "./element/parts/runPartsProductionRun";
+import RunPartsProductionRun from "../../shared/parts_table/runPartsProductionRun";
 import { RunStepParametersTable } from "../../shared/parameters/runStepParametersTable";
 import UploadFilesToStep from "../../shared/files/uploadFilesToStep";
 import React, { useRef } from "react";
-import RunPartsResearchRun from "./element/parts/runPartsResearchRun";
+import RunPartsResearchRun from "../../shared/parts_table/runPartsResearchRun";
+import RunPartsQrFlow from "../../shared/parts_table/runPartsQrFlow";
 
 export default function RunStepExecuteMinimal({
   run,
@@ -31,7 +32,7 @@ export default function RunStepExecuteMinimal({
       <div>
         <h3 className="mb-2 text-start">Parts</h3>
         {run.run_type === RunTypeEnum.PRODUCTION && (
-          <RunPartsProductionRun run={run} runStep={runStep} toggleRunPartRef={toggleRunPartRef} />
+          <RunPartsQrFlow run={run} runStep={runStep} toggleRunPartRef={toggleRunPartRef} />
         )}
         {run.run_type === RunTypeEnum.RESEARCH && (
           <RunPartsResearchRun run={run} runStep={runStep} toggleRunStepPartRef={toggleRunStepPartRef} />

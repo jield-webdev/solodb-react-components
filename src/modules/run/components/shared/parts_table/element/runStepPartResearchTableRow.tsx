@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Badge, Button } from "react-bootstrap";
-import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/element/runStepPartComment";
+import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import { RunStepPart, setRunStepPartAction as SetRunStepPartAction } from "@jield/solodb-typescript-core";
 import { RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 
-const RunStepPartTableRow = ({
+const RunStepPartResearchTableRow = ({
   runStepPart,
   editable = true,
   reloadFn,
@@ -56,10 +56,6 @@ const RunStepPartTableRow = ({
     return { label: "Unknown", variant: "secondary", description: "No status available" };
   })();
 
-  const hasSelectionMode = setPartAsSelected !== undefined && partIsSelected !== undefined;
-  const isPartNotSelected = hasSelectionMode && !partIsSelected;
-  const shouldShowActionButtons = editable && !isPartNotSelected;
-
   const partLabel = `${runStepPartState.part.short_label}${
     runStepPartState.part.label && runStepPartState.part.label.trim().length > 0
       ? ` (${runStepPartState.part.label})`
@@ -67,7 +63,7 @@ const RunStepPartTableRow = ({
   }`;
 
   const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
-    if (!hasSelectionMode || !setPartAsSelected) {
+    if (!setPartAsSelected) {
       return;
     }
 
@@ -104,27 +100,33 @@ const RunStepPartTableRow = ({
   };
 
   return (
-    <tr
-      className={isPartNotSelected ? "table-secondary text-muted" : undefined}
-      onClick={handleRowClick}
-      style={hasSelectionMode ? { cursor: "pointer" } : undefined}
-    >
-      <td className={isPartNotSelected ? "table-secondary" : cellClassName}></td>
-      <td>{partLabel}</td>
+    <tr onClick={handleRowClick} style={editable ? { cursor: "pointer" } : undefined}>
+      <td className={cellClassName}></td>
+      <td>
+        <div className={"d-flex align-items-center gap-2"}>
+          {partLabel}
+          {setPartAsSelected && (
+            <input
+              type="checkbox"
+              id={`part-select-${runStepPart.id}`}
+              name="tomato"
+              className={"form-check-input m-0"}
+              checked={partIsSelected}
+              onChange={() => {
+                setPartAsSelected(runStepPart.id);
+              }}
+            />
+          )}
+        </div>
+      </td>
       <td>
         <div className={"d-flex justify-content-between gap-1"}>
           <div>
-            {isPartNotSelected ? (
-              <small className={"fst-italic"}>Select the part to perform actions</small>
-            ) : (
-              <>
-                <Badge bg={statusMeta.variant}>{statusMeta.label}</Badge>
-                <small className={"text-muted ms-2"}>{statusMeta.description}</small>
-              </>
-            )}
+            <Badge bg={statusMeta.variant}>{statusMeta.label}</Badge>
+            <small className={"text-muted ms-2"}>{statusMeta.description}</small>
           </div>
 
-          {shouldShowActionButtons && (
+          {editable && (
             <div className={"d-flex gap-1"}>
               {runStepPartState.actions === 0 && (
                 <Button
@@ -187,14 +189,10 @@ const RunStepPartTableRow = ({
         </div>
       </td>
       <td>
-        <RunStepPartComment
-          editable={editable && !isPartNotSelected}
-          runStepPart={runStepPart}
-          setRunStepPart={setRunStepPart}
-        />
+        <RunStepPartComment editable={editable} runStepPart={runStepPart} setRunStepPart={setRunStepPart} />
       </td>
     </tr>
   );
 };
 
-export default RunStepPartTableRow;
+export default RunStepPartResearchTableRow;
