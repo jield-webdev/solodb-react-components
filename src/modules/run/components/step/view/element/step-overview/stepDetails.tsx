@@ -1,5 +1,5 @@
 import React from "react";
-import RunPartsResearchRun from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/runPartsResearchRun";
+import RunPartsResearchRun from "@jield/solodb-react-components/modules/run/components/shared/parts_table/runPartsResearchRun";
 import { RunStepParametersTable } from "@jield/solodb-react-components/modules/run/components/shared/parameters/runStepParametersTable";
 import { Run, RunStep } from "@jield/solodb-typescript-core";
 

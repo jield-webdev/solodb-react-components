@@ -1,11 +1,11 @@
 import { Run, RunStep, RunTypeEnum } from "@jield/solodb-typescript-core";
 import StepRemark from "./element/stepRemark";
 import RunStepChecklistExecute from "./element/runStepChecklistExecute";
-import RunPartsProductionRun from "./element/parts/runPartsProductionRun";
+import RunPartsProductionRun from "../../shared/parts_table/runPartsProductionRun";
 import { RunStepParametersTable } from "../../shared/parameters/runStepParametersTable";
 import UploadFilesToStep from "../../shared/files/uploadFilesToStep";
 import React, { useRef } from "react";
-import RunPartsResearchRun from "./element/parts/runPartsResearchRun";
+import RunPartsResearchRun from "../../shared/parts_table/runPartsResearchRun";
 
 export default function RunStepExecuteMinimal({
   run,

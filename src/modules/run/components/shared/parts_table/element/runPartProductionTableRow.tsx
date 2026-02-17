@@ -3,7 +3,7 @@ import { Badge, Button, Dropdown } from "react-bootstrap";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
-import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/element/runStepPartComment";
+import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import {
   RunStepPartActionEnum,
   RunPart,

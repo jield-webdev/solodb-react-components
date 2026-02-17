@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Badge, Button } from "react-bootstrap";
-import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/element/runStepPartComment";
+import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import { RunStepPart, setRunStepPartAction as SetRunStepPartAction } from "@jield/solodb-typescript-core";
 import { RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 

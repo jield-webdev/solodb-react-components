@@ -39,7 +39,6 @@ export default function NavigateInRunWithQrScanner({
         case "r":
           const runId = barcodeValue.split("/r/")[1];
           const foundRun = runsList.find((run) => run.id === Number(runId));
-          console.log(runsList);
           if (foundRun !== undefined) {
             setRun(foundRun);
 

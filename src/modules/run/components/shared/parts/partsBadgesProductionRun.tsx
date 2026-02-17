@@ -1,4 +1,4 @@
-import RunPartProductionBadge from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/element/runPartProductionBadge";
+import RunPartProductionBadge from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionBadge";
 import { RunStep, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 
 export const PartBadgesProductionRun = ({

@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Alert, Card, Col, Container, Row } from "react-bootstrap";
 import StepLabel from "@jield/solodb-react-components/modules/run/components/step/view/element/stepLabel";
 import Process from "@jield/solodb-react-components/modules/run/components/step/view/element/process";
-import RunPartsResearchRun from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/runPartsResearchRun";
+import RunPartsResearchRun from "@jield/solodb-react-components/modules/run/components/shared/parts_table/runPartsResearchRun";
 import RunStepChecklist from "@jield/solodb-react-components/modules/run/components/step/view/element/runStepChecklist";
 import StepRemark from "@jield/solodb-react-components/modules/run/components/step/view/element/stepRemark";
 import BatchCardElement from "@jield/solodb-react-components/modules/run/components/step/view/element/batchCardElement";
@@ -18,7 +18,7 @@ import { RunStepContext } from "@jield/solodb-react-components/modules/run/conte
 import MonitorCard from "@jield/solodb-react-components/modules/monitor/components/monitor/monitorCard";
 import Rework from "@jield/solodb-react-components/modules/run/components/step/view/element/rework";
 import { Link, useParams } from "react-router-dom";
-import RunPartsProductionRun from "@jield/solodb-react-components/modules/run/components/step/view/element/parts/runPartsProductionRun";
+import RunPartsProductionRun from "@jield/solodb-react-components/modules/run/components/shared/parts_table/runPartsProductionRun";
 import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 import ReactMarkdown from "react-markdown";
 import { RunStepParametersTable } from "@jield/solodb-react-components/modules/run/components/shared/parameters/runStepParametersTable";
