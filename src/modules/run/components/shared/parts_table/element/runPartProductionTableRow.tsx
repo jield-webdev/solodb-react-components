@@ -96,7 +96,7 @@ const RunStepPartProductionTableRow = ({
 
   if (!runStepPart) {
     return (
-      <tr onClick={handleRowClick} style={{ cursor: "pointer" }} >
+      <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined} >
         <td>
           <div className={"d-flex align-items-center gap-2"}>
             <div className={"fw-semibold"}>
@@ -166,7 +166,7 @@ const RunStepPartProductionTableRow = ({
   })();
 
   return (
-    <tr onClick={handleRowClick} style={{ cursor: "pointer" }}  className={rowClassName}>
+    <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}  className={rowClassName}>
       <td>
         <div className={"d-flex align-items-center gap-2"}>
           <div className={"fw-semibold"}>
