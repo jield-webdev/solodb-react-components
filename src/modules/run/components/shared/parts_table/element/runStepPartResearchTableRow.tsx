@@ -4,7 +4,7 @@ import RunStepPartComment from "@jield/solodb-react-components/modules/run/compo
 import { RunStepPart, setRunStepPartAction as SetRunStepPartAction } from "@jield/solodb-typescript-core";
 import { RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 
-const RunStepPartTableRow = ({
+const RunStepPartResearchTableRow = ({
   runStepPart,
   editable = true,
   reloadFn,
@@ -197,4 +197,4 @@ const RunStepPartTableRow = ({
   );
 };
 
-export default RunStepPartTableRow;
+export default RunStepPartResearchTableRow;

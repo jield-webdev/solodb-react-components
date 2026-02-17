@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { Table } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
-import RunStepPartTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts/runStepPartTableRow";
+import RunStepPartResearchTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartResearchTableRow";
 import { listRunStepParts, Run, RunStep, RunStepPart } from "@jield/solodb-typescript-core";
 import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
@@ -107,7 +107,7 @@ const RunPartsResearchRun = ({
                 const partIsSelected = selectedParts.get(stepPart.id) ?? false;
 
                 return (
-                  <RunStepPartTableRow
+                  <RunStepPartResearchTableRow
                     editable={editable}
                     runStepPart={stepPart}
                     key={stepPart.id}
