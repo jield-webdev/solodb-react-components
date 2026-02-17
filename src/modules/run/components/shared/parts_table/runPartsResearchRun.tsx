@@ -93,7 +93,7 @@ const RunPartsResearchRun = ({
     <Fragment>
       {stepParts && stepParts.length > 0 && (
         <>
-          <Table size={"sm"} striped bordered>
+          <Table size={"sm"} striped hover>
             <thead>
               <tr>
                 <th></th>

@@ -55,6 +55,19 @@ const RunStepPartProductionTableRow = ({
       });
   };
 
+  const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
+    if (!setPartAsSelected) {
+      return;
+    }
+
+    const target = event.target as HTMLElement;
+    if (target.closest("button, a, input, textarea, select, option, label")) {
+      return;
+    }
+
+    setPartAsSelected(runPart.id);
+  };
+
   const setRunStepPartAction = ({
     runStepPart,
     runStepPartAction,
@@ -83,7 +96,7 @@ const RunStepPartProductionTableRow = ({
 
   if (!runStepPart) {
     return (
-      <tr>
+      <tr onClick={handleRowClick} style={{ cursor: "pointer" }} >
         <td>
           <div className={"d-flex align-items-center gap-2"}>
             <div className={"fw-semibold"}>
@@ -91,21 +104,16 @@ const RunStepPartProductionTableRow = ({
               {runPart.label && runPart.label.trim().length > 0 ? ` (${runPart.label})` : ""}
             </div>
             {setPartAsSelected && (
-              <>
-                <input
-                  type="checkbox"
-                  id={`part-select-${runPart.id}`}
-                  name="tomato"
-                  className={"form-check-input m-0"}
-                  checked={partIsSelected}
-                  onChange={() => {
-                    setPartAsSelected(runPart.id);
-                  }}
-                />
-                <label className={"visually-hidden"} htmlFor={`part-select-${runPart.id}`}>
-                  Select part
-                </label>
-              </>
+              <input
+                type="checkbox"
+                id={`part-select-${runPart.id}`}
+                name="tomato"
+                className={"form-check-input m-0"}
+                checked={partIsSelected}
+                onChange={() => {
+                  setPartAsSelected(runPart.id);
+                }}
+              />
             )}
           </div>
         </td>
@@ -158,14 +166,12 @@ const RunStepPartProductionTableRow = ({
   })();
 
   return (
-    <tr className={rowClassName}>
+    <tr onClick={handleRowClick} style={{ cursor: "pointer" }}  className={rowClassName}>
       <td>
         <div className={"d-flex align-items-center gap-2"}>
           <div className={"fw-semibold"}>
             Part {runStepPart.part.short_label}
-            {runStepPart.part.label && runStepPart.part.label.trim().length > 0
-              ? ` (${runStepPart.part.label})`
-              : ""}
+            {runStepPart.part.label && runStepPart.part.label.trim().length > 0 ? ` (${runStepPart.part.label})` : ""}
           </div>
           {setPartAsSelected && (
             <>
