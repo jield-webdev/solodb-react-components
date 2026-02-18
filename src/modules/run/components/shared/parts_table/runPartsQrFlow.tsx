@@ -3,7 +3,7 @@ import { Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
-import { Run, RunStep, RunStepPart, RunPart, listRunParts, listRunStepParts } from "@jield/solodb-typescript-core";
+import { Run, RunStep, RunStepPart, RunPart, listRunParts, listRunStepParts, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
 import { usePartActions } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartActions";
 import { PartActionsDropdown } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partActionsDropdown";
@@ -58,13 +58,13 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
   );
 
   // Use custom hooks for selection and actions
-  const { selectedParts, setPartAsSelected, selectAllParts, selectNoneParts, hasSelectedParts } = usePartSelection({
+  const { selectedParts } = usePartSelection({
     parts: leveledParts,
     getPartId: (part) => part.id,
     toggleRef: toggleRunPartRef,
   });
 
-  const { performActionToSelectedParts, getAvailableActionsForSelection } = usePartActions({
+  const { getAvailableActionsForSelection } = usePartActions({
     runStep,
     parts: leveledParts,
     selectedParts,
@@ -145,7 +145,32 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
           ))}
         </tbody>
       </Table>
+      <DisplayStepPartsInfo runStepParts={runStepPartsData} selectedPartsLength={partsToRender.length} />
     </React.Fragment>
+  );
+};
+
+const DisplayStepPartsInfo = ({ runStepParts, selectedPartsLength }: { runStepParts: RunStepPart[]; selectedPartsLength: number; }) => {
+  const finishedParts = useMemo(() => {
+    let counter = 0;
+    runStepParts.forEach((part) => part.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING ? counter++ : null);
+    return counter;
+  }, [runStepParts]);
+
+  const remainingParts = useMemo(() => runStepParts.length - selectedPartsLength, [runStepParts, selectedPartsLength]);
+
+  return (
+    <div className="d-flex flex-column flex-sm-row flex-wrap gap-2 mt-2">
+      <span className="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fw-semibold">
+        This step has {remainingParts} more parts
+      </span>
+      <span className="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-2 fw-semibold">
+        This step has {selectedPartsLength} scanned parts
+      </span>
+      <span className="badge rounded-pill bg-success-subtle text-success-emphasis border border-success-subtle px-3 py-2 fw-semibold">
+        This step has {finishedParts} finished parts
+      </span>
+    </div>
   );
 };
 
