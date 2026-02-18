@@ -3,14 +3,7 @@ import { Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
-import {
-  Run,
-  RunStep,
-  RunStepPart,
-  RunPart,
-  listRunParts,
-  listRunStepParts,
-} from "@jield/solodb-typescript-core";
+import { Run, RunStep, RunStepPart, RunPart, listRunParts, listRunStepParts } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
 import { usePartActions } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartActions";
 import { PartActionsDropdown } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partActionsDropdown";
@@ -27,14 +20,7 @@ type Props = {
   } | null>;
 };
 
-const RunPartsQrFlow = ({
-  run,
-  runStep,
-  runStepParts,
-  runParts,
-  refetchFn = () => {},
-  toggleRunPartRef,
-}: Props) => {
+const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () => {}, toggleRunPartRef }: Props) => {
   const queryClient = useQueryClient();
   const queries = useQueries({
     queries: [
@@ -72,27 +58,22 @@ const RunPartsQrFlow = ({
   );
 
   // Use custom hooks for selection and actions
-  const { selectedParts, setPartAsSelected, selectAllParts, selectNoneParts, hasSelectedParts } =
-    usePartSelection({
-      parts: leveledParts,
-      getPartId: (part) => part.id,
-      toggleRef: toggleRunPartRef,
-    });
+  const { selectedParts, setPartAsSelected, selectAllParts, selectNoneParts, hasSelectedParts } = usePartSelection({
+    parts: leveledParts,
+    getPartId: (part) => part.id,
+    toggleRef: toggleRunPartRef,
+  });
 
   const { performActionToSelectedParts, getAvailableActionsForSelection } = usePartActions({
     runStep,
     parts: leveledParts,
     selectedParts,
     getPartId: (part) => part.id,
-    getRunStepPart: (part) =>
-      runStepPartsData.find((sp) => sp.part.id === part.id && sp.step.id === runStep.id),
+    getRunStepPart: (part) => runStepPartsData.find((sp) => sp.part.id === part.id && sp.step.id === runStep.id),
     refetchFn,
   });
 
-  const availableActions = useMemo(
-    () => getAvailableActionsForSelection(),
-    [getAvailableActionsForSelection]
-  );
+  const availableActions = useMemo(() => getAvailableActionsForSelection(), [getAvailableActionsForSelection]);
 
   const partsToRender = useMemo(() => leveledParts.filter((part) => selectedParts.get(part.id)), [selectedParts]);
 
@@ -140,46 +121,30 @@ const RunPartsQrFlow = ({
 
   return (
     <React.Fragment>
-      {leveledParts.length > 0 && (
-        <>
-          <Table size={"sm"} striped hover>
-            <thead>
-              <tr>
-                <th>Part</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Actions</th>
-                <th>Comment</th>
-              </tr>
-            </thead>
-            <tbody>
-              {partsToRender.map((runPart: RunPart, i: React.Key) => (
-                <RunPartProductionTableRow
-                  runStep={runStep}
-                  runPart={runPart}
-                  runStepParts={runStepPartsData}
-                  refetchFn={refetchFn}
-                  key={i}
-                  partIsSelected={selectedParts.get(runPart.id) ?? false}
-                />
-              ))}
-            </tbody>
-          </Table>
-          <PartSelectionControls
-            onSelectAll={selectAllParts}
-            onSelectNone={selectNoneParts}
-            hasSelectedParts={hasSelectedParts}
-            actionsDropdown={
-              <PartActionsDropdown
-                availableActions={availableActions}
-                onActionSelected={performActionToSelectedParts}
-                showInitAction={hasInitAction}
-                onInitSelected={initSelectedParts}
-              />
-            }
-          />
-        </>
-      )}
+      <Table size={"sm"} striped hover>
+        <thead>
+          <tr>
+            <th>Part</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          {partsToRender.map((runPart: RunPart, i: React.Key) => (
+            <RunPartProductionTableRow
+              runStep={runStep}
+              runPart={runPart}
+              runStepParts={runStepPartsData}
+              refetchFn={refetchFn}
+              key={i}
+              partIsSelected={selectedParts.get(runPart.id) ?? false}
+              dropdown={false}
+            />
+          ))}
+        </tbody>
+      </Table>
     </React.Fragment>
   );
 };
