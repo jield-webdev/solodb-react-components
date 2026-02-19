@@ -13,6 +13,7 @@ type Props = {
   refetchFn?: () => void;
   toggleRunPartRef?: React.RefObject<{
     setPart: (part: number) => void;
+    setPartByLabel: (label: string) => void;
   } | null>;
 };
 
@@ -22,7 +23,7 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     queries: [
       {
         queryKey: ["runParts", run],
-        queryFn: () => listRunParts({ run: run }),
+        queryFn: () => listRunParts({ run: run, level: runStep.part_level }),
         enabled: !runParts, // don't fetch if runParts prop provided
       },
       {
@@ -52,8 +53,6 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     () => runPartsData.filter((part) => part.part_level === runStep.part_level),
     [runPartsData, runStep.part_level]
   );
-
-  console.log(leveledParts);
 
   // Use custom hooks for selection and actions
   const { selectedParts } = usePartSelection({

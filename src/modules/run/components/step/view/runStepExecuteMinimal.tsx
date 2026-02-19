@@ -21,6 +21,7 @@ export default function RunStepExecuteMinimal({
   reloadRunStepFn: () => void;
   toggleRunPartRef?: React.RefObject<{
     setPart: (part: number) => void;
+    setPartByLabel: (label: string) => void;
   } | null>;
 }) {
   return (

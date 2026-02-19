@@ -5,6 +5,7 @@ export interface UsePartSelectionOptions<T> {
   getPartId: (part: T) => number;
   toggleRef?: React.RefObject<{
     setPart: (part: number) => void;
+    setPartByLabel: (label: string) => void;
   } | null>;
 }
 
@@ -59,6 +60,11 @@ export function usePartSelection<T>({
     setPart(part: number) {
       setPartAsSelected(part);
     },
+    setPartByLabel(label: string) {
+        const part = (parts.find((p) => (p as any)?.short_label === label) as any)?.id;
+        if (part !== undefined) 
+            setPartAsSelected(part);
+    }
   }));
 
   const selectAllParts = useCallback(() => {

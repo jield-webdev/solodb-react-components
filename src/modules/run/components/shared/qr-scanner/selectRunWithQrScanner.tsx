@@ -9,11 +9,13 @@ export default function NavigateInRunWithQrScanner({
   setRun,
   setRunStepPartId,
   setRunPartId,
+  setRunPartLabel
 }: {
   runsList: Run[];
   setRun: (run: Run) => void;
   setRunStepPartId?: (stepPart: number) => void;
   setRunPartId?: (part: number) => void;
+  setRunPartLabel?: (label: string) => void;
 }) {
   const [showInput, setShowInput] = useState<boolean>(false);
   const { control, watch, reset, setFocus } = useForm<{
@@ -37,6 +39,7 @@ export default function NavigateInRunWithQrScanner({
       // When the barcode contains /r/ it is a run
       let foundRun = undefined;
       let foundRunPartId = undefined;
+      let foundRunPartLabel = undefined;
       let foundRunStepPartId = undefined;
       switch (type) {
         // Run
@@ -59,9 +62,9 @@ export default function NavigateInRunWithQrScanner({
         // Part Badge
         case "pb":
           const runPartBadgeParsed = barcodeValue.split("/pb/")[1].split("-");
-          if (runPartBadgeParsed.length != 4) break;
+          if (!(runPartBadgeParsed.length == 4 || runPartBadgeParsed.length == 3)) break;
           foundRun = runsList.find((run) => run.label === `${runPartBadgeParsed[0]}-${runPartBadgeParsed[1]}`);
-          console.log(`Run part: ${runPartBadgeParsed[2]}${runPartBadgeParsed[3]}`);
+          foundRunPartLabel = `${runPartBadgeParsed[2]}` + (runPartBadgeParsed[3] ? `-${runPartBadgeParsed[3]}` : "");
           break;
         default:
           break;
@@ -70,6 +73,7 @@ export default function NavigateInRunWithQrScanner({
       if (setRun !== undefined && foundRun !== undefined) setRun(foundRun);
       if (setRunPartId !== undefined && foundRunPartId !== undefined) {setRunPartId(foundRunPartId);}
       if (setRunStepPartId !== undefined && foundRunStepPartId !== undefined) setRunStepPartId(foundRunStepPartId);
+      if (setRunPartLabel !== undefined && foundRunPartLabel !== undefined) setRunPartLabel(foundRunPartLabel);
 
       startForm();
     }, 1000);
