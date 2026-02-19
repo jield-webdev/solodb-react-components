@@ -35,34 +35,41 @@ export default function NavigateInRunWithQrScanner({
       }
 
       // When the barcode contains /r/ it is a run
+      let foundRun = undefined;
+      let foundRunPartId = undefined;
+      let foundRunStepPartId = undefined;
       switch (type) {
+        // Run
         case "r":
           const runId = barcodeValue.split("/r/")[1];
-          const foundRun = runsList.find((run) => run.id === Number(runId));
-          if (foundRun !== undefined) {
-            setRun(foundRun);
-
-          }
+          foundRun = runsList.find((run) => run.id === Number(runId));
           break;
+        // Step Part
         case "sp":
-          if (setRunStepPartId) {
-            const stepPartId = barcodeValue.split("/sp/")[1];
-            if (!isNaN(Number(stepPartId))) {
-                setRunStepPartId(Number(stepPartId));
-            }
+          const stepPartId = barcodeValue.split("/sp/")[1];
+          if (!isNaN(Number(stepPartId))) {
+            foundRunStepPartId = Number(stepPartId);
           }
           break;
+        // Run Part
         case "rp":
-          if (setRunPartId) {
-            const runPartId = barcodeValue.split("/rp/")[1];
-            if (!isNaN(Number(runPartId))) {
-                setRunPartId(Number(runPartId));
-            }
-          }
+          const runPartId = barcodeValue.split("/rp/")[1];
+          foundRunPartId = Number(runPartId);
+          break;
+        // Part Badge
+        case "pb":
+          const runPartBadgeParsed = barcodeValue.split("/pb/")[1].split("-");
+          if (runPartBadgeParsed.length != 4) break;
+          foundRun = runsList.find((run) => run.label === `${runPartBadgeParsed[0]}-${runPartBadgeParsed[1]}`);
+          console.log(`Run part: ${runPartBadgeParsed[2]}${runPartBadgeParsed[3]}`);
           break;
         default:
           break;
       }
+
+      if (setRun !== undefined && foundRun !== undefined) setRun(foundRun);
+      if (setRunPartId !== undefined && foundRunPartId !== undefined) {setRunPartId(foundRunPartId);}
+      if (setRunStepPartId !== undefined && foundRunStepPartId !== undefined) setRunStepPartId(foundRunStepPartId);
 
       startForm();
     }, 1000);

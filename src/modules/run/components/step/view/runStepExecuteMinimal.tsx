@@ -13,16 +13,12 @@ export default function RunStepExecuteMinimal({
   runStep,
   showOnlyEmphasizedParameters,
   reloadRunStepFn,
-  toggleRunStepPartRef,
   toggleRunPartRef,
 }: {
   run: Run;
   runStep: RunStep;
   showOnlyEmphasizedParameters: boolean;
   reloadRunStepFn: () => void;
-  toggleRunStepPartRef?: React.RefObject<{
-    setPart: (part: number) => void;
-  } | null>;
   toggleRunPartRef?: React.RefObject<{
     setPart: (part: number) => void;
   } | null>;
@@ -35,7 +31,7 @@ export default function RunStepExecuteMinimal({
           <RunPartsQrFlow run={run} runStep={runStep} toggleRunPartRef={toggleRunPartRef} />
         )}
         {run.run_type === RunTypeEnum.RESEARCH && (
-          <RunPartsResearchRun run={run} runStep={runStep} toggleRunStepPartRef={toggleRunStepPartRef} />
+          <RunPartsResearchRun run={run} runStep={runStep} />
         )}
       </div>
 

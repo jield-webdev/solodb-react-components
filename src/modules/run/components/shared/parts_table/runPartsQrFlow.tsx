@@ -1,13 +1,9 @@
 import React, { useMemo } from "react";
 import { Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
 import { Run, RunStep, RunStepPart, RunPart, listRunParts, listRunStepParts, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
-import { usePartActions } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartActions";
-import { PartActionsDropdown } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partActionsDropdown";
-import { PartSelectionControls } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partSelectionControls";
 
 type Props = {
   run: Run;
@@ -46,7 +42,7 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     () => runParts ?? (runPartQuery.data?.items as RunPart[] | undefined) ?? [],
     [runParts, runPartQuery.data]
   );
-
+  
   const runStepPartsData = useMemo<RunStepPart[]>(
     () => runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
     [runStepParts, runStepPartsQuery.data]
@@ -57,6 +53,8 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     [runPartsData, runStep.part_level]
   );
 
+  console.log(leveledParts);
+
   // Use custom hooks for selection and actions
   const { selectedParts } = usePartSelection({
     parts: leveledParts,
@@ -64,53 +62,7 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     toggleRef: toggleRunPartRef,
   });
 
-  const { getAvailableActionsForSelection } = usePartActions({
-    runStep,
-    parts: leveledParts,
-    selectedParts,
-    getPartId: (part) => part.id,
-    getRunStepPart: (part) => runStepPartsData.find((sp) => sp.part.id === part.id && sp.step.id === runStep.id),
-    refetchFn,
-  });
-
-  const availableActions = useMemo(() => getAvailableActionsForSelection(), [getAvailableActionsForSelection]);
-
   const partsToRender = useMemo(() => leveledParts.filter((part) => selectedParts.get(part.id)), [selectedParts]);
-
-  // Determine if selected parts have uninitialized items
-  const hasInitAction = useMemo(() => {
-    const selectedRunParts = leveledParts.filter((part) => selectedParts.get(part.id));
-    return selectedRunParts.some(
-      (runPart) =>
-        !runStepPartsData.find(
-          (runStepPart) => runStepPart.part.id === runPart.id && runStepPart.step.id === runStep.id
-        )
-    );
-  }, [leveledParts, selectedParts, runStepPartsData, runStep.id]);
-
-  const initSelectedParts = () => {
-    const selectedRunParts = leveledParts.filter((part) => selectedParts.get(part.id));
-    const partsToInit = selectedRunParts.filter(
-      (runPart) =>
-        !runStepPartsData.find(
-          (runStepPart) => runStepPart.part.id === runPart.id && runStepPart.step.id === runStep.id
-        )
-    );
-
-    Promise.all(
-      partsToInit.map((runPart) =>
-        axios.post("/create/run/step/part", {
-          run_part_id: runPart.id,
-          run_step_id: runStep.id,
-        })
-      )
-    ).then(() => {
-      queryClient.refetchQueries({ queryKey: ["runStepParts", runStep.id] });
-      if (refetchFn) {
-        refetchFn();
-      }
-    });
-  };
 
   if (isLoading) {
     return <div>Loading...</div>;
