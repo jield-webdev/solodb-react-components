@@ -3,9 +3,9 @@ import { useCallback, useEffect, useImperativeHandle, useState } from "react";
 export interface UsePartSelectionOptions<T> {
   parts: T[];
   getPartId: (part: T) => number;
-  toggleRef?: React.RefObject<{
+  toggleRef?: React.Ref<{
     setPart: (part: number) => void;
-    setPartByLabel: (label: string) => void;
+    setPartByLabel?: (label: string) => void;
   } | null>;
 }
 
@@ -28,9 +28,7 @@ export function usePartSelection<T>({
   getPartId,
   toggleRef,
 }: UsePartSelectionOptions<T>): UsePartSelectionResult {
-  const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(
-    new Map<number, boolean>()
-  );
+  const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
 
   // Update selection map when parts change
   useEffect(() => {
@@ -41,7 +39,7 @@ export function usePartSelection<T>({
       newMap.set(id, selectedParts.get(id) ?? false);
     }
     if (newMap.size !== selectedParts.size) {
-      setSelectedParts((prev) => {
+      setSelectedParts(() => {
         return newMap;
       });
     }
@@ -56,16 +54,29 @@ export function usePartSelection<T>({
   }, []);
 
   // Expose setPart function to parent component via ref
-  useImperativeHandle(toggleRef, () => ({
-    setPart(part: number) {
-      setPartAsSelected(part);
-    },
-    setPartByLabel(label: string) {
+  useImperativeHandle<
+    {
+      setPart: (part: number) => void;
+      setPartByLabel?: (label: string) => void;
+    } | null,
+    {
+      setPart: (part: number) => void;
+      setPartByLabel?: (label: string) => void;
+    } | null
+  >(toggleRef, () => {
+    if (parts.length === 0) return null;
+    console.log(parts);
+
+    return {
+      setPart(part: number) {
+        setPartAsSelected(part);
+      },
+      setPartByLabel(label: string) {
         const part = (parts.find((p) => (p as any)?.short_label === label) as any)?.id;
-        if (part !== undefined) 
-            setPartAsSelected(part);
-    }
-  }));
+        if (part !== undefined) setPartAsSelected(part);
+      },
+    };
+  }, [parts, setPartAsSelected]);
 
   const selectAllParts = useCallback(() => {
     setSelectedParts((prev) => new Map([...prev.keys()].map((key) => [key, true])));

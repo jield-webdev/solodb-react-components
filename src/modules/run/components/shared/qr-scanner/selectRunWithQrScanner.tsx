@@ -71,7 +71,7 @@ export default function NavigateInRunWithQrScanner({
       }
 
       if (setRun !== undefined && foundRun !== undefined) setRun(foundRun);
-      if (setRunPartId !== undefined && foundRunPartId !== undefined) {setRunPartId(foundRunPartId);}
+      if (setRunPartId !== undefined && foundRunPartId !== undefined) setRunPartId(foundRunPartId);
       if (setRunStepPartId !== undefined && foundRunStepPartId !== undefined) setRunStepPartId(foundRunStepPartId);
       if (setRunPartLabel !== undefined && foundRunPartLabel !== undefined) setRunPartLabel(foundRunPartLabel);
 
