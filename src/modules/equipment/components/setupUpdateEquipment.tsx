@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQueries, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Equipment,
   Facet,
@@ -19,15 +19,12 @@ import { useInView } from "react-intersection-observer";
 import EquipmentTable from "./setup/equipmentTable";
 import FilterFormBar from "./setup/filterFormBar";
 import { FilterBadges } from "./setup/filterBadges";
-import { Setup } from "@jield/solodb-typescript-core/dist/equipment/interfaces/setup";
 import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 
 export function populateFilterData(filterFormData: FilterFormData): FilterData {
-  let facet: { [fieldsetName: string]: { values: string[] } } = {};
-
-  for (const fieldset of Object.entries(filterFormData.facet.fieldsets)) {
-    facet[fieldset[0]] = { values: [] };
-  }
+  const facet = Object.fromEntries(Object.keys(filterFormData.facet.fieldsets).map((key) => [key, { values: [] }])) as {
+    [fieldsetName: string]: { values: string[] };
+  };
 
   return {
     filter: { general: [] },
@@ -45,33 +42,24 @@ export default function SetupUpdateEquipment() {
   const [searchQuery, setSearchQuery] = useState<string | undefined>(undefined);
   const [filter, setFilter] = useState<FilterData | undefined>(undefined);
 
-  const [pageSize] = useState<number>(20);
+  const pageSize = 20;
 
   const queryClient = useQueryClient();
 
-  const queries = useQueries({
-    queries: [
-      {
-        queryKey: ["setup", id],
-        queryFn: () => getSetup({ id: Number(id) }),
-        enabled: Boolean(id),
-      },
-      {
-        queryKey: ["filter", JSON.stringify(filter)],
-        queryFn: () => getFilter({ service: "equipment", formResult: filter, environment: environment }),
-      },
-    ],
+  const setupQuery = useQuery({
+    queryKey: ["setup", id],
+    queryFn: () => getSetup({ id: Number(id) }),
+    enabled: Boolean(id),
   });
 
-  const reloadQueriesByKey = (key: any[]) => {
-    queryClient.refetchQueries({ queryKey: key });
-  };
+  const filterFormQuery = useQuery({
+    queryKey: ["filter", environment, filter],
+    queryFn: () => getFilter({ service: "equipment", formResult: filter, environment: environment }),
+    enabled: Boolean(environment),
+  });
 
-  const [setupQuery, filterFormQuery] = queries;
-
-  const isError = queries.some((query) => query.isError);
-
-  const setup = useMemo(() => setupQuery.data as unknown as Setup, [setupQuery.data]);
+  const isError = setupQuery.isError || filterFormQuery.isError;
+  const setup = setupQuery.data;
   const previousFilterFormData = useRef<FilterFormData | undefined>(undefined);
   const filterFormData = useMemo<FilterFormData>(() => {
     if (filterFormQuery.data === undefined) {
@@ -116,6 +104,7 @@ export default function SetupUpdateEquipment() {
   const [selectedSetupEquipmentIdMap, setSelectedSetupEquipmentIdMap] = useState<Map<number, number>>(
     new Map<number, number>()
   );
+  const selectedEquipmentList = useMemo(() => Array.from(selectedEquipmentMap.values()), [selectedEquipmentMap]);
 
   // infinite query for equipments
   const {
@@ -125,7 +114,7 @@ export default function SetupUpdateEquipment() {
     fetchNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    queryKey: ["equipment", searchQuery, JSON.stringify(filter), JSON.stringify(equipmentSort)],
+    queryKey: ["equipment", environment, searchQuery, filter, equipmentSort],
     queryFn: async ({ pageParam }) => {
       const res = await listEquipment({
         environment: environment,
@@ -146,13 +135,14 @@ export default function SetupUpdateEquipment() {
     initialPageParam: 1,
     getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextPage : undefined),
     getPreviousPageParam: (firstPage) => firstPage.prevPage ?? undefined,
+    enabled: Boolean(environment),
   });
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // manage the selected equipments
   useEffect(() => {
@@ -169,59 +159,86 @@ export default function SetupUpdateEquipment() {
     }
   }, [setup]);
 
-  const addEquipment = async (equipment: Equipment) => {
-    if (!setup) return;
-
-    setSelectedEquipmentMap((prev) => new Map(prev.set(equipment.id, equipment)));
-
-    try {
+  const addEquipmentMutation = useMutation({
+    mutationFn: async (equipment: Equipment) => {
+      if (!setup) return;
       await axios.post(`create/setup/equipment/${setup.id}`, {
         equipment_id: equipment.id,
       });
-      reloadQueriesByKey(["setup"]);
-    } catch (error) {
-      console.error("Failed to add equipment", error);
+    },
+    onMutate: (equipment) => {
+      let previous: Map<number, Equipment> | undefined;
       setSelectedEquipmentMap((prev) => {
-        const map = new Map(prev);
-        map.delete(equipment.id);
-        return map;
+        previous = new Map(prev);
+        const next = new Map(prev);
+        next.set(equipment.id, equipment);
+        return next;
       });
-    }
+      return { previous: previous ?? new Map<number, Equipment>() };
+    },
+    onError: (error, _equipment, context) => {
+      console.error("Failed to add equipment", error);
+      if (context?.previous) {
+        setSelectedEquipmentMap(context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["setup"] });
+    },
+  });
+
+  const removeEquipmentMutation = useMutation({
+    mutationFn: async (equipment: Equipment) => {
+      const setupEquipmentId = selectedSetupEquipmentIdMap.get(equipment.id);
+      if (!setupEquipmentId) {
+        throw new Error(`Missing setup equipment id for removal: ${equipment.id}`);
+      }
+      await axios.delete(`delete/setup/equipment/${setupEquipmentId}`);
+    },
+    onMutate: (equipment) => {
+      let previous: Map<number, Equipment> | undefined;
+      setSelectedEquipmentMap((prev) => {
+        previous = new Map(prev);
+        const next = new Map(prev);
+        next.delete(equipment.id);
+        return next;
+      });
+      return { previous: previous ?? new Map<number, Equipment>() };
+    },
+    onError: (error, _equipment, context) => {
+      console.error("Failed to remove equipment", error);
+      if (context?.previous) {
+        setSelectedEquipmentMap(context.previous);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["setup"] });
+    },
+  });
+
+  const addEquipment = (equipment: Equipment) => {
+    if (!setup) return;
+    addEquipmentMutation.mutate(equipment);
   };
-
-  const removeEquipment = async (equipment: Equipment) => {
+  const removeEquipment = (equipment: Equipment) => {
     const setupEquipmentId = selectedSetupEquipmentIdMap.get(equipment.id);
-
     if (!setupEquipmentId) {
       console.error("Missing setup equipment id for removal", equipment.id);
-      reloadQueriesByKey(["setup"]);
+      queryClient.invalidateQueries({ queryKey: ["setup"] });
       return;
     }
-
-    const previousEquipmentMap = new Map(selectedEquipmentMap);
-    setSelectedEquipmentMap((prev) => {
-      const map = new Map(prev);
-      map.delete(equipment.id);
-      return map;
-    });
-
-    try {
-      await axios.delete(`delete/setup/equipment/${setupEquipmentId}`);
-      reloadQueriesByKey(["setup"]);
-    } catch (error) {
-      console.error("Failed to remove equipment", error);
-      setSelectedEquipmentMap(previousEquipmentMap);
-    }
+    removeEquipmentMutation.mutate(equipment);
   };
 
   if (isError) {
     return (
       <div className="alert alert-danger my-3" role="alert">
         Error loading:{" "}
-        {queries
+        {[setupQuery, filterFormQuery]
           .filter((q) => q.isError)
           .map((q, idx) => {
-            return <span key={idx}>Query error {q.error.message}</span>;
+            const message = q.error instanceof Error ? q.error.message : "Unknown error";
+            return <span key={idx}>Query error {message}</span>;
           })}
       </div>
     );
@@ -249,10 +266,7 @@ export default function SetupUpdateEquipment() {
             Return to setup
           </a>
         </div>
-        <SelectedEquipmentTable
-          equipmentList={Array.from(selectedEquipmentMap).map(([_, value]) => value)}
-          removeEquipment={removeEquipment}
-        />
+        <SelectedEquipmentTable equipmentList={selectedEquipmentList} removeEquipment={removeEquipment} />
       </div>
       {/* Equipment table */}
       <div className="row">
@@ -278,7 +292,9 @@ export default function SetupUpdateEquipment() {
             <EquipmentTable
               equipmentList={
                 equipmentListData?.pages.flatMap((page) =>
-                  page.items?.filter((e) => !selectedEquipmentMap.has(e.id))
+                  page.items
+                    ?.filter((equipment) => !equipment.is_in_fixed_setup)
+                    .filter((e) => !selectedEquipmentMap.has(e.id))
                 ) ?? []
               }
               currentFilter={filter}

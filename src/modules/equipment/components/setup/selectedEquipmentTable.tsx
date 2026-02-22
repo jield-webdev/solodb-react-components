@@ -1,7 +1,6 @@
 import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { EquipmentModuleStatusWrapper } from "./equipmentModuleStatusWrapper";
-import { Setup } from "@jield/solodb-typescript-core/dist/equipment/interfaces/setup";
 import { Equipment } from "@jield/solodb-typescript-core";
 
 export default function SelectedEquipmentTable({
