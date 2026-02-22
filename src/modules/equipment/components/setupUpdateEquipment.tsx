@@ -51,8 +51,9 @@ export default function SetupUpdateEquipment() {
   const queries = useQueries({
     queries: [
       {
-        queryKey: ["setup"],
+        queryKey: ["setup", id],
         queryFn: () => getSetup({ id: Number(id) }),
+        enabled: Boolean(id),
       },
       {
         queryKey: ["filter", JSON.stringify(filter)],
@@ -111,6 +112,9 @@ export default function SetupUpdateEquipment() {
   const [selectedEquipmentMap, setSelectedEquipmentMap] = useState<Map<number, Equipment>>(
     new Map<number, Equipment>()
   );
+  const [selectedSetupEquipmentIdMap, setSelectedSetupEquipmentIdMap] = useState<Map<number, number>>(
+    new Map<number, number>()
+  );
 
   // infinite query for equipments
   const {
@@ -153,55 +157,61 @@ export default function SetupUpdateEquipment() {
   useEffect(() => {
     if (setup !== undefined) {
       const equipmentMap = new Map<number, Equipment>();
+      const setupEquipmentIdMap = new Map<number, number>();
       for (let i = 0; i < setup.setup_equipment.length; i++) {
         const setupEquipment = setup.setup_equipment[i];
         equipmentMap.set(setupEquipment.equipment.id, setupEquipment.equipment);
+        setupEquipmentIdMap.set(setupEquipment.equipment.id, setupEquipment.id);
       }
       setSelectedEquipmentMap(equipmentMap);
+      setSelectedSetupEquipmentIdMap(setupEquipmentIdMap);
     }
   }, [setup]);
 
-  const addEquipment = (equipment: Equipment) => {
+  const addEquipment = async (equipment: Equipment) => {
+    if (!setup) return;
+
     setSelectedEquipmentMap((prev) => new Map(prev.set(equipment.id, equipment)));
+
+    try {
+      await axios.post(`create/setup/equipment/${setup.id}`, {
+        equipment_id: equipment.id,
+      });
+      reloadQueriesByKey(["setup"]);
+    } catch (error) {
+      console.error("Failed to add equipment", error);
+      setSelectedEquipmentMap((prev) => {
+        const map = new Map(prev);
+        map.delete(equipment.id);
+        return map;
+      });
+    }
   };
 
-  const removeEquipment = (equipment: Equipment) => {
+  const removeEquipment = async (equipment: Equipment) => {
+    const setupEquipmentId = selectedSetupEquipmentIdMap.get(equipment.id);
+
+    if (!setupEquipmentId) {
+      console.error("Missing setup equipment id for removal", equipment.id);
+      reloadQueriesByKey(["setup"]);
+      return;
+    }
+
+    const previousEquipmentMap = new Map(selectedEquipmentMap);
     setSelectedEquipmentMap((prev) => {
       const map = new Map(prev);
       map.delete(equipment.id);
       return map;
     });
-  };
 
-  // Update selected equipments in backend
-  useEffect(() => {
-    if (!setup) return;
-
-    const originalIds = setup.setup_equipment.map((e: { id: number }) => e.id).sort((a: number, b: number) => a - b);
-    const currentIds = Array.from(selectedEquipmentMap.keys()).sort((a, b) => a - b);
-
-    const isEqual =
-      originalIds.length === currentIds.length &&
-      originalIds.every((id: number, index: number) => id === currentIds[index]);
-
-    if (isEqual) {
-      return;
+    try {
+      await axios.delete(`delete/setup/equipment/${setupEquipmentId}`);
+      reloadQueriesByKey(["setup"]);
+    } catch (error) {
+      console.error("Failed to remove equipment", error);
+      setSelectedEquipmentMap(previousEquipmentMap);
     }
-
-    const submit = async () => {
-      try {
-        const data = {
-          equipment_list: currentIds,
-        };
-
-        await axios.patch(`update/setup/${setup.id}/equipment`, data);
-      } catch (error) {
-        console.error("Failed to update equipment", error);
-      }
-    };
-
-    submit();
-  }, [selectedEquipmentMap]);
+  };
 
   if (isError) {
     return (
@@ -235,10 +245,8 @@ export default function SetupUpdateEquipment() {
           </a>
         </div>
         <SelectedEquipmentTable
-          setup={setup}
           equipmentList={Array.from(selectedEquipmentMap).map(([_, value]) => value)}
           removeEquipment={removeEquipment}
-          refetchQueries={reloadQueriesByKey}
         />
       </div>
       {/* Equipment table */}
@@ -271,6 +279,7 @@ export default function SetupUpdateEquipment() {
               currentFilter={filter}
               setEquipmentSort={setEquipmentSort}
               addEquipment={addEquipment}
+              addDisabled={!setup?.id}
             />
           </div>
           <div ref={ref}>{isFetching ? "Fetching new equipment..." : null}</div>

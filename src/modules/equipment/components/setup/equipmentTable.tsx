@@ -17,10 +17,12 @@ export default function EquipmentTable({
   currentFilter,
   setEquipmentSort,
   addEquipment,
+  addDisabled = false,
 }: {
   equipmentList: Equipment[];
   currentFilter: FilterData | undefined;
   addEquipment: (equipment: Equipment) => void;
+  addDisabled?: boolean;
   setEquipmentSort: Dispatch<
     SetStateAction<{
       order: string;
@@ -110,7 +112,12 @@ export default function EquipmentTable({
                 <span className="badge bg-info badge-active">In use in {equipment.active_setup?.name}</span>
               )}{" "}
               {!equipment.is_in_fixed_setup && (
-                <button onClick={() => addEquipment(equipment)} className="btn btn-outline-success btn-sm">
+                <button
+                  onClick={() => addEquipment(equipment)}
+                  className="btn btn-outline-success btn-sm"
+                  disabled={addDisabled}
+                  title={addDisabled ? "Setup is still loading" : undefined}
+                >
                   <i className="fa fa-plus" /> Add to setup
                 </button>
               )}
@@ -234,7 +241,7 @@ export default function EquipmentTable({
   const table = useReactTable({
     columns,
     data: equipmentList,
-    debugTable: true,
+    debugTable: false,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: handleSortingChange,
