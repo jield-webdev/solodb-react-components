@@ -20,6 +20,7 @@ import EquipmentTable from "./setup/equipmentTable";
 import FilterFormBar from "./setup/filterFormBar";
 import { FilterBadges } from "./setup/filterBadges";
 import { Setup } from "@jield/solodb-typescript-core/dist/equipment/interfaces/setup";
+import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 
 export function populateFilterData(filterFormData: FilterFormData): FilterData {
   let facet: { [fieldsetName: string]: { values: string[] } } = {};
@@ -224,6 +225,10 @@ export default function SetupUpdateEquipment() {
           })}
       </div>
     );
+  }
+
+  if (setupQuery.isLoading) {
+    return <LoadingComponent message={"Loading setup..."} />;
   }
 
   return (
