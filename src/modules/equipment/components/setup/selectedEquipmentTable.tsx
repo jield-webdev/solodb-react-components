@@ -1,19 +1,14 @@
 import { Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { EquipmentModuleStatusWrapper } from "./equipmentModuleStatusWrapper";
-import { Setup } from "@jield/solodb-typescript-core/dist/equipment/interfaces/setup";
 import { Equipment } from "@jield/solodb-typescript-core";
 
 export default function SelectedEquipmentTable({
-  setup,
   equipmentList,
   removeEquipment,
-  refetchQueries,
 }: {
-  setup: Setup;
   equipmentList: Equipment[];
   removeEquipment: (equipment: Equipment) => void;
-  refetchQueries: (key: any[]) => void;
 }) {
   const { environment } = useParams();
 
