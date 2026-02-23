@@ -9,7 +9,7 @@ export default function NavigateInRunWithQrScanner({
   setRun,
   setRunStepPartId,
   setRunPartId,
-  setRunPartLabel
+  setRunPartLabel,
 }: {
   runsList: Run[];
   setRun: (run: Run) => void;
@@ -121,12 +121,12 @@ export default function NavigateInRunWithQrScanner({
   };
 
   return (
-    <div className="d-flex flex-column justify-content-between">
-      {showInput && <BarcodeScanElement control={control} />}
+    <div className="d-flex flex-row gap-3">
       <div className="d-flex flex-column">
         <QRCodeSVG value={"start-form"} size={100} className={"float-end"} onClick={() => startForm()} />
         <span className={"text-muted"}>Start QR</span>
       </div>
+      {showInput && <BarcodeScanElement control={control} />}
     </div>
   );
 }

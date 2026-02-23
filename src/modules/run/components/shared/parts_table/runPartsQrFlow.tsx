@@ -5,6 +5,8 @@ import RunPartProductionTableRow from "@jield/solodb-react-components/modules/ru
 import { Run, RunStep, RunStepPart, RunPart, listRunParts, listRunStepParts, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
 
+const SHOW_FINISH_PARTS = false;
+
 type Props = {
   run: Run;
   runStep: RunStep;
@@ -22,7 +24,7 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
   const queries = useQueries({
     queries: [
       {
-        queryKey: ["runParts", run],
+        queryKey: ["runParts", run.id, runStep.part_level],
         queryFn: () => listRunParts({ run: run, level: runStep.part_level }),
         enabled: !runParts, // don't fetch if runParts prop provided
       },
@@ -61,7 +63,16 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     toggleRef: toggleRunPartRef,
   });
 
-  const partsToRender = useMemo(() => leveledParts.filter((part) => selectedParts.get(part.id)), [selectedParts]);
+
+
+  const partsToRender = useMemo(() => leveledParts.filter((part) => selectedParts.get(part.id) && !isRunPartFinish(runStepPartsData, part)), [selectedParts, runStepPartsData]);
+
+  const reloadData = () => {
+      // Reload the data
+      queryClient.invalidateQueries({queryKey: ["runParts", run.id, runStep.part_level]});
+      queryClient.invalidateQueries({queryKey: ["runStepParts", runStep.id]});
+      refetchFn();
+  }
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -88,7 +99,7 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
               runStep={runStep}
               runPart={runPart}
               runStepParts={runStepPartsData}
-              refetchFn={refetchFn}
+              refetchFn={reloadData}
               key={i}
               partIsSelected={selectedParts.get(runPart.id) ?? false}
               dropdown={false}
@@ -99,6 +110,16 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
       <DisplayStepPartsInfo runStepParts={runStepPartsData} selectedPartsLength={partsToRender.length} />
     </React.Fragment>
   );
+};
+
+const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart): boolean => {
+    if (SHOW_FINISH_PARTS) return false;
+
+    const stepPart = runStepParts.find((p) => p.part.id == part.id);
+
+    if (stepPart === null || stepPart === undefined) return false;
+    
+    return stepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
 };
 
 const DisplayStepPartsInfo = ({ runStepParts, selectedPartsLength }: { runStepParts: RunStepPart[]; selectedPartsLength: number; }) => {

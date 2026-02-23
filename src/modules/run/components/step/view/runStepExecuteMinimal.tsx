@@ -39,7 +39,7 @@ export default function RunStepExecuteMinimal({
       <h3 className="mt-2">Parameters</h3>
       <RunStepParametersTable runStep={runStep} showOnlyEmphasizedParameters={showOnlyEmphasizedParameters} />
 
-      <div className="row row-cols-2 ">
+      <div className="row row-cols-2">
         <div className={"col"}>
           <StepRemark runStep={runStep} reloadRunStep={reloadRunStepFn} />
         </div>

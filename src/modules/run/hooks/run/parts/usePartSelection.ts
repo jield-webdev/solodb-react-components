@@ -65,7 +65,6 @@ export function usePartSelection<T>({
     } | null
   >(toggleRef, () => {
     if (parts.length === 0) return null;
-    console.log(parts);
 
     return {
       setPart(part: number) {
