@@ -71,23 +71,29 @@ export default function StepRemark({
 
   if (!showForm || !canUpdateRemark) {
     return (
-      <>
-        <div className="d-flex align-items-center gap-2">
-          <h3 className={titleClassName}>{title}</h3>
-          {!hasRemark && canUpdateRemark && (
-            <Button variant="primary" className="ms-auto" size="sm" onClick={() => setShowForm(true)}>
-              Add remark
-            </Button>
-          )}
-        </div>
-        {hasRemark && <div className="text-success" dangerouslySetInnerHTML={{ __html: resolvedRunStep.remark }} />}
-        {!hasRemark && <small className="text-muted">No remark.</small>}
-        {hasRemark && canUpdateRemark && (
-          <Button variant="primary" className="mt-3" onClick={() => setShowForm(true)}>
-            Edit remark
-          </Button>
+      <div>
+        <h3 className={titleClassName}>{title}</h3>
+        {!hasRemark && (
+          <>
+            <div className="text-muted">No remark.</div>
+            {canUpdateRemark && (
+              <Button variant="primary" className="ms-auto" size="sm" onClick={() => setShowForm(true)}>
+                Add remark
+              </Button>
+            )}
+          </>
         )}
-      </>
+        {hasRemark && (
+          <>
+            <div className="text-success" dangerouslySetInnerHTML={{ __html: resolvedRunStep.remark }} />{" "}
+            {canUpdateRemark && (
+              <Button variant="primary" className="mt-3" onClick={() => setShowForm(true)}>
+                Edit remark
+              </Button>
+            )}
+          </>
+        )}
+      </div>
     );
   }
 
