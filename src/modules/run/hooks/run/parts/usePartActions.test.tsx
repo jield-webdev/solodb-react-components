@@ -5,11 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   RunStepPartActionEnum,
   getAvailableRunStepPartActions,
-  setRunStepPartAction,
   RunStepPart,
   RunStep,
 } from "@jield/solodb-typescript-core";
 import { ReactNode } from "react";
+import performRunStepPartAction from "../../../../../utils/run/performRunStepPartAction";
 
 // Mock the core library functions
 vi.mock("@jield/solodb-typescript-core", async () => {
@@ -17,9 +17,12 @@ vi.mock("@jield/solodb-typescript-core", async () => {
   return {
     ...actual,
     getAvailableRunStepPartActions: vi.fn(),
-    setRunStepPartAction: vi.fn(),
   };
 });
+
+vi.mock("../../../../../utils/run/performRunStepPartAction", () => ({
+  default: vi.fn(),
+}));
 
 interface MockPart {
   id: number;
@@ -44,8 +47,7 @@ describe("usePartActions", () => {
   ];
 
   const getPartId = (part: MockPart) => part.id;
-  const getRunStepPart = (part: MockPart) =>
-    mockRunStepParts.find((sp) => sp.id === part.stepPartId);
+  const getRunStepPart = (part: MockPart) => mockRunStepParts.find((sp) => sp.id === part.stepPartId);
 
   beforeEach(() => {
     queryClient = new QueryClient({
@@ -92,11 +94,7 @@ describe("usePartActions", () => {
 
     vi.mocked(getAvailableRunStepPartActions).mockImplementation((part) => {
       if (part.id === 10) return [RunStepPartActionEnum.START_PROCESSING];
-      if (part.id === 20)
-        return [
-          RunStepPartActionEnum.START_PROCESSING,
-          RunStepPartActionEnum.FINISH_PROCESSING,
-        ];
+      if (part.id === 20) return [RunStepPartActionEnum.START_PROCESSING, RunStepPartActionEnum.FINISH_PROCESSING];
       return [];
     });
 
@@ -131,7 +129,7 @@ describe("usePartActions", () => {
       return [];
     });
 
-    vi.mocked(setRunStepPartAction).mockResolvedValue({} as any);
+    vi.mocked(performRunStepPartAction).mockResolvedValue({} as any);
 
     const refetchFn = vi.fn();
 
@@ -154,11 +152,11 @@ describe("usePartActions", () => {
 
     await waitFor(() => {
       // Should only be called once for part 1 (part 2 doesn't have the action)
-      expect(setRunStepPartAction).toHaveBeenCalledTimes(1);
-      expect(setRunStepPartAction).toHaveBeenCalledWith({
-        runStepPart: mockRunStepParts[0],
-        runStepPartAction: RunStepPartActionEnum.START_PROCESSING,
-      });
+      expect(performRunStepPartAction).toHaveBeenCalledTimes(1);
+      expect(performRunStepPartAction).toHaveBeenCalledWith(
+        mockRunStepParts[0],
+        RunStepPartActionEnum.START_PROCESSING
+      );
     });
 
     await waitFor(() => {
@@ -169,10 +167,8 @@ describe("usePartActions", () => {
   it("invalidates both stepParts and runStepParts queries after action", async () => {
     const selectedParts = new Map<number, boolean>([[1, true]]);
 
-    vi.mocked(getAvailableRunStepPartActions).mockReturnValue([
-      RunStepPartActionEnum.FINISH_PROCESSING,
-    ]);
-    vi.mocked(setRunStepPartAction).mockResolvedValue({} as any);
+    vi.mocked(getAvailableRunStepPartActions).mockReturnValue([RunStepPartActionEnum.FINISH_PROCESSING]);
+    vi.mocked(performRunStepPartAction).mockResolvedValue({} as any);
 
     const refetchQueriesSpy = vi.spyOn(queryClient, "refetchQueries");
 
@@ -228,7 +224,7 @@ describe("usePartActions", () => {
       result.current.performActionToSelectedParts(RunStepPartActionEnum.START_PROCESSING);
     });
 
-    expect(setRunStepPartAction).not.toHaveBeenCalled();
+    expect(performRunStepPartAction).not.toHaveBeenCalled();
   });
 
   it("does nothing when no parts are selected", async () => {
@@ -259,7 +255,7 @@ describe("usePartActions", () => {
     // Wait a bit to ensure no async calls happen
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(setRunStepPartAction).not.toHaveBeenCalled();
+    expect(performRunStepPartAction).not.toHaveBeenCalled();
     expect(refetchFn).not.toHaveBeenCalled();
   });
 });

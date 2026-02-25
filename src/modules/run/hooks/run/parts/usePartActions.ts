@@ -2,11 +2,11 @@ import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   RunStepPartActionEnum,
-  setRunStepPartAction,
   RunStepPart,
   RunStep,
   getAvailableRunStepPartActions,
 } from "@jield/solodb-typescript-core";
+import performRunStepPartAction from "@jield/solodb-react-components/utils/run/performRunStepPartAction";
 
 export interface UsePartActionsOptions<T> {
   runStep: RunStep;
@@ -49,12 +49,8 @@ export function usePartActions<T>({
       const promises = selectedItems
         .map((item) => getRunStepPart(item))
         .filter((runStepPart): runStepPart is RunStepPart => runStepPart !== undefined)
-        .filter((runStepPart) =>
-          getAvailableRunStepPartActions(runStepPart).some((a) => a === action)
-        )
-        .map((runStepPart) =>
-          setRunStepPartAction({ runStepPart, runStepPartAction: action })
-        );
+        .filter((runStepPart) => getAvailableRunStepPartActions(runStepPart).some((a) => a === action))
+        .map((runStepPart) => performRunStepPartAction(runStepPart, action));
 
       Promise.all(promises).then(() => {
         queryClient.refetchQueries({ queryKey: ["stepParts", runStep.id] });
