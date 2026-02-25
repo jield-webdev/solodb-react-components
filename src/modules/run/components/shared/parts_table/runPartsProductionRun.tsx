@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -15,6 +15,7 @@ import { usePartSelection } from "@jield/solodb-react-components/modules/run/hoo
 import { usePartActions } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartActions";
 import { PartActionsDropdown } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partActionsDropdown";
 import { PartSelectionControls } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partSelectionControls";
+import finishStepWhenAllPartsAreFinished from "@jield/solodb-react-components/utils/run/step/finishStepWhenAllPartsAreFinished";
 
 type Props = {
   run: Run;
@@ -65,6 +66,12 @@ const RunPartsProductionRun = ({
     () => runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
     [runStepParts, runStepPartsQuery.data]
   );
+
+  useEffect(() => {
+      const partsToVerify = runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [];
+      // verify for the need to finish the step
+      finishStepWhenAllPartsAreFinished(runStep, partsToVerify);
+  }, [runStepParts, runStepPartsQuery.data])
 
   const leveledParts = useMemo(
     () => runPartsData.filter((part) => part.part_level === runStep.part_level),

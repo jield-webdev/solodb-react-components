@@ -9,7 +9,10 @@ import {
   RunStep,
 } from "@jield/solodb-typescript-core";
 import { ReactNode } from "react";
-import performRunStepPartAction from "../../../../../utils/run/step/performRunStepPartAction";
+
+const { performRunStepPartActionMock } = vi.hoisted(() => ({
+  performRunStepPartActionMock: vi.fn(),
+}));
 
 // Mock the core library functions
 vi.mock("@jield/solodb-typescript-core", async () => {
@@ -20,8 +23,8 @@ vi.mock("@jield/solodb-typescript-core", async () => {
   };
 });
 
-vi.mock("../../../../../utils/run/performRunStepPartAction", () => ({
-  default: vi.fn(),
+vi.mock("@jield/solodb-react-components/utils/run/step/performRunStepPartAction", () => ({
+  default: performRunStepPartActionMock,
 }));
 
 interface MockPart {
@@ -129,7 +132,7 @@ describe("usePartActions", () => {
       return [];
     });
 
-    vi.mocked(performRunStepPartAction).mockResolvedValue({} as any);
+    performRunStepPartActionMock.mockResolvedValue({} as any);
 
     const refetchFn = vi.fn();
 
@@ -152,8 +155,8 @@ describe("usePartActions", () => {
 
     await waitFor(() => {
       // Should only be called once for part 1 (part 2 doesn't have the action)
-      expect(performRunStepPartAction).toHaveBeenCalledTimes(1);
-      expect(performRunStepPartAction).toHaveBeenCalledWith(
+      expect(performRunStepPartActionMock).toHaveBeenCalledTimes(1);
+      expect(performRunStepPartActionMock).toHaveBeenCalledWith(
         mockRunStepParts[0],
         RunStepPartActionEnum.START_PROCESSING
       );
@@ -168,7 +171,7 @@ describe("usePartActions", () => {
     const selectedParts = new Map<number, boolean>([[1, true]]);
 
     vi.mocked(getAvailableRunStepPartActions).mockReturnValue([RunStepPartActionEnum.FINISH_PROCESSING]);
-    vi.mocked(performRunStepPartAction).mockResolvedValue({} as any);
+    performRunStepPartActionMock.mockResolvedValue({} as any);
 
     const refetchQueriesSpy = vi.spyOn(queryClient, "refetchQueries");
 
@@ -224,7 +227,7 @@ describe("usePartActions", () => {
       result.current.performActionToSelectedParts(RunStepPartActionEnum.START_PROCESSING);
     });
 
-    expect(performRunStepPartAction).not.toHaveBeenCalled();
+    expect(performRunStepPartActionMock).not.toHaveBeenCalled();
   });
 
   it("does nothing when no parts are selected", async () => {
@@ -255,7 +258,7 @@ describe("usePartActions", () => {
     // Wait a bit to ensure no async calls happen
     await new Promise((resolve) => setTimeout(resolve, 50));
 
-    expect(performRunStepPartAction).not.toHaveBeenCalled();
+    expect(performRunStepPartActionMock).not.toHaveBeenCalled();
     expect(refetchFn).not.toHaveBeenCalled();
   });
 });

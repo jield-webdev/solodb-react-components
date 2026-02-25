@@ -6,7 +6,7 @@ import {
   RunStep,
   getAvailableRunStepPartActions,
 } from "@jield/solodb-typescript-core";
-import performRunStepPartAction from "@jield/solodb-react-components/utils/run/performRunStepPartAction";
+import performRunStepPartAction from "@jield/solodb-react-components/utils/run/step/performRunStepPartAction";
 
 export interface UsePartActionsOptions<T> {
   runStep: RunStep;

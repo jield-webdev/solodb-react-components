@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep } from "@jield/solodb-typescript-core";
-import performRunStepPartAction from "@jield/solodb-react-components/utils/run/performRunStepPartAction";
+import performRunStepPartAction from "@jield/solodb-react-components/utils/run/step/performRunStepPartAction";
 
 const RunStepPartProductionTableRow = ({
   runPart,

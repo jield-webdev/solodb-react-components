@@ -3,7 +3,7 @@ import { Button, Dropdown } from "react-bootstrap";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep } from "@jield/solodb-typescript-core";
-import performRunStepPartAction from "@jield/solodb-react-components/utils/run/performRunStepPartAction";
+import performRunStepPartAction from "@jield/solodb-react-components/utils/run/step/performRunStepPartAction";
 
 const RunStepPartProductionBadge = ({
   runPart,

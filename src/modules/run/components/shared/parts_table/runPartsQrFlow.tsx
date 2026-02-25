@@ -1,9 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
 import { Run, RunStep, RunStepPart, RunPart, listRunParts, listRunStepParts, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
+import finishStepWhenAllPartsAreFinished from "@jield/solodb-react-components/utils/run/step/finishStepWhenAllPartsAreFinished";
 
 const SHOW_FINISH_PARTS = false;
 
@@ -51,6 +52,12 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     [runStepParts, runStepPartsQuery.data]
   );
 
+  useEffect(() => {
+      const partsToVerify = runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [];
+      // verify for the need to finish the step
+      finishStepWhenAllPartsAreFinished(runStep, partsToVerify);
+  }, [runStepParts, runStepPartsQuery.data])
+
   const leveledParts = useMemo(
     () => runPartsData.filter((part) => part.part_level === runStep.part_level),
     [runPartsData, runStep.part_level]
@@ -62,8 +69,6 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     getPartId: (part) => part.id,
     toggleRef: toggleRunPartRef,
   });
-
-
 
   const partsToRender = useMemo(() => leveledParts.filter((part) => selectedParts.get(part.id) && !isRunPartFinish(runStepPartsData, part)), [selectedParts, runStepPartsData]);
 
