@@ -2,9 +2,17 @@ import React, { useEffect, useMemo } from "react";
 import { Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
-import { Run, RunStep, RunStepPart, RunPart, listRunParts, listRunStepParts, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
+import {
+  finishStepWhenAllPartsAreFinished,
+  Run,
+  RunStep,
+  RunStepPart,
+  RunPart,
+  listRunParts,
+  listRunStepParts,
+  RunStepPartActionEnum,
+} from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
-import finishStepWhenAllPartsAreFinished from "@jield/solodb-react-components/utils/run/step/finishStepWhenAllPartsAreFinished";
 
 const SHOW_FINISH_PARTS = false;
 
@@ -46,17 +54,17 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     () => runParts ?? (runPartQuery.data?.items as RunPart[] | undefined) ?? [],
     [runParts, runPartQuery.data]
   );
-  
+
   const runStepPartsData = useMemo<RunStepPart[]>(
     () => runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
     [runStepParts, runStepPartsQuery.data]
   );
 
   useEffect(() => {
-      const partsToVerify = runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [];
-      // verify for the need to finish the step
-      finishStepWhenAllPartsAreFinished(runStep, partsToVerify);
-  }, [runStepParts, runStepPartsQuery.data])
+    const partsToVerify = runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [];
+    // verify for the need to finish the step
+    finishStepWhenAllPartsAreFinished(runStep, partsToVerify);
+  }, [runStepParts, runStepPartsQuery.data]);
 
   const leveledParts = useMemo(
     () => runPartsData.filter((part) => part.part_level === runStep.part_level),
@@ -70,14 +78,17 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     toggleRef: toggleRunPartRef,
   });
 
-  const partsToRender = useMemo(() => leveledParts.filter((part) => selectedParts.get(part.id) && !isRunPartFinish(runStepPartsData, part)), [selectedParts, runStepPartsData]);
+  const partsToRender = useMemo(
+    () => leveledParts.filter((part) => selectedParts.get(part.id) && !isRunPartFinish(runStepPartsData, part)),
+    [selectedParts, runStepPartsData]
+  );
 
   const reloadData = () => {
-      // Reload the data
-      queryClient.invalidateQueries({queryKey: ["runParts", run.id, runStep.part_level]});
-      queryClient.invalidateQueries({queryKey: ["runStepParts", runStep.id]});
-      refetchFn();
-  }
+    // Reload the data
+    queryClient.invalidateQueries({ queryKey: ["runParts", run.id, runStep.part_level] });
+    queryClient.invalidateQueries({ queryKey: ["runStepParts", runStep.id] });
+    refetchFn();
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -118,19 +129,27 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
 };
 
 const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart): boolean => {
-    if (SHOW_FINISH_PARTS) return false;
+  if (SHOW_FINISH_PARTS) return false;
 
-    const stepPart = runStepParts.find((p) => p.part.id == part.id);
+  const stepPart = runStepParts.find((p) => p.part.id == part.id);
 
-    if (stepPart === null || stepPart === undefined) return false;
-    
-    return stepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
+  if (stepPart === null || stepPart === undefined) return false;
+
+  return stepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
 };
 
-const DisplayStepPartsInfo = ({ runStepParts, selectedPartsLength }: { runStepParts: RunStepPart[]; selectedPartsLength: number; }) => {
+const DisplayStepPartsInfo = ({
+  runStepParts,
+  selectedPartsLength,
+}: {
+  runStepParts: RunStepPart[];
+  selectedPartsLength: number;
+}) => {
   const finishedParts = useMemo(() => {
     let counter = 0;
-    runStepParts.forEach((part) => part.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING ? counter++ : null);
+    runStepParts.forEach((part) =>
+      part.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING ? counter++ : null
+    );
     return counter;
   }, [runStepParts]);
 

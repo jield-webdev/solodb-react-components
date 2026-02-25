@@ -1,8 +1,7 @@
 import React from "react";
 import { Badge, Button } from "react-bootstrap";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
-import { RunStepPart, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
-import performRunStepPartAction from "@jield/solodb-react-components/utils/run/step/performRunStepPartAction";
+import { performRunStepPartAction, RunStepPart, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 
 const RunStepPartResearchTableRow = ({
   runStepPart,

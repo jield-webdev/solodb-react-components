@@ -4,8 +4,13 @@ import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
-import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep } from "@jield/solodb-typescript-core";
-import performRunStepPartAction from "@jield/solodb-react-components/utils/run/step/performRunStepPartAction";
+import {
+  performRunStepPartAction,
+  RunStepPartActionEnum,
+  RunPart,
+  RunStepPart,
+  RunStep,
+} from "@jield/solodb-typescript-core";
 
 const RunStepPartProductionTableRow = ({
   runPart,
@@ -74,10 +79,11 @@ const RunStepPartProductionTableRow = ({
   }) => {
     performRunStepPartAction(runStepPart, runStepPartAction)
       .then((response) => {
+        const latestAction = response as unknown as RunStepPart["latest_action"];
         setRunStepPart({
           ...runStepPart,
           ...{
-            latest_action: response,
+            latest_action: latestAction,
             actions: runStepPart.actions + 1,
           },
         });

@@ -20,12 +20,9 @@ vi.mock("@jield/solodb-typescript-core", async () => {
   return {
     ...actual,
     getAvailableRunStepPartActions: vi.fn(),
+    performRunStepPartAction: performRunStepPartActionMock,
   };
 });
-
-vi.mock("@jield/solodb-react-components/utils/run/step/performRunStepPartAction", () => ({
-  default: performRunStepPartActionMock,
-}));
 
 interface MockPart {
   id: number;

@@ -2,8 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Button, Dropdown } from "react-bootstrap";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
-import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep } from "@jield/solodb-typescript-core";
-import performRunStepPartAction from "@jield/solodb-react-components/utils/run/step/performRunStepPartAction";
+import {
+  performRunStepPartAction,
+  RunStepPartActionEnum,
+  RunPart,
+  RunStepPart,
+  RunStep,
+} from "@jield/solodb-typescript-core";
 
 const RunStepPartProductionBadge = ({
   runPart,
@@ -53,10 +58,11 @@ const RunStepPartProductionBadge = ({
   }) => {
     performRunStepPartAction(runStepPart, runStepPartAction)
       .then((response) => {
+        const latestAction = response as unknown as RunStepPart["latest_action"];
         setRunStepPart({
           ...runStepPart,
           ...{
-            latest_action: response,
+            latest_action: latestAction,
             actions: runStepPart.actions + 1,
           },
         });

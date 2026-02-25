@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Badge, Button } from "react-bootstrap";
 import axios from "axios";
-import { RunStepPartActionEnum, RunPart, RunStepPart, RunStep } from "@jield/solodb-typescript-core";
-import performRunStepPartAction from "@jield/solodb-react-components/utils/run/step/performRunStepPartAction";
+import {
+  performRunStepPartAction,
+  RunStepPartActionEnum,
+  RunPart,
+  RunStepPart,
+  RunStep,
+} from "@jield/solodb-typescript-core";
 
 export default function RunPartStepPart({
   runPart,
@@ -42,10 +47,11 @@ export default function RunPartStepPart({
     runStepPartAction: RunStepPartActionEnum;
   }) => {
     performRunStepPartAction(runStepPart, runStepPartAction).then((response) => {
+      const latestAction = response as unknown as RunStepPart["latest_action"];
       setRunStepPart({
         ...runStepPart,
         ...{
-          latest_action: response,
+          latest_action: latestAction,
           actions: runStepPart.actions + 1,
         },
       });
