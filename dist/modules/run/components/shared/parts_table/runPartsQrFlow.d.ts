@@ -8,7 +8,8 @@ type Props = {
     refetchFn?: () => void;
     toggleRunPartRef?: React.RefObject<{
         setPart: (part: number) => void;
+        setPartByLabel: (label: string) => void;
     } | null>;
 };
-declare const RunPartsQrFlow: ({ run, runStep, runStepParts, runParts, refetchFn, toggleRunPartRef, }: Props) => import("react/jsx-runtime").JSX.Element;
+declare const RunPartsQrFlow: ({ run, runStep, runStepParts, runParts, refetchFn, toggleRunPartRef }: Props) => import("react/jsx-runtime").JSX.Element;
 export default RunPartsQrFlow;
