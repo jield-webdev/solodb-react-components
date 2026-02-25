@@ -18,7 +18,7 @@
 
 ## Expected Validation Before Finalizing Changes
 
-- Run at least `yarn test` and `yarn build` before finishing.
+- Run at least `yarn test` and `npx -y react-doctor@latest . --verbose --diff` before finishing.
 - If behavior changes, add or update tests near the affected domain code.
 - Use the example app (`yarn dev`) to manually verify UI/interaction changes.
 
