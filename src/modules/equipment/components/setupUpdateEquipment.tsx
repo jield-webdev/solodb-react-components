@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQueries, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import {
   Equipment,
   Facet,
@@ -112,6 +112,21 @@ export default function SetupUpdateEquipment() {
     new Map<number, Equipment>()
   );
 
+  const updateSetupEquipmentMutation = useMutation({
+    mutationFn: async (equipmentIds: number[]) => {
+      if (!setup) {
+        return;
+      }
+
+      await axios.patch(`update/setup/${setup.id}/equipment`, {
+        equipment_list: equipmentIds,
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to update equipment", error);
+    },
+  });
+
   // infinite query for equipments
   const {
     data: equipmentListData,
@@ -162,46 +177,22 @@ export default function SetupUpdateEquipment() {
   }, [setup]);
 
   const addEquipment = (equipment: Equipment) => {
-    setSelectedEquipmentMap((prev) => new Map(prev.set(equipment.id, equipment)));
+    setSelectedEquipmentMap((prev) => {
+      const map = new Map(prev);
+      map.set(equipment.id, equipment);
+      updateSetupEquipmentMutation.mutate(Array.from(map.keys()).sort((a, b) => a - b));
+      return map;
+    });
   };
 
   const removeEquipment = (equipment: Equipment) => {
     setSelectedEquipmentMap((prev) => {
       const map = new Map(prev);
       map.delete(equipment.id);
+      updateSetupEquipmentMutation.mutate(Array.from(map.keys()).sort((a, b) => a - b));
       return map;
     });
   };
-
-  // Update selected equipments in backend
-  useEffect(() => {
-    if (!setup) return;
-
-    const originalIds = setup.setup_equipment.map((e: { id: number }) => e.id).sort((a: number, b: number) => a - b);
-    const currentIds = Array.from(selectedEquipmentMap.keys()).sort((a, b) => a - b);
-
-    const isEqual =
-      originalIds.length === currentIds.length &&
-      originalIds.every((id: number, index: number) => id === currentIds[index]);
-
-    if (isEqual) {
-      return;
-    }
-
-    const submit = async () => {
-      try {
-        const data = {
-          equipment_list: currentIds,
-        };
-
-        await axios.patch(`update/setup/${setup.id}/equipment`, data);
-      } catch (error) {
-        console.error("Failed to update equipment", error);
-      }
-    };
-
-    submit();
-  }, [selectedEquipmentMap]);
 
   if (isError) {
     return (
@@ -209,8 +200,8 @@ export default function SetupUpdateEquipment() {
         Error loading:{" "}
         {queries
           .filter((q) => q.isError)
-          .map((q, idx) => {
-            return <span key={idx}>Query error {q.error.message}</span>;
+          .map((q) => {
+            return <span key={q.error.message}>Query error {q.error.message}</span>;
           })}
       </div>
     );

@@ -54,14 +54,11 @@ export default function RunStepChecklist({
   const resolvedRunStep = runStep ?? contextRunStep;
   const resolvedReloadRunStep = reloadRunStep ?? contextReloadRunStep ?? (() => null);
 
-  if (!resolvedRunStep || !resolvedReloadRunStep || !resolvedRun) {
-    return <>Please set RunStepContext in RunStepChecklist</>;
-  }
-
   //Grab the checklist, via a tanstack query
   const { data, error, isLoading, refetch } = useQuery({
-    queryKey: ["checklist", resolvedRunStep.id],
-    queryFn: () => listRunStepChecklistItems({ runStep: resolvedRunStep }),
+    queryKey: ["checklist", resolvedRunStep?.id],
+    queryFn: () => listRunStepChecklistItems({ runStep: resolvedRunStep! }),
+    enabled: Boolean(resolvedRunStep),
   });
 
   const finishOperation = useCallback(
@@ -120,9 +117,13 @@ export default function RunStepChecklist({
       ...item,
       can_finish: index === firstPendingIndex,
     })) as RunStepChecklistItem[];
-    const canFinish = !resolvedRunStep.is_finished && firstPendingIndex === -1;
+    const canFinish = Boolean(resolvedRunStep && !resolvedRunStep.is_finished && firstPendingIndex === -1);
     return { checklistItems: enhancedItems, canFinishOperation: canFinish };
-  }, [data, resolvedRunStep.is_finished]);
+  }, [data, resolvedRunStep]);
+
+  if (!resolvedRunStep || !resolvedRun) {
+    return <>Please set RunStepContext in RunStepChecklist</>;
+  }
 
   if (isLoading) {
     return <LoadingComponent message={"Loading..."} />;

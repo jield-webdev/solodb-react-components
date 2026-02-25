@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, ListGroup } from "react-bootstrap";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { useQuery } from "@tanstack/react-query";
@@ -27,8 +27,14 @@ export default function RunStepChecklistExecute({
   runStep?: RunStep;
   reloadRunStep?: () => void;
 }) {
+  const { run: contextRun, runStep: contextRunStep, reloadRunStep: contextReloadRunStep } = useContext(RunStepContext);
+
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+  const resolvedRun = run ?? contextRun;
+  const resolvedRunStep = runStep ?? contextRunStep;
+  const resolvedReloadRunStep = reloadRunStep ?? contextReloadRunStep ?? (() => null);
 
   useEffect(() => {
     if (statusMessage) {
@@ -39,36 +45,18 @@ export default function RunStepChecklistExecute({
     }
   }, [statusMessage]);
 
-  if (!run) {
-    run = useContext(RunStepContext).run;
-  }
-  if (!runStep) {
-    runStep = useContext(RunStepContext).runStep;
-  }
+  //Grab the checklist, via a tanstack query
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["checklist", resolvedRunStep?.id],
+    queryFn: () => listRunStepChecklistItems({ runStep: resolvedRunStep! }),
+    enabled: Boolean(resolvedRunStep),
+  });
 
-  const contextReloadFn = useContext(RunStepContext).reloadRunStep;
-  if (!reloadRunStep) {
-    reloadRunStep = contextReloadFn ?? (() => null);
-  }
-
-  if (!runStep || !reloadRunStep || !run) {
+  if (!resolvedRunStep || !resolvedRun) {
     return <>Please set RunStepContext in RunStepChecklist</>;
   }
 
-  //Grab the checklist, via a tanstack query
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ["checklist", runStep.id],
-    queryFn: () => listRunStepChecklistItems({ runStep: runStep }),
-  });
-
-  // TODO: remove ts-ignore when new version of solodb-typescript-core with the correct interface is released
-  // @ts-ignore
-  let stepIsStarted = useRef<boolean>(runStep.is_started);
-  let stepIsFinished = useRef<boolean>(runStep.is_finished);
-
-
-
-  if (stepIsFinished.current) {
+  if (resolvedRunStep.is_finished) {
     return <div>Step is finished</div>;
   }
 
@@ -82,8 +70,7 @@ export default function RunStepChecklistExecute({
     finishStep(runStep).then(() => {
       setIsProcessing(false);
       setStatusMessage(null);
-      // @ts-ignore
-      reloadRunStep();
+      resolvedReloadRunStep();
     });
   }
 
@@ -93,8 +80,7 @@ export default function RunStepChecklistExecute({
     startStep(runStep).then(() => {
       setIsProcessing(false);
       setStatusMessage(null);
-      // @ts-ignore
-      reloadRunStep();
+      resolvedReloadRunStep();
     });
   }
 
@@ -104,23 +90,23 @@ export default function RunStepChecklistExecute({
 
       {data!.items.length > 0 && (
         <ListGroup>
-          {data!.items.map((checklistItem: RunStepChecklistItem, i: React.Key) => (
-            <ChecklistItemElement checklistItem={checklistItem} refetch={refetch} key={i} />
+          {data!.items.map((checklistItem: RunStepChecklistItem) => (
+            <ChecklistItemElement checklistItem={checklistItem} refetch={refetch} key={checklistItem.id} />
           ))}
         </ListGroup>
       )}
 
       <div className={"d-flex justify-content-between mt-3"}>
         <div className={"d-flex gap-2 align-items-center"}>
-          {stepIsStarted.current ? (
+          {resolvedRunStep.is_started ? (
             <div>
-              <Button variant={"success"} onClick={() => finishOperation(runStep)} disabled={isProcessing}>
+              <Button variant={"success"} onClick={() => finishOperation(resolvedRunStep)} disabled={isProcessing}>
                 {statusMessage !== null ? statusMessage : "Move out"}
               </Button>
             </div>
           ) : (
             <div>
-              <Button variant={"success"} onClick={() => startOperation(runStep)} disabled={isProcessing}>
+              <Button variant={"success"} onClick={() => startOperation(resolvedRunStep)} disabled={isProcessing}>
                 {statusMessage !== null ? statusMessage : "Start processing"}
               </Button>
             </div>

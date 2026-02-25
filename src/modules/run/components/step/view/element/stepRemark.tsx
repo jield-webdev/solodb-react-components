@@ -35,26 +35,26 @@ export default function StepRemark({
 
   const [showForm, setShowForm] = useState(false);
 
-  if (!resolvedRunStep) {
-    return <>Please set RunStepContext for StepRemark</>;
-  }
-
-  const canUpdateRemark = !resolvedRunStep.is_finished;
-  const hasRemark = Boolean(resolvedRunStep.remark?.trim());
+  const canUpdateRemark = resolvedRunStep ? !resolvedRunStep.is_finished : false;
+  const hasRemark = Boolean(resolvedRunStep?.remark?.trim());
 
   const { register, handleSubmit, formState, reset } = useForm<Inputs>({
     defaultValues: {
-      remark: resolvedRunStep.remark_unparsed ?? "",
+      remark: resolvedRunStep?.remark_unparsed ?? "",
     },
   });
   const { isSubmitting } = formState;
 
   useEffect(() => {
-    reset({ remark: resolvedRunStep.remark_unparsed ?? "" });
-  }, [reset, resolvedRunStep.remark_unparsed]);
+    reset({ remark: resolvedRunStep?.remark_unparsed ?? "" });
+  }, [reset, resolvedRunStep?.remark_unparsed]);
 
   const onSubmit = useCallback(
     async (data: Inputs) => {
+      if (!resolvedRunStep) {
+        return;
+      }
+
       await axios.patch("update/run/step/" + resolvedRunStep.id, {
         remark: data.remark,
       });
@@ -68,6 +68,10 @@ export default function StepRemark({
     },
     [resolvedRunStep, setRunStep]
   );
+
+  if (!resolvedRunStep) {
+    return <>Please set RunStepContext for StepRemark</>;
+  }
 
   if (!showForm || !canUpdateRemark) {
     return (
