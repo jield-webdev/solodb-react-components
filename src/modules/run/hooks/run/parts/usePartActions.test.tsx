@@ -9,7 +9,7 @@ import {
   RunStep,
 } from "@jield/solodb-typescript-core";
 import { ReactNode } from "react";
-import performRunStepPartAction from "../../../../../utils/run/performRunStepPartAction";
+import performRunStepPartAction from "../../../../../utils/run/step/performRunStepPartAction";
 
 // Mock the core library functions
 vi.mock("@jield/solodb-typescript-core", async () => {
