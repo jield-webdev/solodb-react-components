@@ -1,6 +1,6 @@
 import { Button, Table } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useMemo, useState } from "react";
 import {
   ColumnDef,
   flexRender,
@@ -17,10 +17,12 @@ export default function EquipmentTable({
   currentFilter,
   setEquipmentSort,
   addEquipment,
+  addDisabled = false,
 }: {
   equipmentList: Equipment[];
   currentFilter: FilterData | undefined;
   addEquipment: (equipment: Equipment) => void;
+  addDisabled?: boolean;
   setEquipmentSort: Dispatch<
     SetStateAction<{
       order: string;
@@ -34,25 +36,32 @@ export default function EquipmentTable({
     return equipment.main_tool_latest_status?.status.status === "RESERVED";
   };
 
-  const [showEquipmentProperties, setShowEquipmentProperties] = useState<boolean>(false);
   const [blacklistedEquipmentProperties, setBlacklistedEquipmentProperties] = useState<string[]>([]);
   const [showEditSortingPropertiesModal, setShowEditSortingPropertiesModal] = useState<boolean>(false);
 
-  // Get if the type or category filter is set
-  useEffect(() => {
-    if (equipmentList.length === 0) {
-      return;
-    }
+  const showEquipmentProperties = useMemo(() => {
+    const hasTypeFilter = (currentFilter?.facet.type_name?.values?.length ?? 0) > 0;
+    const hasCategoryFilter = (currentFilter?.facet.category?.values?.length ?? 0) > 0;
+    return hasTypeFilter || hasCategoryFilter;
+  }, [currentFilter]);
 
-    if (
-      (currentFilter?.facet.type_name && currentFilter?.facet.type_name.values.length > 0) ||
-      (currentFilter?.facet.category && currentFilter?.facet.category.values.length > 0)
-    ) {
-      setShowEquipmentProperties(true);
-    } else {
-      setShowEquipmentProperties(false);
-    }
-  }, [currentFilter, equipmentList]);
+  const properties = useMemo(() => {
+    return Array.from(
+      new Map(
+        equipmentList
+          .flatMap((eq) =>
+            (eq.properties ?? []).map((prop) => ({
+              property: prop.property,
+              label: prop.label,
+              type: prop.int_value != null ? "int" : prop.float_value != null ? "float" : "string",
+            }))
+          )
+          .map((p) => [p.property, p])
+      )
+        .values()
+        .filter((prop) => !blacklistedEquipmentProperties.includes(prop.property))
+    );
+  }, [equipmentList, blacklistedEquipmentProperties]);
 
   /*
    * TanStack Table
@@ -110,7 +119,12 @@ export default function EquipmentTable({
                 <span className="badge bg-info badge-active">In use in {equipment.active_setup?.name}</span>
               )}{" "}
               {!equipment.is_in_fixed_setup && (
-                <button onClick={() => addEquipment(equipment)} className="btn btn-outline-success btn-sm">
+                <button
+                  onClick={() => addEquipment(equipment)}
+                  className="btn btn-outline-success btn-sm"
+                  disabled={addDisabled}
+                  title={addDisabled ? "Setup is still loading" : undefined}
+                >
                   <i className="fa fa-plus" /> Add to setup
                 </button>
               )}
@@ -135,14 +149,21 @@ export default function EquipmentTable({
       {
         accessorKey: "name",
         header: "Name",
-        cell: ({ row, getValue }) => (
-          <>
-            <a href={`/${environment}/equipment/details/${row.original.id}/general.html`}>{String(getValue() ?? "")}</a>{" "}
-            <a href={`/${environment}/equipment/edit/${row.original.id}.html`}>
-              <i className="fa fa-pencil-square-o fa-fw" />
-            </a>
-          </>
-        ),
+        cell: ({ row, getValue }) => {
+          const equipment = row.original;
+          const inactive = !equipment.active;
+          return (
+            <>
+              <a href={`/${environment}/equipment/details/${row.original.id}/general.html`}>
+                {String(getValue() ?? "")}
+              </a>{" "}
+              <a href={`/${environment}/equipment/edit/${row.original.id}.html`}>
+                <i className="fa fa-pencil-square-o fa-fw" />
+              </a>
+              {inactive && <span className="badge bg-danger">INACTIVE</span>}{" "}
+            </>
+          );
+        },
       },
     ];
     const nonPropertiesColumns: ColumnDef<Equipment>[] = [
@@ -174,26 +195,10 @@ export default function EquipmentTable({
       },
     ];
 
-    const properties = Array.from(
-      new Map(
-        equipmentList
-          .flatMap((eq) =>
-            (eq.properties ?? []).map((prop) => ({
-              property: prop.property,
-              label: prop.label,
-              type: prop.int_value ? "int" : prop.float_value ? "float" : "string",
-            }))
-          )
-          .map((p) => [p.property, p])
-      )
-        .values()
-        .filter((prop) => !blacklistedEquipmentProperties.includes(prop.property))
-    );
-
     if (properties.length === 0 || !showEquipmentProperties) {
       baseColumns.push(...nonPropertiesColumns);
     } else {
-      const renderPropertiesColumns: ColumnDef<Equipment>[] = properties.map((prop, key) => {
+      const renderPropertiesColumns: ColumnDef<Equipment>[] = properties.map((prop) => {
         const customAccessorFn = (row: Equipment) => {
           if (prop.type === "int") {
             return row.properties?.find((property) => property.property == prop.property)?.int_value ?? 0;
@@ -208,7 +213,7 @@ export default function EquipmentTable({
 
         return {
           header: prop.label,
-          id: `property-${key}`,
+          id: `property-${prop.property}`,
           accessorFn: (row) => customAccessorFn(row),
           cell: ({ row }) => {
             const equipment = row.original;
@@ -229,12 +234,12 @@ export default function EquipmentTable({
     }
 
     return baseColumns;
-  }, [showEquipmentProperties, blacklistedEquipmentProperties]);
+  }, [environment, addDisabled, addEquipment, showEquipmentProperties, properties]);
 
   const table = useReactTable({
     columns,
     data: equipmentList,
-    debugTable: true,
+    debugTable: false,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: handleSortingChange,
