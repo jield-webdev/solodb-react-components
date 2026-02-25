@@ -1,10 +1,9 @@
 import { Run, RunStep, RunTypeEnum } from "@jield/solodb-typescript-core";
 import StepRemark from "./element/stepRemark";
 import RunStepChecklistExecute from "./element/runStepChecklistExecute";
-import RunPartsProductionRun from "../../shared/parts_table/runPartsProductionRun";
 import { RunStepParametersTable } from "../../shared/parameters/runStepParametersTable";
 import UploadFilesToStep from "../../shared/files/uploadFilesToStep";
-import React, { useRef } from "react";
+import React from "react";
 import RunPartsResearchRun from "../../shared/parts_table/runPartsResearchRun";
 import RunPartsQrFlow from "../../shared/parts_table/runPartsQrFlow";
 
@@ -13,18 +12,15 @@ export default function RunStepExecuteMinimal({
   runStep,
   showOnlyEmphasizedParameters,
   reloadRunStepFn,
-  toggleRunStepPartRef,
   toggleRunPartRef,
 }: {
   run: Run;
   runStep: RunStep;
   showOnlyEmphasizedParameters: boolean;
   reloadRunStepFn: () => void;
-  toggleRunStepPartRef?: React.RefObject<{
-    setPart: (part: number) => void;
-  } | null>;
   toggleRunPartRef?: React.RefObject<{
     setPart: (part: number) => void;
+    setPartByLabel: (label: string) => void;
   } | null>;
 }) {
   return (
@@ -34,19 +30,17 @@ export default function RunStepExecuteMinimal({
         {run.run_type === RunTypeEnum.PRODUCTION && (
           <RunPartsQrFlow run={run} runStep={runStep} toggleRunPartRef={toggleRunPartRef} />
         )}
-        {run.run_type === RunTypeEnum.RESEARCH && (
-          <RunPartsResearchRun run={run} runStep={runStep} toggleRunStepPartRef={toggleRunStepPartRef} />
-        )}
+        {run.run_type === RunTypeEnum.RESEARCH && <RunPartsResearchRun run={run} runStep={runStep} />}
       </div>
 
       <h3 className="mt-2">Parameters</h3>
       <RunStepParametersTable runStep={runStep} showOnlyEmphasizedParameters={showOnlyEmphasizedParameters} />
 
-      <div className="row row-cols-2 ">
-        <div className={"col"}>
+      <div className="row row-cols-2">
+        <div className="col">
           <StepRemark runStep={runStep} reloadRunStep={reloadRunStepFn} />
         </div>
-        <div className={"col"}>
+        <div className="col">
           {runStep.has_instructions && runStep.instructions && (
             <React.Fragment>
               <h3 className="mb-2 text-start">Instructions</h3>
@@ -59,12 +53,16 @@ export default function RunStepExecuteMinimal({
           )}
         </div>
       </div>
-
-      <h3 className="mt-2">Checklist</h3>
-      <RunStepChecklistExecute run={run} runStep={runStep} reloadRunStep={reloadRunStepFn} />
-
-      <h3 className="mt-2">Step files</h3>
-      <UploadFilesToStep runStep={runStep} />
+      <div className="row row-cols-2">
+        <div className="col">
+          <h3 className="mt-2">Checklist</h3>
+          <RunStepChecklistExecute run={run} runStep={runStep} reloadRunStep={reloadRunStepFn} />
+        </div>
+        <div className="col">
+          <h3 className="mt-2">Step files</h3>
+          <UploadFilesToStep runStep={runStep} />
+        </div>
+      </div>
     </>
   );
 }

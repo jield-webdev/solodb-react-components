@@ -5,11 +5,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import {
+  performRunStepPartAction,
   RunStepPartActionEnum,
   RunPart,
   RunStepPart,
   RunStep,
-  setRunStepPartAction as SetRunStepPartAction,
 } from "@jield/solodb-typescript-core";
 
 const RunStepPartProductionTableRow = ({
@@ -19,6 +19,7 @@ const RunStepPartProductionTableRow = ({
   refetchFn = () => {},
   partIsSelected,
   setPartAsSelected,
+  dropdown = true,
 }: {
   runPart: RunPart;
   runStepParts: RunStepPart[];
@@ -26,6 +27,7 @@ const RunStepPartProductionTableRow = ({
   refetchFn?: () => void;
   partIsSelected?: boolean;
   setPartAsSelected?: (partID: number) => void;
+  dropdown?: boolean;
 }) => {
   const [runStepPart, setRunStepPart] = useState<RunStepPart | undefined>(undefined);
   const queryClient = useQueryClient();
@@ -68,19 +70,20 @@ const RunStepPartProductionTableRow = ({
     setPartAsSelected(runPart.id);
   };
 
-  const setRunStepPartAction = ({
+  const performAction = ({
     runStepPart,
     runStepPartAction,
   }: {
     runStepPart: RunStepPart;
     runStepPartAction: RunStepPartActionEnum;
   }) => {
-    SetRunStepPartAction({ runStepPart, runStepPartAction })
+    performRunStepPartAction(runStepPart, runStepPartAction)
       .then((response) => {
+        const latestAction = response as unknown as RunStepPart["latest_action"];
         setRunStepPart({
           ...runStepPart,
           ...{
-            latest_action: response,
+            latest_action: latestAction,
             actions: runStepPart.actions + 1,
           },
         });
@@ -96,7 +99,7 @@ const RunStepPartProductionTableRow = ({
 
   if (!runStepPart) {
     return (
-      <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined} >
+      <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}>
         <td>
           <div className={"d-flex align-items-center gap-2"}>
             <div className={"fw-semibold"}>
@@ -166,7 +169,7 @@ const RunStepPartProductionTableRow = ({
   })();
 
   return (
-    <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}  className={rowClassName}>
+    <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined} className={rowClassName}>
       <td>
         <div className={"d-flex align-items-center gap-2"}>
           <div className={"fw-semibold"}>
@@ -204,70 +207,169 @@ const RunStepPartProductionTableRow = ({
         </span>
       </td>
       <td>
-        <Dropdown align="end">
-          <Dropdown.Toggle size="sm" variant="outline-secondary">
-            Actions
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            {runStepPart.actions === 0 && (
-              <Dropdown.Item
-                onClick={() =>
-                  setRunStepPartAction({
-                    runStepPart: runStepPart,
-                    runStepPartAction: RunStepPartActionEnum.START_PROCESSING,
-                  })
-                }
-              >
-                Start
-              </Dropdown.Item>
-            )}
-            {runStepPart.actions > 0 &&
-              runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-              runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-                <Dropdown.Item
-                  onClick={() =>
-                    setRunStepPartAction({
-                      runStepPart: runStepPart,
-                      runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
-                    })
-                  }
-                >
-                  Finish
-                </Dropdown.Item>
-              )}
-            {runStepPart.actions > 0 &&
-              runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-              runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-                <Dropdown.Item
-                  onClick={() =>
-                    setRunStepPartAction({
-                      runStepPart: runStepPart,
-                      runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
-                    })
-                  }
-                >
-                  Failed
-                </Dropdown.Item>
-              )}
-            {runStepPart.actions > 0 && (
-              <Dropdown.Item
-                onClick={() =>
-                  setRunStepPartAction({
-                    runStepPart: runStepPart,
-                    runStepPartAction: RunStepPartActionEnum.REWORK,
-                  })
-                }
-              >
-                Rework
-              </Dropdown.Item>
-            )}
-          </Dropdown.Menu>
-        </Dropdown>
+        {dropdown ? (
+          <ActionsDropwown runStepPart={runStepPart} setRunStepPartAction={performAction} />
+        ) : (
+          <ActionsButtons runStepPart={runStepPart} setRunStepPartAction={performAction} />
+        )}
       </td>
       <td>
         <RunStepPartComment runStepPart={runStepPart} setRunStepPart={setRunStepPart} />
       </td>
     </tr>
+  );
+};
+
+const ActionsButtons = ({
+  runStepPart,
+  setRunStepPartAction,
+}: {
+  runStepPart: RunStepPart;
+  setRunStepPartAction: ({
+    runStepPart,
+    runStepPartAction,
+  }: {
+    runStepPart: RunStepPart;
+    runStepPartAction: RunStepPartActionEnum;
+  }) => void;
+}) => {
+  return (
+    <div className={"d-flex justify-content-between gap-1"}>
+      <div className={"d-flex gap-2"}>
+        {runStepPart.actions === 0 && (
+          <Button
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.START_PROCESSING,
+              })
+            }
+            className={"btn-success btn-sm"}
+          >
+            Start
+          </Button>
+        )}
+        {runStepPart.actions > 0 &&
+          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
+          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
+            <Button
+              onClick={() =>
+                setRunStepPartAction({
+                  runStepPart: runStepPart,
+                  runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
+                })
+              }
+              className={"btn-primary btn-sm"}
+            >
+              Finish
+            </Button>
+          )}
+        {runStepPart.actions > 0 &&
+          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
+          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
+            <Button
+              onClick={() =>
+                setRunStepPartAction({
+                  runStepPart: runStepPart,
+                  runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
+                })
+              }
+              className={"btn-danger btn-sm"}
+            >
+              Failed
+            </Button>
+          )}
+        {runStepPart.actions > 0 && (
+          <Button
+            size={"sm"}
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.REWORK,
+              })
+            }
+          >
+            Rework
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const ActionsDropwown = ({
+  runStepPart,
+  setRunStepPartAction,
+}: {
+  runStepPart: RunStepPart;
+  setRunStepPartAction: ({
+    runStepPart,
+    runStepPartAction,
+  }: {
+    runStepPart: RunStepPart;
+    runStepPartAction: RunStepPartActionEnum;
+  }) => void;
+}) => {
+  return (
+    <Dropdown align="end">
+      <Dropdown.Toggle size="sm" variant="outline-secondary">
+        Actions
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        {runStepPart.actions === 0 && (
+          <Dropdown.Item
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.START_PROCESSING,
+              })
+            }
+          >
+            Start
+          </Dropdown.Item>
+        )}
+        {runStepPart.actions > 0 &&
+          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
+          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
+            <Dropdown.Item
+              onClick={() =>
+                setRunStepPartAction({
+                  runStepPart: runStepPart,
+                  runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
+                })
+              }
+            >
+              Finish
+            </Dropdown.Item>
+          )}
+        {runStepPart.actions > 0 &&
+          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
+          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
+            <Dropdown.Item
+              onClick={() =>
+                setRunStepPartAction({
+                  runStepPart: runStepPart,
+                  runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
+                })
+              }
+            >
+              Failed
+            </Dropdown.Item>
+          )}
+        {runStepPart.actions > 0 && (
+          <Dropdown.Item
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.REWORK,
+              })
+            }
+          >
+            Rework
+          </Dropdown.Item>
+        )}
+      </Dropdown.Menu>
+    </Dropdown>
   );
 };
 

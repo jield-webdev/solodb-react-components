@@ -21,10 +21,12 @@ export default function StepDetails({
   parts: RunPart[];
   refetchFn?: (keys: any[]) => void;
 }) {
+  const { run: contextRun } = useContext(RunContext);
   const { showOnlyEmphasizedParameters } = useContext(EmphasizedParametersContext);
+  const resolvedRun = run ?? contextRun;
 
-  if (!run) {
-    run = useContext(RunContext).run;
+  if (!resolvedRun) {
+    return null;
   }
 
   return (
@@ -32,9 +34,9 @@ export default function StepDetails({
       <Card.Body>
         <Row>
           <Col md="6">
-            {run.run_type === RunTypeEnum.RESEARCH && (
+            {resolvedRun.run_type === RunTypeEnum.RESEARCH && (
               <RunPartsResearchRun
-                run={run}
+                run={resolvedRun}
                 runStep={step}
                 runStepParts={stepParts}
                 refetchFn={() => {
@@ -42,9 +44,9 @@ export default function StepDetails({
                 }}
               />
             )}
-            {run.run_type === RunTypeEnum.PRODUCTION && (
+            {resolvedRun.run_type === RunTypeEnum.PRODUCTION && (
               <RunPartsProductionRun
-                run={run}
+                run={resolvedRun}
                 runStep={step}
                 runParts={parts}
                 refetchFn={() => {

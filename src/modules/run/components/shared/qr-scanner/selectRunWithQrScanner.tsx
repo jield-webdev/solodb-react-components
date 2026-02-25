@@ -9,11 +9,13 @@ export default function NavigateInRunWithQrScanner({
   setRun,
   setRunStepPartId,
   setRunPartId,
+  setRunPartLabel,
 }: {
   runsList: Run[];
   setRun: (run: Run) => void;
   setRunStepPartId?: (stepPart: number) => void;
   setRunPartId?: (part: number) => void;
+  setRunPartLabel?: (label: string) => void;
 }) {
   const [showInput, setShowInput] = useState<boolean>(false);
   const { control, watch, reset, setFocus } = useForm<{
@@ -35,34 +37,43 @@ export default function NavigateInRunWithQrScanner({
       }
 
       // When the barcode contains /r/ it is a run
+      let foundRun = undefined;
+      let foundRunPartId = undefined;
+      let foundRunPartLabel = undefined;
+      let foundRunStepPartId = undefined;
       switch (type) {
+        // Run
         case "r":
           const runId = barcodeValue.split("/r/")[1];
-          const foundRun = runsList.find((run) => run.id === Number(runId));
-          if (foundRun !== undefined) {
-            setRun(foundRun);
-
-          }
+          foundRun = runsList.find((run) => run.id === Number(runId));
           break;
+        // Step Part
         case "sp":
-          if (setRunStepPartId) {
-            const stepPartId = barcodeValue.split("/sp/")[1];
-            if (!isNaN(Number(stepPartId))) {
-                setRunStepPartId(Number(stepPartId));
-            }
+          const stepPartId = barcodeValue.split("/sp/")[1];
+          if (!isNaN(Number(stepPartId))) {
+            foundRunStepPartId = Number(stepPartId);
           }
           break;
+        // Run Part
         case "rp":
-          if (setRunPartId) {
-            const runPartId = barcodeValue.split("/rp/")[1];
-            if (!isNaN(Number(runPartId))) {
-                setRunPartId(Number(runPartId));
-            }
-          }
+          const runPartId = barcodeValue.split("/rp/")[1];
+          foundRunPartId = Number(runPartId);
+          break;
+        // Part Badge
+        case "pb":
+          const runPartBadgeParsed = barcodeValue.split("/pb/")[1].split("-");
+          if (!(runPartBadgeParsed.length == 4 || runPartBadgeParsed.length == 3)) break;
+          foundRun = runsList.find((run) => run.label === `${runPartBadgeParsed[0]}-${runPartBadgeParsed[1]}`);
+          foundRunPartLabel = `${runPartBadgeParsed[2]}` + (runPartBadgeParsed[3] ? `-${runPartBadgeParsed[3]}` : "");
           break;
         default:
           break;
       }
+
+      if (setRun !== undefined && foundRun !== undefined) setRun(foundRun);
+      if (setRunPartId !== undefined && foundRunPartId !== undefined) setRunPartId(foundRunPartId);
+      if (setRunStepPartId !== undefined && foundRunStepPartId !== undefined) setRunStepPartId(foundRunStepPartId);
+      if (setRunPartLabel !== undefined && foundRunPartLabel !== undefined) setRunPartLabel(foundRunPartLabel);
 
       startForm();
     }, 1000);
@@ -110,12 +121,12 @@ export default function NavigateInRunWithQrScanner({
   };
 
   return (
-    <div className="d-flex flex-column justify-content-between">
-      {showInput && <BarcodeScanElement control={control} />}
+    <div className="d-flex flex-row gap-3">
       <div className="d-flex flex-column">
         <QRCodeSVG value={"start-form"} size={100} className={"float-end"} onClick={() => startForm()} />
         <span className={"text-muted"}>Start QR</span>
       </div>
+      {showInput && <BarcodeScanElement control={control} />}
     </div>
   );
 }

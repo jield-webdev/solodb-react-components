@@ -2,7 +2,13 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { Table } from "react-bootstrap";
 import { useQuery } from "@tanstack/react-query";
 import RunStepPartResearchTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartResearchTableRow";
-import { listRunStepParts, Run, RunStep, RunStepPart } from "@jield/solodb-typescript-core";
+import {
+  finishStepWhenAllPartsAreFinished,
+  listRunStepParts,
+  Run,
+  RunStep,
+  RunStepPart,
+} from "@jield/solodb-typescript-core";
 import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
 import { usePartActions } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartActions";
@@ -52,16 +58,17 @@ const RunPartsResearchRun = ({
   useEffect(() => {
     if (runStepParts) {
       setStepParts(runStepParts);
+      // verify for the need to finish the step
+      finishStepWhenAllPartsAreFinished(runStep, runStepParts);
     }
-  }, [runStepParts]);
+  }, [stepParts]);
 
   // Use custom hooks for selection and actions
-  const { selectedParts, setPartAsSelected, selectAllParts, selectNoneParts, hasSelectedParts } =
-    usePartSelection({
-      parts: stepParts,
-      getPartId: (part) => part.id,
-      toggleRef: toggleRunStepPartRef,
-    });
+  const { selectedParts, setPartAsSelected, selectAllParts, selectNoneParts, hasSelectedParts } = usePartSelection({
+    parts: stepParts,
+    getPartId: (part) => part.id,
+    toggleRef: toggleRunStepPartRef,
+  });
 
   const { performActionToSelectedParts, getAvailableActionsForSelection } = usePartActions({
     runStep,
@@ -72,10 +79,7 @@ const RunPartsResearchRun = ({
     refetchFn: effectiveRefetchFn,
   });
 
-  const availableActions = useMemo(
-    () => getAvailableActionsForSelection(),
-    [getAvailableActionsForSelection]
-  );
+  const availableActions = useMemo(() => getAvailableActionsForSelection(), [getAvailableActionsForSelection]);
 
   if (isLoading) {
     return <LoadingComponent message={"Loading run parts"} />;

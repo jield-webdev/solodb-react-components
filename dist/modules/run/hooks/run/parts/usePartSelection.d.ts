@@ -1,8 +1,9 @@
 export interface UsePartSelectionOptions<T> {
     parts: T[];
     getPartId: (part: T) => number;
-    toggleRef?: React.RefObject<{
+    toggleRef?: React.Ref<{
         setPart: (part: number) => void;
+        setPartByLabel?: (label: string) => void;
     } | null>;
 }
 export interface UsePartSelectionResult {

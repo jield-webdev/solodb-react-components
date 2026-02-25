@@ -35,26 +35,26 @@ export default function StepRemark({
 
   const [showForm, setShowForm] = useState(false);
 
-  if (!resolvedRunStep) {
-    return <>Please set RunStepContext for StepRemark</>;
-  }
-
-  const canUpdateRemark = !resolvedRunStep.is_finished;
-  const hasRemark = Boolean(resolvedRunStep.remark?.trim());
+  const canUpdateRemark = resolvedRunStep ? !resolvedRunStep.is_finished : false;
+  const hasRemark = Boolean(resolvedRunStep?.remark?.trim());
 
   const { register, handleSubmit, formState, reset } = useForm<Inputs>({
     defaultValues: {
-      remark: resolvedRunStep.remark_unparsed ?? "",
+      remark: resolvedRunStep?.remark_unparsed ?? "",
     },
   });
   const { isSubmitting } = formState;
 
   useEffect(() => {
-    reset({ remark: resolvedRunStep.remark_unparsed ?? "" });
-  }, [reset, resolvedRunStep.remark_unparsed]);
+    reset({ remark: resolvedRunStep?.remark_unparsed ?? "" });
+  }, [reset, resolvedRunStep?.remark_unparsed]);
 
   const onSubmit = useCallback(
     async (data: Inputs) => {
+      if (!resolvedRunStep) {
+        return;
+      }
+
       await axios.patch("update/run/step/" + resolvedRunStep.id, {
         remark: data.remark,
       });
@@ -69,25 +69,35 @@ export default function StepRemark({
     [resolvedRunStep, setRunStep]
   );
 
+  if (!resolvedRunStep) {
+    return <>Please set RunStepContext for StepRemark</>;
+  }
+
   if (!showForm || !canUpdateRemark) {
     return (
-      <>
-        <div className="d-flex align-items-center gap-2">
-          <h3 className={titleClassName}>{title}</h3>
-          {!hasRemark && canUpdateRemark && (
-            <Button variant="primary" className="ms-auto" size="sm" onClick={() => setShowForm(true)}>
-              Add remark
-            </Button>
-          )}
-        </div>
-        {hasRemark && <div className="text-success" dangerouslySetInnerHTML={{ __html: resolvedRunStep.remark }} />}
-        {!hasRemark && <small className="text-muted">No remark.</small>}
-        {hasRemark && canUpdateRemark && (
-          <Button variant="primary" className="mt-3" onClick={() => setShowForm(true)}>
-            Edit remark
-          </Button>
+      <div>
+        <h3 className={titleClassName}>{title}</h3>
+        {!hasRemark && (
+          <>
+            <div className="text-muted">No remark.</div>
+            {canUpdateRemark && (
+              <Button variant="primary" className="ms-auto" size="sm" onClick={() => setShowForm(true)}>
+                Add remark
+              </Button>
+            )}
+          </>
         )}
-      </>
+        {hasRemark && (
+          <>
+            <div className="text-success" dangerouslySetInnerHTML={{ __html: resolvedRunStep.remark }} />{" "}
+            {canUpdateRemark && (
+              <Button variant="primary" className="mt-3" onClick={() => setShowForm(true)}>
+                Edit remark
+              </Button>
+            )}
+          </>
+        )}
+      </div>
     );
   }
 

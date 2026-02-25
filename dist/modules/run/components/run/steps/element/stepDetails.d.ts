@@ -5,4 +5,4 @@ export default function StepDetails({ run, step, stepParts, parts, refetchFn, }:
     stepParts: RunStepPart[];
     parts: RunPart[];
     refetchFn?: (keys: any[]) => void;
-}): import("react/jsx-runtime").JSX.Element;
+}): import("react/jsx-runtime").JSX.Element | null;

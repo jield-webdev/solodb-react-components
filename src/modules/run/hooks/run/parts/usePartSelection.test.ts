@@ -147,15 +147,18 @@ describe("usePartSelection", () => {
   });
 
   it("handles empty parts array", () => {
+    const toggleRef = createRef<{ setPart: (part: number) => void } | null>();
     const { result } = renderHook(() =>
       usePartSelection({
         parts: [],
         getPartId,
+        toggleRef
       })
     );
 
     expect(result.current.hasSelectedParts).toBe(false);
     expect(result.current.selectedParts.size).toBe(0);
+    expect(toggleRef.current).toBe(null);
 
     // Should not error when selecting all/none
     act(() => {
