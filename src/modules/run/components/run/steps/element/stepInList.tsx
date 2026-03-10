@@ -5,7 +5,16 @@ import StepDetails from "@jield/solodb-react-components/modules/run/components/r
 import { PartsBadgesResearchRun } from "@jield/solodb-react-components/modules/run/components/shared/parts/partsBadgesResearchRun";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { PartBadgesProductionRun } from "@jield/solodb-react-components/modules/run/components/shared/parts/partsBadgesProductionRun";
-import { Run, RunStep, RunPart, RunStepPart, Requirement, EquipmentModule, RunTypeEnum } from "@jield/solodb-typescript-core";
+import {
+  Run,
+  RunStep,
+  RunPart,
+  RunStepPart,
+  Requirement,
+  EquipmentModule,
+  RunTypeEnum,
+} from "@jield/solodb-typescript-core";
+import { PartsBadgesTrayed } from "@jield/solodb-react-components/modules/run/components/shared/parts/partsBadgesTrayed";
 
 export default function StepInList({
   run,
@@ -56,10 +65,13 @@ export default function StepInList({
               : ""
           }
         >
-          {run.run_type === RunTypeEnum.RESEARCH && (
+          {run.tray_type && (
+            <PartsBadgesTrayed step={step} parts={parts} stepParts={stepParts} run={run} />
+          )}
+          {!run.tray_type && run.run_type === RunTypeEnum.RESEARCH && (
             <PartsBadgesResearchRun step={step} parts={parts} stepParts={stepParts} />
           )}
-          {run.run_type === RunTypeEnum.PRODUCTION && (
+          {!run.tray_type && run.run_type === RunTypeEnum.PRODUCTION && (
             <PartBadgesProductionRun
               runStep={step}
               parts={parts}
