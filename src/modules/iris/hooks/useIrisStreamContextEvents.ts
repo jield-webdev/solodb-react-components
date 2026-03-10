@@ -49,21 +49,21 @@ export function useIrisStreamContextEvents({
 
   useEffect(() => {
     const setupSSE = async () => {
-      if (context == "" || isConnected) {
+      if (context == "") {
         return;
       }
 
       try {
         // Create EventSource with authentication
         const baseUrl = irisEndpoint.endsWith("/") ? irisEndpoint : `${irisEndpoint}/`;
-        const url = new URL(`v1/${encodeURIComponent(context)}/events`, baseUrl);
+        const url = new URL(`v1/${context}/events`, baseUrl);
         const eventSource = new EventSource(url.toString());
 
         eventSourceRef.current = eventSource;
 
         eventSource.onopen = () => {
           setIsConnected(true);
-          onError(null); 
+          onError(null);
         };
 
         eventSource.onmessage = (event) => {

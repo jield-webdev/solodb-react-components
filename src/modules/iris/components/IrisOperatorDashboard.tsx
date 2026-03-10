@@ -114,7 +114,13 @@ export default function IrisOperatorDashboard() {
               </div>
 
               <div className="col-xl-7">
-                <IrisOperatorEventDetails event={selectedEvent} contentEntries={selectedEventContent} />
+                <IrisOperatorEventDetails
+                  key={selectedEvent?.uid || ""}
+                  event={selectedEvent}
+                  contentEntries={selectedEventContent}
+                  irisEndpoint={IRIS_SERVER_ENDPOINT}
+                  onEventUpdated={handleMessage}
+                />
               </div>
             </div>
           )}
