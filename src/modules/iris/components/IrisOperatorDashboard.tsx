@@ -1,5 +1,5 @@
-import { FileUploadEvent } from "@jield/solodb-typescript-core";
-import { FormEvent, useCallback, useMemo, useState } from "react";
+import { FileUploadEvent, irisListContextEvents } from "@jield/solodb-typescript-core";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import IrisOperatorEventDetails from "./operatorDashboard/IrisOperatorEventDetails";
 import IrisOperatorEventList from "./operatorDashboard/IrisOperatorEventList";
 import { getContentEntries } from "./irisOperatorDashboardUtils";
@@ -12,6 +12,13 @@ export default function IrisOperatorDashboard() {
   const [events, setEvents] = useState<FileUploadEvent[]>([]);
   const [selectedEventUid, setSelectedEventUid] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    irisListContextEvents({ irisServerUrl: IRIS_SERVER_ENDPOINT, context: irisContext }).then((response) => {
+      // TO DO: merge with current events in case a new event hapens before the data is fetched
+      setEvents(response.data);
+    });
+  }, [irisContext]);
 
   const handleMessage = useCallback(
     (incomingEvent: FileUploadEvent) => {
