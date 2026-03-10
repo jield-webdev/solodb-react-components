@@ -1,7 +1,7 @@
 import { FileUploadEvent } from "@jield/solodb-typescript-core";
 import { FormEvent, useCallback, useMemo, useState } from "react";
-import IrisOperatorEventDetails from "./IrisOperatorEventDetails";
-import IrisOperatorEventList from "./IrisOperatorEventList";
+import IrisOperatorEventDetails from "./operatorDashboard/IrisOperatorEventDetails";
+import IrisOperatorEventList from "./operatorDashboard/IrisOperatorEventList";
 import { getContentEntries } from "./irisOperatorDashboardUtils";
 import { useIrisStreamContextEvents } from "../hooks/useIrisStreamContextEvents";
 

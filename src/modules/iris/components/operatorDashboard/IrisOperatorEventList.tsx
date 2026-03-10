@@ -1,6 +1,6 @@
 import { FileUploadEvent } from "@jield/solodb-typescript-core";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
-import { getStateBadgeClass } from "./irisOperatorDashboardUtils";
+import { getStateBadgeClass } from "../irisOperatorDashboardUtils";
 
 interface IrisOperatorEventListProps {
   activeContext: string;

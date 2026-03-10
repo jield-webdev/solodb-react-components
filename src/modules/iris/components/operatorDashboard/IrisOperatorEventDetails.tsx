@@ -7,7 +7,7 @@ import {
 } from "@jield/solodb-typescript-core";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import { useCallback, useMemo, useState } from "react";
-import { ContentEntry, getStateBadgeClass } from "./irisOperatorDashboardUtils";
+import { ContentEntry, getStateBadgeClass } from "../irisOperatorDashboardUtils";
 import { getAllowedActionsForState, getErrorMessage, IrisOperatorEventAction } from "./irisOperatorEventDetailsUtils";
 
 interface IrisOperatorEventDetailsProps {
