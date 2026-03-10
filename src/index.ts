@@ -50,6 +50,9 @@ export { default as GoldsteinClientsDashboard } from "@jield/solodb-react-compon
 // Service Components
 export { default as ReportResults } from "@jield/solodb-react-components/modules/service/components/ReportResult";
 
+// Iris components
+export { default as IrisOperatorDashboard } from "@jield/solodb-react-components/modules/iris/components/IrisOperatorDashboard";
+
 // Partial Components
 export { default as PaginationLinks } from "@jield/solodb-react-components/modules/partial/paginationLinks";
 export { default as InputModal } from "@jield/solodb-react-components/modules/partial/modal";
