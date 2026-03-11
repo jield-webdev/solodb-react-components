@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { configureAxiosHeaders, getMe, User } from "@jield/solodb-typescript-core";
-import { getServerUri } from "@jield/solodb-react-components/modules/core/config/runtimeConfig";
+import { getSolodbServerApiUrl } from "@jield/solodb-react-components/modules/core/config/runtimeConfig";
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -13,7 +13,7 @@ export const useAuth = () => {
     const bearerToken = domContainer?.dataset.jwt ?? "";
 
     // Configure axios headers (if token is empty, it will clear auth header)
-    configureAxiosHeaders(bearerToken, getServerUri());
+    configureAxiosHeaders(bearerToken, getSolodbServerApiUrl());
 
     // If there is no token, we cannot fetch the user — stop loading early
     if (!bearerToken) {

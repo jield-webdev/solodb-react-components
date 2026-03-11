@@ -1,4 +1,4 @@
-import { FileUploadEvent } from "@jield/solodb-typescript-core";
+import { FileUploadEvent, irisStreamEventsInContext } from "@jield/solodb-typescript-core";
 import { useEffect, useRef, useState } from "react";
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -49,43 +49,34 @@ export function useIrisStreamContextEvents({
 
   useEffect(() => {
     const setupSSE = async () => {
-      if (context == "") {
+      if (!context) {
         return;
       }
 
       try {
-        // Create EventSource with authentication
         const baseUrl = irisEndpoint.endsWith("/") ? irisEndpoint : `${irisEndpoint}/`;
-        const url = new URL(`v1/${context}/events`, baseUrl);
-        const eventSource = new EventSource(url.toString());
 
-        eventSourceRef.current = eventSource;
-
-        eventSource.onopen = () => {
-          setIsConnected(true);
-          onError(null);
-        };
-
-        eventSource.onmessage = (event) => {
-          try {
-            const data = parseFileUploadEvents(event.data);
-            onMessage(data);
-          } catch (err) {
-            console.error("Failed to parse SSE data:", err);
-            throw err;
-          }
-        };
-
-        eventSource.onerror = (error) => {
-          setIsConnected(false);
-          if (onError) {
-            onError(error);
-          }
-
-          // Auto-reconnect logic
-          eventSource.close();
-          setTimeout(setupSSE, 5000);
-        };
+        const stream = irisStreamEventsInContext({
+          context: context,
+          irisServerUrl: baseUrl,
+          onError: (error) => {
+            setIsConnected(false);
+            if (onError) onError(error);
+            stream.close();
+          },
+          onOpen: (event: FileUploadEvent) => {
+            setIsConnected(true);
+          },
+          onEvent: (event: FileUploadEvent) => {
+            try {
+              const data = parseFileUploadEvents(event);
+              onMessage(data);
+            } catch (err) {
+              console.error("Failed to parse SSE data:", err);
+              throw err;
+            }
+          },
+        });
       } catch (err) {
         console.error("Failed to establish SSE connection:", err);
         setTimeout(setupSSE, 5000);
