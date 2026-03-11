@@ -30,15 +30,20 @@
 
 /* Tray layout */
 .tray-grid-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     gap: 20px;
+    align-items: flex-start;
+    overflow-x: auto;
+    padding-bottom: 4px;
 }
 
 .tray-grid-wrapper {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    flex: 0 0 auto;
 }
 
 .tray-grid__label {
@@ -148,4 +153,8 @@
 .step-part-inactive {
     background: #3b4148;
     color: #f8f9fa;
+}
+
+.step-part-selected {
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.35);
 }

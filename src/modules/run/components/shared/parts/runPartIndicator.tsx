@@ -9,6 +9,7 @@ const RunPartIndicator = ({
   withTrayCell = false,
   allowCreate = false,
   hasStepPart = false,
+  isSelected = false,
   runStep,
   reloadFn = () => {},
 }: {
@@ -17,6 +18,7 @@ const RunPartIndicator = ({
   withTrayCell?: boolean;
   allowCreate?: boolean;
   hasStepPart?: boolean;
+  isSelected?: boolean;
   runStep?: RunStep;
   reloadFn?: () => void;
 }) => {
@@ -53,11 +55,11 @@ const RunPartIndicator = ({
       );
     }
 
-    return (
-      <span className={`tray-grid__badge ${statusClass ?? "step-part-inactive"}`}>
-        {runPart.label ?? runPart.short_label}
-      </span>
-    );
+    const badgeClassName = `tray-grid__badge ${statusClass ?? "step-part-inactive"}${
+      isSelected ? " step-part-selected" : ""
+    }`;
+
+    return <span className={badgeClassName}>{runPart.label ?? runPart.short_label}</span>;
   })();
 
   if (!withTrayCell) return badgeContent;

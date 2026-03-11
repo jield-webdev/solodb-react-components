@@ -1,11 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Table } from "react-bootstrap";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
 import StepElement from "@jield/solodb-react-components/modules/run/components/step/view/element/step-overview/stepElement";
 import RequirementElement from "@jield/solodb-react-components/modules/run/components/step/view/element/step-overview/requirementElement";
-import { listRunParts, listRunStepParts, listRunSteps, listRequirements, Requirement, RunStep } from "@jield/solodb-typescript-core";
+import {
+  listRunParts,
+  listRunStepParts,
+  listRunSteps,
+  listRequirements,
+  Requirement,
+  RunStep,
+} from "@jield/solodb-typescript-core";
 
 const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: number; hideLabel?: boolean }) => {
   const { runStep, run } = useContext(RunStepContext);
@@ -92,39 +98,37 @@ const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: nu
       ) : isError ? (
         <div>Error: {String((error as any)?.message ?? error)}</div>
       ) : (
-        <Table size="sm" striped bordered hover>
-          <tbody>
-            {steps.map((step: RunStep, idx: number) => (
-              <React.Fragment key={idx}>
-                {step.has_requirement ? (
-                  (() => {
-                    const requirement = requirements.find((r) => r.step.id === step.id) as Requirement;
-                    return (
-                      <RequirementElement
-                        key={step.id ?? step.sequence ?? idx}
-                        requirement={requirement}
-                        runParts={runParts}
-                        runStepParts={runStepParts}
-                        firstInGroup={firstInGroupSteps.includes(step)}
-                      />
-                    );
-                  })()
-                ) : (
-                  <StepElement
-                    run={run}
-                    key={step.id ?? step.sequence ?? idx}
-                    monitoredBy={monitoredSteps[step.id]}
-                    runParts={runParts}
-                    runStepParts={runStepParts}
-                    hideLabel={hideLabel}
-                    firstInGroup={firstInGroupSteps.includes(step)}
-                    runStep={step}
-                  />
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </Table>
+        <div className="d-flex flex-column gap-2">
+          {steps.map((step: RunStep, idx: number) => (
+            <React.Fragment key={idx}>
+              {step.has_requirement ? (
+                (() => {
+                  const requirement = requirements.find((r) => r.step.id === step.id) as Requirement;
+                  return (
+                    <RequirementElement
+                      key={step.id ?? step.sequence ?? idx}
+                      requirement={requirement}
+                      runParts={runParts}
+                      runStepParts={runStepParts}
+                      firstInGroup={firstInGroupSteps.includes(step)}
+                    />
+                  );
+                })()
+              ) : (
+                <StepElement
+                  run={run}
+                  key={step.id ?? step.sequence ?? idx}
+                  monitoredBy={monitoredSteps[step.id]}
+                  runParts={runParts}
+                  runStepParts={runStepParts}
+                  hideLabel={hideLabel}
+                  firstInGroup={firstInGroupSteps.includes(step)}
+                  runStep={step}
+                />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
       )}
       <PaginationLinks
         data={runStepsQuery.data as any}

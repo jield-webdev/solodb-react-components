@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Badge, Button } from "react-bootstrap";
+import { useQueryClient } from "@tanstack/react-query";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import { performRunStepPartAction, RunStepPart, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
+import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 
 const RunStepPartResearchTableRow = ({
   runStepPart,
@@ -16,9 +18,16 @@ const RunStepPartResearchTableRow = ({
   partIsSelected?: boolean;
   setPartAsSelected?: (partID: number) => void;
 }) => {
-  const isProcessed = runStepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
-  const isFailed = runStepPart.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING;
-  const cellClassName = runStepPart.part_processing_failed_in_previous_step
+  const queryClient = useQueryClient();
+  const [rowRunStepPart, setRowRunStepPart] = useState<RunStepPart>(runStepPart);
+
+  useEffect(() => {
+    setRowRunStepPart(runStepPart);
+  }, [runStepPart]);
+
+  const isProcessed = rowRunStepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
+  const isFailed = rowRunStepPart.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING;
+  const cellClassName = rowRunStepPart.part_processing_failed_in_previous_step
     ? "table-danger"
     : isProcessed
       ? "table-success"
@@ -27,28 +36,31 @@ const RunStepPartResearchTableRow = ({
         : "";
 
   const statusMeta = (() => {
-    if (runStepPart.part_processing_failed_in_previous_step) {
+    if (rowRunStepPart.part.part_processing_failed) {
+      return { label: "Blocked", variant: "danger", description: "Failed in an other step" };
+    }
+    if (rowRunStepPart.part_processing_failed_in_previous_step) {
       return { label: "Blocked", variant: "danger", description: "Failed in previous step" };
     }
-    if (runStepPart.actions === 0) {
+    if (rowRunStepPart.actions === 0) {
       return { label: "Not started", variant: "secondary", description: "No actions yet" };
     }
-    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.START_PROCESSING) {
+    if (rowRunStepPart.latest_action?.type.id === RunStepPartActionEnum.START_PROCESSING) {
       return { label: "In progress", variant: "primary", description: "Processing started" };
     }
-    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING) {
+    if (rowRunStepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING) {
       return { label: "Completed", variant: "success", description: "Processing finished" };
     }
-    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING) {
+    if (rowRunStepPart.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING) {
       return { label: "Failed", variant: "danger", description: "Processing failed" };
     }
-    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.REWORK) {
+    if (rowRunStepPart.latest_action?.type.id === RunStepPartActionEnum.REWORK) {
       return { label: "Rework", variant: "warning", description: "Needs rework" };
     }
     return { label: "Unknown", variant: "secondary", description: "No status available" };
   })();
 
-  const partLabel = runStepPart.part.label ?? runStepPart.part.short_label;
+  const partLabel = rowRunStepPart.part.label ?? rowRunStepPart.part.short_label;
 
   const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
     if (!setPartAsSelected) {
@@ -60,7 +72,7 @@ const RunStepPartResearchTableRow = ({
       return;
     }
 
-    setPartAsSelected(runStepPart.id);
+    setPartAsSelected(rowRunStepPart.part.id);
   };
 
   const setRunStepPartAction = async ({
@@ -70,7 +82,20 @@ const RunStepPartResearchTableRow = ({
     runStepPart: RunStepPart;
     runStepPartAction: RunStepPartActionEnum;
   }) => {
-    await performRunStepPartAction(runStepPart, runStepPartAction);
+    const latestAction = (await performRunStepPartAction(
+      runStepPart,
+      runStepPartAction
+    )) as RunStepPart["latest_action"];
+    setRowRunStepPart((current) => ({
+      ...current,
+      latest_action: latestAction,
+      actions: current.actions + 1,
+    }));
+    updateRunStepPartCache(queryClient, {
+      runStepPart: rowRunStepPart,
+      action: runStepPartAction,
+      latestAction,
+    });
     if (reloadFn) {
       reloadFn();
     }
@@ -85,12 +110,12 @@ const RunStepPartResearchTableRow = ({
           {setPartAsSelected && (
             <input
               type="checkbox"
-              id={`part-select-${runStepPart.id}`}
+              id={`part-select-${rowRunStepPart.id}`}
               name="tomato"
               className={"form-check-input m-0"}
               checked={partIsSelected}
               onChange={() => {
-                setPartAsSelected(runStepPart.id);
+                setPartAsSelected(rowRunStepPart.part.id);
               }}
             />
           )}
@@ -105,11 +130,11 @@ const RunStepPartResearchTableRow = ({
 
           {editable && (
             <div className={"d-flex gap-1"}>
-              {runStepPart.actions === 0 && (
+              {rowRunStepPart.actions === 0 && (
                 <Button
                   onClick={() =>
                     setRunStepPartAction({
-                      runStepPart: runStepPart,
+                      runStepPart: rowRunStepPart,
                       runStepPartAction: RunStepPartActionEnum.START_PROCESSING,
                     })
                   }
@@ -118,13 +143,13 @@ const RunStepPartResearchTableRow = ({
                   Start
                 </Button>
               )}
-              {runStepPart.actions > 0 &&
-                runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-                runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
+              {rowRunStepPart.actions > 0 &&
+                rowRunStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
+                rowRunStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
                   <Button
                     onClick={() =>
                       setRunStepPartAction({
-                        runStepPart: runStepPart,
+                        runStepPart: rowRunStepPart,
                         runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
                       })
                     }
@@ -133,13 +158,13 @@ const RunStepPartResearchTableRow = ({
                     Finish
                   </Button>
                 )}
-              {runStepPart.actions > 0 &&
-                runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-                runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
+              {rowRunStepPart.actions > 0 &&
+                rowRunStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
+                rowRunStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
                   <Button
                     onClick={() =>
                       setRunStepPartAction({
-                        runStepPart: runStepPart,
+                        runStepPart: rowRunStepPart,
                         runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
                       })
                     }
@@ -148,12 +173,12 @@ const RunStepPartResearchTableRow = ({
                     Failed
                   </Button>
                 )}
-              {runStepPart.actions > 0 && (
+              {rowRunStepPart.actions > 0 && (
                 <Button
                   size={"sm"}
                   onClick={() =>
                     setRunStepPartAction({
-                      runStepPart: runStepPart,
+                      runStepPart: rowRunStepPart,
                       runStepPartAction: RunStepPartActionEnum.REWORK,
                     })
                   }
@@ -168,8 +193,9 @@ const RunStepPartResearchTableRow = ({
       <td>
         <RunStepPartComment
           editable={editable}
-          runStepPart={runStepPart}
-          setRunStepPart={() => {
+          runStepPart={rowRunStepPart}
+          setRunStepPart={(nextRunStepPart) => {
+            setRowRunStepPart(nextRunStepPart);
             if (reloadFn) {
               reloadFn();
             }

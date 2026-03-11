@@ -11,6 +11,7 @@ import {
   RunStepPart,
   RunStep,
 } from "@jield/solodb-typescript-core";
+import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 
 const RunStepPartProductionTableRow = ({
   runPart,
@@ -80,12 +81,21 @@ const RunStepPartProductionTableRow = ({
     performRunStepPartAction(runStepPart, runStepPartAction)
       .then((response) => {
         const latestAction = response as unknown as RunStepPart["latest_action"];
-        setRunStepPart({
-          ...runStepPart,
-          ...{
+        setRunStepPart((current) => {
+          if (!current) {
+            return current;
+          }
+          const updatedRunStepPart = {
+            ...current,
             latest_action: latestAction,
-            actions: runStepPart.actions + 1,
-          },
+            actions: current.actions + 1,
+          };
+          updateRunStepPartCache(queryClient, {
+            runStepPart: updatedRunStepPart,
+            action: runStepPartAction,
+            latestAction,
+          });
+          return updatedRunStepPart;
         });
       })
       .then(() => {

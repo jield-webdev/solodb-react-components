@@ -85,6 +85,13 @@ const RunPartsProductionRun = ({
     toggleRef: toggleRunPartRef,
   });
 
+  useEffect(() => {
+    const selectedIds = Array.from(selectedParts.entries())
+      .filter(([, isSelected]) => isSelected)
+      .map(([id]) => id);
+    queryClient.setQueryData(["runPartSelection", runStep.id], selectedIds);
+  }, [queryClient, runStep.id, selectedParts]);
+
   const { performActionToSelectedParts, getAvailableActionsForSelection } = usePartActions({
     runStep,
     parts: leveledParts,

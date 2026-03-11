@@ -14,24 +14,22 @@ const StepDetails = ({
 }) => {
   return (
     <>
-      <tr>
-        <td colSpan={6}>
-          <div className={"d-flex gap-2"}>
-            <div style={{ flexGrow: 1, flex: "1 1 50%" }}>
-              <RunPartsResearchRun run={run} editable={false} runStep={runStep} />
-            </div>
-            <div style={{ flexGrow: 1, flex: "1 1 50%" }}>
-              {showOnlyEmphasizedParameters && <h4>Emphasized parameters</h4>}
-              {!showOnlyEmphasizedParameters && <h4>Parameters</h4>}
-              <RunStepParametersTable
-                runStep={runStep}
-                editableParameters={false}
-                showOnlyEmphasizedParameters={showOnlyEmphasizedParameters}
-              />
-            </div>
+      <div className="border rounded px-3 py-3">
+        <div className="d-flex flex-wrap gap-3">
+          <div style={{ flexGrow: 1, flex: "1 1 360px" }}>
+            <RunPartsResearchRun run={run} editable={false} runStep={runStep} />
           </div>
-        </td>
-      </tr>
+          <div style={{ flexGrow: 1, flex: "1 1 360px" }}>
+            {showOnlyEmphasizedParameters && <h4>Emphasized parameters</h4>}
+            {!showOnlyEmphasizedParameters && <h4>Parameters</h4>}
+            <RunStepParametersTable
+              runStep={runStep}
+              editableParameters={false}
+              showOnlyEmphasizedParameters={showOnlyEmphasizedParameters}
+            />
+          </div>
+        </div>
+      </div>
     </>
   );
 };

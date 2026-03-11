@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { Table } from "react-bootstrap";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import RunStepPartResearchTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartResearchTableRow";
 import {
   finishStepWhenAllPartsAreFinished,
@@ -36,6 +36,7 @@ const RunPartsResearchRun = ({
 }: Props) => {
   const [stepParts, setStepParts] = useState<RunStepPart[]>(runStepParts || []);
   const effectiveRefetchFn = refetchFn ?? (() => {});
+  const queryClient = useQueryClient();
 
   const { isLoading, isError, error, data } = useQuery({
     queryKey: ["stepParts", runStep.id],
@@ -66,15 +67,22 @@ const RunPartsResearchRun = ({
   // Use custom hooks for selection and actions
   const { selectedParts, setPartAsSelected, selectAllParts, selectNoneParts, hasSelectedParts } = usePartSelection({
     parts: stepParts,
-    getPartId: (part) => part.id,
+    getPartId: (part) => part.part.id,
     toggleRef: toggleRunStepPartRef,
   });
+
+  useEffect(() => {
+    const selectedIds = Array.from(selectedParts.entries())
+      .filter(([, isSelected]) => isSelected)
+      .map(([id]) => id);
+    queryClient.setQueryData(["runPartSelection", runStep.id], selectedIds);
+  }, [queryClient, runStep.id, selectedParts]);
 
   const { performActionToSelectedParts, getAvailableActionsForSelection } = usePartActions({
     runStep,
     parts: stepParts,
     selectedParts,
-    getPartId: (part) => part.id,
+    getPartId: (part) => part.part.id,
     getRunStepPart: (part) => part, // Research uses RunStepPart directly
     refetchFn: effectiveRefetchFn,
   });
@@ -108,7 +116,7 @@ const RunPartsResearchRun = ({
             </thead>
             <tbody>
               {stepParts.map((stepPart: RunStepPart) => {
-                const partIsSelected = selectedParts.get(stepPart.id) ?? false;
+                const partIsSelected = selectedParts.get(stepPart.part.id) ?? false;
 
                 return (
                   <RunStepPartResearchTableRow

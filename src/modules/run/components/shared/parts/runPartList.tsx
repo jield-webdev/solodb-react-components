@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { RunStep, RunPart, RunStepPart, TrayType, Run, RunTypeEnum } from "@jield/solodb-typescript-core";
 import RunPartIndicator from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartIndicator";
 
@@ -37,6 +38,12 @@ export const RunPartList = ({
   }, new Map());
 
   const allowCreate = run.run_type === RunTypeEnum.PRODUCTION;
+  const { data: selectedPartIds = [] } = useQuery<number[]>({
+    queryKey: ["runPartSelection", step.id],
+    queryFn: async () => [],
+    initialData: [],
+    enabled: false,
+  });
 
   const getBadgeStatusClass = (runPart: RunPart): string => {
     const match = stepPartsById.get(runPart.id);
@@ -50,15 +57,42 @@ export const RunPartList = ({
   };
 
   if (trays.length === 0) {
+    const totalColumns = Math.max(1, leveledParts.length);
+    const trayStyle: CSSProperties = {
+      "--tray-columns": totalColumns,
+      "--tray-rows": 1,
+    } as CSSProperties;
+    const slots = Array.from({ length: totalColumns }, () => null as RunPart | null);
+    const unassigned: RunPart[] = [];
+
+    leveledParts.forEach((runPart) => {
+      const column = runPart.left;
+      const slotIndex = column >= 1 && column <= totalColumns ? column - 1 : null;
+      if (slotIndex !== null && !slots[slotIndex]) {
+        slots[slotIndex] = runPart;
+      } else {
+        unassigned.push(runPart);
+      }
+    });
+
+    unassigned.forEach((runPart) => {
+      const nextIndex = slots.findIndex((slot) => !slot);
+      if (nextIndex !== -1) {
+        slots[nextIndex] = runPart;
+      }
+    });
+
     return (
-      <div className="d-flex flex-wrap gap-2">
-        {leveledParts.map((runPart) => (
+      <div className="tray-grid" data-orientation="ltr" style={trayStyle}>
+        {slots.map((runPart, slotIndex) => (
           <RunPartIndicator
-            key={runPart.id}
+            key={`slot-no-tray-${slotIndex}`}
             runPart={runPart}
-            statusClass={getBadgeStatusClass(runPart)}
+            statusClass={runPart ? getBadgeStatusClass(runPart) : undefined}
+            withTrayCell
             allowCreate={allowCreate}
-            hasStepPart={stepPartsById.has(runPart.id)}
+            hasStepPart={runPart ? stepPartsById.has(runPart.id) : false}
+            isSelected={runPart ? selectedPartIds.includes(runPart.id) : false}
             runStep={step}
             reloadFn={reloadFn}
           />
@@ -93,6 +127,7 @@ export const RunPartList = ({
                     statusClass={getBadgeStatusClass(runPart)}
                     allowCreate={allowCreate}
                     hasStepPart={stepPartsById.has(runPart.id)}
+                    isSelected={selectedPartIds.includes(runPart.id)}
                     runStep={step}
                     reloadFn={reloadFn}
                   />
@@ -132,6 +167,7 @@ export const RunPartList = ({
                     withTrayCell
                     allowCreate={allowCreate}
                     hasStepPart={runPart ? stepPartsById.has(runPart.id) : false}
+                    isSelected={runPart ? selectedPartIds.includes(runPart.id) : false}
                     runStep={step}
                     reloadFn={reloadFn}
                   />
