@@ -11,6 +11,7 @@ import {
   RunStepPart,
   RunStep,
 } from "@jield/solodb-typescript-core";
+import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 
 const RunStepPartProductionTableRow = ({
   runPart,
@@ -20,6 +21,8 @@ const RunStepPartProductionTableRow = ({
   partIsSelected,
   setPartAsSelected,
   dropdown = true,
+  layout = "default",
+  onRunStepPartUpdated,
 }: {
   runPart: RunPart;
   runStepParts: RunStepPart[];
@@ -28,16 +31,29 @@ const RunStepPartProductionTableRow = ({
   partIsSelected?: boolean;
   setPartAsSelected?: (partID: number) => void;
   dropdown?: boolean;
+  layout?: "default" | "research";
+  onRunStepPartUpdated?: (runStepPart: RunStepPart) => void;
 }) => {
   const [runStepPart, setRunStepPart] = useState<RunStepPart | undefined>(undefined);
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    setRunStepPart(
-      runStepParts.find(
-        (runStepPart: RunStepPart) => runStepPart.part.id === runPart.id && runStepPart.step.id === runStep.id
-      )
+    const nextRunStepPart = runStepParts.find(
+      (runStepPart: RunStepPart) => runStepPart.part.id === runPart.id && runStepPart.step.id === runStep.id
     );
+    if (!nextRunStepPart) {
+      setRunStepPart(undefined);
+      return;
+    }
+    setRunStepPart((current) => {
+      if (!current) {
+        return nextRunStepPart;
+      }
+      if ((nextRunStepPart.actions ?? 0) >= (current.actions ?? 0)) {
+        return nextRunStepPart;
+      }
+      return current;
+    });
   }, [runStepParts, runPart, runStep]);
 
   const createRunStepPart = () => {
@@ -47,7 +63,11 @@ const RunStepPartProductionTableRow = ({
         run_step_id: runStep.id,
       })
       .then((response) => {
-        setRunStepPart({ ...response.data });
+        const nextStepPart = { ...response.data } as RunStepPart;
+        setRunStepPart(nextStepPart);
+        if (onRunStepPartUpdated) {
+          onRunStepPartUpdated(nextStepPart);
+        }
 
         //Invalidate the query so we can fetch the new data
         refetchFn();
@@ -80,12 +100,24 @@ const RunStepPartProductionTableRow = ({
     performRunStepPartAction(runStepPart, runStepPartAction)
       .then((response) => {
         const latestAction = response as unknown as RunStepPart["latest_action"];
-        setRunStepPart({
-          ...runStepPart,
-          ...{
+        setRunStepPart((current) => {
+          if (!current) {
+            return current;
+          }
+          const updatedRunStepPart = {
+            ...current,
             latest_action: latestAction,
-            actions: runStepPart.actions + 1,
-          },
+            actions: current.actions + 1,
+          };
+          updateRunStepPartCache(queryClient, {
+            runStepPart: updatedRunStepPart,
+            action: runStepPartAction,
+            latestAction,
+          });
+          if (onRunStepPartUpdated) {
+            onRunStepPartUpdated(updatedRunStepPart);
+          }
+          return updatedRunStepPart;
         });
       })
       .then(() => {
@@ -98,13 +130,53 @@ const RunStepPartProductionTableRow = ({
   };
 
   if (!runStepPart) {
+    if (layout === "research") {
+      return (
+        <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}>
+          <td></td>
+          <td>
+            <div className={"d-flex align-items-center gap-2"}>
+              <div className={"fw-semibold"}>
+                {runPart.label || runPart.short_label}
+              </div>
+              {setPartAsSelected && (
+                <input
+                  type="checkbox"
+                  id={`part-select-${runPart.id}`}
+                  name="tomato"
+                  className={"form-check-input m-0"}
+                  checked={partIsSelected}
+                  onChange={() => {
+                    setPartAsSelected(runPart.id);
+                  }}
+                />
+              )}
+            </div>
+          </td>
+          <td>
+            <div className={"d-flex justify-content-between gap-1"}>
+              <div className={"d-flex flex-column align-items-start gap-1"}>
+                <Badge bg={"secondary"}>Not initialized</Badge>
+                <small className={"text-muted"}>No actions yet</small>
+              </div>
+              <div>
+                <Button size={"sm"} variant={"outline-info"} onClick={() => createRunStepPart()}>
+                  Init
+                </Button>
+              </div>
+            </div>
+          </td>
+          <td></td>
+        </tr>
+      );
+    }
+
     return (
       <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}>
         <td>
           <div className={"d-flex align-items-center gap-2"}>
             <div className={"fw-semibold"}>
-              Part {runPart.short_label}
-              {runPart.label && runPart.label.trim().length > 0 ? ` (${runPart.label})` : ""}
+              {runPart.label || runPart.short_label}
             </div>
             {setPartAsSelected && (
               <input
@@ -139,7 +211,9 @@ const RunStepPartProductionTableRow = ({
 
   const isProcessed = runStepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
   const isFailed = runStepPart.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING;
-  const rowClassName = runStepPart.part_processing_failed_in_previous_step
+  const rowClassName = runStepPart.part.part_processing_failed
+    ? "table-danger"
+    : runStepPart.part_processing_failed_in_previous_step
     ? "table-danger"
     : isProcessed
       ? "table-success"
@@ -147,6 +221,9 @@ const RunStepPartProductionTableRow = ({
         ? "table-danger"
         : "";
   const statusMeta = (() => {
+    if (runStepPart.part.part_processing_failed) {
+      return { label: "Blocked", variant: "danger", description: "Failed in an other step" };
+    }
     if (runStepPart.part_processing_failed_in_previous_step) {
       return { label: "Blocked", variant: "danger", description: "Failed in previous step" };
     }
@@ -167,6 +244,60 @@ const RunStepPartProductionTableRow = ({
     }
     return { label: "Unknown", variant: "secondary", description: "No status available" };
   })();
+
+  if (layout === "research") {
+    return (
+      <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}>
+        <td className={rowClassName}></td>
+        <td>
+          <div className={"d-flex align-items-center gap-2"}>
+            <div className={"fw-semibold"}>
+              {runStepPart.part.label || runStepPart.part.short_label}
+            </div>
+            {setPartAsSelected && (
+              <>
+                <input
+                  type="checkbox"
+                  id={`part-select-${runStepPart.part.id}`}
+                  name="tomato"
+                  className={"form-check-input m-0"}
+                  checked={partIsSelected}
+                  onChange={() => {
+                    setPartAsSelected(runPart.id);
+                  }}
+                />
+                <label className={"visually-hidden"} htmlFor={`part-select-${runStepPart.part.id}`}>
+                  Select part
+                </label>
+              </>
+            )}
+          </div>
+        </td>
+        <td>
+          <div className={"d-flex justify-content-between gap-1"}>
+            <div>
+              <Badge bg={statusMeta.variant}>{statusMeta.label}</Badge>
+              <small className={"text-muted ms-2"}>{statusMeta.description}</small>
+            </div>
+            <div>
+              <ActionsButtons runStepPart={runStepPart} setRunStepPartAction={performAction} />
+            </div>
+          </div>
+        </td>
+        <td>
+          <RunStepPartComment
+            runStepPart={runStepPart}
+            setRunStepPart={(nextStepPart) => {
+              setRunStepPart(nextStepPart);
+              if (onRunStepPartUpdated) {
+                onRunStepPartUpdated(nextStepPart);
+              }
+            }}
+          />
+        </td>
+      </tr>
+    );
+  }
 
   return (
     <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined} className={rowClassName}>
@@ -208,13 +339,21 @@ const RunStepPartProductionTableRow = ({
       </td>
       <td>
         {dropdown ? (
-          <ActionsDropwown runStepPart={runStepPart} setRunStepPartAction={performAction} />
+          <ActionsDropdown runStepPart={runStepPart} setRunStepPartAction={performAction} />
         ) : (
           <ActionsButtons runStepPart={runStepPart} setRunStepPartAction={performAction} />
         )}
       </td>
       <td>
-        <RunStepPartComment runStepPart={runStepPart} setRunStepPart={setRunStepPart} />
+        <RunStepPartComment
+          runStepPart={runStepPart}
+          setRunStepPart={(nextStepPart) => {
+            setRunStepPart(nextStepPart);
+            if (onRunStepPartUpdated) {
+              onRunStepPartUpdated(nextStepPart);
+            }
+          }}
+        />
       </td>
     </tr>
   );
@@ -279,7 +418,7 @@ const ActionsButtons = ({
               Failed
             </Button>
           )}
-        {runStepPart.actions > 0 && (
+        {runStepPart.actions > 0 && runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING && (
           <Button
             size={"sm"}
             onClick={() =>
@@ -297,7 +436,7 @@ const ActionsButtons = ({
   );
 };
 
-const ActionsDropwown = ({
+const ActionsDropdown = ({
   runStepPart,
   setRunStepPartAction,
 }: {

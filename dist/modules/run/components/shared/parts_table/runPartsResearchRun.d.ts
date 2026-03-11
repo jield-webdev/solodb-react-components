@@ -1,3 +1,4 @@
+import { RefObject } from 'react';
 import { Run, RunStep, RunStepPart } from '@jield/solodb-typescript-core';
 type Props = {
     run: Run;
@@ -5,7 +6,7 @@ type Props = {
     runStepParts?: RunStepPart[];
     editable?: boolean;
     refetchFn?: () => void;
-    toggleRunStepPartRef?: React.RefObject<{
+    toggleRunStepPartRef?: RefObject<{
         setPart: (part: number) => void;
     } | null>;
 };

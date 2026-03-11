@@ -7,6 +7,7 @@ import {
   RunStep,
   getAvailableRunStepPartActions,
 } from "@jield/solodb-typescript-core";
+import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 
 export interface UsePartActionsOptions<T> {
   runStep: RunStep;
@@ -50,7 +51,15 @@ export function usePartActions<T>({
         .map((item) => getRunStepPart(item))
         .filter((runStepPart): runStepPart is RunStepPart => runStepPart !== undefined)
         .filter((runStepPart) => getAvailableRunStepPartActions(runStepPart).some((a) => a === action))
-        .map((runStepPart) => performRunStepPartAction(runStepPart, action));
+        .map((runStepPart) =>
+          performRunStepPartAction(runStepPart, action).then((latestAction) => {
+            updateRunStepPartCache(queryClient, {
+              runStepPart,
+              action,
+              latestAction: latestAction as RunStepPart["latest_action"],
+            });
+          })
+        );
 
       Promise.all(promises).then(() => {
         queryClient.refetchQueries({ queryKey: ["stepParts", runStep.id] });
