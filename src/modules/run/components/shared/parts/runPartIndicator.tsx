@@ -38,6 +38,7 @@ const RunPartIndicator = ({
   };
 
   const badgeContent = (() => {
+    if (!hasStepPart) return null;
     if (!runPart) return null;
     if (allowCreate && !hasStepPart) {
       return (

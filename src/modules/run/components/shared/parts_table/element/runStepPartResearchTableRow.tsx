@@ -48,9 +48,7 @@ const RunStepPartResearchTableRow = ({
     return { label: "Unknown", variant: "secondary", description: "No status available" };
   })();
 
-  const partLabel = `${runStepPart.part.short_label}${
-    runStepPart.part.label && runStepPart.part.label.trim().length > 0 ? ` (${runStepPart.part.label})` : ""
-  }`;
+  const partLabel = runStepPart.part.label ?? runStepPart.part.short_label;
 
   const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
     if (!setPartAsSelected) {
