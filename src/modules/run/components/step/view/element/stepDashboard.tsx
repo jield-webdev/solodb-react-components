@@ -32,6 +32,9 @@ import {
   RunTypeEnum,
   listEcn,
 } from "@jield/solodb-typescript-core";
+import {
+  PartsBadgesTrayed
+} from "@jield/solodb-react-components/modules/run/components/shared/parts/partsBadgesTrayed";
 
 const StepDashboard = () => {
   const { environment } = useParams();

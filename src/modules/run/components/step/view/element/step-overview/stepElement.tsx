@@ -4,7 +4,7 @@ import StepDetails from "@jield/solodb-react-components/modules/run/components/s
 import { Link, useParams } from "react-router-dom";
 import DateFormat from "@jield/solodb-react-components/modules/partial/dateFormat";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
-import { PartsBadgesResearchRun } from "@jield/solodb-react-components/modules/run/components/shared/parts/partsBadgesResearchRun";
+import { RunPartList } from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartList";
 import { Requirement, Run, RunPart, RunStep, RunStepPart } from "@jield/solodb-typescript-core";
 
 const StepElement = ({
@@ -67,7 +67,7 @@ const StepElement = ({
           )}
         </td>
         <td>
-          <PartsBadgesResearchRun step={runStep} parts={runParts} stepParts={runStepParts} />
+          <RunPartList step={runStep} parts={runParts} stepParts={runStepParts} run={run} />
         </td>
         <td>
           {runStep.number} {runStep.is_skipped && <Badge bg={"info"}>Skipped</Badge>}

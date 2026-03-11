@@ -1,17 +1,19 @@
 import type { CSSProperties } from "react";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { RunStep, RunPart, RunStepPart, TrayType, Run } from "@jield/solodb-typescript-core";
+import { RunStep, RunPart, RunStepPart, TrayType, Run, RunTypeEnum } from "@jield/solodb-typescript-core";
+import RunPartIndicator from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartIndicator";
 
-export const PartsBadgesTrayed = ({
+export const RunPartList = ({
   step,
   parts,
   stepParts,
   run,
+  reloadFn,
 }: {
   step: RunStep;
   parts: RunPart[];
   stepParts: RunStepPart[];
   run: Run;
+  reloadFn?: () => void;
 }) => {
   const leveledParts = parts
     .filter((p) => p.part_level === step.part_level)
@@ -22,17 +24,9 @@ export const PartsBadgesTrayed = ({
       return a.left - b.left;
     });
 
-  const grouped = leveledParts.reduce<Record<number, RunPart[]>>((acc, part) => {
-    const key = part.root_id ?? part.id;
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(part);
-    return acc;
-  }, {});
-
   const stepPartsById = new Map(stepParts.filter((sp) => sp.step.id === step.id).map((sp) => [sp.part.id, sp]));
 
   const trays = [...(run.run_trays ?? [])].sort((a, b) => a.sequence - b.sequence);
-  const hasTrayLayout = trays.some((tray) => tray.tray_type?.rows && tray.tray_type?.columns);
 
   const partsByTrayId = leveledParts.reduce<Map<number, RunPart[]>>((acc, part) => {
     if (!part.tray) return acc;
@@ -42,59 +36,34 @@ export const PartsBadgesTrayed = ({
     return acc;
   }, new Map());
 
+  const allowCreate = run.run_type === RunTypeEnum.PRODUCTION;
+
   const getBadgeStatusClass = (runPart: RunPart): string => {
     const match = stepPartsById.get(runPart.id);
-    if (!match) return "badge-inactive";
-    if (match.part_processing_failed_in_previous_step) return "badge-failed-previous";
-    if (match.failed) return "badge-failed";
-    if (match.processed) return "badge-processed";
-    if (match.started) return "badge-started";
-    return "";
+    if (!match) return "step-part-inactive";
+    if (match.part_processing_failed_in_previous_step) return "step-part-failed-other";
+    if (match.part.part_processing_failed) return "step-part-failed-other";
+    if (match.failed) return "step-part-failed";
+    if (match.processed) return "step-part-processed";
+    if (match.started) return "step-part-started";
+    return "step-part-inactive";
   };
 
-  const badge = (runPart: RunPart) => {
+  if (trays.length === 0) {
     return (
-      <OverlayTrigger
-        placement="top"
-        key={runPart.id}
-        overlay={
-          <Tooltip id={`tooltip-${runPart.id}`}>
-            {`Level: ${runPart.part_level}${runPart.parent ? `, Parent: ${runPart.parent.short_label}` : ""}`}
-          </Tooltip>
-        }
-      >
-        <span
-          key={runPart.id}
-          className={`badge badge-level-${runPart.part_level} ${getBadgeStatusClass(runPart)} me-1`}
-        >
-          {runPart.label ?? runPart.short_label}
-        </span>
-      </OverlayTrigger>
-    );
-  };
-
-  const getSlotStatusClass = (runPart: RunPart | null): string => {
-    if (!runPart) return "tray-grid__cell--empty";
-    const match = stepPartsById.get(runPart.id);
-    if (!match) return "tray-grid__cell--inactive";
-    if (match.part_processing_failed_in_previous_step || match.failed) return "tray-grid__cell--failed";
-    if (match.processed) return "tray-grid__cell--processed";
-    if (match.started) return "tray-grid__cell--started";
-    return "tray-grid__cell--idle";
-  };
-
-  if (!hasTrayLayout) {
-    return (
-      <>
-        {leveledParts[0] && leveledParts[0].parent
-          ? Object.entries(grouped).map(([groupId, groupParts]) => (
-              <div key={groupId} className="mb-2">
-                <label className="text-muted me-1">{groupParts[0].parent?.short_label}:</label>{" "}
-                {groupParts.map((runPart) => badge(runPart))}
-              </div>
-            ))
-          : leveledParts.map((runPart) => badge(runPart))}
-      </>
+      <div className="d-flex flex-wrap gap-2">
+        {leveledParts.map((runPart) => (
+          <RunPartIndicator
+            key={runPart.id}
+            runPart={runPart}
+            statusClass={getBadgeStatusClass(runPart)}
+            allowCreate={allowCreate}
+            hasStepPart={stepPartsById.has(runPart.id)}
+            runStep={step}
+            reloadFn={reloadFn}
+          />
+        ))}
+      </div>
     );
   }
 
@@ -116,7 +85,19 @@ export const PartsBadgesTrayed = ({
           return (
             <div key={`tray-${tray.id}`} className="tray-grid-wrapper">
               <div className="tray-grid__label">{tray.name ?? tray.label}</div>
-              <div>{trayParts.map((runPart) => badge(runPart))}</div>
+              <div className="d-flex flex-wrap gap-2">
+                {trayParts.map((runPart) => (
+                  <RunPartIndicator
+                    key={runPart.id}
+                    runPart={runPart}
+                    statusClass={getBadgeStatusClass(runPart)}
+                    allowCreate={allowCreate}
+                    hasStepPart={stepPartsById.has(runPart.id)}
+                    runStep={step}
+                    reloadFn={reloadFn}
+                  />
+                ))}
+              </div>
             </div>
           );
         }
@@ -141,14 +122,19 @@ export const PartsBadgesTrayed = ({
             <div className="tray-grid__label">{tray.name ?? tray.label}</div>
             <div className="tray-grid" data-orientation={trayOrientation} style={trayStyle}>
               {slots.map((runPart, slotIndex) => {
-                const cellClassName = `tray-grid__cell ${getSlotStatusClass(runPart)}`;
+                const statusClass = runPart ? getBadgeStatusClass(runPart) : undefined;
 
                 return (
-                  <div key={`slot-${tray.id}-${slotIndex}`} className={cellClassName}>
-                    {runPart ? (
-                      <span className="tray-grid__cell-label">{runPart.label ?? runPart.short_label}</span>
-                    ) : null}
-                  </div>
+                  <RunPartIndicator
+                    key={`slot-${tray.id}-${slotIndex}`}
+                    runPart={runPart}
+                    statusClass={statusClass}
+                    withTrayCell
+                    allowCreate={allowCreate}
+                    hasStepPart={runPart ? stepPartsById.has(runPart.id) : false}
+                    runStep={step}
+                    reloadFn={reloadFn}
+                  />
                 );
               })}
             </div>
