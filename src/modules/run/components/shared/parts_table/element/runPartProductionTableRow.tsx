@@ -38,11 +38,22 @@ const RunStepPartProductionTableRow = ({
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    setRunStepPart(
-      runStepParts.find(
-        (runStepPart: RunStepPart) => runStepPart.part.id === runPart.id && runStepPart.step.id === runStep.id
-      )
+    const nextRunStepPart = runStepParts.find(
+      (runStepPart: RunStepPart) => runStepPart.part.id === runPart.id && runStepPart.step.id === runStep.id
     );
+    if (!nextRunStepPart) {
+      setRunStepPart(undefined);
+      return;
+    }
+    setRunStepPart((current) => {
+      if (!current) {
+        return nextRunStepPart;
+      }
+      if ((nextRunStepPart.actions ?? 0) >= (current.actions ?? 0)) {
+        return nextRunStepPart;
+      }
+      return current;
+    });
   }, [runStepParts, runPart, runStep]);
 
   const createRunStepPart = () => {
@@ -126,8 +137,7 @@ const RunStepPartProductionTableRow = ({
           <td>
             <div className={"d-flex align-items-center gap-2"}>
               <div className={"fw-semibold"}>
-                Part {runPart.short_label}
-                {runPart.label && runPart.label.trim().length > 0 ? ` (${runPart.label})` : ""}
+                {runPart.label || runPart.short_label}
               </div>
               {setPartAsSelected && (
                 <input
@@ -166,8 +176,7 @@ const RunStepPartProductionTableRow = ({
         <td>
           <div className={"d-flex align-items-center gap-2"}>
             <div className={"fw-semibold"}>
-              Part {runPart.short_label}
-              {runPart.label && runPart.label.trim().length > 0 ? ` (${runPart.label})` : ""}
+              {runPart.label || runPart.short_label}
             </div>
             {setPartAsSelected && (
               <input
@@ -243,8 +252,7 @@ const RunStepPartProductionTableRow = ({
         <td>
           <div className={"d-flex align-items-center gap-2"}>
             <div className={"fw-semibold"}>
-              Part {runStepPart.part.short_label}
-              {runStepPart.part.label && runStepPart.part.label.trim().length > 0 ? ` (${runStepPart.part.label})` : ""}
+              {runStepPart.part.label || runStepPart.part.short_label}
             </div>
             {setPartAsSelected && (
               <>
@@ -331,7 +339,7 @@ const RunStepPartProductionTableRow = ({
       </td>
       <td>
         {dropdown ? (
-          <ActionsDropwown runStepPart={runStepPart} setRunStepPartAction={performAction} />
+          <ActionsDropdown runStepPart={runStepPart} setRunStepPartAction={performAction} />
         ) : (
           <ActionsButtons runStepPart={runStepPart} setRunStepPartAction={performAction} />
         )}
@@ -410,7 +418,7 @@ const ActionsButtons = ({
               Failed
             </Button>
           )}
-        {runStepPart.actions > 0 && (
+        {runStepPart.actions > 0 && runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING && (
           <Button
             size={"sm"}
             onClick={() =>
@@ -428,7 +436,7 @@ const ActionsButtons = ({
   );
 };
 
-const ActionsDropwown = ({
+const ActionsDropdown = ({
   runStepPart,
   setRunStepPartAction,
 }: {

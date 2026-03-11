@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState, RefObject } from "react";
 import { Table } from "react-bootstrap";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import RunStepPartResearchTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartResearchTableRow";
@@ -21,7 +21,7 @@ type Props = {
   runStepParts?: RunStepPart[];
   editable?: boolean;
   refetchFn?: () => void;
-  toggleRunStepPartRef?: React.RefObject<{
+  toggleRunStepPartRef?: RefObject<{
     setPart: (part: number) => void;
   } | null>;
 };

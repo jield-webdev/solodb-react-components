@@ -57,17 +57,23 @@ export const RunPartList = ({
   };
 
   if (trays.length === 0) {
-    const totalColumns = Math.max(1, leveledParts.length);
+    const columnsPerRow = 12;
+    const maxSlotIndex = Math.max(
+      leveledParts.length,
+      leveledParts.reduce((maxValue, runPart) => Math.max(maxValue, runPart.left ?? 0), 0),
+    );
+    const totalRows = Math.max(1, Math.ceil(maxSlotIndex / columnsPerRow));
+    const totalColumns = columnsPerRow;
     const trayStyle: CSSProperties = {
       "--tray-columns": totalColumns,
-      "--tray-rows": 1,
+      "--tray-rows": totalRows,
     } as CSSProperties;
-    const slots = Array.from({ length: totalColumns }, () => null as RunPart | null);
+    const slots = Array.from({ length: totalRows * totalColumns }, () => null as RunPart | null);
     const unassigned: RunPart[] = [];
 
     leveledParts.forEach((runPart) => {
       const column = runPart.left;
-      const slotIndex = column >= 1 && column <= totalColumns ? column - 1 : null;
+      const slotIndex = column >= 1 && column <= slots.length ? column - 1 : null;
       if (slotIndex !== null && !slots[slotIndex]) {
         slots[slotIndex] = runPart;
       } else {

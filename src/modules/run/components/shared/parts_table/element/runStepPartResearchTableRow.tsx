@@ -36,6 +36,7 @@ const RunStepPartResearchTableRow = ({
         : "";
 
   const statusMeta = (() => {
+
     if (rowRunStepPart.part.part_processing_failed) {
       return { label: "Blocked", variant: "danger", description: "Failed in an other step" };
     }
@@ -173,19 +174,20 @@ const RunStepPartResearchTableRow = ({
                     Failed
                   </Button>
                 )}
-              {rowRunStepPart.actions > 0 && (
-                <Button
-                  size={"sm"}
-                  onClick={() =>
-                    setRunStepPartAction({
-                      runStepPart: rowRunStepPart,
-                      runStepPartAction: RunStepPartActionEnum.REWORK,
-                    })
-                  }
-                >
-                  Rework
-                </Button>
-              )}
+              {rowRunStepPart.actions > 0 &&
+                rowRunStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING && (
+                  <Button
+                    size={"sm"}
+                    onClick={() =>
+                      setRunStepPartAction({
+                        runStepPart: rowRunStepPart,
+                        runStepPartAction: RunStepPartActionEnum.REWORK,
+                      })
+                    }
+                  >
+                    Rework
+                  </Button>
+                )}
             </div>
           )}
         </div>

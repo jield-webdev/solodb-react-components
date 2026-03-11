@@ -48,7 +48,6 @@
 
 .tray-grid__label {
     font-size: 0.85rem;
-    font-weight: 600;
     color: #f1f3f5;
     background: #33383e;
     border-radius: 10px;
@@ -62,8 +61,8 @@
     --tray-rows: 1;
     --tray-gap: 10px;
     --tray-padding: 0px;
-    --tray-cell-size: 44px;
-    --tray-cell-radius: 10px;
+    --tray-cell-size: 25px;
+    --tray-cell-radius: 5px;
     display: grid;
     grid-template-columns: repeat(var(--tray-columns), minmax(var(--tray-cell-size), 1fr));
     grid-template-rows: repeat(var(--tray-rows), minmax(var(--tray-cell-size), 1fr));
@@ -115,7 +114,6 @@
     min-width: var(--tray-cell-size);
     padding: 0 6px;
     border-radius: var(--tray-cell-radius);
-    font-weight: 600;
     color: #f8f9fa;
     background: #3b4148;
     text-align: center;
