@@ -1,4 +1,5 @@
 import BarcodeScanElement from "@jield/solodb-react-components/modules/chemical/components/chemical/barcodeScanElement";
+import { makeKeySequenceListener } from "@jield/solodb-react-components/utils/keySequenceListener";
 import { Run } from "@jield/solodb-typescript-core";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
@@ -25,6 +26,19 @@ export default function NavigateInRunWithQrScanner({
       barcode: "",
     },
   });
+
+  // With document listener for keys
+  useEffect(() => {
+    const listener = makeKeySequenceListener("/pb/*/", (readed: string) => {
+      console.log("Callback with readed data: " + readed);
+    });
+
+    document.addEventListener("keyup", listener);
+
+    return () => {
+      document.removeEventListener("keyup", listener);
+    };
+  }, []);
 
   const barcodeValue = watch("barcode");
 
@@ -126,7 +140,7 @@ export default function NavigateInRunWithQrScanner({
         <QRCodeSVG value={"start-form"} size={100} className={"float-end"} onClick={() => startForm()} />
         <span className={"text-muted"}>Start QR</span>
       </div>
-      {showInput && <BarcodeScanElement control={control} />}
+      {false && <BarcodeScanElement control={control} />}
     </div>
   );
 }
