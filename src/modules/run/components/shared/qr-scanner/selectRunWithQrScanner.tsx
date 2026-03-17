@@ -1,132 +1,70 @@
-import BarcodeScanElement from "@jield/solodb-react-components/modules/chemical/components/chemical/barcodeScanElement";
+import { makeKeySequenceListener } from "@jield/solodb-react-components/utils/keySequenceListener";
+import Notification, { type NotificationType } from "@jield/solodb-react-components/utils/notification";
 import { Run } from "@jield/solodb-typescript-core";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
 
 export default function NavigateInRunWithQrScanner({
   runsList,
   setRun,
-  setRunStepPartId,
-  setRunPartId,
   setRunPartLabel,
 }: {
   runsList: Run[];
   setRun: (run: Run) => void;
-  setRunStepPartId?: (stepPart: number) => void;
-  setRunPartId?: (part: number) => void;
   setRunPartLabel?: (label: string) => void;
 }) {
-  const [showInput, setShowInput] = useState<boolean>(false);
-  const { control, watch, reset, setFocus } = useForm<{
-    barcode: string;
-  }>({
-    defaultValues: {
-      barcode: "",
-    },
-  });
+  const [readedKeys, setReadedKeys] = useState<string>("");
+  const [notification, setNotification] = useState<NotificationType>({ text: "", show: false, variant: "success" });
 
-  const barcodeValue = watch("barcode");
+  const setByPB = (readed: string) => {
+    const runPartBadgeParsed = readed.split("-");
+    if (!(runPartBadgeParsed.length == 4 || runPartBadgeParsed.length == 3)) {
+      setNotification({ text: "Part not found", show: true, variant: "danger" });
+      return;
+    }
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      // Ignore processing if the barcode includes /l/'
-      const type = barcodeValue?.match(/\/([^/]+)\//)?.[1];
-      if (type === "l") {
-        return;
-      }
+    const foundRun = runsList.find((run) => run.label === `${runPartBadgeParsed[0]}-${runPartBadgeParsed[1]}`);
+    const foundRunPartLabel = (
+      `${runPartBadgeParsed[2]}` + (runPartBadgeParsed[3] ? `-${runPartBadgeParsed[3]}` : "")
+    ).replace("/", "");
 
-      // When the barcode contains /r/ it is a run
-      let foundRun = undefined;
-      let foundRunPartId = undefined;
-      let foundRunPartLabel = undefined;
-      let foundRunStepPartId = undefined;
-      switch (type) {
-        // Run
-        case "r":
-          const runId = barcodeValue.split("/r/")[1];
-          foundRun = runsList.find((run) => run.id === Number(runId));
-          break;
-        // Step Part
-        case "sp":
-          const stepPartId = barcodeValue.split("/sp/")[1];
-          if (!isNaN(Number(stepPartId))) {
-            foundRunStepPartId = Number(stepPartId);
-          }
-          break;
-        // Run Part
-        case "rp":
-          const runPartId = barcodeValue.split("/rp/")[1];
-          foundRunPartId = Number(runPartId);
-          break;
-        // Part Badge
-        case "pb":
-          const runPartBadgeParsed = barcodeValue.split("/pb/")[1].split("-");
-          if (!(runPartBadgeParsed.length == 4 || runPartBadgeParsed.length == 3)) break;
-          foundRun = runsList.find((run) => run.label === `${runPartBadgeParsed[0]}-${runPartBadgeParsed[1]}`);
-          foundRunPartLabel = `${runPartBadgeParsed[2]}` + (runPartBadgeParsed[3] ? `-${runPartBadgeParsed[3]}` : "");
-          break;
-        default:
-          break;
-      }
+    if (!foundRun) {
+      setNotification({ text: "Run not found", show: true, variant: "danger" });
+      return;
+    }
 
-      if (setRun !== undefined && foundRun !== undefined) setRun(foundRun);
-      if (setRunPartId !== undefined && foundRunPartId !== undefined) setRunPartId(foundRunPartId);
-      if (setRunStepPartId !== undefined && foundRunStepPartId !== undefined) setRunStepPartId(foundRunStepPartId);
-      if (setRunPartLabel !== undefined && foundRunPartLabel !== undefined) setRunPartLabel(foundRunPartLabel);
+    if (!foundRunPartLabel) {
+      setNotification({ text: "Part label not found", show: true, variant: "danger" });
+      return;
+    }
 
-      startForm();
-    }, 1000);
-
-    return () => {
-      clearTimeout(handler); // Cleanup timeout on changes
-    };
-  }, [barcodeValue, reset]);
-
-  useEffect(() => {
-    let scannedCode = ""; // Accumulates the scanner input
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Ignore inputs coming from physical keyboard if barcode scanner is exclusively expected
-      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-        return; // Don't process if the user is typing into a text field or textarea
-      }
-
-      // Ignore modifier keys like Shift, Ctrl, Alt, etc.
-      if (event.key.length > 1 && event.key !== "Enter") {
-        return;
-      }
-
-      if (event.key === "Enter") {
-        // Perform actions on Enter key
-        if (scannedCode === "start-form") {
-          startForm(); // Start the form
-        }
-        scannedCode = ""; // Reset the scanned code after processing
-      } else {
-        scannedCode += event.key; // Append the key to the accumulated code
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [reset]);
-
-  const startForm = () => {
-    setShowInput(true);
-    setFocus("barcode");
-    reset({ barcode: "" });
+    if (setRun !== undefined) {
+        setNotification({ text: `Found run ${foundRun.label}`, show: true, variant: "success" });
+        setRun(foundRun);
+    }
+    if (setRunPartLabel !== undefined) setRunPartLabel(foundRunPartLabel);
   };
+
+  // With document listener for keys
+  useEffect(() => {
+    const listener = makeKeySequenceListener("*", setByPB, (keys) => {
+      setReadedKeys(keys);
+    });
+
+    document.addEventListener("keyup", listener);
+
+    return () => {
+      document.removeEventListener("keyup", listener);
+    };
+  }, []);
 
   return (
     <div className="d-flex flex-row gap-3">
       <div className="d-flex flex-column">
-        <QRCodeSVG value={"start-form"} size={100} className={"float-end"} onClick={() => startForm()} />
-        <span className={"text-muted"}>Start QR</span>
+        <QRCodeSVG value={"start-form"} size={100} className={"float-end"} onClick={() => {}} />
+        <span className={"text-muted"}>Reading: {readedKeys}</span>
       </div>
-      {showInput && <BarcodeScanElement control={control} />}
+      <Notification notification={notification} setNotification={setNotification} />
     </div>
   );
 }

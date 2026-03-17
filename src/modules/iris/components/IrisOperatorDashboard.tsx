@@ -1,17 +1,29 @@
-import { FileUploadEvent } from "@jield/solodb-typescript-core";
-import { FormEvent, useCallback, useMemo, useState } from "react";
-import IrisOperatorEventDetails from "./IrisOperatorEventDetails";
-import IrisOperatorEventList from "./IrisOperatorEventList";
+import { FileUploadEvent, irisListContextEvents } from "@jield/solodb-typescript-core";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import IrisOperatorEventDetails from "./operatorDashboard/IrisOperatorEventDetails";
+import IrisOperatorEventList from "./operatorDashboard/IrisOperatorEventList";
 import { getContentEntries } from "./irisOperatorDashboardUtils";
 import { useIrisStreamContextEvents } from "../hooks/useIrisStreamContextEvents";
-
-const IRIS_SERVER_ENDPOINT = "http://127.0.0.1:4444";
+import { getIrisServerUrl } from "../../core/config/runtimeConfig";
 
 export default function IrisOperatorDashboard() {
-  const [irisContext, setContextInput] = useState("lab-a");
+  const [irisInputContext, setIrisInputContext] = useState("");
+  const [irisContext, setIrisContext] = useState("");
   const [events, setEvents] = useState<FileUploadEvent[]>([]);
   const [selectedEventUid, setSelectedEventUid] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const irisServerUrl = getIrisServerUrl();
+
+  useEffect(() => {
+    if (!irisContext) {
+      return;
+    }
+    irisListContextEvents({ irisServerUrl: irisServerUrl, context: irisContext }).then((response) => {
+      // TO DO: merge with current events in case a new event hapens before the data is fetched
+      setEvents(response);
+    });
+  }, [irisContext]);
 
   const handleMessage = useCallback(
     (incomingEvent: FileUploadEvent) => {
@@ -22,6 +34,8 @@ export default function IrisOperatorDashboard() {
       if (incomingEvent.context !== irisContext) {
         return;
       }
+
+      setErrorMessage("");
 
       setEvents((currentEvents) => [
         incomingEvent,
@@ -50,18 +64,22 @@ export default function IrisOperatorDashboard() {
   );
 
   const { isConnected } = useIrisStreamContextEvents({
-    irisEndpoint: IRIS_SERVER_ENDPOINT,
+    irisEndpoint: irisServerUrl,
     context: irisContext,
     onMessage: handleMessage,
     onError: handleError,
   });
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setEvents([]);
-    setSelectedEventUid("");
-    setErrorMessage("");
-  };
+  const handleSubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setIrisContext(irisInputContext);
+      setEvents([]);
+      setSelectedEventUid("");
+      setErrorMessage("");
+    },
+    [irisInputContext]
+  );
 
   const selectedEvent = useMemo(() => {
     if (events.length === 0) {
@@ -92,10 +110,15 @@ export default function IrisOperatorDashboard() {
                 id="iris-context-input"
                 className="form-control"
                 type="text"
-                value={irisContext}
+                value={irisInputContext}
                 placeholder="lab-a"
-                onChange={(event) => setContextInput(event.target.value)}
+                onChange={(event) => setIrisInputContext(event.target.value)}
               />
+            </div>
+            <div className="col-lg-4 col-xl-2">
+              <button className="btn btn-primary w-100" type="submit" disabled={irisInputContext.trim() === ""}>
+                Load context
+              </button>
             </div>
           </form>
 
@@ -118,7 +141,7 @@ export default function IrisOperatorDashboard() {
                   key={selectedEvent?.uid || ""}
                   event={selectedEvent}
                   contentEntries={selectedEventContent}
-                  irisEndpoint={IRIS_SERVER_ENDPOINT}
+                  irisEndpoint={irisServerUrl}
                   onEventUpdated={handleMessage}
                 />
               </div>

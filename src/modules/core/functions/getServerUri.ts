@@ -1,5 +1,5 @@
-import { getServerUri } from "@jield/solodb-react-components/modules/core/config/runtimeConfig";
+import { getSolodbServerApiUrl } from "@jield/solodb-react-components/modules/core/config/runtimeConfig";
 
 export const GetServerUri = () => {
-  return getServerUri();
+  return getSolodbServerApiUrl();
 };

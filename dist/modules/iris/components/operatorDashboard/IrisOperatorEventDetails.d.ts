@@ -1,5 +1,5 @@
 import { FileUploadEvent } from '@jield/solodb-typescript-core';
-import { ContentEntry } from './irisOperatorDashboardUtils';
+import { ContentEntry } from '../irisOperatorDashboardUtils';
 interface IrisOperatorEventDetailsProps {
     event: FileUploadEvent | null;
     contentEntries: ContentEntry[];
