@@ -1,39 +1,14 @@
 import { FileUploadEvent, irisStreamEventsInContext } from "@jield/solodb-typescript-core";
 import { useEffect, useRef, useState } from "react";
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function isFileUploadEvent(value: unknown): value is FileUploadEvent {
-  if (!isObject(value)) {
-    return false;
-  }
-
-  return (
-    typeof value.uid === "string" &&
-    typeof value.context === "string" &&
-    typeof value.state === "string" &&
-    typeof value.start === "string"
-  );
-}
-
-function parseFileUploadEvents(rawData: string): FileUploadEvent {
-  const parsedData: unknown = JSON.parse(rawData);
-
-  if (!isFileUploadEvent(parsedData)) {
-    throw new Error("Received SSE payload is not a valid FileUploadEvent[]");
-  }
-
-  return parsedData;
-}
-
 interface IrisStreamContextEventsOptions {
   irisEndpoint: string;
   context: string;
   onMessage: (data: FileUploadEvent) => void;
   onError: (error: Event | null) => void;
 }
+
+type IrisStreamHandle = ReturnType<typeof irisStreamEventsInContext>;
 
 export function useIrisStreamContextEvents({
   irisEndpoint,
@@ -44,62 +19,71 @@ export function useIrisStreamContextEvents({
   isConnected: boolean;
   close: () => void;
 } {
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const streamRef = useRef<IrisStreamHandle | null>(null);
+  const reconnectTimerRef = useRef<number | null>(null);
+  const shouldReconnectRef = useRef(true);
+  const retryCountRef = useRef(0);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const setupSSE = async () => {
-      if (!context) {
-        return;
-      }
+    if (!context) return;
 
-      try {
-        const baseUrl = irisEndpoint.endsWith("/") ? irisEndpoint : `${irisEndpoint}/`;
+    shouldReconnectRef.current = true;
 
-        const stream = irisStreamEventsInContext({
-          context: context,
-          irisServerUrl: baseUrl,
-          onError: (error) => {
-            setIsConnected(false);
-            if (onError) onError(error);
-            stream.close();
-          },
-          onOpen: (event: FileUploadEvent) => {
-            setIsConnected(true);
-          },
-          onEvent: (event: FileUploadEvent) => {
-            try {
-              const data = parseFileUploadEvents(event);
-              onMessage(data);
-            } catch (err) {
-              console.error("Failed to parse SSE data:", err);
-              throw err;
-            }
-          },
-        });
-      } catch (err) {
-        console.error("Failed to establish SSE connection:", err);
-        setTimeout(setupSSE, 5000);
+    const clearReconnectTimer = () => {
+      if (reconnectTimerRef.current !== null) {
+        window.clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
       }
     };
 
-    setupSSE();
+    const connect = () => {
+      clearReconnectTimer();
+      const stream = irisStreamEventsInContext({
+        context,
+        irisServerUrl: irisEndpoint.endsWith("/") ? irisEndpoint : `${irisEndpoint}/`,
+        onOpen: () => {
+          retryCountRef.current = 0;
+          setIsConnected(true);
+        },
+        onEvent: (event: FileUploadEvent) => {
+          onMessage(event);
+        },
+        onError: (error) => {
+          setIsConnected(false);
+          onError(error);
+          stream.close();
+          if (!shouldReconnectRef.current) return;
+          const delay = Math.min(1000 * 2 ** retryCountRef.current, 30000);
+          retryCountRef.current += 1;
+          reconnectTimerRef.current = window.setTimeout(() => {
+            connect();
+          }, delay);
+        },
+      });
+      streamRef.current = stream;
+      stream.start();
+    };
+
+    connect();
 
     return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-        setIsConnected(false);
-      }
+      shouldReconnectRef.current = false;
+      clearReconnectTimer();
+      streamRef.current?.close();
+      streamRef.current = null;
+      setIsConnected(false);
     };
   }, [irisEndpoint, context, onMessage, onError]);
-
   const close = () => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-      setIsConnected(false);
+    shouldReconnectRef.current = false;
+    if (reconnectTimerRef.current !== null) {
+      window.clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
     }
+    streamRef.current?.close();
+    streamRef.current = null;
+    setIsConnected(false);
   };
 
   return { isConnected, close };

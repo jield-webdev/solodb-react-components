@@ -35,6 +35,8 @@ export default function IrisOperatorDashboard() {
         return;
       }
 
+      setErrorMessage("");
+
       setEvents((currentEvents) => [
         incomingEvent,
         ...currentEvents.filter((event) => event.uid !== incomingEvent.uid),

@@ -19,7 +19,7 @@ export default function NavigateInRunWithQrScanner({
   const setByPB = (readed: string) => {
     const runPartBadgeParsed = readed.split("-");
     if (!(runPartBadgeParsed.length == 4 || runPartBadgeParsed.length == 3)) {
-      setNotification({ text: "Run not found", show: true, variant: "danger" });
+      setNotification({ text: "Part not found", show: true, variant: "danger" });
       return;
     }
 
