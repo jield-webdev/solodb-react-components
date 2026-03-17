@@ -49,7 +49,7 @@ export default function RequirementElement({
         ?.values.find((v) => v.step_part_id === stepPart.id);
 
       if (!(value && !isNaN(parseFloat(value.string_value)))) {
-        return runStep.id === contextRunStep.id ? "table-success" : "";
+        return runStep.id === contextRunStep.id ? "bg-success-subtle" : "";
       }
 
       const val = parseFloat(value.string_value);
@@ -69,31 +69,31 @@ export default function RequirementElement({
     }
 
     if (failed) {
-      return "table-danger";
+      return "bg-danger-subtle";
     }
-    return runStep.id === contextRunStep.id ? "table-success" : "";
+    return runStep.id === contextRunStep.id ? "bg-success-subtle" : "";
   };
 
   return (
     <>
       {!hideLabel && runStep.has_label && runStep.is_own_label && (
-        <tr>
-          <td className={"bg-info"} colSpan={7}>
-            {runStep.label?.label}
-          </td>
-        </tr>
+        <div className="bg-info text-white rounded px-3 py-1">
+          {runStep.label?.label}
+        </div>
       )}
 
       {runStep.step_group && firstInGroup && (
-        <tr>
-          <td className={"bg-secondary"} colSpan={7}>
-            {runStep.step_group?.label}
-          </td>
-        </tr>
+        <div className="bg-secondary text-white rounded px-3 py-1">
+          {runStep.step_group?.label}
+        </div>
       )}
 
-      <tr className={getRowStatus()}>
-        <td className={runStep.has_step_group ? "ps-4" : ""}>
+      <div
+        className={`d-flex flex-wrap align-items-center gap-3 border rounded px-3 py-2 ${getRowStatus()} ${
+          runStep.has_step_group ? "ms-4" : ""
+        }`}
+      >
+        <div className="d-flex align-items-center gap-2 flex-shrink-0">
           {runStep.id !== contextRunStep.id && (
             <i
               className={"fa " + (showRequirementDetail ? "fa-chevron-down" : "fa-chevron-right")}
@@ -103,31 +103,36 @@ export default function RequirementElement({
               }}
             />
           )}
-        </td>
-        <td>
-          <MeasurementResultsBadges
-            requirement={requirement}
-            step={runStep}
-            parts={runParts}
-            stepParts={runStepParts}
-            measurementResults={measurementResultsQuery.data?.items ?? []}
-          />
-        </td>
-        <td>
-          {runStep.number} {runStep.is_skipped && <Badge bg={"info"}>Skipped</Badge>}
-        </td>
-        <td>
-          <Badge bg="info">requirement</Badge>
-          {" "}
-          <Link
-            to={`/${environment}/operator/run/step/${runStep.id}`}
-            dangerouslySetInnerHTML={{ __html: runStep.name }}
-          />{" "}
-        </td>
-        <td>{runStep.finish_user ? runStep.finish_user.initials : ""}</td>
-        <td>{runStep.has_rework ? <span className={"badge bg-primary"}>Rework</span> : ""}</td>
-        <td>{runStep.is_finished ? <DateFormat format={"DD-MM-YYYY"}>{runStep.finish_date!}</DateFormat> : ""}</td>
-      </tr>
+        </div>
+        <div className="d-flex flex-wrap align-items-center gap-3 flex-grow-1 min-w-0">
+          <div className="flex-shrink-0">
+            <MeasurementResultsBadges
+              requirement={requirement}
+              step={runStep}
+              parts={runParts}
+              stepParts={runStepParts}
+              measurementResults={measurementResultsQuery.data?.items ?? []}
+            />
+          </div>
+          <div className="flex-shrink-0 text-nowrap">
+            {runStep.number} {runStep.is_skipped && <Badge bg={"info"}>Skipped</Badge>}
+          </div>
+          <div className="flex-grow-1 min-w-0">
+            <Badge bg="info">requirement</Badge>{" "}
+            <Link
+              to={`/${environment}/operator/run/step/${runStep.id}`}
+              dangerouslySetInnerHTML={{ __html: runStep.name }}
+            />{" "}
+          </div>
+        </div>
+        <div className="d-flex align-items-center gap-3 flex-shrink-0 ms-auto">
+          <span className="text-nowrap">{runStep.finish_user ? runStep.finish_user.initials : ""}</span>
+          <span className="text-nowrap">{runStep.has_rework ? <span className={"badge bg-primary"}>Rework</span> : ""}</span>
+          <span className="text-nowrap">
+            {runStep.is_finished ? <DateFormat format={"DD-MM-YYYY"}>{runStep.finish_date!}</DateFormat> : ""}
+          </span>
+        </div>
+      </div>
 
       {showRequirementDetail && (
         <RequirementDetails

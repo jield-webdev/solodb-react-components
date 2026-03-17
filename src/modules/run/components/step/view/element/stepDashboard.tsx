@@ -161,6 +161,9 @@ const StepDashboard = () => {
             <Col>
               <h3>Checklist</h3>
               <RunStepChecklist />
+
+              <h2 className={'mt-2'}>Step files</h2>
+              <UploadFilesToStep runStep={runStep} />
             </Col>
             <Col>
               <h2>Parameters</h2>
@@ -197,29 +200,22 @@ const StepDashboard = () => {
               <Rework />
             </Col>
           </Row>
-          <Row>
-            <Col>
-              <h2>Step files</h2>
-              <UploadFilesToStep runStep={runStep} />
-            </Col>
-            <Col>
-              <div className={"d-flex justify-content-between mb-3"}>
-                <h2>Run steps</h2>
-                <div className={"d-flex gap-2 flex-wrap justify-content-end"}>
-                  <div>
-                    <StepOverviewButton size={undefined} />
-                  </div>
-                  <div>
-                    <RunChangelogButton size={undefined} />
-                  </div>
-                  <div>
-                    <LogAssistElement size={undefined} moduleId={runStep.process_module.module.id} />
-                  </div>
-                </div>
+
+          <div className={"d-flex justify-content-between mb-3"}>
+            <h2>Run steps</h2>
+            <div className={"d-flex gap-2 flex-wrap justify-content-end"}>
+              <div>
+                <StepOverviewButton size={undefined} />
               </div>
-              <RunStepSimpleList pageSize={run.run_type === RunTypeEnum.RESEARCH ? 5 : 1000} hideLabel={true} />
-            </Col>
-          </Row>
+              <div>
+                <RunChangelogButton size={undefined} />
+              </div>
+              <div>
+                <LogAssistElement size={undefined} moduleId={runStep.process_module.module.id} />
+              </div>
+            </div>
+          </div>
+          <RunStepSimpleList pageSize={run.run_type === RunTypeEnum.RESEARCH ? 5 : 1000} hideLabel={true} />
         </Col>
 
         <Col className={"col-3"}>

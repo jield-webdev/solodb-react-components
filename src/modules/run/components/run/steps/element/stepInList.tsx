@@ -2,10 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 import StepDetails from "@jield/solodb-react-components/modules/run/components/run/steps/element/stepDetails";
-import { PartsBadgesResearchRun } from "@jield/solodb-react-components/modules/run/components/shared/parts/partsBadgesResearchRun";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { PartBadgesProductionRun } from "@jield/solodb-react-components/modules/run/components/shared/parts/partsBadgesProductionRun";
-import { Run, RunStep, RunPart, RunStepPart, Requirement, EquipmentModule, RunTypeEnum } from "@jield/solodb-typescript-core";
+import {
+  Run,
+  RunStep,
+  RunPart,
+  RunStepPart,
+  Requirement,
+  EquipmentModule,
+} from "@jield/solodb-typescript-core";
+import { RunPartList } from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartList";
 
 export default function StepInList({
   run,
@@ -56,19 +62,15 @@ export default function StepInList({
               : ""
           }
         >
-          {run.run_type === RunTypeEnum.RESEARCH && (
-            <PartsBadgesResearchRun step={step} parts={parts} stepParts={stepParts} />
-          )}
-          {run.run_type === RunTypeEnum.PRODUCTION && (
-            <PartBadgesProductionRun
-              runStep={step}
-              parts={parts}
-              runStepParts={stepParts}
-              reloadFn={() => {
-                refetchFn(["runStepParts"]);
-              }}
-            />
-          )}
+          <RunPartList
+            step={step}
+            parts={parts}
+            stepParts={stepParts}
+            run={run}
+            reloadFn={() => {
+              refetchFn(["runStepParts"]);
+            }}
+          />
         </td>
 
         {/* misc status elements */}
