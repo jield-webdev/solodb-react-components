@@ -44,7 +44,7 @@ export default function NavigateInRunWithQrScanner({
       setNotification({ text: `Found run ${foundRun.label}`, show: true, variant: "success" });
       setRun(foundRun);
     }
-    if (setRunPartLabel !== undefined) setRunPartLabel(foundRunPartLabel);
+    if (setRunPartLabel !== undefined) setRunPartLabel(runPartBadgeParsed[2]);
   };
 
   // With document listener for keys
