@@ -4,7 +4,6 @@ import RunStepChecklistExecute from "./element/runStepChecklistExecute";
 import { RunStepParametersTable } from "../../shared/parameters/runStepParametersTable";
 import UploadFilesToStep from "../../shared/files/uploadFilesToStep";
 import React from "react";
-import RunPartsResearchRun from "../../shared/parts_table/runPartsResearchRun";
 import RunPartsQrFlow from "../../shared/parts_table/runPartsQrFlow";
 
 export default function RunStepExecuteMinimal({
@@ -27,10 +26,7 @@ export default function RunStepExecuteMinimal({
     <>
       <div>
         <h3 className="mb-2 text-start">Parts</h3>
-        {run.run_type === RunTypeEnum.PRODUCTION && (
-          <RunPartsQrFlow run={run} runStep={runStep} toggleRunPartRef={toggleRunPartRef} />
-        )}
-        {run.run_type === RunTypeEnum.RESEARCH && <RunPartsResearchRun run={run} runStep={runStep} />}
+        <RunPartsQrFlow run={run} runStep={runStep} toggleRunPartRef={toggleRunPartRef} />
       </div>
 
       <h3 className="mt-2">Parameters</h3>

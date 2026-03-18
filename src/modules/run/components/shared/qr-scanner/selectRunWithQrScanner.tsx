@@ -39,8 +39,8 @@ export default function NavigateInRunWithQrScanner({
     }
 
     if (setRun !== undefined) {
-        setNotification({ text: `Found run ${foundRun.label}`, show: true, variant: "success" });
-        setRun(foundRun);
+      setNotification({ text: `Found run ${foundRun.label}`, show: true, variant: "success" });
+      setRun(foundRun);
     }
     if (setRunPartLabel !== undefined) setRunPartLabel(foundRunPartLabel);
   };
@@ -61,8 +61,9 @@ export default function NavigateInRunWithQrScanner({
   return (
     <div className="d-flex flex-row gap-3">
       <div className="d-flex flex-column">
-        <QRCodeSVG value={"start-form"} size={100} className={"float-end"} onClick={() => {}} />
-        <span className={"text-muted"}>Reading: {readedKeys}</span>
+        <div className={"h3"}>
+          Reading: <span className={"font-monospace"}>{readedKeys}</span>
+        </div>
       </div>
       <Notification notification={notification} setNotification={setNotification} />
     </div>
