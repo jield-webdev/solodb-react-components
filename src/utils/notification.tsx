@@ -1,6 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
 import { ToastContainer, Toast } from "react-bootstrap";
-import { NavigationButton } from "yet-another-react-lightbox/*";
 
 type NotificationVariant = "success" | "danger";
 
