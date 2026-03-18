@@ -11,6 +11,10 @@ function isValidCharacter(char: string): boolean {
   return /^[a-zA-Z0-9-]$/.test(char);
 }
 
+function isPrintableCharacter(char: string): boolean {
+  return char.length === 1;
+}
+
 function isEndCharacter(char: string): boolean {
   switch (char) {
     case "Enter":
@@ -23,25 +27,33 @@ function isEndCharacter(char: string): boolean {
 
 /**
  * Represents a book.
- * key sequence suports := ([a-zA-Z0-9-], * , /)
+ * key sequence supports := ([a-zA-Z0-9-], * , /)
  */
 export function makeKeySequenceListener(
   keySequence: string,
-  callback: (readedKeys: string) => void,
-  currentReadedKeys?: (keys: string) => void
+  callback: (readKeys: string) => void,
+  currentReadKeys?: (keys: string) => void,
+  options?: {
+    requireEndCharacter?: boolean;
+  }
 ) {
+  const requireEndCharacter = options?.requireEndCharacter ?? false;
   let i = 0;
   let keys = "";
 
   const restart = () => {
     i = 0;
     keys = "";
-    if (currentReadedKeys) currentReadedKeys(keys);
+    if (currentReadKeys) currentReadKeys(keys);
   };
 
   return (e: KeyboardEvent) => {
     const key = e.key;
 
+    if (key === "Escape") {
+      restart();
+      return;
+    }
     if (isIgnorableKey(key)) return;
     if (isEndCharacter(key)) {
       callback(keys);
@@ -61,20 +73,19 @@ export function makeKeySequenceListener(
         }
         break;
       case "*":
-        if (key == keySequence[i + 1]) {
-          i += 2;
-          break;
-        }
+        // if (key == keySequence[i + 1]) {
+        //   i += 2;
+        //   break;
+        // }
 
-        if (!isValidCharacter(key)) {
-          restart();
+        if (!isPrintableCharacter(key)) {
           return;
         }
 
         break;
       default:
         if (!isValidCharacter(keySequence[i])) {
-          throw new Error("Invalid character expresion in makeKeySequenceListener call");
+          throw new Error("Invalid character expression in makeKeySequenceListener call");
         }
         if (key != keySequence[i]) {
           restart();
@@ -85,12 +96,12 @@ export function makeKeySequenceListener(
         break;
     }
 
-    if (i === keySequence.length) {
+    if (!requireEndCharacter && i === keySequence.length) {
       callback(keys);
       restart();
       return;
     }
 
-    if (currentReadedKeys) currentReadedKeys(keys);
+    if (currentReadKeys) currentReadKeys(keys);
   };
 }

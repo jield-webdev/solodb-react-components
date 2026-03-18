@@ -1,7 +1,6 @@
 import { makeKeySequenceListener } from "@jield/solodb-react-components/utils/keySequenceListener";
 import Notification, { type NotificationType } from "@jield/solodb-react-components/utils/notification";
 import { Run } from "@jield/solodb-typescript-core";
-import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 
 export default function NavigateInRunWithQrScanner({
@@ -13,20 +12,23 @@ export default function NavigateInRunWithQrScanner({
   setRun: (run: Run) => void;
   setRunPartLabel?: (label: string) => void;
 }) {
-  const [readedKeys, setReadedKeys] = useState<string>("");
+  const [readKeys, setReadKeys] = useState<string>("");
   const [notification, setNotification] = useState<NotificationType>({ text: "", show: false, variant: "success" });
 
-  const setByPB = (readed: string) => {
-    const runPartBadgeParsed = readed.split("-");
+  const setByPB = (read: string) => {
+    const normalizedRead = read.replace(/_/g, "-").toUpperCase();
+    const runPartBadgeParsed = normalizedRead.split("-");
     if (!(runPartBadgeParsed.length == 4 || runPartBadgeParsed.length == 3)) {
-      setNotification({ text: "Part not found", show: true, variant: "danger" });
+      setNotification({
+        text: "Part not found, found " + runPartBadgeParsed.length + " splits in " + normalizedRead,
+        show: true,
+        variant: "danger",
+      });
       return;
     }
 
     const foundRun = runsList.find((run) => run.label === `${runPartBadgeParsed[0]}-${runPartBadgeParsed[1]}`);
-    const foundRunPartLabel = (
-      `${runPartBadgeParsed[2]}` + (runPartBadgeParsed[3] ? `-${runPartBadgeParsed[3]}` : "")
-    ).replace("/", "");
+    const foundRunPartLabel = normalizedRead;
 
     if (!foundRun) {
       setNotification({ text: "Run not found", show: true, variant: "danger" });
@@ -47,9 +49,7 @@ export default function NavigateInRunWithQrScanner({
 
   // With document listener for keys
   useEffect(() => {
-    const listener = makeKeySequenceListener("*", setByPB, (keys) => {
-      setReadedKeys(keys);
-    });
+    const listener = makeKeySequenceListener("*", setByPB, setReadKeys, { requireEndCharacter: true });
 
     document.addEventListener("keyup", listener);
 
@@ -62,7 +62,7 @@ export default function NavigateInRunWithQrScanner({
     <div className="d-flex flex-row gap-3">
       <div className="d-flex flex-column">
         <div className={"h3"}>
-          Reading: <span className={"font-monospace"}>{readedKeys}</span>
+          Reading: <span className={"font-monospace"}>{readKeys}</span>
         </div>
       </div>
       <Notification notification={notification} setNotification={setNotification} />
