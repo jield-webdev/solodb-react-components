@@ -22,13 +22,9 @@ type Props = {
   runStepParts?: RunStepPart[];
   runParts?: RunPart[];
   refetchFn?: () => void;
-  toggleRunPartRef?: React.RefObject<{
-    setPart: (part: number) => void;
-    setPartByLabel: (label: string) => void;
-  } | null>;
 };
 
-const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () => {}, toggleRunPartRef }: Props) => {
+const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () => {} }: Props) => {
   const queryClient = useQueryClient();
   const queries = useQueries({
     queries: [
@@ -75,7 +71,6 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
   const { selectedParts } = usePartSelection({
     parts: leveledParts,
     getPartId: (part) => part.id,
-    toggleRef: toggleRunPartRef,
   });
 
   const partsToRender = useMemo(

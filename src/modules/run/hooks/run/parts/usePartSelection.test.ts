@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { usePartSelection } from "./usePartSelection";
-import { createRef } from "react";
 
 interface MockPart {
   id: number;
@@ -124,48 +123,5 @@ describe("usePartSelection", () => {
     expect(result.current.selectedParts.get(1)).toBe(true);
     // New part should be unselected
     expect(result.current.selectedParts.get(4)).toBe(false);
-  });
-
-  it("exposes setPart via toggleRef", () => {
-    const toggleRef = createRef<{ setPart: (part: number) => void } | null>();
-
-    const { result } = renderHook(() =>
-      usePartSelection({
-        parts: mockParts,
-        getPartId,
-        toggleRef,
-      })
-    );
-
-    // Access the ref and toggle part 2
-    act(() => {
-      toggleRef.current?.setPart(2);
-    });
-
-    expect(result.current.selectedParts.get(2)).toBe(true);
-    expect(result.current.hasSelectedParts).toBe(true);
-  });
-
-  it("handles empty parts array", () => {
-    const toggleRef = createRef<{ setPart: (part: number) => void } | null>();
-    const { result } = renderHook(() =>
-      usePartSelection({
-        parts: [],
-        getPartId,
-        toggleRef
-      })
-    );
-
-    expect(result.current.hasSelectedParts).toBe(false);
-    expect(result.current.selectedParts.size).toBe(0);
-    expect(toggleRef.current).toBe(null);
-
-    // Should not error when selecting all/none
-    act(() => {
-      result.current.selectAllParts();
-      result.current.selectNoneParts();
-    });
-
-    expect(result.current.hasSelectedParts).toBe(false);
   });
 });

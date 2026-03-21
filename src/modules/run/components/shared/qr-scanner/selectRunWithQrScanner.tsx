@@ -1,7 +1,8 @@
+import { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import { makeKeySequenceListener } from "@jield/solodb-react-components/utils/keySequenceListener";
 import Notification, { type NotificationType } from "@jield/solodb-react-components/utils/notification";
 import { Run } from "@jield/solodb-typescript-core";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function NavigateInRunWithQrScanner({
   runsList,
@@ -12,11 +13,12 @@ export default function NavigateInRunWithQrScanner({
   setRun: (run: Run) => void;
   setRunPartLabel?: (label: string) => void;
 }) {
-  const [readKeys, setReadKeys] = useState<string>("");
   const [notification, setNotification] = useState<NotificationType>({ text: "", show: false, variant: "success" });
 
-  const setByPB = (read: string) => {
-    const normalizedRead = read.replace(/_/g, "-").toUpperCase();
+  const { readedKeys, readingKeys } = useContext(ScannerContext);
+
+  useEffect(() => {
+    const normalizedRead = readedKeys.replace(/_/g, "-").toUpperCase();
     const runPartBadgeParsed = normalizedRead.split("-");
     if (!(runPartBadgeParsed.length == 4 || runPartBadgeParsed.length == 3)) {
       setNotification({
@@ -45,24 +47,13 @@ export default function NavigateInRunWithQrScanner({
       setRun(foundRun);
     }
     if (setRunPartLabel !== undefined) setRunPartLabel(runPartBadgeParsed[2]);
-  };
-
-  // With document listener for keys
-  useEffect(() => {
-    const listener = makeKeySequenceListener("*", setByPB, setReadKeys, { requireEndCharacter: true });
-
-    document.addEventListener("keyup", listener);
-
-    return () => {
-      document.removeEventListener("keyup", listener);
-    };
-  }, []);
+  }, [readedKeys]);
 
   return (
     <div className="d-flex flex-row gap-3">
       <div className="d-flex flex-column">
         <div className={"h3"}>
-          Reading: <span className={"font-monospace"}>{readKeys}</span>
+          Reading: <span className={"font-monospace"}>{readingKeys}</span>
         </div>
       </div>
       <Notification notification={notification} setNotification={setNotification} />

@@ -66,6 +66,8 @@ export { MonitorContext } from "@jield/solodb-react-components/modules/monitor/c
 export { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 export { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 export { EmphasizedParametersContext } from "@jield/solodb-react-components/modules/run/contexts/emphasizedParametersContext";
+export { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+export { ScannerProvider } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerProvider";
 
 // Hooks
 export { useAuth } from "@jield/solodb-react-components/modules/core/hooks/useAuth";

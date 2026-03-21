@@ -1,12 +1,9 @@
-import { useCallback, useEffect, useImperativeHandle, useState } from "react";
+import { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import { useCallback, useContext, useEffect, useImperativeHandle, useState } from "react";
 
 export interface UsePartSelectionOptions<T> {
   parts: T[];
   getPartId: (part: T) => number;
-  toggleRef?: React.Ref<{
-    setPart: (part: number) => void;
-    setPartByLabel?: (label: string) => void;
-  } | null>;
 }
 
 export interface UsePartSelectionResult {
@@ -20,15 +17,21 @@ export interface UsePartSelectionResult {
 /**
  * Hook for managing part selection state across RunParts components
  *
- * @param options Configuration object with parts array, ID getter, and optional ref
+ * @param options Configuration object with parts array, ID getter
  * @returns Object with selection state and control functions
  */
-export function usePartSelection<T>({
-  parts,
-  getPartId,
-  toggleRef,
-}: UsePartSelectionOptions<T>): UsePartSelectionResult {
+export function usePartSelection<T>({ parts, getPartId }: UsePartSelectionOptions<T>): UsePartSelectionResult {
   const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
+  // TODO: lisen for part selection via ScannerProvider
+  const { readedKeys, readingKeys } = useContext(ScannerContext);
+
+  useEffect(() => {
+    console.log(readedKeys);
+  }, [readedKeys]);
+
+  useEffect(() => {
+    console.log(readingKeys);
+  }, [readingKeys]);
 
   // Update selection map when parts change
   useEffect(() => {
@@ -52,30 +55,6 @@ export function usePartSelection<T>({
       return next;
     });
   }, []);
-
-  // Expose setPart function to parent component via ref
-  useImperativeHandle<
-    {
-      setPart: (part: number) => void;
-      setPartByLabel?: (label: string) => void;
-    } | null,
-    {
-      setPart: (part: number) => void;
-      setPartByLabel?: (label: string) => void;
-    } | null
-  >(toggleRef, () => {
-    if (parts.length === 0) return null;
-
-    return {
-      setPart(part: number) {
-        setPartAsSelected(part);
-      },
-      setPartByLabel(label: string) {
-        const part = (parts.find((p) => (p as any)?.short_label === label) as any)?.id;
-        if (part !== undefined) setPartAsSelected(part);
-      },
-    };
-  }, [parts, setPartAsSelected]);
 
   const selectAllParts = useCallback(() => {
     setSelectedParts((prev) => new Map([...prev.keys()].map((key) => [key, true])));

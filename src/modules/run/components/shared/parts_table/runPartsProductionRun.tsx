@@ -24,9 +24,6 @@ type Props = {
   runStepParts?: RunStepPart[];
   runParts?: RunPart[];
   refetchFn?: () => void;
-  toggleRunPartRef?: React.RefObject<{
-    setPart: (part: number) => void;
-  } | null>;
 };
 
 const RunPartsProductionRun = ({
@@ -35,7 +32,6 @@ const RunPartsProductionRun = ({
   runStepParts,
   runParts,
   refetchFn = () => {},
-  toggleRunPartRef,
 }: Props) => {
   const queryClient = useQueryClient();
   const [stepParts, setStepParts] = useState<RunStepPart[]>(runStepParts || []);
@@ -107,7 +103,6 @@ const RunPartsProductionRun = ({
   const { selectedParts, setPartAsSelected, selectAllParts, selectNoneParts, hasSelectedParts } = usePartSelection({
     parts: leveledParts,
     getPartId: (part) => part.id,
-    toggleRef: toggleRunPartRef,
   });
 
   useEffect(() => {

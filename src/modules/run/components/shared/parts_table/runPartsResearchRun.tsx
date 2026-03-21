@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState, RefObject } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { Table } from "react-bootstrap";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import RunStepPartResearchTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartResearchTableRow";
@@ -21,9 +21,6 @@ type Props = {
   runStepParts?: RunStepPart[];
   editable?: boolean;
   refetchFn?: () => void;
-  toggleRunStepPartRef?: RefObject<{
-    setPart: (part: number) => void;
-  } | null>;
 };
 
 const RunPartsResearchRun = ({
@@ -32,7 +29,6 @@ const RunPartsResearchRun = ({
   runStepParts,
   editable = true,
   refetchFn,
-  toggleRunStepPartRef,
 }: Props) => {
   const [stepParts, setStepParts] = useState<RunStepPart[]>(runStepParts || []);
   const effectiveRefetchFn = refetchFn ?? (() => {});
@@ -68,7 +64,6 @@ const RunPartsResearchRun = ({
   const { selectedParts, setPartAsSelected, selectAllParts, selectNoneParts, hasSelectedParts } = usePartSelection({
     parts: stepParts,
     getPartId: (part) => part.part.id,
-    toggleRef: toggleRunStepPartRef,
   });
 
   useEffect(() => {
