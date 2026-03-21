@@ -1,9 +1,9 @@
 import { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-import { useCallback, useContext, useEffect, useImperativeHandle, useState } from "react";
+import { RunPart, RunStepPart } from "@jield/solodb-typescript-core";
+import { useCallback, useContext, useEffect, useState } from "react";
 
-export interface UsePartSelectionOptions<T> {
-  parts: T[];
-  getPartId: (part: T) => number;
+export interface UsePartSelectionOptions {
+  parts: RunPart[] | RunStepPart[];
 }
 
 export interface UsePartSelectionResult {
@@ -20,25 +20,32 @@ export interface UsePartSelectionResult {
  * @param options Configuration object with parts array, ID getter
  * @returns Object with selection state and control functions
  */
-export function usePartSelection<T>({ parts, getPartId }: UsePartSelectionOptions<T>): UsePartSelectionResult {
+export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSelectionResult {
   const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
-  // TODO: lisen for part selection via ScannerProvider
+
+  // read keys from the scanner
   const { readedKeys, readingKeys } = useContext(ScannerContext);
+  useEffect(() => {}, [readingKeys]);
 
   useEffect(() => {
-    console.log(readedKeys);
+    const normalizedRead = readedKeys.replace(/_/g, "-").toUpperCase();
+
+    console.log(normalizedRead);
+
+    // @ts-ignore
+    const foundPart = parts.find((p) => normalizedRead.includes(p?.short_label ? p?.short_label : p?.part?.short_label));
+
+    if (!foundPart) return;
+
+    setPartAsSelected(foundPart.id);
   }, [readedKeys]);
-
-  useEffect(() => {
-    console.log(readingKeys);
-  }, [readingKeys]);
 
   // Update selection map when parts change
   useEffect(() => {
     // first check if there is a need to update
     const newMap = new Map<number, boolean>();
     for (const part of parts) {
-      const id = getPartId(part);
+      const id = part.id;
       newMap.set(id, selectedParts.get(id) ?? false);
     }
     if (newMap.size !== selectedParts.size) {
@@ -46,7 +53,7 @@ export function usePartSelection<T>({ parts, getPartId }: UsePartSelectionOption
         return newMap;
       });
     }
-  }, [parts, getPartId]);
+  }, [parts]);
 
   const setPartAsSelected = useCallback((partID: number) => {
     setSelectedParts((prev) => {

@@ -63,7 +63,6 @@ const RunPartsResearchRun = ({
   // Use custom hooks for selection and actions
   const { selectedParts, setPartAsSelected, selectAllParts, selectNoneParts, hasSelectedParts } = usePartSelection({
     parts: stepParts,
-    getPartId: (part) => part.part.id,
   });
 
   useEffect(() => {

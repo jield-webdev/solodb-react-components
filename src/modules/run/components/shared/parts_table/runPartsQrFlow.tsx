@@ -70,7 +70,6 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
   // Use custom hooks for selection and actions
   const { selectedParts } = usePartSelection({
     parts: leveledParts,
-    getPartId: (part) => part.id,
   });
 
   const partsToRender = useMemo(

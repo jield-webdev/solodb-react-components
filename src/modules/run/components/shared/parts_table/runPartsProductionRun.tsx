@@ -102,7 +102,6 @@ const RunPartsProductionRun = ({
   // Use custom hooks for selection and actions
   const { selectedParts, setPartAsSelected, selectAllParts, selectNoneParts, hasSelectedParts } = usePartSelection({
     parts: leveledParts,
-    getPartId: (part) => part.id,
   });
 
   useEffect(() => {
