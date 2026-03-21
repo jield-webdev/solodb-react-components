@@ -1,6 +1,6 @@
 import { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import { RunPart, RunStepPart } from "@jield/solodb-typescript-core";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 export interface UsePartSelectionOptions {
   parts: RunPart[] | RunStepPart[];
@@ -24,16 +24,30 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
   const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
 
   // read keys from the scanner
-  const { readedKeys, readingKeys } = useContext(ScannerContext);
-  useEffect(() => {}, [readingKeys]);
+  const { readedKeys } = useContext(ScannerContext);
+
+  //buffer to keep scanned keys if parts is empty
+  const scannedKeysBuffer = useRef<Set<string>>(new Set<string>());
 
   useEffect(() => {
     const normalizedRead = readedKeys.replace(/_/g, "-").toUpperCase();
 
-    console.log(normalizedRead);
+    if (parts.length == 0) {
+      if (scannedKeysBuffer.current.size >= 15) {
+        const firstKey = scannedKeysBuffer.current.values().next().value;
+        if (firstKey !== undefined) {
+          scannedKeysBuffer.current.delete(firstKey);
+        }
+      }
 
-    // @ts-ignore
-    const foundPart = parts.find((p) => normalizedRead.includes(p?.short_label ? p?.short_label : p?.part?.short_label));
+      scannedKeysBuffer.current.add(normalizedRead);
+      // to make sure it doesnt get to big
+      return;
+    }
+
+    const foundPart = parts.find((p) =>
+      normalizedRead.includes(p?.short_label ? p?.short_label : p?.part?.short_label)
+    );
 
     if (!foundPart) return;
 
@@ -52,6 +66,23 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
       setSelectedParts(() => {
         return newMap;
       });
+    }
+
+    // process the scannedKeysBuffer
+    if (parts.length > 0) {
+      scannedKeysBuffer.current.forEach((keys) => {
+        const foundPart = parts.find((p) =>
+          keys
+            .replace(/_/g, "-")
+            .toUpperCase()
+            .includes(p?.short_label ? p?.short_label : p?.part?.short_label)
+        );
+
+        if (foundPart) setPartAsSelected(foundPart.id);
+        console.log(foundPart);
+      });
+
+      scannedKeysBuffer.current.clear();
     }
   }, [parts]);
 

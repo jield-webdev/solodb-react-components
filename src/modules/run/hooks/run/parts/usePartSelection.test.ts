@@ -1,26 +1,21 @@
 import { describe, it, expect, vi } from "vitest";
-import { renderHook, act } from "@testing-library/react";
-import { usePartSelection } from "./usePartSelection";
-
-interface MockPart {
-  id: number;
-  name: string;
-}
+import { act, render, renderHook, waitFor } from "@testing-library/react";
+import { createElement, useEffect } from "react";
+import { RunPart } from "@jield/solodb-typescript-core";
+import { ScannerContext } from "../../../../core/contexts/scanner/ScannerContext";
+import { usePartSelection, UsePartSelectionResult } from "./usePartSelection";
 
 describe("usePartSelection", () => {
-  const mockParts: MockPart[] = [
-    { id: 1, name: "Part 1" },
-    { id: 2, name: "Part 2" },
-    { id: 3, name: "Part 3" },
-  ];
-
-  const getPartId = (part: MockPart) => part.id;
+  const mockParts = [
+    { id: 1, short_label: "PART-1" },
+    { id: 2, short_label: "PART-2" },
+    { id: 3, short_label: "PART-3" },
+  ] as RunPart[];
 
   it("initializes with no parts selected", () => {
     const { result } = renderHook(() =>
       usePartSelection({
         parts: mockParts,
-        getPartId,
       })
     );
 
@@ -34,7 +29,6 @@ describe("usePartSelection", () => {
     const { result } = renderHook(() =>
       usePartSelection({
         parts: mockParts,
-        getPartId,
       })
     );
 
@@ -58,7 +52,6 @@ describe("usePartSelection", () => {
     const { result } = renderHook(() =>
       usePartSelection({
         parts: mockParts,
-        getPartId,
       })
     );
 
@@ -76,7 +69,6 @@ describe("usePartSelection", () => {
     const { result } = renderHook(() =>
       usePartSelection({
         parts: mockParts,
-        getPartId,
       })
     );
 
@@ -101,7 +93,6 @@ describe("usePartSelection", () => {
       ({ parts }) =>
         usePartSelection({
           parts,
-          getPartId,
         }),
       {
         initialProps: { parts: mockParts },
@@ -116,12 +107,87 @@ describe("usePartSelection", () => {
     expect(result.current.selectedParts.get(1)).toBe(true);
 
     // Add a new part
-    const newParts = [...mockParts, { id: 4, name: "Part 4" }];
+    const newParts = [...mockParts, { id: 4, short_label: "PART-4" } as RunPart];
     rerender({ parts: newParts });
 
     // Part 1 should still be selected
     expect(result.current.selectedParts.get(1)).toBe(true);
     // New part should be unselected
     expect(result.current.selectedParts.get(4)).toBe(false);
+  });
+
+  it("deduplicates buffered scanned keys before applying selection", async () => {
+    const bufferedPart = { id: 1, short_label: "ABC-123" } as RunPart;
+    let latestResult: UsePartSelectionResult | null = null;
+
+    const Inner = ({ parts, onChange }: { parts: RunPart[]; onChange: (result: UsePartSelectionResult) => void }) => {
+      const result = usePartSelection({ parts });
+
+      useEffect(() => {
+        onChange(result);
+      }, [onChange, result]);
+
+      return null;
+    };
+
+    const Harness = ({
+      parts,
+      readedKeys,
+      onChange,
+    }: {
+      parts: RunPart[];
+      readedKeys: string;
+      onChange: (result: UsePartSelectionResult) => void;
+    }) =>
+      createElement(
+        ScannerContext.Provider,
+        {
+          value: {
+            readedKeys,
+            readingKeys: "",
+          },
+        },
+        createElement(Inner, { parts, onChange })
+      );
+
+    const onChange = vi.fn((result: UsePartSelectionResult) => {
+      latestResult = result;
+    });
+
+    const { rerender } = render(
+      createElement(Harness, {
+        parts: [],
+        readedKeys: "abc_123",
+        onChange,
+      })
+    );
+
+    rerender(
+      createElement(Harness, {
+        parts: [],
+        readedKeys: "ignored",
+        onChange,
+      })
+    );
+
+    rerender(
+      createElement(Harness, {
+        parts: [],
+        readedKeys: "abc_123",
+        onChange,
+      })
+    );
+
+    rerender(
+      createElement(Harness, {
+        parts: [bufferedPart],
+        readedKeys: "abc_123",
+        onChange,
+      })
+    );
+
+    await waitFor(() => {
+      expect(latestResult?.selectedParts.get(1)).toBe(true);
+    });
   });
 });
