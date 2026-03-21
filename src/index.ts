@@ -32,8 +32,6 @@ export { default as RunStepChecklist } from "@jield/solodb-react-components/modu
 export { default as RunStepExecuteMinimal } from "@jield/solodb-react-components/modules/run/components/step/view/runStepExecuteMinimal";
 export { default as BatchCardElement } from "@jield/solodb-react-components/modules/run/components/step/view/element/batchCardElement";
 export { default as SelectRunWithQrScanner } from "@jield/solodb-react-components/modules/run/components/shared/qr-scanner/selectRunWithQrScanner";
-export { default as NavigateInRunWithQrScanner } from "@jield/solodb-react-components/modules/run/components/shared/qr-scanner/selectRunWithQrScanner";
-
 
 // Run Providers
 export { default as RunProvider } from "@jield/solodb-react-components/modules/run/providers/runProvider";
@@ -71,6 +69,7 @@ export { ScannerProvider } from "@jield/solodb-react-components/modules/core/con
 
 // Hooks
 export { useAuth } from "@jield/solodb-react-components/modules/core/hooks/useAuth";
+export { default as useSelectRunWithScanner } from "@jield/solodb-react-components/modules/run/hooks/useSelectRunWithScanner";
 
 // Runtime configuration
 export { initSolodbComponents } from "@jield/solodb-react-components/modules/core/config/runtimeConfig";

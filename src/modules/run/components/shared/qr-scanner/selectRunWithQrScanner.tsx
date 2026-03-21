@@ -1,5 +1,4 @@
 import { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-import { makeKeySequenceListener } from "@jield/solodb-react-components/utils/keySequenceListener";
 import Notification, { type NotificationType } from "@jield/solodb-react-components/utils/notification";
 import { Run } from "@jield/solodb-typescript-core";
 import { useContext, useEffect, useState } from "react";
