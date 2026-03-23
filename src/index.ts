@@ -74,7 +74,7 @@ export { default as useSelectRunWithScanner } from "@jield/solodb-react-componen
 // Runtime configuration
 export { initSolodbComponents } from "@jield/solodb-react-components/modules/core/config/runtimeConfig";
 
-// Types/Interfaces - Export key interfaces that consumers might need
-export type { User, Equipment, Monitor, Run, RunStep } from "@jield/solodb-typescript-core";
+// Utils
+export { notification, NotificationProvider } from "@jield/solodb-react-components/utils/notification";
 
 import "./style/main.css"

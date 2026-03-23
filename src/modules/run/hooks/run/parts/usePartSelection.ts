@@ -1,4 +1,5 @@
 import { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import { notification } from "@jield/solodb-react-components/utils/notification";
 import { RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 
@@ -54,6 +55,9 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
     );
 
     if (!foundPart) return;
+
+    notification({notificationHeader: "Part scanner", notificationBody: `Found part: ${foundPart.id}`, notificationType: "success"});
+    console.log("asdf");
 
     setPartAsSelected(foundPart.id);
   };
