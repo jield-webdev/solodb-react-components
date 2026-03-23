@@ -1,6 +1,6 @@
 import { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import { RunPart, RunStepPart } from "@jield/solodb-typescript-core";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 
 export interface UsePartSelectionOptions {
   parts: RunPart[] | RunStepPart[];
@@ -24,13 +24,17 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
   const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
 
   // read keys from the scanner
-  const { readedKeys } = useContext(ScannerContext);
+  const { readedKeys, addCallbackFn, removeCallbackFn } = useContext(ScannerContext);
+  const callbackId = useId();
 
   //buffer to keep scanned keys if parts is empty
   const scannedKeysBuffer = useRef<Set<string>>(new Set<string>());
 
-  useEffect(() => {
-    const normalizedRead = readedKeys.replace(/_/g, "-").toUpperCase();
+  // ref so the registered callback always sees the latest parts/setPartAsSelected
+  const onScanReadsKeysRef = useRef<(keys: string) => void>(() => {});
+
+  onScanReadsKeysRef.current = (keys: string) => {
+    const normalizedRead = keys.replace(/_/g, "-").toUpperCase();
 
     if (parts.length == 0) {
       if (scannedKeysBuffer.current.size >= 15) {
@@ -52,7 +56,16 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
     if (!foundPart) return;
 
     setPartAsSelected(foundPart.id);
-  }, [readedKeys]);
+  };
+
+  useEffect(() => {
+    onScanReadsKeysRef.current(readedKeys);
+    addCallbackFn(callbackId, (keys) => onScanReadsKeysRef.current(keys));
+
+    return () => {
+      removeCallbackFn(callbackId);
+    };
+  }, []);
 
   // Update selection map when parts change
   useEffect(() => {
@@ -79,7 +92,6 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
         );
 
         if (foundPart) setPartAsSelected(foundPart.id);
-        console.log(foundPart);
       });
 
       scannedKeysBuffer.current.clear();
