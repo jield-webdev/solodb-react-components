@@ -141,7 +141,7 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
           ))}
         </tbody>
       </Table>
-      <DisplayStepPartsInfo runStepParts={runStepPartsData} selectedPartsLength={partsToRender.length} />
+      <DisplayStepPartsInfo runStepParts={runStepPartsData} selectedPartsLength={partsToRender.length} totalParts={leveledParts.length} />
     </React.Fragment>
   );
 };
@@ -159,9 +159,11 @@ const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart): boolean =>
 const DisplayStepPartsInfo = ({
   runStepParts,
   selectedPartsLength,
+  totalParts,
 }: {
   runStepParts: RunStepPart[];
   selectedPartsLength: number;
+  totalParts: number;
 }) => {
   const finishedParts = useMemo(() => {
     let counter = 0;
@@ -171,7 +173,7 @@ const DisplayStepPartsInfo = ({
     return counter;
   }, [runStepParts]);
 
-  const remainingParts = useMemo(() => runStepParts.length - selectedPartsLength, [runStepParts, selectedPartsLength]);
+  const remainingParts = useMemo(() => totalParts - selectedPartsLength, [totalParts, selectedPartsLength]);
 
   return (
     <div className="d-flex flex-column flex-sm-row flex-wrap gap-2 mt-2">
