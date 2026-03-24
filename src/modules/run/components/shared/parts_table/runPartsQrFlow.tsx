@@ -69,7 +69,7 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
   );
 
   // Use custom hooks for selection and actions
-  const { selectedParts } = usePartSelection({
+  const { selectedParts, selectAllParts } = usePartSelection({
     parts: leveledParts,
   });
 
@@ -141,7 +141,7 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
           ))}
         </tbody>
       </Table>
-      <DisplayStepPartsInfo runStepParts={runStepPartsData} selectedPartsLength={partsToRender.length} totalParts={leveledParts.length} />
+      <DisplayStepPartsInfo runStepParts={runStepPartsData} selectedPartsLength={partsToRender.length} totalParts={leveledParts.length} onSelectAll={selectAllParts} />
     </React.Fragment>
   );
 };
@@ -160,10 +160,12 @@ const DisplayStepPartsInfo = ({
   runStepParts,
   selectedPartsLength,
   totalParts,
+  onSelectAll,
 }: {
   runStepParts: RunStepPart[];
   selectedPartsLength: number;
   totalParts: number;
+  onSelectAll: () => void;
 }) => {
   const finishedParts = useMemo(() => {
     let counter = 0;
@@ -177,7 +179,13 @@ const DisplayStepPartsInfo = ({
 
   return (
     <div className="d-flex flex-column flex-sm-row flex-wrap gap-2 mt-2">
-      <span className="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fw-semibold">
+      <span
+        className="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fw-semibold"
+        role="button"
+        title="Show all the parts"
+        onClick={onSelectAll}
+        style={{ cursor: "pointer" }}
+      >
         This step has {remainingParts} more parts
       </span>
       <span className="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-2 fw-semibold">
