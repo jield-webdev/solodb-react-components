@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
@@ -13,6 +13,7 @@ import {
   RunStepPartActionEnum,
 } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
+import { notification } from "@jield/solodb-react-components/utils/notification";
 
 const SHOW_FINISH_PARTS = false;
 
@@ -71,6 +72,29 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
   const { selectedParts } = usePartSelection({
     parts: leveledParts,
   });
+
+  const prevSelectedPartsRef = useRef<Map<number, boolean>>(new Map());
+
+  useEffect(() => {
+    const prev = prevSelectedPartsRef.current;
+
+    const newlySelected = [...selectedParts.entries()]
+      .filter(([id, selected]) => selected && !prev.get(id))
+      .map(([id]) => id);
+
+    newlySelected.forEach((partId) => {
+      const part = leveledParts.find((p) => p.id === partId);
+      if (part && isRunPartFinish(runStepPartsData, part)) {
+        notification({
+          notificationHeader: "Part already finished",
+          notificationBody: `Part ${part.short_label} has already been processed`,
+          notificationType: "danger",
+        });
+      }
+    });
+
+    prevSelectedPartsRef.current = new Map(selectedParts);
+  }, [selectedParts, runStepPartsData, leveledParts]);
 
   const partsToRender = useMemo(
     () => leveledParts.filter((part) => selectedParts.get(part.id) && !isRunPartFinish(runStepPartsData, part)),
