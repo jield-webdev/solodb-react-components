@@ -145,6 +145,8 @@ describe("usePartSelection", () => {
           value: {
             readedKeys,
             readingKeys: "",
+            addCallbackFn: vi.fn(),
+            removeCallbackFn: vi.fn(),
           },
         },
         createElement(Inner, { parts, onChange })

@@ -1,10 +1,6 @@
-export interface UsePartSelectionOptions<T> {
-    parts: T[];
-    getPartId: (part: T) => number;
-    toggleRef?: React.Ref<{
-        setPart: (part: number) => void;
-        setPartByLabel?: (label: string) => void;
-    } | null>;
+import { RunPart, RunStepPart } from '@jield/solodb-typescript-core';
+export interface UsePartSelectionOptions {
+    parts: RunPart[] | RunStepPart[];
 }
 export interface UsePartSelectionResult {
     selectedParts: Map<number, boolean>;
@@ -16,7 +12,7 @@ export interface UsePartSelectionResult {
 /**
  * Hook for managing part selection state across RunParts components
  *
- * @param options Configuration object with parts array, ID getter, and optional ref
+ * @param options Configuration object with parts array, ID getter
  * @returns Object with selection state and control functions
  */
-export declare function usePartSelection<T>({ parts, getPartId, toggleRef, }: UsePartSelectionOptions<T>): UsePartSelectionResult;
+export declare function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSelectionResult;

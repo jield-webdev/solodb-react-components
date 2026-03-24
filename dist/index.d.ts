@@ -21,7 +21,6 @@ export { default as RunStepChecklist } from './modules/run/components/step/view/
 export { default as RunStepExecuteMinimal } from './modules/run/components/step/view/runStepExecuteMinimal';
 export { default as BatchCardElement } from './modules/run/components/step/view/element/batchCardElement';
 export { default as SelectRunWithQrScanner } from './modules/run/components/shared/qr-scanner/selectRunWithQrScanner';
-export { default as NavigateInRunWithQrScanner } from './modules/run/components/shared/qr-scanner/selectRunWithQrScanner';
 export { default as RunProvider } from './modules/run/providers/runProvider';
 export { default as RunStepProvider } from './modules/run/providers/runStepProvider';
 export { default as EmphasizedParametersProvider } from './modules/run/providers/emphasizedParametersProvider';
@@ -40,6 +39,9 @@ export { MonitorContext } from './modules/monitor/contexts/monitorContext';
 export { RunContext } from './modules/run/contexts/runContext';
 export { RunStepContext } from './modules/run/contexts/runStepContext';
 export { EmphasizedParametersContext } from './modules/run/contexts/emphasizedParametersContext';
+export { ScannerContext, useScannerContext } from './modules/core/contexts/scanner/ScannerContext';
+export { ScannerProvider } from './modules/core/contexts/scanner/ScannerProvider';
 export { useAuth } from './modules/core/hooks/useAuth';
+export { default as useSelectRunWithScanner } from './modules/run/hooks/useSelectRunWithScanner';
 export { initSolodbComponents } from './modules/core/config/runtimeConfig';
-export type { User, Equipment, Monitor, Run, RunStep } from '@jield/solodb-typescript-core';
+export { notification, NotificationProvider } from './utils/notification';

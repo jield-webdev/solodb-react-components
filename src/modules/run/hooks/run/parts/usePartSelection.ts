@@ -51,7 +51,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
     }
 
     const foundPart = parts.find((p) =>
-      normalizedRead.includes(p?.short_label ? p?.short_label : p?.part?.short_label)
+      normalizedRead.includes('short_label' in p ? p.short_label : p.part.short_label)
     );
 
     if (!foundPart) { 
@@ -92,7 +92,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
           keys
             .replace(/_/g, "-")
             .toUpperCase()
-            .includes(p?.short_label ? p?.short_label : p?.part?.short_label)
+            .includes('short_label' in p ? p.short_label : p.part.short_label)
         );
 
         if (foundPart) {
