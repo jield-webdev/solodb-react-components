@@ -1,13 +1,12 @@
-import { Dispatch, SetStateAction } from 'react';
+import { ReactNode } from 'react';
 type NotificationVariant = "success" | "danger";
-export type NotificationType = {
-    text: string;
-    show: boolean;
-    variant: NotificationVariant;
+export type NotificationProps = {
+    notificationHeader: string;
+    notificationBody: string;
+    notificationType: NotificationVariant;
 };
-type NotificationProps = {
-    notification: NotificationType;
-    setNotification: Dispatch<SetStateAction<NotificationType>>;
-};
-export default function Notification({ notification, setNotification }: NotificationProps): import("react/jsx-runtime").JSX.Element;
+export declare function notification(props: NotificationProps): void;
+export declare function NotificationProvider({ children }: {
+    children: ReactNode;
+}): import("react/jsx-runtime").JSX.Element;
 export {};

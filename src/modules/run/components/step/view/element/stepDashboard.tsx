@@ -32,6 +32,7 @@ import {
   RunTypeEnum,
   listEcn,
 } from "@jield/solodb-typescript-core";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 
 const StepDashboard = () => {
   const { environment } = useParams();
@@ -69,6 +70,8 @@ const StepDashboard = () => {
   const [monitorQuery, ecnQuery, moduleQuery, requirementQuery] = queries;
 
   const [showOnlyEmphasizedParameters, setShowOnlyEmphasizedParameters] = useState(true);
+
+  const { readingKeys } = useScannerContext();
 
   //show a loading state while the queries are loading
   const isLoading = queries.some((query) => query.isLoading);
@@ -157,12 +160,13 @@ const StepDashboard = () => {
               <RunPartsProductionRun run={run} runStep={runStep} />
             </>
           )}
+          <span>Reading from scanner: {readingKeys}</span>
           <Row className={"py-4"}>
             <Col>
               <h3>Checklist</h3>
               <RunStepChecklist />
 
-              <h2 className={'mt-2'}>Step files</h2>
+              <h2 className={"mt-2"}>Step files</h2>
               <UploadFilesToStep runStep={runStep} />
             </Col>
             <Col>

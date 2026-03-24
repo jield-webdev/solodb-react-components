@@ -1,7 +1,7 @@
-import { makeKeySequenceListener } from "@jield/solodb-react-components/utils/keySequenceListener";
-import Notification, { type NotificationType } from "@jield/solodb-react-components/utils/notification";
+import { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import { notification } from "@jield/solodb-react-components/utils/notification";
 import { Run } from "@jield/solodb-typescript-core";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function NavigateInRunWithQrScanner({
   runsList,
@@ -12,17 +12,16 @@ export default function NavigateInRunWithQrScanner({
   setRun: (run: Run) => void;
   setRunPartLabel?: (label: string) => void;
 }) {
-  const [readKeys, setReadKeys] = useState<string>("");
-  const [notification, setNotification] = useState<NotificationType>({ text: "", show: false, variant: "success" });
+  const { readedKeys, readingKeys } = useContext(ScannerContext);
 
-  const setByPB = (read: string) => {
-    const normalizedRead = read.replace(/_/g, "-").toUpperCase();
+  useEffect(() => {
+    const normalizedRead = readedKeys.replace(/_/g, "-").toUpperCase();
     const runPartBadgeParsed = normalizedRead.split("-");
     if (!(runPartBadgeParsed.length == 4 || runPartBadgeParsed.length == 3)) {
-      setNotification({
-        text: "Part not found, found " + runPartBadgeParsed.length + " splits in " + normalizedRead,
-        show: true,
-        variant: "danger",
+      notification({
+        notificationHeader: "Run scanner",
+        notificationBody: "Part not found, found " + runPartBadgeParsed.length + " splits in " + normalizedRead,
+        notificationType: "danger",
       });
       return;
     }
@@ -31,41 +30,40 @@ export default function NavigateInRunWithQrScanner({
     const foundRunPartLabel = normalizedRead;
 
     if (!foundRun) {
-      setNotification({ text: "Run not found", show: true, variant: "danger" });
+      notification({
+        notificationHeader: "Run scanner",
+        notificationBody: `Run not found`,
+        notificationType: "danger",
+      });
       return;
     }
 
     if (!foundRunPartLabel) {
-      setNotification({ text: "Part label not found", show: true, variant: "danger" });
+      notification({
+        notificationHeader: "Run scanner",
+        notificationBody: `Part label not found`,
+        notificationType: "danger",
+      });
       return;
     }
 
     if (setRun !== undefined) {
-      setNotification({ text: `Found run ${foundRun.label}`, show: true, variant: "success" });
-      setRun(foundRun);
+      notification({
+        notificationHeader: "Run scanner",
+        notificationBody: `Found run ${foundRun.label}`,
+        notificationType: "success",
+      });
     }
     if (setRunPartLabel !== undefined) setRunPartLabel(runPartBadgeParsed[2]);
-  };
-
-  // With document listener for keys
-  useEffect(() => {
-    const listener = makeKeySequenceListener("*", setByPB, setReadKeys, { requireEndCharacter: true });
-
-    document.addEventListener("keyup", listener);
-
-    return () => {
-      document.removeEventListener("keyup", listener);
-    };
-  }, []);
+  }, [readedKeys]);
 
   return (
     <div className="d-flex flex-row gap-3">
       <div className="d-flex flex-column">
         <div className={"h3"}>
-          Reading: <span className={"font-monospace"}>{readKeys}</span>
+          Reading: <span className={"font-monospace"}>{readingKeys}</span>
         </div>
       </div>
-      <Notification notification={notification} setNotification={setNotification} />
     </div>
   );
 }

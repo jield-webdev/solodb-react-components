@@ -32,8 +32,6 @@ export { default as RunStepChecklist } from "@jield/solodb-react-components/modu
 export { default as RunStepExecuteMinimal } from "@jield/solodb-react-components/modules/run/components/step/view/runStepExecuteMinimal";
 export { default as BatchCardElement } from "@jield/solodb-react-components/modules/run/components/step/view/element/batchCardElement";
 export { default as SelectRunWithQrScanner } from "@jield/solodb-react-components/modules/run/components/shared/qr-scanner/selectRunWithQrScanner";
-export { default as NavigateInRunWithQrScanner } from "@jield/solodb-react-components/modules/run/components/shared/qr-scanner/selectRunWithQrScanner";
-
 
 // Run Providers
 export { default as RunProvider } from "@jield/solodb-react-components/modules/run/providers/runProvider";
@@ -66,14 +64,17 @@ export { MonitorContext } from "@jield/solodb-react-components/modules/monitor/c
 export { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 export { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 export { EmphasizedParametersContext } from "@jield/solodb-react-components/modules/run/contexts/emphasizedParametersContext";
+export { ScannerContext, useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+export { ScannerProvider } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerProvider";
 
 // Hooks
 export { useAuth } from "@jield/solodb-react-components/modules/core/hooks/useAuth";
+export { default as useSelectRunWithScanner } from "@jield/solodb-react-components/modules/run/hooks/useSelectRunWithScanner";
 
 // Runtime configuration
 export { initSolodbComponents } from "@jield/solodb-react-components/modules/core/config/runtimeConfig";
 
-// Types/Interfaces - Export key interfaces that consumers might need
-export type { User, Equipment, Monitor, Run, RunStep } from "@jield/solodb-typescript-core";
+// Utils
+export { notification, NotificationProvider } from "@jield/solodb-react-components/utils/notification";
 
 import "./style/main.css"

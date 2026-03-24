@@ -1,5 +1,7 @@
 /**
  * Represents a book.
- * key sequence suports := ([a-zA-Z0-9-], * , /)
+ * key sequence supports := ([a-zA-Z0-9-], * , /)
  */
-export declare function makeKeySequenceListener(keySequence: string, callback: (readedKeys: string) => void, currentReadedKeys?: (keys: string) => void): (e: KeyboardEvent) => void;
+export declare function makeKeySequenceListener(keySequence: string, callback: (readKeys: string) => void, currentReadKeys?: (keys: string) => void, options?: {
+    requireEndCharacter?: boolean;
+}): (e: KeyboardEvent) => void;

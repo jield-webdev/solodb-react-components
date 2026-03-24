@@ -17,6 +17,7 @@ import {
   GoldsteinClientsDashboard,
   ReportResults,
   ChemicalIntakeElement,
+  ScannerProvider,
 } from "@jield/solodb-react-components";
 import { Route, Routes } from "react-router-dom";
 
@@ -120,7 +121,14 @@ export default function PageRoutes() {
             }
           />
         </Route>
-        <Route path={ROUTES.RUN.STEP} element={<RunStepHeaderElement />}>
+        <Route
+          path={ROUTES.RUN.STEP}
+          element={
+            <ScannerProvider>
+              <RunStepHeaderElement></RunStepHeaderElement>
+            </ScannerProvider>
+          }
+        >
           <Route index element={<RunStepExecuteElement />} />
         </Route>
       </Route>

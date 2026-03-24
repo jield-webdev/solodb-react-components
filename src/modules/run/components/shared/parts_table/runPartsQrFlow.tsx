@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
@@ -13,8 +13,7 @@ import {
   RunStepPartActionEnum,
 } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
-
-const SHOW_FINISH_PARTS = false;
+import { notification } from "@jield/solodb-react-components/utils/notification";
 
 type Props = {
   run: Run;
@@ -22,13 +21,9 @@ type Props = {
   runStepParts?: RunStepPart[];
   runParts?: RunPart[];
   refetchFn?: () => void;
-  toggleRunPartRef?: React.RefObject<{
-    setPart: (part: number) => void;
-    setPartByLabel: (label: string) => void;
-  } | null>;
 };
 
-const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () => {}, toggleRunPartRef }: Props) => {
+const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () => {} }: Props) => {
   const queryClient = useQueryClient();
   const queries = useQueries({
     queries: [
@@ -71,16 +66,40 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     [runPartsData, runStep.part_level]
   );
 
+  const [showCompletedParts, setShowCompletedParts] = useState<boolean>(false);
+
   // Use custom hooks for selection and actions
-  const { selectedParts } = usePartSelection({
+  const { selectedParts, selectAllParts } = usePartSelection({
     parts: leveledParts,
-    getPartId: (part) => part.id,
-    toggleRef: toggleRunPartRef,
   });
 
-  const partsToRender = useMemo(
-    () => leveledParts.filter((part) => selectedParts.get(part.id) && !isRunPartFinish(runStepPartsData, part)),
-    [selectedParts, runStepPartsData]
+  const prevSelectedPartsRef = useRef<Map<number, boolean>>(new Map());
+
+  useEffect(() => {
+    const prev = prevSelectedPartsRef.current;
+
+    const newlySelected = [...selectedParts.entries()]
+      .filter(([id, selected]) => selected && !prev.get(id))
+      .map(([id]) => id);
+
+    newlySelected.forEach((partId) => {
+      const part = leveledParts.find((p) => p.id === partId);
+      if (part && isRunPartFinish(runStepPartsData, part)) {
+        notification({
+          notificationHeader: "Part already finished",
+          notificationBody: `Part ${part.short_label} has already been processed`,
+          notificationType: "danger",
+        });
+      }
+    });
+
+    prevSelectedPartsRef.current = new Map(selectedParts);
+  }, [selectedParts, runStepPartsData, leveledParts]);
+
+  const partsToRender = useMemo(                        
+    () => leveledParts.filter((part) => selectedParts.get(part.id) && (showCompletedParts ||
+  !isRunPartFinish(runStepPartsData, part))),                                                                           
+    [leveledParts, selectedParts, runStepPartsData, showCompletedParts] 
   );
 
   const reloadData = () => {
@@ -116,21 +135,25 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
               runPart={runPart}
               runStepParts={runStepPartsData}
               refetchFn={reloadData}
-              key={i}
+              key={`${runPart.parsed_label}${i}` }
               partIsSelected={selectedParts.get(runPart.id) ?? false}
               dropdown={false}
             />
           ))}
         </tbody>
       </Table>
-      <DisplayStepPartsInfo runStepParts={runStepPartsData} selectedPartsLength={partsToRender.length} />
+      <DisplayStepPartsInfo
+        runStepParts={runStepPartsData}
+        selectedPartsLength={partsToRender.length}
+        totalParts={leveledParts.length}
+        onSelectAll={selectAllParts}
+        toggleShowCompletedParts={() => { setShowCompletedParts(!showCompletedParts); }}
+      />
     </React.Fragment>
   );
 };
 
 const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart): boolean => {
-  if (SHOW_FINISH_PARTS) return false;
-
   const stepPart = runStepParts.find((p) => p.part.id == part.id);
 
   if (stepPart === null || stepPart === undefined) return false;
@@ -141,9 +164,15 @@ const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart): boolean =>
 const DisplayStepPartsInfo = ({
   runStepParts,
   selectedPartsLength,
+  totalParts,
+  onSelectAll,
+  toggleShowCompletedParts,
 }: {
   runStepParts: RunStepPart[];
   selectedPartsLength: number;
+  totalParts: number;
+  onSelectAll: () => void;
+  toggleShowCompletedParts: () => void,
 }) => {
   const finishedParts = useMemo(() => {
     let counter = 0;
@@ -153,17 +182,28 @@ const DisplayStepPartsInfo = ({
     return counter;
   }, [runStepParts]);
 
-  const remainingParts = useMemo(() => runStepParts.length - selectedPartsLength, [runStepParts, selectedPartsLength]);
+  const remainingParts = useMemo(() => totalParts - selectedPartsLength, [totalParts, selectedPartsLength]);
 
   return (
     <div className="d-flex flex-column flex-sm-row flex-wrap gap-2 mt-2">
-      <span className="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fw-semibold">
+      <span
+        className="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fw-semibold"
+        role="button"
+        title="Show all the parts"
+        onClick={onSelectAll}
+        style={{ cursor: "pointer" }}
+      >
         This step has {remainingParts} more parts
       </span>
       <span className="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-2 fw-semibold">
         This step has {selectedPartsLength} scanned parts
       </span>
-      <span className="badge rounded-pill bg-success-subtle text-success-emphasis border border-success-subtle px-3 py-2 fw-semibold">
+      <span
+        title="Show all the parts"
+        style={{ cursor: "pointer" }}
+        onClick={toggleShowCompletedParts}
+        className="badge rounded-pill bg-success-subtle text-success-emphasis border border-success-subtle px-3 py-2 fw-semibold"
+      >
         This step has {finishedParts} finished parts
       </span>
     </div>
