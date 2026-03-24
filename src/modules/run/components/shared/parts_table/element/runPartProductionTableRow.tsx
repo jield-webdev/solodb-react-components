@@ -32,8 +32,6 @@ const RunStepPartProductionTableRow = (props: Props) => {
   const refetchFn = props.refetchFn ?? (() => {});
   const [runStepPart, setRunStepPart] = useState<RunStepPart | undefined>();
 
-  console.log("runStepPart", props.runStepParts);
-
   useEffect(() => {
     const match = props.runStepParts.find((sp) => sp.part.id === props.runPart.id);
     setRunStepPart(match);
@@ -129,7 +127,7 @@ const RunStepPartProductionTableRow = (props: Props) => {
   };
 
   if (!runStepPart) {
-     return null;
+    return null;
   }
 
   return (

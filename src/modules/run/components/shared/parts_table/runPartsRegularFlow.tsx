@@ -83,7 +83,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
   // Use custom hooks for selection and actions
   const { selectedParts, setPartAsSelected, setPartsSelection, selectAllParts, selectNoneParts, hasSelectedParts } =
     usePartSelection({
-      parts: stepParts,
+      parts: runStepPartsData,
     });
 
   useEffect(() => {
@@ -158,6 +158,8 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
     return <Alert variant={"warning"}>No step parts found for this run step.</Alert>;
   }
 
+  console.log(selectedParts);
+
   return (
     <Fragment>
       {runPartsData && runPartsData.length > 0 && (
@@ -182,7 +184,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
                       runStep={runStep}
                       runPart={runPart}
                       runStepParts={runStepPartsData}
-                      key={`key-${i}`}
+                      key={`key-${i}-${runPart.id}`}
                       canInit={run.run_type === RunTypeEnum.PRODUCTION}
                       refetchFn={effectiveRefetchFn}
                       partIsSelected={partIsSelected}
