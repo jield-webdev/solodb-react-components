@@ -2,14 +2,14 @@ import { createContext, useContext } from "react";
 
 export interface ScannerContext {
   readingKeys: string;
-  readedKeys: string;
+  readKeys: string;
   addCallbackFn: (id: string, fun: (readedKeys: string) => void) => void;
   removeCallbackFn: (id: string) => void;
 }
 
 export const ScannerContext = createContext<ScannerContext>({
   readingKeys: "",
-  readedKeys: "",
+  readKeys: "",
   addCallbackFn: () => {},
   removeCallbackFn: () => {},
 });

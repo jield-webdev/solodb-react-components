@@ -48,19 +48,15 @@ export const RunPartList = ({
   const getBadgeStatusClass = (runPart: RunPart): string => {
     const match = stepPartsById.get(runPart.id);
     if (!match) return "step-part-inactive";
-    if (match.part_processing_failed_in_previous_step) return "step-part-failed-other";
-    if (match.part.part_processing_failed) return "step-part-failed-other";
-    if (match.failed) return "step-part-failed";
-    if (match.processed) return "step-part-processed";
-    if (match.started) return "step-part-started";
-    return "step-part-inactive";
+
+    return match.status.class;
   };
 
   if (trays.length === 0) {
     const columnsPerRow = 12;
     const maxSlotIndex = Math.max(
       leveledParts.length,
-      leveledParts.reduce((maxValue, runPart) => Math.max(maxValue, runPart.left ?? 0), 0),
+      leveledParts.reduce((maxValue, runPart) => Math.max(maxValue, runPart.left ?? 0), 0)
     );
     const totalRows = Math.max(1, Math.ceil(maxSlotIndex / columnsPerRow));
     const totalColumns = columnsPerRow;

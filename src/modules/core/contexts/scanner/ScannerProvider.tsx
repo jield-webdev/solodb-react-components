@@ -34,7 +34,7 @@ export const ScannerProvider = ({ children }: { children: ReactElement }) => {
   return (
     <ScannerContext.Provider
       value={{
-        readedKeys,
+        readKeys: readedKeys,
         readingKeys,
         addCallbackFn,
         removeCallbackFn,

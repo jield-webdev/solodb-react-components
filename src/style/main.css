@@ -115,7 +115,7 @@
     padding: 0 6px;
     border-radius: var(--tray-cell-radius);
     color: #f8f9fa;
-    background: #3b4148;
+    /*background: #3b4148;*/
     text-align: center;
     line-height: 1;
 }

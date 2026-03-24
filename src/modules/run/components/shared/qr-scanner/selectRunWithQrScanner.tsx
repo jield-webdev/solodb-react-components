@@ -12,10 +12,10 @@ export default function NavigateInRunWithQrScanner({
   setRun: (run: Run) => void;
   setRunPartLabel?: (label: string) => void;
 }) {
-  const { readedKeys, readingKeys } = useContext(ScannerContext);
+  const { readKeys, readingKeys } = useContext(ScannerContext);
 
   useEffect(() => {
-    const normalizedRead = readedKeys.replace(/_/g, "-").toUpperCase();
+    const normalizedRead = readKeys.replace(/_/g, "-").toUpperCase();
     const runPartBadgeParsed = normalizedRead.split("-");
     if (!(runPartBadgeParsed.length == 4 || runPartBadgeParsed.length == 3)) {
       notification({
@@ -55,7 +55,7 @@ export default function NavigateInRunWithQrScanner({
       });
     }
     if (setRunPartLabel !== undefined) setRunPartLabel(runPartBadgeParsed[2]);
-  }, [readedKeys]);
+  }, [readKeys]);
 
   return (
     <div className="d-flex flex-row gap-3">

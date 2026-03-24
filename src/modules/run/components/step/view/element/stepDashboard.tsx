@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Alert, Card, Col, Container, Row } from "react-bootstrap";
 import StepLabel from "@jield/solodb-react-components/modules/run/components/step/view/element/stepLabel";
 import Process from "@jield/solodb-react-components/modules/run/components/step/view/element/process";
-import RunPartsResearchRun from "@jield/solodb-react-components/modules/run/components/shared/parts_table/runPartsResearchRun";
+import RunPartsRegularFlow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/runPartsRegularFlow";
 import RunStepChecklist from "@jield/solodb-react-components/modules/run/components/step/view/element/runStepChecklist";
 import StepRemark from "@jield/solodb-react-components/modules/run/components/step/view/element/stepRemark";
 import BatchCardElement from "@jield/solodb-react-components/modules/run/components/step/view/element/batchCardElement";
@@ -18,7 +18,6 @@ import { RunStepContext } from "@jield/solodb-react-components/modules/run/conte
 import MonitorCard from "@jield/solodb-react-components/modules/monitor/components/monitor/monitorCard";
 import Rework from "@jield/solodb-react-components/modules/run/components/step/view/element/rework";
 import { Link, useParams } from "react-router-dom";
-import RunPartsProductionRun from "@jield/solodb-react-components/modules/run/components/shared/parts_table/runPartsProductionRun";
 import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 import ReactMarkdown from "react-markdown";
 import { RunStepParametersTable } from "@jield/solodb-react-components/modules/run/components/shared/parameters/runStepParametersTable";
@@ -148,20 +147,16 @@ const StepDashboard = () => {
               <RequirementValuesByStep requirement={requirementQuery.data.items[0]} editOnly={false} />
             </>
           )}
-          {requirementQuery.data?.items.length != 1 && run.run_type === RunTypeEnum.RESEARCH && (
+          {requirementQuery.data?.items.length != 1 && (
             <>
-              <h3>Available parts</h3>
-              <RunPartsResearchRun run={run} runStep={runStep} />
+              <h3>Experimental split</h3>
+              <RunPartsRegularFlow run={run} runStep={runStep} />
             </>
           )}
-          {requirementQuery.data?.items.length != 1 && run.run_type === RunTypeEnum.PRODUCTION && (
-            <>
-              <h3>Available parts</h3>
-              <RunPartsProductionRun run={run} runStep={runStep} />
-            </>
-          )}
-          <span>Reading from scanner: {readingKeys}</span>
-          <Row className={"py-4"}>
+
+          <p className={"pt-3"}>Reading from scanner: {readingKeys}</p>
+
+          <Row className={"pm-3"}>
             <Col>
               <h3>Checklist</h3>
               <RunStepChecklist />

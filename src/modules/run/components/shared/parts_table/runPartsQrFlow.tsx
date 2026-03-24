@@ -14,6 +14,7 @@ import {
 } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
 import { notification } from "@jield/solodb-react-components/utils/notification";
+import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 
 type Props = {
   run: Run;
@@ -96,11 +97,14 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     prevSelectedPartsRef.current = new Map(selectedParts);
   }, [selectedParts, runStepPartsData, leveledParts]);
 
-  const partsToRender = useMemo(                        
-    () => leveledParts.filter((part) => selectedParts.get(part.id) && (showCompletedParts ||
-  !isRunPartFinish(runStepPartsData, part))),                                                                           
-    [leveledParts, selectedParts, runStepPartsData, showCompletedParts] 
+  const partsToRender = useMemo(
+    () =>
+      leveledParts.filter(
+        (part) => selectedParts.get(part.id) && (showCompletedParts || !isRunPartFinish(runStepPartsData, part))
+      ),
+    [leveledParts, selectedParts, runStepPartsData, showCompletedParts]
   );
+
 
   const reloadData = () => {
     // Reload the data
@@ -110,7 +114,7 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <LoadingComponent message={"Loading run parts"} />;
   }
   if (isError) {
     return <div className="text-danger">Error loading run parts.</div>;
@@ -121,11 +125,11 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
       <Table size={"sm"} striped hover>
         <thead>
           <tr>
-            <th>Part</th>
+            <th colSpan={2}>Part</th>
             <th>Status</th>
-            <th>Date</th>
-            <th>Actions</th>
+            <th>last update</th>
             <th>Comment</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -134,8 +138,9 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
               runStep={runStep}
               runPart={runPart}
               runStepParts={runStepPartsData}
+              canInit={false}
               refetchFn={reloadData}
-              key={`${runPart.parsed_label}${i}` }
+              key={`${runPart.parsed_label}${i}`}
               partIsSelected={selectedParts.get(runPart.id) ?? false}
               dropdown={false}
             />
@@ -147,7 +152,9 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
         selectedPartsLength={partsToRender.length}
         totalParts={leveledParts.length}
         onSelectAll={selectAllParts}
-        toggleShowCompletedParts={() => { setShowCompletedParts(!showCompletedParts); }}
+        toggleShowCompletedParts={() => {
+          setShowCompletedParts(!showCompletedParts);
+        }}
       />
     </React.Fragment>
   );
@@ -172,7 +179,7 @@ const DisplayStepPartsInfo = ({
   selectedPartsLength: number;
   totalParts: number;
   onSelectAll: () => void;
-  toggleShowCompletedParts: () => void,
+  toggleShowCompletedParts: () => void;
 }) => {
   const finishedParts = useMemo(() => {
     let counter = 0;
