@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Run } from "@jield/solodb-typescript-core";
 import { useScannerContext } from "../../core/contexts/scanner/ScannerContext";
+import { notification } from "@jield/solodb-react-components/index";
 
 export const enum FailStatus {
     RunNotFound = "Run not found"
@@ -27,6 +28,7 @@ export default function useSelectRunWithScanner({
       return;
     }
 
+    notification({notificationHeader: "Run scanner", notificationBody: `Run ${foundRun.label} found`, notificationType: "success"});
     setRun(foundRun); 
   }, [readedKeys]);
 

@@ -1,4 +1,4 @@
-import { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import { ScannerContext, useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import { notification } from "@jield/solodb-react-components/utils/notification";
 import { RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
@@ -25,7 +25,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
   const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
 
   // read keys from the scanner
-  const { readedKeys, addCallbackFn, removeCallbackFn } = useContext(ScannerContext);
+  const { readedKeys, addCallbackFn, removeCallbackFn } = useScannerContext();
   const callbackId = useId();
 
   //buffer to keep scanned keys if parts is empty
@@ -54,10 +54,10 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
       normalizedRead.includes(p?.short_label ? p?.short_label : p?.part?.short_label)
     );
 
-    if (!foundPart) return;
-
-    notification({notificationHeader: "Part scanner", notificationBody: `Found part: ${foundPart.id}`, notificationType: "success"});
-    console.log("asdf");
+    if (!foundPart) { 
+        notification({notificationHeader: "Part scanner", notificationBody: "Part not found", notificationType: "danger"});
+        return 
+    };
 
     setPartAsSelected(foundPart.id);
   };
@@ -95,7 +95,9 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
             .includes(p?.short_label ? p?.short_label : p?.part?.short_label)
         );
 
-        if (foundPart) setPartAsSelected(foundPart.id);
+        if (foundPart) {
+            setPartAsSelected(foundPart.id);
+        }
       });
 
       scannedKeysBuffer.current.clear();
@@ -103,6 +105,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
   }, [parts]);
 
   const setPartAsSelected = useCallback((partID: number) => {
+    notification({notificationHeader: "Part scanner", notificationBody: `Found part: ${partID}`, notificationType: "success"});
     setSelectedParts((prev) => {
       const next = new Map(prev);
       next.set(partID, !(prev.get(partID) ?? false));
