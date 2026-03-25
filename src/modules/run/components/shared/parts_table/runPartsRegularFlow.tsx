@@ -169,9 +169,9 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
               <tr>
                 <th colSpan={2}>Part</th>
                 <th>Status</th>
-                <th>last update</th>
-                <th>Comment</th>
                 <th>Actions</th>
+                <th>Comment</th>
+                <th>debug</th>
               </tr>
             </thead>
             <tbody>

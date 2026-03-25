@@ -133,7 +133,6 @@ const RunStepPartProductionTableRow = (props: Props) => {
   return (
     <tr onClick={handleRowClick} style={props.setPartAsSelected ? { cursor: "pointer" } : undefined}>
       <td>
-        <small className={"text-muted"}>{runStepPart.id}</small>
         {props.setPartAsSelected && (
           <input
             type="checkbox"
@@ -154,7 +153,6 @@ const RunStepPartProductionTableRow = (props: Props) => {
           <small className={"text-muted"}>{runStepPart.status.text}</small>
         </div>
       </td>
-      <td className={"text-muted"}>{formatDateTime(runStepPart.latest_action?.date_created, "DD-MM-YY HH:mm")}</td>
       <td>
         {props.dropdown && (
           <RunPartProductionActionsDropdown
@@ -169,6 +167,19 @@ const RunStepPartProductionTableRow = (props: Props) => {
       </td>
       <td>
         <RunStepPartComment runStepPart={runStepPart} setRunStepPart={onRunStepPartUpdated} />
+      </td>
+      <td>
+        <small className={"text-muted font-monospace"}>
+          id: {runStepPart.id}
+          <br />
+          level: {props.runStep.part_level}
+          <br />
+          label: {runStepPart.part.label}
+          <br />
+          short_label: {runStepPart.part.short_label}<br />
+          tray: {runStepPart.part.tray.id} ({runStepPart.part.tray.label})<br />
+          tray_column: {runStepPart.part.tray_column} | tray_row: {runStepPart.part.tray_row}
+        </small>
       </td>
     </tr>
   );
