@@ -3,14 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 import StepDetails from "@jield/solodb-react-components/modules/run/components/run/steps/element/stepDetails";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import {
-  Run,
-  RunStep,
-  RunPart,
-  RunStepPart,
-  Requirement,
-  EquipmentModule,
-} from "@jield/solodb-typescript-core";
+import { Run, RunStep, RunPart, RunStepPart, Requirement, EquipmentModule } from "@jield/solodb-typescript-core";
 import { RunPartList } from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartList";
 
 export default function StepInList({
@@ -45,7 +38,6 @@ export default function StepInList({
   return (
     <>
       <tr>
-        {/* toggle */}
         <td>
           <i
             className={"fa ms-2 " + (isExpanded ? "fa-chevron-down" : "fa-chevron-right")}
@@ -53,8 +45,6 @@ export default function StepInList({
             onClick={toggleExpand}
           />
         </td>
-
-        {/* parts */}
         <td
           className={
             stepModule.latest_module_status && stepModule.latest_module_status.status.is_down_status
@@ -72,8 +62,6 @@ export default function StepInList({
             }}
           />
         </td>
-
-        {/* misc status elements */}
         <td>
           {monitoredBy && (
             <OverlayTrigger
@@ -107,8 +95,6 @@ export default function StepInList({
             />
           </Link>{" "}
         </td>
-
-        {/* equipment */}
         <td>
           <Link to={`/${environment}/operator/equipment/${stepModule.equipment.id}`} className="me-2">
             {stepModule.equipment.name}
@@ -121,8 +107,6 @@ export default function StepInList({
           />
         </td>
       </tr>
-
-      {/* Details parts*/}
       {isExpanded && (
         <tr>
           <td colSpan={parts.length + 6}>
