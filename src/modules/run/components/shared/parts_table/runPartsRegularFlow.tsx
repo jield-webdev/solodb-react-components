@@ -67,11 +67,6 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
     finishStepWhenAllPartsAreFinished(runStep, partsToVerify);
   }, [runStepParts, runStepPartsQuery.data]);
 
-  const leveledParts = useMemo(
-    () => runPartsData.filter((part) => part.part_level === runStep.part_level),
-    [runPartsData, runStep.part_level]
-  );
-
   useEffect(() => {
     if (runStepParts) {
       setStepParts(runStepParts);
@@ -103,6 +98,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
   });
 
   const availableActions = useMemo(() => getAvailableActionsForSelection(), [getAvailableActionsForSelection]);
+
   const traySelections = useMemo(() => {
     const trayPartsMap = new Map<number, { id: number; label: string; partIds: number[] }>();
 
@@ -157,8 +153,6 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
   if (runStepPartsData.length === 0) {
     return <Alert variant={"warning"}>No step parts found for this run step.</Alert>;
   }
-
-  console.log(selectedParts);
 
   return (
     <Fragment>

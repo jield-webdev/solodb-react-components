@@ -38,6 +38,7 @@ export const RunPartList = ({
   }, new Map());
 
   const allowCreate = run.run_type === RunTypeEnum.PRODUCTION;
+  const isSplitLevel = step.part_level > 0;
   const { data: selectedPartIds = [] } = useQuery<number[]>({
     queryKey: ["runPartSelection", step.id],
     queryFn: async () => [],
@@ -52,6 +53,29 @@ export const RunPartList = ({
     return match.status.class;
   };
 
+  const renderMultiPartCell = (runParts: RunPart[], key: string) => {
+    const cellClassName = `tray-grid__cell${runParts.length ? "" : " tray-grid__cell--empty"}${
+      runParts.length > 1 ? " tray-grid__cell--multi" : ""
+    }`;
+
+    return (
+      <div key={key} className={cellClassName}>
+        {runParts.map((runPart) => (
+          <RunPartIndicator
+            key={runPart.id}
+            runPart={runPart}
+            statusClass={getBadgeStatusClass(runPart)}
+            allowCreate={allowCreate}
+            hasStepPart={stepPartsById.has(runPart.id)}
+            isSelected={selectedPartIds.includes(runPart.id)}
+            runStep={step}
+            reloadFn={reloadFn}
+          />
+        ))}
+      </div>
+    );
+  };
+
   if (trays.length === 0) {
     const columnsPerRow = 12;
     const maxSlotIndex = Math.max(
@@ -64,41 +88,69 @@ export const RunPartList = ({
       "--tray-columns": totalColumns,
       "--tray-rows": totalRows,
     } as CSSProperties;
-    const slots = Array.from({ length: totalRows * totalColumns }, () => null as RunPart | null);
+    const slots = Array.from({ length: totalRows * totalColumns }, () => [] as RunPart[]);
     const unassigned: RunPart[] = [];
 
     leveledParts.forEach((runPart) => {
       const column = runPart.left;
       const slotIndex = column >= 1 && column <= slots.length ? column - 1 : null;
-      if (slotIndex !== null && !slots[slotIndex]) {
-        slots[slotIndex] = runPart;
+      if (slotIndex !== null) {
+        if (isSplitLevel) {
+          slots[slotIndex].push(runPart);
+          return;
+        }
+        if (!slots[slotIndex].length) {
+          slots[slotIndex].push(runPart);
+          return;
+        }
       } else {
         unassigned.push(runPart);
       }
     });
 
     unassigned.forEach((runPart) => {
-      const nextIndex = slots.findIndex((slot) => !slot);
+      if (isSplitLevel) {
+        const nextIndex = slots.reduce((bestIndex, slot, index) => {
+          if (bestIndex === -1 || slot.length < slots[bestIndex].length) {
+            return index;
+          }
+          return bestIndex;
+        }, -1);
+        if (nextIndex !== -1) {
+          slots[nextIndex].push(runPart);
+        }
+        return;
+      }
+
+      const nextIndex = slots.findIndex((slot) => slot.length === 0);
       if (nextIndex !== -1) {
-        slots[nextIndex] = runPart;
+        slots[nextIndex].push(runPart);
       }
     });
 
     return (
       <div className="tray-grid" data-orientation="ltr" style={trayStyle}>
-        {slots.map((runPart, slotIndex) => (
-          <RunPartIndicator
-            key={`slot-no-tray-${slotIndex}`}
-            runPart={runPart}
-            statusClass={runPart ? getBadgeStatusClass(runPart) : undefined}
-            withTrayCell
-            allowCreate={allowCreate}
-            hasStepPart={runPart ? stepPartsById.has(runPart.id) : false}
-            isSelected={runPart ? selectedPartIds.includes(runPart.id) : false}
-            runStep={step}
-            reloadFn={reloadFn}
-          />
-        ))}
+        {slots.map((runParts, slotIndex) => {
+          if (isSplitLevel) {
+            return renderMultiPartCell(runParts, `slot-no-tray-${slotIndex}`);
+          }
+
+          const runPart = runParts[0] ?? null;
+
+          return (
+            <RunPartIndicator
+              key={`slot-no-tray-${slotIndex}`}
+              runPart={runPart}
+              statusClass={runPart ? getBadgeStatusClass(runPart) : undefined}
+              withTrayCell
+              allowCreate={allowCreate}
+              hasStepPart={runPart ? stepPartsById.has(runPart.id) : false}
+              isSelected={runPart ? selectedPartIds.includes(runPart.id) : false}
+              runStep={step}
+              reloadFn={reloadFn}
+            />
+          );
+        })}
       </div>
     );
   }
@@ -145,20 +197,31 @@ export const RunPartList = ({
           "--tray-columns": trayType.columns,
           "--tray-rows": trayType.rows,
         } as CSSProperties;
-        const slots = Array.from({ length: trayCapacity }, () => null as RunPart | null);
+        const slots = Array.from({ length: trayCapacity }, () => [] as RunPart[]);
         const trayParts = partsByTrayId.get(tray.id) ?? [];
 
         trayParts.forEach((runPart) => {
           const slotIndex = getSlotIndex(trayType, runPart.tray_row, runPart.tray_column);
-          if (slotIndex === null || slots[slotIndex]) return;
-          slots[slotIndex] = runPart;
+          if (slotIndex === null) return;
+          if (isSplitLevel) {
+            slots[slotIndex].push(runPart);
+            return;
+          }
+          if (!slots[slotIndex].length) {
+            slots[slotIndex].push(runPart);
+          }
         });
 
         return (
           <div key={`tray-${tray.id}`} className="tray-grid-wrapper">
             <div className="tray-grid__label">{tray.name ?? tray.label}</div>
             <div className="tray-grid" data-orientation={trayOrientation} style={trayStyle}>
-              {slots.map((runPart, slotIndex) => {
+              {slots.map((runParts, slotIndex) => {
+                if (isSplitLevel) {
+                  return renderMultiPartCell(runParts, `slot-${tray.id}-${slotIndex}`);
+                }
+
+                const runPart = runParts[0] ?? null;
                 const statusClass = runPart ? getBadgeStatusClass(runPart) : undefined;
 
                 return (

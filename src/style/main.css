@@ -91,6 +91,12 @@
     padding: 0;
 }
 
+.tray-grid__cell--multi {
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
 .tray-grid__cell--empty {
     background: transparent;
 }
