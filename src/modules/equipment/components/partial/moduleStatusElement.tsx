@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form"; // react-hook-form for managing form
 import axios from "axios"; // axios for server calls
 import { Badge, Button, Form, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { EquipmentModule, EquipmentModuleStatus, EquipmentStatus, listEquipmentStatus } from "@jield/solodb-typescript-core";
+import {
+  EquipmentModule,
+  EquipmentModuleStatus,
+  EquipmentStatus,
+  listEquipmentStatus,
+} from "@jield/solodb-typescript-core";
 
 type Inputs = {
   status: string;
@@ -11,7 +16,13 @@ type Inputs = {
   email_trained_users: boolean;
 };
 
-export default function ModuleStatusElement({ module, refetchFn = () => {} }: { module: EquipmentModule; refetchFn?: () => void;  }) {
+export default function ModuleStatusElement({
+  module,
+  refetchFn = () => {},
+}: {
+  module: EquipmentModule;
+  refetchFn?: () => void;
+}) {
   const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [formState, setFormState] = useState<string>("Save");
   const [statusOptions, setStatusOptions] = useState<EquipmentStatus[]>([]); // State for status options

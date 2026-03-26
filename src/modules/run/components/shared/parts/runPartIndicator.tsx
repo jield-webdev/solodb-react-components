@@ -50,7 +50,7 @@ const RunPartIndicator = ({
           className="tray-grid__badge tray-grid__badge--init"
           onClick={createRunStepPart}
         >
-          Init {runPart.label ?? runPart.short_label}
+          Init {runPart.scanner_label}
         </Button>
       );
     }
@@ -59,7 +59,7 @@ const RunPartIndicator = ({
       isSelected ? " step-part-selected" : ""
     }`;
 
-    return <span className={badgeClassName}>{runPart.label ?? runPart.short_label}</span>;
+    return <span className={badgeClassName}>{runPart.scanner_label}</span>;
   })();
 
   if (!withTrayCell) return badgeContent;

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Button, Dropdown } from "react-bootstrap";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
-import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
+import RunPartProductionActionsDropdown from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsDropdown";
 import {
   performRunStepPartAction,
   RunStepPartActionEnum,
@@ -12,51 +11,52 @@ import {
   RunStep,
 } from "@jield/solodb-typescript-core";
 import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
+import RunPartProductionActionsButtons from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsButtons";
 
-const RunStepPartProductionTableRow = ({
-  runPart,
-  runStepParts,
-  runStep,
-  refetchFn = () => {},
-  partIsSelected,
-  setPartAsSelected,
-  dropdown = true,
-  layout = "default",
-  onRunStepPartUpdated,
-}: {
+type Props = {
   runPart: RunPart;
-  runStepParts: RunStepPart[];
-  runStep: RunStep;
-  refetchFn?: () => void;
   partIsSelected?: boolean;
   setPartAsSelected?: (partID: number) => void;
-  dropdown?: boolean;
-  layout?: "default" | "research";
+  runStepParts: RunStepPart[];
+  canInit: boolean;
+  runStep: RunStep;
+  refetchFn?: () => void;
+  dropdown: boolean;
   onRunStepPartUpdated?: (runStepPart: RunStepPart) => void;
-}) => {
-  const [runStepPart, setRunStepPart] = useState<RunStepPart | undefined>(undefined);
+};
+
+const RunStepPartProductionTableRow = (props: Props) => {
   const queryClient = useQueryClient();
+  const refetchFn = props.refetchFn ?? (() => {});
+  const [runStepPart, setRunStepPart] = useState<RunStepPart | undefined>();
 
   useEffect(() => {
-    const nextRunStepPart = runStepParts.find(
-      (runStepPart: RunStepPart) => runStepPart.part.id === runPart.id && runStepPart.step.id === runStep.id
-    );
-    if (!nextRunStepPart) {
-      setRunStepPart(undefined);
+    const match = props.runStepParts.find((sp) => sp.part.id === props.runPart.id);
+    setRunStepPart(match);
+  }, [props.runStepParts, props.runPart.id]);
+
+  const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
+    if (!props.setPartAsSelected) {
       return;
     }
-    setRunStepPart((current) => {
-      if (!current) {
-        return nextRunStepPart;
-      }
-      if ((nextRunStepPart.actions ?? 0) >= (current.actions ?? 0)) {
-        return nextRunStepPart;
-      }
-      return current;
-    });
-  }, [runStepParts, runPart, runStep]);
+
+    const target = event.target as HTMLElement;
+    if (target.closest("button, a, input, textarea, select, option, label")) {
+      return;
+    }
+
+    const partId = runStepPart ? runStepPart.part.id : props.runPart.id;
+    if (partId !== undefined) {
+      props.setPartAsSelected(partId);
+    }
+  };
 
   const createRunStepPart = () => {
+    if (props.canInit) {
+      return;
+    }
+
+    const { runPart, runStep, onRunStepPartUpdated } = props as Props;
     axios
       .post("/create/run/step/part", {
         run_part_id: runPart.id,
@@ -77,438 +77,114 @@ const RunStepPartProductionTableRow = ({
       });
   };
 
-  const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
-    if (!setPartAsSelected) {
-      return;
-    }
-
-    const target = event.target as HTMLElement;
-    if (target.closest("button, a, input, textarea, select, option, label")) {
-      return;
-    }
-
-    setPartAsSelected(runPart.id);
-  };
-
-  const performAction = ({
-    runStepPart,
+  const setRunStepPartAction = async ({
+    runStepPart: targetStepPart,
     runStepPartAction,
   }: {
     runStepPart: RunStepPart;
     runStepPartAction: RunStepPartActionEnum;
   }) => {
-    performRunStepPartAction(runStepPart, runStepPartAction)
-      .then((response) => {
-        const latestAction = response as unknown as RunStepPart["latest_action"];
-        setRunStepPart((current) => {
-          if (!current) {
-            return current;
-          }
-          const updatedRunStepPart = {
-            ...current,
-            latest_action: latestAction,
-            actions: current.actions + 1,
-          };
-          updateRunStepPartCache(queryClient, {
-            runStepPart: updatedRunStepPart,
-            action: runStepPartAction,
-            latestAction,
-          });
-          if (onRunStepPartUpdated) {
-            onRunStepPartUpdated(updatedRunStepPart);
-          }
-          return updatedRunStepPart;
-        });
-      })
-      .then(() => {
-        //Invalidate the query so we can fetch the new data
-        refetchFn();
-        queryClient.invalidateQueries({
-          queryKey: ["runSteps"],
-        });
+    const latestAction = (await performRunStepPartAction(
+      targetStepPart,
+      runStepPartAction
+    )) as RunStepPart["latest_action"];
+
+    setRunStepPart((current) => {
+      if (!current) {
+        return current;
+      }
+      const updatedStepPart = {
+        ...current,
+        latest_action: latestAction,
+        actions: current.actions + 1,
+      };
+      updateRunStepPartCache(queryClient, {
+        runStepPart: updatedStepPart,
+        action: runStepPartAction,
+        latestAction,
       });
+      const { onRunStepPartUpdated } = props as Props;
+      if (onRunStepPartUpdated) {
+        onRunStepPartUpdated(updatedStepPart);
+      }
+      return updatedStepPart;
+    });
+
+    refetchFn();
+    queryClient.invalidateQueries({
+      queryKey: ["runSteps"],
+    });
+  };
+
+  const onRunStepPartUpdated = (nextStepPart: RunStepPart) => {
+    setRunStepPart(nextStepPart);
+    const { onRunStepPartUpdated: onUpdated } = props as Props;
+    if (onUpdated) {
+      onUpdated(nextStepPart);
+    }
   };
 
   if (!runStepPart) {
-    if (layout === "research") {
-      return (
-        <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}>
-          <td></td>
-          <td>
-            <div className={"d-flex align-items-center gap-2"}>
-              <div className={"fw-semibold"}>
-                {runPart.label || runPart.short_label}
-              </div>
-              {setPartAsSelected && (
-                <input
-                  type="checkbox"
-                  id={`part-select-${runPart.id}`}
-                  name="tomato"
-                  className={"form-check-input m-0"}
-                  checked={partIsSelected}
-                  onChange={() => {
-                    setPartAsSelected(runPart.id);
-                  }}
-                />
-              )}
-            </div>
-          </td>
-          <td>
-            <div className={"d-flex justify-content-between gap-1"}>
-              <div className={"d-flex flex-column align-items-start gap-1"}>
-                <Badge bg={"secondary"}>Not initialized</Badge>
-                <small className={"text-muted"}>No actions yet</small>
-              </div>
-              <div>
-                <Button size={"sm"} variant={"outline-info"} onClick={() => createRunStepPart()}>
-                  Init
-                </Button>
-              </div>
-            </div>
-          </td>
-          <td></td>
-        </tr>
-      );
-    }
-
-    return (
-      <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}>
-        <td>
-          <div className={"d-flex align-items-center gap-2"}>
-            <div className={"fw-semibold"}>
-              {runPart.label || runPart.short_label}
-            </div>
-            {setPartAsSelected && (
-              <input
-                type="checkbox"
-                id={`part-select-${runPart.id}`}
-                name="tomato"
-                className={"form-check-input m-0"}
-                checked={partIsSelected}
-                onChange={() => {
-                  setPartAsSelected(runPart.id);
-                }}
-              />
-            )}
-          </div>
-        </td>
-        <td>
-          <div className={"d-flex flex-column align-items-start gap-1"}>
-            <Badge bg={"secondary"}>Not initialized</Badge>
-            <small className={"text-muted"}>No actions yet</small>
-          </div>
-        </td>
-        <td className={"text-muted"}>-</td>
-        <td>
-          <Button size={"sm"} variant={"outline-info"} onClick={() => createRunStepPart()}>
-            Init
-          </Button>
-        </td>
-        <td></td>
-      </tr>
-    );
+    return null;
   }
 
-  const isProcessed = runStepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
-  const isFailed = runStepPart.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING;
-  const rowClassName = runStepPart.part.part_processing_failed
-    ? "table-danger"
-    : runStepPart.part_processing_failed_in_previous_step
-    ? "table-danger"
-    : isProcessed
-      ? "table-success"
-      : isFailed
-        ? "table-danger"
-        : "";
-  const statusMeta = (() => {
-    if (runStepPart.part.part_processing_failed) {
-      return { label: "Blocked", variant: "danger", description: "Failed in an other step" };
-    }
-    if (runStepPart.part_processing_failed_in_previous_step) {
-      return { label: "Blocked", variant: "danger", description: "Failed in previous step" };
-    }
-    if (runStepPart.actions === 0) {
-      return { label: "Not started", variant: "secondary", description: "No actions yet" };
-    }
-    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.START_PROCESSING) {
-      return { label: "In progress", variant: "primary", description: "Processing started" };
-    }
-    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING) {
-      return { label: "Completed", variant: "success", description: "Processing finished" };
-    }
-    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.FAILED_PROCESSING) {
-      return { label: "Failed", variant: "danger", description: "Processing failed" };
-    }
-    if (runStepPart.latest_action?.type.id === RunStepPartActionEnum.REWORK) {
-      return { label: "Rework", variant: "warning", description: "Needs rework" };
-    }
-    return { label: "Unknown", variant: "secondary", description: "No status available" };
-  })();
-
-  if (layout === "research") {
-    return (
-      <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}>
-        <td className={rowClassName}></td>
-        <td>
-          <div className={"d-flex align-items-center gap-2"}>
-            <div className={"fw-semibold"}>
-              {runStepPart.part.label || runStepPart.part.short_label}
-            </div>
-            {setPartAsSelected && (
-              <>
-                <input
-                  type="checkbox"
-                  id={`part-select-${runStepPart.part.id}`}
-                  name="tomato"
-                  className={"form-check-input m-0"}
-                  checked={partIsSelected}
-                  onChange={() => {
-                    setPartAsSelected(runPart.id);
-                  }}
-                />
-                <label className={"visually-hidden"} htmlFor={`part-select-${runStepPart.part.id}`}>
-                  Select part
-                </label>
-              </>
-            )}
-          </div>
-        </td>
-        <td>
-          <div className={"d-flex justify-content-between gap-1"}>
-            <div>
-              <Badge bg={statusMeta.variant}>{statusMeta.label}</Badge>
-              <small className={"text-muted ms-2"}>{statusMeta.description}</small>
-            </div>
-            <div>
-              <ActionsButtons runStepPart={runStepPart} setRunStepPartAction={performAction} />
-            </div>
-          </div>
-        </td>
-        <td>
-          <RunStepPartComment
-            runStepPart={runStepPart}
-            setRunStepPart={(nextStepPart) => {
-              setRunStepPart(nextStepPart);
-              if (onRunStepPartUpdated) {
-                onRunStepPartUpdated(nextStepPart);
-              }
+  return (
+    <tr onClick={handleRowClick} style={props.setPartAsSelected ? { cursor: "pointer" } : undefined}>
+      <td>
+        {props.setPartAsSelected && (
+          <input
+            type="checkbox"
+            id={`part-select-${runStepPart.part.id}`}
+            name="tomato"
+            className={"form-check-input"}
+            checked={props.partIsSelected}
+            onChange={() => {
+              props.setPartAsSelected?.(runStepPart.part.id);
             }}
           />
-        </td>
-      </tr>
-    );
-  }
-
-  return (
-    <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined} className={rowClassName}>
+        )}
+      </td>
+      <td>{props.runPart.scanner_label}</td>
       <td>
-        <div className={"d-flex align-items-center gap-2"}>
-          <div className={"fw-semibold"}>
-            Part {runStepPart.part.short_label}
-            {runStepPart.part.label && runStepPart.part.label.trim().length > 0 ? ` (${runStepPart.part.label})` : ""}
-          </div>
-          {setPartAsSelected && (
-            <>
-              <input
-                type="checkbox"
-                id={`part-select-${runStepPart.part.id}`}
-                name="tomato"
-                className={"form-check-input m-0"}
-                checked={partIsSelected}
-                onChange={() => {
-                  setPartAsSelected(runPart.id);
-                }}
-              />
-              <label className={"visually-hidden"} htmlFor={`part-select-${runStepPart.part.id}`}>
-                Select part
-              </label>
-            </>
-          )}
+        <div className={"d-flex align-items-start gap-1"}>
+          <span className={`badge ${runStepPart.status.class ?? ""}`.trim()}>{runStepPart.status.key}</span>
+          <small className={"text-muted"}>{runStepPart.status.text}</small>
         </div>
       </td>
       <td>
-        <div className={"d-flex flex-column align-items-start gap-1"}>
-          <Badge bg={statusMeta.variant}>{statusMeta.label}</Badge>
-          <small className={"text-muted"}>{statusMeta.description}</small>
-        </div>
-      </td>
-      <td>
-        <span className={"text-muted"}>
-          {formatDateTime(runStepPart.latest_action?.date_created, "DD-MM-YY HH:mm")}
-        </span>
-      </td>
-      <td>
-        {dropdown ? (
-          <ActionsDropdown runStepPart={runStepPart} setRunStepPartAction={performAction} />
-        ) : (
-          <ActionsButtons runStepPart={runStepPart} setRunStepPartAction={performAction} />
+        {props.dropdown && (
+          <RunPartProductionActionsDropdown
+            runStepPart={runStepPart}
+            setRunStepPartAction={setRunStepPartAction}
+            createRunStepPart={createRunStepPart}
+          />
+        )}
+        {!props.dropdown && (
+          <RunPartProductionActionsButtons runStepPart={runStepPart} setRunStepPartAction={setRunStepPartAction} />
         )}
       </td>
       <td>
-        <RunStepPartComment
-          runStepPart={runStepPart}
-          setRunStepPart={(nextStepPart) => {
-            setRunStepPart(nextStepPart);
-            if (onRunStepPartUpdated) {
-              onRunStepPartUpdated(nextStepPart);
-            }
-          }}
-        />
+        <RunStepPartComment runStepPart={runStepPart} setRunStepPart={onRunStepPartUpdated} />
       </td>
+      {/*<td>*/}
+      {/*  <small className={"text-muted font-monospace"}>*/}
+      {/*    part id: {runStepPart.part.id}*/}
+      {/*    <br />*/}
+      {/*    run step part id: {runStepPart.id}*/}
+      {/*    <br />*/}
+      {/*    level: {props.runStep.part_level}*/}
+      {/*    <br />*/}
+      {/*    label: {runStepPart.part.label}*/}
+      {/*    <br />*/}
+      {/*    parsed_label: {runStepPart.part.parsed_label}*/}
+      {/*    <br />*/}
+      {/*    short_label: {runStepPart.part.short_label}*/}
+      {/*    <br />*/}
+      {/*    tray: {runStepPart.part.tray?.id} ({runStepPart.part.tray?.label})<br />*/}
+      {/*    tray_column: {runStepPart.part.tray_column} | tray_row: {runStepPart.part.tray_row}*/}
+      {/*  </small>*/}
+      {/*</td>*/}
     </tr>
-  );
-};
-
-const ActionsButtons = ({
-  runStepPart,
-  setRunStepPartAction,
-}: {
-  runStepPart: RunStepPart;
-  setRunStepPartAction: ({
-    runStepPart,
-    runStepPartAction,
-  }: {
-    runStepPart: RunStepPart;
-    runStepPartAction: RunStepPartActionEnum;
-  }) => void;
-}) => {
-  return (
-    <div className={"d-flex justify-content-between gap-1"}>
-      <div className={"d-flex gap-2"}>
-        {runStepPart.actions === 0 && (
-          <Button
-            onClick={() =>
-              setRunStepPartAction({
-                runStepPart: runStepPart,
-                runStepPartAction: RunStepPartActionEnum.START_PROCESSING,
-              })
-            }
-            className={"btn-success btn-sm"}
-          >
-            Start
-          </Button>
-        )}
-        {runStepPart.actions > 0 &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-            <Button
-              onClick={() =>
-                setRunStepPartAction({
-                  runStepPart: runStepPart,
-                  runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
-                })
-              }
-              className={"btn-primary btn-sm"}
-            >
-              Finish
-            </Button>
-          )}
-        {runStepPart.actions > 0 &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-            <Button
-              onClick={() =>
-                setRunStepPartAction({
-                  runStepPart: runStepPart,
-                  runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
-                })
-              }
-              className={"btn-danger btn-sm"}
-            >
-              Failed
-            </Button>
-          )}
-        {runStepPart.actions > 0 && runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING && (
-          <Button
-            size={"sm"}
-            onClick={() =>
-              setRunStepPartAction({
-                runStepPart: runStepPart,
-                runStepPartAction: RunStepPartActionEnum.REWORK,
-              })
-            }
-          >
-            Rework
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const ActionsDropdown = ({
-  runStepPart,
-  setRunStepPartAction,
-}: {
-  runStepPart: RunStepPart;
-  setRunStepPartAction: ({
-    runStepPart,
-    runStepPartAction,
-  }: {
-    runStepPart: RunStepPart;
-    runStepPartAction: RunStepPartActionEnum;
-  }) => void;
-}) => {
-  return (
-    <Dropdown align="end">
-      <Dropdown.Toggle size="sm" variant="outline-secondary">
-        Actions
-      </Dropdown.Toggle>
-      <Dropdown.Menu>
-        {runStepPart.actions === 0 && (
-          <Dropdown.Item
-            onClick={() =>
-              setRunStepPartAction({
-                runStepPart: runStepPart,
-                runStepPartAction: RunStepPartActionEnum.START_PROCESSING,
-              })
-            }
-          >
-            Start
-          </Dropdown.Item>
-        )}
-        {runStepPart.actions > 0 &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-            <Dropdown.Item
-              onClick={() =>
-                setRunStepPartAction({
-                  runStepPart: runStepPart,
-                  runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
-                })
-              }
-            >
-              Finish
-            </Dropdown.Item>
-          )}
-        {runStepPart.actions > 0 &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-            <Dropdown.Item
-              onClick={() =>
-                setRunStepPartAction({
-                  runStepPart: runStepPart,
-                  runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
-                })
-              }
-            >
-              Failed
-            </Dropdown.Item>
-          )}
-        {runStepPart.actions > 0 && (
-          <Dropdown.Item
-            onClick={() =>
-              setRunStepPartAction({
-                runStepPart: runStepPart,
-                runStepPartAction: RunStepPartActionEnum.REWORK,
-              })
-            }
-          >
-            Rework
-          </Dropdown.Item>
-        )}
-      </Dropdown.Menu>
-    </Dropdown>
   );
 };
 

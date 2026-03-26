@@ -3,8 +3,7 @@ import { Card, Col, Row } from "react-bootstrap";
 import { RunStepParametersTable } from "@jield/solodb-react-components/modules/run/components/shared/parameters/runStepParametersTable";
 import { EmphasizedParametersContext } from "@jield/solodb-react-components/modules/run/contexts/emphasizedParametersContext";
 import UploadFilesToStep from "@jield/solodb-react-components/modules/run/components/shared/files/uploadFilesToStep";
-import RunPartsResearchRun from "@jield/solodb-react-components/modules/run/components/shared/parts_table/runPartsResearchRun";
-import RunPartsProductionRun from "@jield/solodb-react-components/modules/run/components/shared/parts_table/runPartsProductionRun";
+import RunPartsRegularFlow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/runPartsRegularFlow";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 import { RunStep, RunStepPart, RunPart, RunTypeEnum, Run } from "@jield/solodb-typescript-core";
 
@@ -34,27 +33,15 @@ export default function StepDetails({
       <Card.Body>
         <Row>
           <Col md="6">
-            {resolvedRun.run_type === RunTypeEnum.RESEARCH && (
-              <RunPartsResearchRun
-                run={resolvedRun}
-                runStep={step}
-                runStepParts={stepParts}
-                refetchFn={() => {
-                  refetchFn(["runStepParts"]);
-                }}
-              />
-            )}
-            {resolvedRun.run_type === RunTypeEnum.PRODUCTION && (
-              <RunPartsProductionRun
-                run={resolvedRun}
-                runStep={step}
-                runParts={parts}
-                refetchFn={() => {
-                  refetchFn(["runStepParts"]);
-                }}
-              />
-            )}
-
+            <h4>Experimental split</h4>
+            <RunPartsRegularFlow
+              run={resolvedRun}
+              runStep={step}
+              runStepParts={stepParts}
+              refetchFn={() => {
+                refetchFn(["runStepParts"]);
+              }}
+            />
             {step.has_remark && (
               <>
                 <h4>Remark</h4>

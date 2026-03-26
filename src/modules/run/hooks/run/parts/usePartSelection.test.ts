@@ -143,10 +143,11 @@ describe("usePartSelection", () => {
         ScannerContext.Provider,
         {
           value: {
-            readedKeys,
-            readingKeys: "",
+            lastlyReadedKeys: readedKeys,
             addCallbackFn: vi.fn(),
             removeCallbackFn: vi.fn(),
+            addReadingCallbackFn: vi.fn(),
+            removeReadingCallbackFn: vi.fn(),
           },
         },
         createElement(Inner, { parts, onChange })

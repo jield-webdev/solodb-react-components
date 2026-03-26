@@ -91,6 +91,12 @@
     padding: 0;
 }
 
+.tray-grid__cell--multi {
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
 .tray-grid__cell--empty {
     background: transparent;
 }
@@ -115,7 +121,7 @@
     padding: 0 6px;
     border-radius: var(--tray-cell-radius);
     color: #f8f9fa;
-    background: #3b4148;
+    /*background: #3b4148;*/
     text-align: center;
     line-height: 1;
 }

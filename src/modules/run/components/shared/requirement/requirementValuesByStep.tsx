@@ -2,7 +2,12 @@ import { Button } from "react-bootstrap";
 import { FillValueModal } from "./fillValueModal";
 import { useEffect, useState } from "react";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { Requirement, MeasurementResult, MeasurementResultValue, listMeasurementResults } from "@jield/solodb-typescript-core";
+import {
+  Requirement,
+  MeasurementResult,
+  MeasurementResultValue,
+  listMeasurementResults,
+} from "@jield/solodb-typescript-core";
 
 export default function RequirementValuesByStep({
   requirement,
@@ -83,7 +88,7 @@ export default function RequirementValuesByStep({
       ? !(target.min_value <= val && target.max_value >= val)
       : !(target.min_value < val && target.max_value > val);
 
-    return failed ? "table-danger" : "";
+    return failed ? "table-danger text-light" : "";
   };
 
   return (
@@ -111,9 +116,9 @@ export default function RequirementValuesByStep({
             </thead>
             <tbody>
               {result.values.map((value) => (
-                <tr key={`value:${value.id}`} className={value ? getRowStatusClass(value) : ""}>
+                <tr key={`value:${value.id}`}>
                   <td>{value.logging_parameter.name}</td>
-                  <td>{value.string_value}</td>
+                  <td className={value ? getRowStatusClass(value) : ""}>{value.string_value}</td>
                   <td>{value.logging_parameter.unit?.abbr ?? ""}</td>
                 </tr>
               ))}

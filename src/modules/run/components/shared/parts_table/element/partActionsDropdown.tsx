@@ -11,7 +11,7 @@ export interface PartActionsDropdownProps {
 /**
  * Dropdown component for bulk part actions
  *
- * Renders a dropdown menu with available actions (Start, Finish, Failed, Rework)
+ * Renders a dropdown menu with available actions (Start, Finish, Failed, Repair, Testing, Rework)
  * and optionally an Init action for production runs.
  */
 export const PartActionsDropdown = ({
@@ -55,6 +55,18 @@ export const PartActionsDropdown = ({
             onClick={() => onActionSelected(RunStepPartActionEnum.FAILED_PROCESSING)}
           >
             Failed
+          </Dropdown.Item>
+        )}
+
+        {availableActions.has(RunStepPartActionEnum.REPAIR) && (
+          <Dropdown.Item onClick={() => onActionSelected(RunStepPartActionEnum.REPAIR)}>
+            Repair
+          </Dropdown.Item>
+        )}
+
+        {availableActions.has(RunStepPartActionEnum.TESTING) && (
+          <Dropdown.Item onClick={() => onActionSelected(RunStepPartActionEnum.TESTING)}>
+            Testing
           </Dropdown.Item>
         )}
 
