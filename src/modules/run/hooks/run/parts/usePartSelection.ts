@@ -65,7 +65,6 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
       const foundPart = parts.find((p) => normalizedRead.includes(p.short_label));
 
       if (!foundPart) {
-        console.log(normalizedRead);
         notification({
           notificationHeader: "Part scanner",
           notificationBody: "Part not found",
