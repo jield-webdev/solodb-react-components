@@ -16,10 +16,10 @@ export default function useSelectRunWithScanner({
 }): { selectedRun: Run | null } {
   const [run, setRun] = useState<Run | null>(null);
 
-  const { readKeys } = useScannerContext();
+  const { lastlyReadedKeys } = useScannerContext();
 
   useEffect(() => {
-    const normalizedRead = readKeys.replace(/_/g, "-").toUpperCase();
+    const normalizedRead = lastlyReadedKeys.replace(/_/g, "-").toUpperCase();
 
     const foundRun = runsList.find((run) => normalizedRead.includes(run.label));
 
@@ -30,7 +30,7 @@ export default function useSelectRunWithScanner({
 
     notification({notificationHeader: "Run scanner", notificationBody: `Run ${foundRun.label} found`, notificationType: "success"});
     setRun(foundRun); 
-  }, [readKeys]);
+  }, [lastlyReadedKeys]);
 
   return { selectedRun: run };
 }

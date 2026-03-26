@@ -45,7 +45,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   return (
     <>
       {children}
-      <ToastContainer position="top-end">
+      <ToastContainer containerPosition="absolute" position="top-end">
         {notifications.map(({ id, notificationHeader, notificationBody, notificationType }) => (
           <Toast key={id} show={true} delay={3000} autohide bg={notificationType} onClose={() => remove(id)} className="m-5">
             <Toast.Header>

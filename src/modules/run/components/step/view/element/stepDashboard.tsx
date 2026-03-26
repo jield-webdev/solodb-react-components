@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Alert, Card, Col, Container, Row } from "react-bootstrap";
 import StepLabel from "@jield/solodb-react-components/modules/run/components/step/view/element/stepLabel";
 import Process from "@jield/solodb-react-components/modules/run/components/step/view/element/process";
@@ -32,6 +32,7 @@ import {
   listEcn,
 } from "@jield/solodb-typescript-core";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import { randomUUID } from "node:crypto";
 
 const StepDashboard = () => {
   const { environment } = useParams();
@@ -70,7 +71,26 @@ const StepDashboard = () => {
 
   const [showOnlyEmphasizedParameters, setShowOnlyEmphasizedParameters] = useState(true);
 
-  const { readingKeys } = useScannerContext();
+  const { addReadingCallbackFn, removeReadingCallbackFn } = useScannerContext();
+  const [readingKeys, setReadingKeys] = useState<string>("");
+
+  const scannerCallbackId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (scannerCallbackId.current === null) {
+      scannerCallbackId.current = self.crypto.randomUUID();
+      addReadingCallbackFn(scannerCallbackId.current, (keys) => {
+        setReadingKeys(keys);
+      });
+    }
+
+    return () => {
+      if (scannerCallbackId.current !== null) { 
+          removeReadingCallbackFn(scannerCallbackId.current);
+          scannerCallbackId.current = null;
+      }
+    };
+  }, []);
 
   //show a loading state while the queries are loading
   const isLoading = queries.some((query) => query.isLoading);

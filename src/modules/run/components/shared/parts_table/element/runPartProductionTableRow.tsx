@@ -177,7 +177,7 @@ const RunStepPartProductionTableRow = (props: Props) => {
           label: {runStepPart.part.label}
           <br />
           short_label: {runStepPart.part.short_label}<br />
-          tray: {runStepPart.part.tray.id} ({runStepPart.part.tray.label})<br />
+          tray: {runStepPart.part.tray?.id} ({runStepPart.part.tray?.label})<br />
           tray_column: {runStepPart.part.tray_column} | tray_row: {runStepPart.part.tray_row}
         </small>
       </td>

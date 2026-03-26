@@ -1,13 +1,10 @@
-import {
-  ScannerContext,
-  useScannerContext,
-} from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import { notification } from "@jield/solodb-react-components/utils/notification";
-import { RunPart, RunStepPart } from "@jield/solodb-typescript-core";
-import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
+import { RunPart } from "@jield/solodb-typescript-core";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 export interface UsePartSelectionOptions {
-  parts: RunPart[] | RunStepPart[];
+  parts: RunPart[];
 }
 
 export interface UsePartSelectionResult {
@@ -27,14 +24,8 @@ export interface UsePartSelectionResult {
  */
 export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSelectionResult {
   const [selectedParts, setSelectedParts] = useState<Map<number, boolean>>(new Map<number, boolean>());
-  const getPartId = useCallback((part: RunPart | RunStepPart) => ("part" in part ? part.part.id : part.id), []);
 
   const setPartAsSelected = useCallback((partID: number) => {
-    notification({
-      notificationHeader: "Part scanner",
-      notificationBody: `Found part: ${partID}`,
-      notificationType: "success",
-    });
     setSelectedParts((prev) => {
       const next = new Map(prev);
       next.set(partID, !(prev.get(partID) ?? false));
@@ -43,7 +34,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
   }, []);
 
   // read keys from the scanner
-  const { readKeys, addCallbackFn, removeCallbackFn } = useScannerContext();
+  const { lastlyReadedKeys, addCallbackFn, removeCallbackFn } = useScannerContext();
   const callbackId = useId();
 
   //buffer to keep scanned keys if parts is empty
@@ -68,9 +59,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
       return;
     }
 
-    const foundPart = parts.find((p) =>
-      normalizedRead.includes("short_label" in p ? p.short_label : p.part.short_label)
-    );
+    const foundPart = parts.find((p) => normalizedRead.includes(p.parsed_label ?? p.short_label));
 
     if (!foundPart) {
       notification({
@@ -81,11 +70,17 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
       return;
     }
 
-    setPartAsSelected(getPartId(foundPart));
+    notification({
+      notificationHeader: "Part scanner",
+      notificationBody: `Found part: ${foundPart.parsed_label ?? foundPart.short_label}`,
+      notificationType: "success",
+    });
+
+    setPartAsSelected(foundPart.id);
   };
 
   useEffect(() => {
-    onScanReadsKeysRef.current(readKeys);
+    onScanReadsKeysRef.current(lastlyReadedKeys);
     addCallbackFn(callbackId, (keys) => onScanReadsKeysRef.current(keys));
 
     return () => {
@@ -98,7 +93,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
     // first check if there is a need to update
     const newMap = new Map<number, boolean>();
     for (const part of parts) {
-      const id = getPartId(part);
+      const id = part.id;
       newMap.set(id, selectedParts.get(id) ?? false);
     }
     if (newMap.size !== selectedParts.size) {
@@ -114,17 +109,22 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
           keys
             .replace(/_/g, "-")
             .toUpperCase()
-            .includes("short_label" in p ? p.short_label : p.part.short_label)
+            .includes(p.parsed_label ?? p.short_label)
         );
 
         if (foundPart) {
-          setPartAsSelected(getPartId(foundPart));
+          notification({
+            notificationHeader: "Part scanner",
+            notificationBody: `Found part: ${foundPart.parsed_label ?? foundPart.short_label}`,
+            notificationType: "success",
+          });
+          setPartAsSelected(foundPart.id);
         }
       });
 
       scannedKeysBuffer.current.clear();
     }
-  }, [getPartId, parts, selectedParts, setPartAsSelected]);
+  }, [parts, selectedParts, setPartAsSelected]);
 
   const setPartsSelection = useCallback((partIDs: number[], nextSelected: boolean) => {
     setSelectedParts((prev) => {

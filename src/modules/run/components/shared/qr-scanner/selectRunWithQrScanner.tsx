@@ -1,7 +1,7 @@
-import { ScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import { notification } from "@jield/solodb-react-components/utils/notification";
 import { Run } from "@jield/solodb-typescript-core";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 export default function NavigateInRunWithQrScanner({
   runsList,
@@ -12,10 +12,17 @@ export default function NavigateInRunWithQrScanner({
   setRun: (run: Run) => void;
   setRunPartLabel?: (label: string) => void;
 }) {
-  const { readKeys, readingKeys } = useContext(ScannerContext);
+  const { lastlyReadedKeys, addReadingCallbackFn, removeReadingCallbackFn } = useScannerContext();
+  const callbackId = useId();
+  const [readingKeys, setReadingKeys] = useState<string>("");
 
   useEffect(() => {
-    const normalizedRead = readKeys.replace(/_/g, "-").toUpperCase();
+    addReadingCallbackFn(callbackId, setReadingKeys);
+    return () => removeReadingCallbackFn(callbackId);
+  }, []);
+
+  useEffect(() => {
+    const normalizedRead = lastlyReadedKeys.replace(/_/g, "-").toUpperCase();
     const runPartBadgeParsed = normalizedRead.split("-");
     if (!(runPartBadgeParsed.length == 4 || runPartBadgeParsed.length == 3)) {
       notification({
@@ -55,7 +62,7 @@ export default function NavigateInRunWithQrScanner({
       });
     }
     if (setRunPartLabel !== undefined) setRunPartLabel(runPartBadgeParsed[2]);
-  }, [readKeys]);
+  }, [lastlyReadedKeys]);
 
   return (
     <div className="d-flex flex-row gap-3">

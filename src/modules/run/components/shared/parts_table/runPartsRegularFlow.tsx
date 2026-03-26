@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { Alert, Table } from "react-bootstrap";
-import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
 import RunStepPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
 import {
   finishStepWhenAllPartsAreFinished,
@@ -78,7 +78,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
   // Use custom hooks for selection and actions
   const { selectedParts, setPartAsSelected, setPartsSelection, selectAllParts, selectNoneParts, hasSelectedParts } =
     usePartSelection({
-      parts: runStepPartsData,
+      parts: runParts ?? [],
     });
 
   useEffect(() => {
@@ -173,19 +173,17 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
                 const partIsSelected = selectedParts.get(runPart.id) ?? false;
 
                 return (
-                  <>
-                    <RunStepPartProductionTableRow
-                      runStep={runStep}
-                      runPart={runPart}
-                      runStepParts={runStepPartsData}
-                      key={`key-${i}-${runPart.id}`}
-                      canInit={run.run_type === RunTypeEnum.PRODUCTION}
-                      refetchFn={effectiveRefetchFn}
-                      partIsSelected={partIsSelected}
-                      setPartAsSelected={setPartAsSelected}
-                      dropdown={true}
-                    />
-                  </>
+                  <RunStepPartProductionTableRow
+                    runStep={runStep}
+                    runPart={runPart}
+                    runStepParts={runStepPartsData}
+                    key={`key-${i}-${runPart.id}`}
+                    canInit={run.run_type === RunTypeEnum.PRODUCTION}
+                    refetchFn={effectiveRefetchFn}
+                    partIsSelected={partIsSelected}
+                    setPartAsSelected={setPartAsSelected}
+                    dropdown={true}
+                  />
                 );
               })}
             </tbody>
