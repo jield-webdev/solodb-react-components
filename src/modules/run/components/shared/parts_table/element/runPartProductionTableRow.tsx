@@ -144,7 +144,7 @@ const RunStepPartProductionTableRow = (props: Props) => {
           />
         )}
       </td>
-      <td>{props.runPart.label || props.runPart.short_label}</td>
+      <td>{props.runPart.scanner_label}</td>
       <td>
         <div className={"d-flex align-items-start gap-1"}>
           <span className={`badge ${runStepPart.status.class ?? ""}`.trim()}>{runStepPart.status.key}</span>

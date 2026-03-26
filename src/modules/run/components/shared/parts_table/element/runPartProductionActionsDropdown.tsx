@@ -15,6 +15,21 @@ type Props = {
 };
 
 const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, createRunStepPart }: Props) => {
+  const lastAction = runStepPart.latest_action?.type.id ?? null;
+  const showStart = runStepPart.actions === 0 || lastAction === RunStepPartActionEnum.REWORK;
+  const showFinishFailed =
+    runStepPart.actions > 0 &&
+    (lastAction === RunStepPartActionEnum.START_PROCESSING || lastAction === null);
+  const showTesting =
+    lastAction === RunStepPartActionEnum.FINISH_PROCESSING || lastAction === RunStepPartActionEnum.REPAIR;
+  const showRepair =
+    lastAction === RunStepPartActionEnum.FAILED_PROCESSING || lastAction === RunStepPartActionEnum.TESTING;
+  const showRework =
+    lastAction === RunStepPartActionEnum.FINISH_PROCESSING ||
+    lastAction === RunStepPartActionEnum.FAILED_PROCESSING ||
+    lastAction === RunStepPartActionEnum.REPAIR ||
+    lastAction === RunStepPartActionEnum.TESTING;
+
   return (
     <Dropdown align="end">
       {" "}
@@ -22,7 +37,7 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, c
         Actions
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        {runStepPart.actions === 0 && (
+        {showStart && (
           <Dropdown.Item
             onClick={() =>
               setRunStepPartAction({
@@ -34,35 +49,55 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, c
             Start
           </Dropdown.Item>
         )}
-        {runStepPart.actions > 0 &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-            <Dropdown.Item
-              onClick={() =>
-                setRunStepPartAction({
-                  runStepPart: runStepPart,
-                  runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
-                })
-              }
-            >
-              Finish
-            </Dropdown.Item>
-          )}
-        {runStepPart.actions > 0 &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-            <Dropdown.Item
-              onClick={() =>
-                setRunStepPartAction({
-                  runStepPart: runStepPart,
-                  runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
-                })
-              }
-            >
-              Failed
-            </Dropdown.Item>
-          )}
-        {runStepPart.actions > 0 && (
+        {showFinishFailed && (
+          <Dropdown.Item
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
+              })
+            }
+          >
+            Finish
+          </Dropdown.Item>
+        )}
+        {showFinishFailed && (
+          <Dropdown.Item
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
+              })
+            }
+          >
+            Failed
+          </Dropdown.Item>
+        )}
+        {showTesting && (
+          <Dropdown.Item
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.TESTING,
+              })
+            }
+          >
+            Testing
+          </Dropdown.Item>
+        )}
+        {showRepair && (
+          <Dropdown.Item
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.REPAIR,
+              })
+            }
+          >
+            Repair
+          </Dropdown.Item>
+        )}
+        {showRework && (
           <Dropdown.Item
             onClick={() =>
               setRunStepPartAction({

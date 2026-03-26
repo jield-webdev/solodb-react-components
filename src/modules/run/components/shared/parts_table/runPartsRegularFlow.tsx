@@ -60,11 +60,11 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
     [runStepParts, runStepPartsQuery.data]
   );
 
-  const effectiveRefetchFn = () => { 
-      queryClient.invalidateQueries({ queryKey: ["runParts", run.id, runStep.part_level] })
-      queryClient.invalidateQueries({ queryKey: ["runStepParts", runStep.id] })
+  const effectiveRefetchFn = () => {
+    queryClient.invalidateQueries({ queryKey: ["runParts", run.id, runStep.part_level] });
+    queryClient.invalidateQueries({ queryKey: ["runStepParts", runStep.id] });
 
-      if (refetchFn) refetchFn();
+    if (refetchFn) refetchFn();
   };
 
   useEffect(() => {
@@ -96,19 +96,20 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
 
   const { performActionToSelectedParts, getAvailableActionsForSelection } = usePartActions({
     runStep,
-    parts: stepParts,
+    parts: runStepPartsData,
     selectedParts,
     getPartId: (part) => part.part.id,
     getRunStepPart: (part) => part,
     refetchFn: effectiveRefetchFn,
   });
 
-  const availableActions = useMemo(() => getAvailableActionsForSelection(), [getAvailableActionsForSelection]);
+  const availableActions = useMemo(
+    () => getAvailableActionsForSelection(), [getAvailableActionsForSelection]);
 
   const traySelections = useMemo(() => {
     const trayPartsMap = new Map<number, { id: number; label: string; partIds: number[] }>();
 
-    stepParts.forEach((stepPart) => {
+    runStepPartsData.forEach((stepPart) => {
       const tray = stepPart.part.tray;
       if (!tray) return;
       const entry = trayPartsMap.get(tray.id) ?? {

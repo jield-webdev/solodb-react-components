@@ -1,6 +1,6 @@
 import React from "react";
-import { Button, Dropdown } from "react-bootstrap";
-import { RunStepPartActionEnum, RunStepPart } from "@jield/solodb-typescript-core";
+import { Button } from "react-bootstrap";
+import { RunStepPartActionEnum, RunStepPart, getAvailableRunStepPartActions } from "@jield/solodb-typescript-core";
 
 type Props = {
   runStepPart: RunStepPart;
@@ -14,10 +14,12 @@ type Props = {
 };
 
 const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction }: Props) => {
+  const availableActions = getAvailableRunStepPartActions(runStepPart);
+
   return (
     <div className={"d-flex justify-content-between gap-1"}>
       <div className={"d-flex gap-2"}>
-        {runStepPart.actions === 0 && (
+        {availableActions.includes(RunStepPartActionEnum.START_PROCESSING) && (
           <Button
             onClick={() =>
               setRunStepPartAction({
@@ -30,37 +32,59 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction }:
             Start
           </Button>
         )}
-        {runStepPart.actions > 0 &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-            <Button
-              onClick={() =>
-                setRunStepPartAction({
-                  runStepPart: runStepPart,
-                  runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
-                })
-              }
-              className={"btn-primary btn-sm"}
-            >
-              Finish
-            </Button>
-          )}
-        {runStepPart.actions > 0 &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING &&
-          runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FAILED_PROCESSING && (
-            <Button
-              onClick={() =>
-                setRunStepPartAction({
-                  runStepPart: runStepPart,
-                  runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
-                })
-              }
-              className={"btn-danger btn-sm"}
-            >
-              Failed
-            </Button>
-          )}
-        {runStepPart.actions > 0 && runStepPart.latest_action?.type.id !== RunStepPartActionEnum.FINISH_PROCESSING && (
+        {availableActions.includes(RunStepPartActionEnum.FINISH_PROCESSING) && (
+          <Button
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
+              })
+            }
+            className={"btn-primary btn-sm"}
+          >
+            Finish
+          </Button>
+        )}
+        {availableActions.includes(RunStepPartActionEnum.FAILED_PROCESSING) && (
+          <Button
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.FAILED_PROCESSING,
+              })
+            }
+            className={"btn-danger btn-sm"}
+          >
+            Failed
+          </Button>
+        )}
+        {availableActions.includes(RunStepPartActionEnum.TESTING) && (
+          <Button
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.TESTING,
+              })
+            }
+            className={"btn-info btn-sm"}
+          >
+            Testing
+          </Button>
+        )}
+        {availableActions.includes(RunStepPartActionEnum.REPAIR) && (
+          <Button
+            onClick={() =>
+              setRunStepPartAction({
+                runStepPart: runStepPart,
+                runStepPartAction: RunStepPartActionEnum.REPAIR,
+              })
+            }
+            className={"btn-warning btn-sm"}
+          >
+            Repair
+          </Button>
+        )}
+        {availableActions.includes(RunStepPartActionEnum.REWORK) && (
           <Button
             size={"sm"}
             onClick={() =>

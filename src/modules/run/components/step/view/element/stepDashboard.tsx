@@ -64,6 +64,10 @@ const StepDashboard = () => {
         queryKey: ["requirement", runStep.id],
         queryFn: () => listRequirements({ run: run, step: runStep }),
       },
+      {
+        queryKey: ["requirement", runStep.id],
+        queryFn: () => listRequirements({ run: run, step: runStep }),
+      },
     ],
   });
 

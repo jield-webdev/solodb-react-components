@@ -62,7 +62,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
         return;
       }
 
-      const foundPart = parts.find((p) => normalizedRead.includes(p.label) || normalizedRead.includes(p.short_label));
+      const foundPart = parts.find((p) => normalizedRead.includes(p.scanner_label));
 
       if (!foundPart) {
         notification({
@@ -75,7 +75,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
 
       notification({
         notificationHeader: "Part scanner",
-        notificationBody: `Found part: ${foundPart.label ?? foundPart.short_label}`,
+        notificationBody: `Found part: ${foundPart.scanner_label}`,
         notificationType: "success",
       });
 
