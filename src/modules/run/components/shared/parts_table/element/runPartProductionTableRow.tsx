@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
-import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import RunPartProductionActionsDropdown from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsDropdown";
 import {
@@ -13,7 +12,6 @@ import {
 } from "@jield/solodb-typescript-core";
 import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import RunPartProductionActionsButtons from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsButtons";
-import { Alert } from "react-bootstrap";
 
 type Props = {
   runPart: RunPart;
@@ -168,19 +166,24 @@ const RunStepPartProductionTableRow = (props: Props) => {
       <td>
         <RunStepPartComment runStepPart={runStepPart} setRunStepPart={onRunStepPartUpdated} />
       </td>
-      <td>
-        <small className={"text-muted font-monospace"}>
-          id: {runStepPart.id}
-          <br />
-          level: {props.runStep.part_level}
-          <br />
-          label: {runStepPart.part.label}
-          <br />
-          short_label: {runStepPart.part.short_label}<br />
-          tray: {runStepPart.part.tray?.id} ({runStepPart.part.tray?.label})<br />
-          tray_column: {runStepPart.part.tray_column} | tray_row: {runStepPart.part.tray_row}
-        </small>
-      </td>
+      {/*<td>*/}
+      {/*  <small className={"text-muted font-monospace"}>*/}
+      {/*    part id: {runStepPart.part.id}*/}
+      {/*    <br />*/}
+      {/*    run step part id: {runStepPart.id}*/}
+      {/*    <br />*/}
+      {/*    level: {props.runStep.part_level}*/}
+      {/*    <br />*/}
+      {/*    label: {runStepPart.part.label}*/}
+      {/*    <br />*/}
+      {/*    parsed_label: {runStepPart.part.parsed_label}*/}
+      {/*    <br />*/}
+      {/*    short_label: {runStepPart.part.short_label}*/}
+      {/*    <br />*/}
+      {/*    tray: {runStepPart.part.tray?.id} ({runStepPart.part.tray?.label})<br />*/}
+      {/*    tray_column: {runStepPart.part.tray_column} | tray_row: {runStepPart.part.tray_row}*/}
+      {/*  </small>*/}
+      {/*</td>*/}
     </tr>
   );
 };

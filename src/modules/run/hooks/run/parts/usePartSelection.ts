@@ -48,7 +48,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
       // TO prevent empty values
       if (!normalizedRead) return;
 
-      // if parts is empty add it to a buffer for procesing when there is parts available
+      // if parts is empty add it to a buffer for processing when there is parts available
       if (parts.length == 0) {
         if (scannedKeysBuffer.current.size >= 15) {
           const firstKey = scannedKeysBuffer.current.values().next().value;
@@ -62,7 +62,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
         return;
       }
 
-      const foundPart = parts.find((p) => normalizedRead.includes(p.short_label));
+      const foundPart = parts.find((p) => normalizedRead.includes(p.label) || normalizedRead.includes(p.short_label));
 
       if (!foundPart) {
         notification({
@@ -75,7 +75,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
 
       notification({
         notificationHeader: "Part scanner",
-        notificationBody: `Found part: ${foundPart.parsed_label ?? foundPart.short_label}`,
+        notificationBody: `Found part: ${foundPart.label ?? foundPart.short_label}`,
         notificationType: "success",
       });
 
