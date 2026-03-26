@@ -45,7 +45,6 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
     ],
   });
 
-  const effectiveRefetchFn = refetchFn ?? (() => {});
   const [runPartQuery, runStepPartsQuery] = queries;
 
   const isLoading = queries.some((q) => q.isLoading);
@@ -61,6 +60,13 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
     [runStepParts, runStepPartsQuery.data]
   );
 
+  const effectiveRefetchFn = () => { 
+      queryClient.invalidateQueries({ queryKey: ["runParts", run.id, runStep.part_level] })
+      queryClient.invalidateQueries({ queryKey: ["runStepParts", runStep.id] })
+
+      if (refetchFn) refetchFn();
+  };
+
   useEffect(() => {
     const partsToVerify = runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [];
     // verify for the need to finish the step
@@ -73,7 +79,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
       // verify for the need to finish the step
       finishStepWhenAllPartsAreFinished(runStep, runStepParts);
     }
-  }, [stepParts]);
+  }, [runStepParts]);
 
   // Use custom hooks for selection and actions
   const { selectedParts, setPartAsSelected, setPartsSelection, selectAllParts, selectNoneParts, hasSelectedParts } =
@@ -182,7 +188,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
                     refetchFn={effectiveRefetchFn}
                     partIsSelected={partIsSelected}
                     setPartAsSelected={setPartAsSelected}
-                    dropdown={true}
+                    dropdown={false}
                   />
                 );
               })}

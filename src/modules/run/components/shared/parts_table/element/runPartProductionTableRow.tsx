@@ -35,7 +35,7 @@ const RunStepPartProductionTableRow = (props: Props) => {
   useEffect(() => {
     const match = props.runStepParts.find((sp) => sp.part.id === props.runPart.id);
     setRunStepPart(match);
-  }, []);
+  }, [props.runStepParts, props.runPart.id]);
 
   const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
     if (!props.setPartAsSelected) {
