@@ -40,53 +40,61 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
   //buffer to keep scanned keys if parts is empty
   const scannedKeysBuffer = useRef<Set<string>>(new Set<string>());
 
-  // ref so the registered callback always sees the latest parts/setPartAsSelected
-  const onScanReadsKeysRef = useRef<(keys: string) => void>(() => {});
+  // Update the ref whenever parts or setPartAsSelected changes
+  const onScanReadsKey = useCallback(
+    (keys: string) => {
+      const normalizedRead = keys.replace(/_/g, "-").toUpperCase();
 
-  onScanReadsKeysRef.current = (keys: string) => {
-    const normalizedRead = keys.replace(/_/g, "-").toUpperCase();
+      // TO prevent empty values
+      if (!normalizedRead) return;
 
-    if (parts.length == 0) {
-      if (scannedKeysBuffer.current.size >= 15) {
-        const firstKey = scannedKeysBuffer.current.values().next().value;
-        if (firstKey !== undefined) {
-          scannedKeysBuffer.current.delete(firstKey);
+      // if parts is empty add it to a buffer for procesing when there is parts available
+      if (parts.length == 0) {
+        if (scannedKeysBuffer.current.size >= 15) {
+          const firstKey = scannedKeysBuffer.current.values().next().value;
+          if (firstKey !== undefined) {
+            scannedKeysBuffer.current.delete(firstKey);
+          }
         }
+
+        scannedKeysBuffer.current.add(normalizedRead);
+        // to make sure it doesnt get to big
+        return;
       }
 
-      scannedKeysBuffer.current.add(normalizedRead);
-      // to make sure it doesnt get to big
-      return;
-    }
+      const foundPart = parts.find((p) => normalizedRead.includes(p.short_label));
 
-    const foundPart = parts.find((p) => normalizedRead.includes(p.parsed_label ?? p.short_label));
+      if (!foundPart) {
+        console.log(normalizedRead);
+        notification({
+          notificationHeader: "Part scanner",
+          notificationBody: "Part not found",
+          notificationType: "danger",
+        });
+        return;
+      }
 
-    if (!foundPart) {
       notification({
         notificationHeader: "Part scanner",
-        notificationBody: "Part not found",
-        notificationType: "danger",
+        notificationBody: `Found part: ${foundPart.parsed_label ?? foundPart.short_label}`,
+        notificationType: "success",
       });
-      return;
-    }
 
-    notification({
-      notificationHeader: "Part scanner",
-      notificationBody: `Found part: ${foundPart.parsed_label ?? foundPart.short_label}`,
-      notificationType: "success",
-    });
+      setPartAsSelected(foundPart.id);
+    },
+    [parts, setPartAsSelected]
+  );
 
-    setPartAsSelected(foundPart.id);
-  };
-
+  // So when it mounts it tries to pick the lastlyReadedKeys
   useEffect(() => {
-    onScanReadsKeysRef.current(lastlyReadedKeys);
-    addCallbackFn(callbackId, (keys) => onScanReadsKeysRef.current(keys));
+    removeCallbackFn(callbackId);
+    onScanReadsKey(lastlyReadedKeys);
+    addCallbackFn(callbackId, onScanReadsKey);
 
     return () => {
       removeCallbackFn(callbackId);
     };
-  }, []);
+  }, [parts]);
 
   // Update selection map when parts change
   useEffect(() => {
@@ -105,21 +113,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
     // process the scannedKeysBuffer
     if (parts.length > 0) {
       scannedKeysBuffer.current.forEach((keys) => {
-        const foundPart = parts.find((p) =>
-          keys
-            .replace(/_/g, "-")
-            .toUpperCase()
-            .includes(p.parsed_label ?? p.short_label)
-        );
-
-        if (foundPart) {
-          notification({
-            notificationHeader: "Part scanner",
-            notificationBody: `Found part: ${foundPart.parsed_label ?? foundPart.short_label}`,
-            notificationType: "success",
-          });
-          setPartAsSelected(foundPart.id);
-        }
+        onScanReadsKey(keys);
       });
 
       scannedKeysBuffer.current.clear();

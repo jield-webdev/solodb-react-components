@@ -78,7 +78,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
   // Use custom hooks for selection and actions
   const { selectedParts, setPartAsSelected, setPartsSelection, selectAllParts, selectNoneParts, hasSelectedParts } =
     usePartSelection({
-      parts: runParts ?? [],
+      parts: runPartsData ?? [],
     });
 
   useEffect(() => {

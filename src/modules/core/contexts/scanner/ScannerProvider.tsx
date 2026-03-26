@@ -1,4 +1,4 @@
-import { ReactElement, startTransition, useCallback, useEffect, useRef, useState } from "react";
+import { ReactElement, startTransition, useEffect, useRef, useState } from "react";
 import { ScannerContext } from "./ScannerContext";
 import { makeKeySequenceListener } from "@jield/solodb-react-components/utils/keySequenceListener";
 

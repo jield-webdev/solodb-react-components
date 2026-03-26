@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useId, useRef, useState } from "react";
 import { Alert, Card, Col, Container, Row } from "react-bootstrap";
 import StepLabel from "@jield/solodb-react-components/modules/run/components/step/view/element/stepLabel";
 import Process from "@jield/solodb-react-components/modules/run/components/step/view/element/process";
@@ -74,21 +74,13 @@ const StepDashboard = () => {
   const { addReadingCallbackFn, removeReadingCallbackFn } = useScannerContext();
   const [readingKeys, setReadingKeys] = useState<string>("");
 
-  const scannerCallbackId = useRef<string | null>(null);
+  const scannerCallbackId = useId();
 
   useEffect(() => {
-    if (scannerCallbackId.current === null) {
-      scannerCallbackId.current = self.crypto.randomUUID();
-      addReadingCallbackFn(scannerCallbackId.current, (keys) => {
-        setReadingKeys(keys);
-      });
-    }
+    addReadingCallbackFn(scannerCallbackId, setReadingKeys);
 
     return () => {
-      if (scannerCallbackId.current !== null) { 
-          removeReadingCallbackFn(scannerCallbackId.current);
-          scannerCallbackId.current = null;
-      }
+      removeReadingCallbackFn(scannerCallbackId);
     };
   }, []);
 
