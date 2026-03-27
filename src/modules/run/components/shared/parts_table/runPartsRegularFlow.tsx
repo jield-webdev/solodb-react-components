@@ -39,7 +39,6 @@ const RunPartsRegularFlow = ({ run, runStep, refetchFn }: Props) => {
       {
         queryKey: ["runStepParts", runStep.id],
         queryFn: () => listRunStepParts({ step: runStep }),
-        enabled: true, // don't fetch if runStepParts prop provided
       },
     ],
   });
