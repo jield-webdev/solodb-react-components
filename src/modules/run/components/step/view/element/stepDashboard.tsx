@@ -32,7 +32,6 @@ import {
   listEcn,
 } from "@jield/solodb-typescript-core";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-import { randomUUID } from "node:crypto";
 
 const StepDashboard = () => {
   const { environment } = useParams();

@@ -25,21 +25,16 @@ const USE_DROPDOWN = false;
 type Props = {
   run: Run;
   runStep: RunStep;
-  runStepParts?: RunStepPart[];
-  runParts?: RunPart[];
   refetchFn?: () => void;
 };
 
-const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }: Props) => {
-  const [stepParts, setStepParts] = useState<RunStepPart[]>(runStepParts || []);
-
+const RunPartsRegularFlow = ({ run, runStep, refetchFn }: Props) => {
   const queryClient = useQueryClient();
   const queries = useQueries({
     queries: [
       {
         queryKey: ["runParts", run.id, runStep.part_level],
         queryFn: () => listRunParts({ run: run, level: runStep.part_level }),
-        enabled: true, // don't fetch if runParts prop provided
       },
       {
         queryKey: ["runStepParts", runStep.id],
@@ -54,14 +49,14 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
   const isLoading = queries.some((q) => q.isLoading);
   const isError = queries.some((q) => q.isError);
 
-  const runPartsData = useMemo<RunPart[]>(
-    () => runParts ?? (runPartQuery.data?.items as RunPart[] | undefined) ?? [],
-    [runParts, runPartQuery.data]
+  const runParts = useMemo<RunPart[]>(
+    () => (runPartQuery.data?.items as RunPart[]) ?? [],
+    [runPartQuery.data]
   );
 
-  const runStepPartsData = useMemo<RunStepPart[]>(
-    () => runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
-    [runStepParts, runStepPartsQuery.data]
+  const runStepParts = useMemo<RunStepPart[]>(
+    () => (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
+    [runStepPartsQuery.data]
   );
 
   const effectiveRefetchFn = () => {
@@ -75,20 +70,12 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
     const partsToVerify = runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [];
     // verify for the need to finish the step
     finishStepWhenAllPartsAreFinished(runStep, partsToVerify);
-  }, [runStepParts, runStepPartsQuery.data]);
-
-  useEffect(() => {
-    if (runStepParts) {
-      setStepParts(runStepParts);
-      // verify for the need to finish the step
-      finishStepWhenAllPartsAreFinished(runStep, runStepParts);
-    }
   }, [runStepParts]);
 
   // Use custom hooks for selection and actions
   const { selectedParts, setPartAsSelected, setPartsSelection, selectAllParts, selectNoneParts, hasSelectedParts } =
     usePartSelection({
-      parts: runPartsData ?? [],
+      parts: runParts ?? [],
     });
 
   useEffect(() => {
@@ -100,7 +87,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
 
   const { performActionToSelectedParts, getAvailableActionsForSelection } = usePartActions({
     runStep,
-    parts: runStepPartsData,
+    parts: runStepParts,
     selectedParts,
     getPartId: (part) => part.part.id,
     getRunStepPart: (part) => part,
@@ -112,7 +99,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
   const traySelections = useMemo(() => {
     const trayPartsMap = new Map<number, { id: number; label: string; partIds: number[] }>();
 
-    runStepPartsData.forEach((stepPart) => {
+    runStepParts.forEach((stepPart) => {
       const tray = stepPart.part.tray;
       if (!tray) return;
       const entry = trayPartsMap.get(tray.id) ?? {
@@ -146,7 +133,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
       ...tray,
       allSelected: tray.partIds.every((partId) => selectedParts.get(partId)),
     }));
-  }, [run.run_trays, selectedParts, stepParts]);
+  }, [run.run_trays, selectedParts, runStepParts]);
 
   if (isLoading) {
     return <LoadingComponent message={"Loading run parts"} />;
@@ -156,17 +143,17 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
     return <div className="text-danger">Error loading run parts.</div>;
   }
 
-  if (runPartsData.length === 0) {
+  if (runParts.length === 0) {
     return <Alert variant={"warning"}>No parts found for this run step.</Alert>;
   }
 
-  if (runStepPartsData.length === 0) {
+  if (runStepParts.length === 0) {
     return <Alert variant={"warning"}>No step parts found for this run step.</Alert>;
   }
 
   return (
     <Fragment>
-      {runPartsData && runPartsData.length > 0 && (
+      {runParts && runParts.length > 0 && (
         <>
           <Table size={"sm"} striped hover>
             <thead>
@@ -178,14 +165,14 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
               </tr>
             </thead>
             <tbody>
-              {runPartsData.map((runPart: RunPart, i: React.Key) => {
+              {runParts.map((runPart: RunPart, i: React.Key) => {
                 const partIsSelected = selectedParts.get(runPart.id) ?? false;
 
                 return (
                   <RunStepPartProductionTableRow
                     runStep={runStep}
                     runPart={runPart}
-                    runStepParts={runStepPartsData}
+                    runStepParts={runStepParts}
                     key={`key-${i}-${runPart.id}`}
                     canInit={run.run_type === RunTypeEnum.PRODUCTION}
                     refetchFn={effectiveRefetchFn}

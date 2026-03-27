@@ -110,7 +110,7 @@ export default function StepInList({
       {isExpanded && (
         <tr>
           <td colSpan={parts.length + 6}>
-            <StepDetails step={step} stepParts={stepParts} parts={parts} refetchFn={refetchFn} />
+            <StepDetails step={step} refetchFn={refetchFn} />
           </td>
         </tr>
       )}
