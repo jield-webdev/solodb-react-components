@@ -143,7 +143,6 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
             <th>Status</th>
             <th>Actions</th>
             <th>Comment</th>
-            <th>Debug</th>
           </tr>
         </thead>
         <tbody>

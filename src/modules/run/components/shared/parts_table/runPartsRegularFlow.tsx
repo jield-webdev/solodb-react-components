@@ -172,7 +172,6 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
                 <th>Status</th>
                 <th>Actions</th>
                 <th>Comment</th>
-                <th>debug</th>
               </tr>
             </thead>
             <tbody>
