@@ -17,6 +17,10 @@ import { usePartSelection } from "@jield/solodb-react-components/modules/run/hoo
 import { usePartActions } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartActions";
 import { PartActionsDropdown } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partActionsDropdown";
 import { PartSelectionControls } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partSelectionControls";
+import { PartActionsButtons } from "./element/partActionsButtons";
+
+// TODO: use a real way to handle the use of either dropdowns or buttons
+const USE_DROPDOWN = false;
 
 type Props = {
   run: Run;
@@ -103,8 +107,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
     refetchFn: effectiveRefetchFn,
   });
 
-  const availableActions = useMemo(
-    () => getAvailableActionsForSelection(), [getAvailableActionsForSelection]);
+  const availableActions = useMemo(() => getAvailableActionsForSelection(), [getAvailableActionsForSelection]);
 
   const traySelections = useMemo(() => {
     const trayPartsMap = new Map<number, { id: number; label: string; partIds: number[] }>();
@@ -188,7 +191,7 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
                     refetchFn={effectiveRefetchFn}
                     partIsSelected={partIsSelected}
                     setPartAsSelected={setPartAsSelected}
-                    dropdown={false}
+                    dropdown={USE_DROPDOWN}
                   />
                 );
               })}
@@ -201,10 +204,17 @@ const RunPartsRegularFlow = ({ run, runStep, runStepParts, runParts, refetchFn }
             traySelections={traySelections}
             onToggleTray={(partIds, nextSelected) => setPartsSelection(partIds, nextSelected)}
             actionsDropdown={
-              <PartActionsDropdown
-                availableActions={availableActions}
-                onActionSelected={performActionToSelectedParts}
-              />
+              USE_DROPDOWN ? (
+                <PartActionsDropdown
+                  availableActions={availableActions}
+                  onActionSelected={performActionToSelectedParts}
+                />
+              ) : (
+                <PartActionsButtons
+                  availableActions={availableActions}
+                  onActionSelected={performActionToSelectedParts}
+                />
+              )
             }
           />
         </>

@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "react-bootstrap";
 import { RunStepPartActionEnum, RunStepPart, getAvailableRunStepPartActions } from "@jield/solodb-typescript-core";
 
@@ -13,7 +12,7 @@ type Props = {
   }) => void;
 };
 
-const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction }: Props) => {
+const RunPartProductionActionsButtons = ({ runStepPart, setRunStepPartAction }: Props) => {
   const availableActions = getAvailableRunStepPartActions(runStepPart);
 
   return (
@@ -40,7 +39,7 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction }:
                 runStepPartAction: RunStepPartActionEnum.FINISH_PROCESSING,
               })
             }
-            className={"btn-primary btn-sm"}
+            className={"btn-info btn-sm"}
           >
             Finish
           </Button>
@@ -86,7 +85,7 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction }:
         )}
         {availableActions.includes(RunStepPartActionEnum.REWORK) && (
           <Button
-            size={"sm"}
+            className={"btn-sm"}
             onClick={() =>
               setRunStepPartAction({
                 runStepPart: runStepPart,
@@ -102,4 +101,4 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction }:
   );
 };
 
-export default RunPartProductionActionsDropdown;
+export default RunPartProductionActionsButtons;
