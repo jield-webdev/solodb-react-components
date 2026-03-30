@@ -83,14 +83,12 @@ export function usePartActions<T>({
 
   const onScanner = useCallback(
     (keys: string) => {
-      const normalizedRead = keys.replace(/_/g, "-").toUpperCase();
-
       // TO prevent empty values
-      if (!normalizedRead) return;
+      if (!keys) return;
 
-      if (!validScannerInput(normalizedRead)) return;
+      if (!validScannerInput(keys)) return;
 
-      const parsedScanner = normalizedRead.split("/");
+      const parsedScanner = keys.split("/");
 
       const actions = [
         RunStepPartActionEnum.START_PROCESSING,
@@ -108,9 +106,9 @@ export function usePartActions<T>({
         return;
       }
 
-      const action = Number(parsedScanner[2]) as RunStepPartActionEnum;
+      const partLabel = parsedScanner[1].replace(/_/g, "-").toUpperCase();
 
-      const foundPart = parts.find((p) => parsedScanner[1].includes(p.scanner_label));
+      const foundPart = parts.find((p) => partLabel.includes(getRunStepPart(p)?.part.scanner_label));
 
       const runStepPart = foundPart ? getRunStepPart(foundPart) : null;
 
@@ -122,6 +120,23 @@ export function usePartActions<T>({
         });
         return;
       }
+
+      const action = Number(parsedScanner[2]) as RunStepPartActionEnum;
+
+      if (!getAvailableRunStepPartActions(runStepPart).includes(action)) {
+        notification({
+          notificationHeader: "Part scanner",
+          notificationBody: "The selected action is not available on the selected part",
+          notificationType: "danger",
+        });
+        return;
+      }
+
+      notification({
+        notificationHeader: "Part scanner",
+        notificationBody: `Performin action in ${runStepPart.part.scanner_label}`,
+        notificationType: "success",
+      });
 
       performRunStepPartAction(runStepPart, action).then((latestAction) => {
         updateRunStepPartCache(queryClient, {
@@ -172,7 +187,7 @@ export function usePartActions<T>({
 
 function validScannerInput(input: string) {
   // The regex pattern
-  const pattern = RegExp(`/^${PERFORM_ACTION_TRIGER}\/.+\/\d+$/`);
+  const pattern = new RegExp(`^${PERFORM_ACTION_TRIGER}/.+/\\d+$`);
 
   return pattern.test(input);
 }
