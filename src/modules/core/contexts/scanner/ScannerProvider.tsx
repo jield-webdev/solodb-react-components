@@ -1,11 +1,12 @@
 import { ReactElement, startTransition, useEffect, useRef, useState } from "react";
 import { ScannerContext } from "./ScannerContext";
 import { makeKeySequenceListener } from "@jield/solodb-react-components/utils/keySequenceListener";
+import parseScannerForRun, { ScannedKeysType } from "@jield/solodb-react-components/modules/run/utils/parseScannerForRun";
 
 export const ScannerProvider = ({ children }: { children: ReactElement }) => {
   const [lastlyReadedKeys, setLastlyReadedKeys] = useState<string>("");
 
-  const readCompletedCallbacksRef = useRef<Map<string, (keys: string) => void>>(new Map());
+  const readCompletedCallbacksRef = useRef<Map<ScannedKeysType, Map<string, (keys: string) => void>>>(new Map());
   const readingCallbacksRef = useRef<Map<string, (keys: string) => void>>(new Map());
 
   const onReadingKeys = (keys: string) => {
@@ -16,8 +17,11 @@ export const ScannerProvider = ({ children }: { children: ReactElement }) => {
 
   const onReadKeys = (keys: string) => {
     setLastlyReadedKeys(keys);
+
+    const scannedKeysType = parseScannerForRun(keys);
+
     startTransition(() => {
-      readCompletedCallbacksRef.current.forEach((fun) => fun(keys));
+      readCompletedCallbacksRef.current.get(scannedKeysType)?.forEach((fun) => fun(keys));
     });
   };
 
@@ -31,12 +35,15 @@ export const ScannerProvider = ({ children }: { children: ReactElement }) => {
     };
   }, [onReadKeys, onReadingKeys]);
 
-  const addCallbackFn = (id: string, fun: (readedKeys: string) => void) => {
-    readCompletedCallbacksRef.current.set(id, fun);
+  const addCallbackFn = (type: ScannedKeysType, id: string, fun: (readedKeys: string) => void) => {
+    if (!readCompletedCallbacksRef.current.has(type)) {
+      readCompletedCallbacksRef.current.set(type, new Map());
+    }
+    readCompletedCallbacksRef.current.get(type)!.set(id, fun);
   };
 
-  const removeCallbackFn = (id: string) => {
-    readCompletedCallbacksRef.current.delete(id);
+  const removeCallbackFn = (type: ScannedKeysType, id: string) => {
+    readCompletedCallbacksRef.current.get(type)?.delete(id);
   };
 
   const addReadingCallbackFn = (id: string, fun: (readingKeys: string) => void) => {

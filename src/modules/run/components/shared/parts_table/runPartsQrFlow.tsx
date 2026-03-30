@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
@@ -16,6 +16,7 @@ import { usePartSelection } from "@jield/solodb-react-components/modules/run/hoo
 import { notification } from "@jield/solodb-react-components/utils/notification";
 import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import { ScannedKeysType } from "../../../utils/parseScannerForRun";
 
 type Props = {
   run: Run;
@@ -44,12 +45,12 @@ const RunPartsQrFlow = ({ run, runStep, refetchFn = () => {} }: Props) => {
   const isError = queries.some((q) => q.isError);
 
   const runParts = useMemo<RunPart[]>(
-    () => runPartQuery.data?.items as RunPart[] | undefined ?? [],
+    () => (runPartQuery.data?.items as RunPart[] | undefined) ?? [],
     [runPartQuery.data]
   );
 
   const runStepParts = useMemo<RunStepPart[]>(
-    () => runStepPartsQuery.data?.items as RunStepPart[] | undefined ?? [],
+    () => (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
     [runStepPartsQuery.data]
   );
 
@@ -113,12 +114,12 @@ const RunPartsQrFlow = ({ run, runStep, refetchFn = () => {} }: Props) => {
 
   // update the callback
   useEffect(() => {
-    removeCallbackFn(callbackId);
-    addCallbackFn(callbackId, onReadKeys);
+    removeCallbackFn(ScannedKeysType.SELECT, callbackId);
+    addCallbackFn(ScannedKeysType.SELECT, callbackId, onReadKeys);
     onReadKeys(lastlyReadedKeys);
 
     return () => {
-      removeCallbackFn(callbackId);
+      removeCallbackFn(ScannedKeysType.SELECT, callbackId);
     };
   }, [runParts, runStepParts]);
 

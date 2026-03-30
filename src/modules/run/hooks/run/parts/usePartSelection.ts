@@ -2,6 +2,7 @@ import { useScannerContext } from "@jield/solodb-react-components/modules/core/c
 import { notification } from "@jield/solodb-react-components/utils/notification";
 import { RunPart } from "@jield/solodb-typescript-core";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { ScannedKeysType } from "../../../utils/parseScannerForRun";
 
 export interface UsePartSelectionOptions {
   parts: RunPart[];
@@ -86,12 +87,12 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
 
   // So when it mounts it tries to pick the lastlyReadedKeys
   useEffect(() => {
-    removeCallbackFn(callbackId);
+    removeCallbackFn(ScannedKeysType.SELECT, callbackId);
     onScanReadsKey(lastlyReadedKeys);
-    addCallbackFn(callbackId, onScanReadsKey);
+    addCallbackFn(ScannedKeysType.SELECT, callbackId, onScanReadsKey);
 
     return () => {
-      removeCallbackFn(callbackId);
+      removeCallbackFn(ScannedKeysType.SELECT, callbackId);
     };
   }, [parts]);
 
