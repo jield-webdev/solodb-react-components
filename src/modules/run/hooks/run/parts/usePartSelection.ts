@@ -2,7 +2,7 @@ import { useScannerContext } from "@jield/solodb-react-components/modules/core/c
 import { notification } from "@jield/solodb-react-components/utils/notification";
 import { RunPart } from "@jield/solodb-typescript-core";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { ScannedKeysType } from "../../../utils/parseScannerForRun";
+import parseScannerForRun, { ScannedKeysType } from "../../../utils/parseScannerForRun";
 
 export interface UsePartSelectionOptions {
   parts: RunPart[];
@@ -44,6 +44,8 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
   // Update the ref whenever parts or setPartAsSelected changes
   const onScanReadsKey = useCallback(
     (keys: string) => {
+      if (parseScannerForRun(keys) != ScannedKeysType.SELECT) return;
+
       const normalizedRead = keys.replace(/_/g, "-").toUpperCase();
 
       // TO prevent empty values

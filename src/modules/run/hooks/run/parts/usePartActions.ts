@@ -45,7 +45,7 @@ export function usePartActions<T>({
   const queryClient = useQueryClient();
 
   // read keys from the scanner
-  const { lastlyReadedKeys, addCallbackFn, removeCallbackFn } = useScannerContext();
+  const { addCallbackFn, removeCallbackFn } = useScannerContext();
   const callbackId = useId();
 
   const performActionToSelectedParts = useCallback(
@@ -97,7 +97,7 @@ export function usePartActions<T>({
         RunStepPartActionEnum.FINISH_PROCESSING,
       ];
 
-      if (!actions.includes(Number(parsedScanner[2]))) {
+      if (!actions.includes(Number(parsedScanner[1]))) {
         notification({
           notificationHeader: "Part scanner",
           notificationBody: "Non valid action found in the scanned text",
@@ -106,45 +106,15 @@ export function usePartActions<T>({
         return;
       }
 
-      const partLabel = parsedScanner[1].replace(/_/g, "-").toUpperCase();
-
-      const foundPart = parts.find((p) => partLabel.includes(getRunStepPart(p)?.part.scanner_label));
-
-      const runStepPart = foundPart ? getRunStepPart(foundPart) : null;
-
-      if (!runStepPart) {
-        notification({
-          notificationHeader: "Part scanner",
-          notificationBody: "Trying to perform a action to a not found part",
-          notificationType: "danger",
-        });
-        return;
-      }
-
-      const action = Number(parsedScanner[2]) as RunStepPartActionEnum;
-
-      if (!getAvailableRunStepPartActions(runStepPart).includes(action)) {
-        notification({
-          notificationHeader: "Part scanner",
-          notificationBody: "The selected action is not available on the selected part",
-          notificationType: "danger",
-        });
-        return;
-      }
+      const action = Number(parsedScanner[1]) as RunStepPartActionEnum;
 
       notification({
         notificationHeader: "Part scanner",
-        notificationBody: `Performin action in ${runStepPart.part.scanner_label}`,
+        notificationBody: `Performin action ${actionIdToName(action)} in selected parts`,
         notificationType: "success",
       });
 
-      performRunStepPartAction(runStepPart, action).then((latestAction) => {
-        updateRunStepPartCache(queryClient, {
-          runStepPart,
-          action,
-          latestAction: latestAction as RunStepPart["latest_action"],
-        });
-      });
+      performActionToSelectedParts(action);
     },
     [performActionToSelectedParts]
   );
@@ -152,12 +122,13 @@ export function usePartActions<T>({
   useEffect(() => {
     if (!actionsFromScanner) return;
 
+    removeCallbackFn(ScannedKeysType.PERFORM_ACTION, callbackId);
     addCallbackFn(ScannedKeysType.PERFORM_ACTION, callbackId, onScanner);
 
     return () => {
       removeCallbackFn(ScannedKeysType.PERFORM_ACTION, callbackId);
     };
-  }, [parts]);
+  }, [parts, performActionToSelectedParts]);
 
   const getAvailableActionsForSelection = useCallback((): Set<RunStepPartActionEnum> => {
     const selectedItems = parts.filter((part) => selectedParts.get(getPartId(part)));
@@ -187,7 +158,18 @@ export function usePartActions<T>({
 
 function validScannerInput(input: string) {
   // The regex pattern
-  const pattern = new RegExp(`^${PERFORM_ACTION_TRIGER}/.+/\\d+$`);
+  const pattern = new RegExp(`^${PERFORM_ACTION_TRIGER}/\\d+$`);
 
   return pattern.test(input);
+}
+
+function actionIdToName(actionId: number): string {
+  const actionsMap: Map<number, string> = new Map([
+    [RunStepPartActionEnum.START_PROCESSING, "Start processing"],
+    [RunStepPartActionEnum.FINISH_PROCESSING, "Finish processing"],
+    [RunStepPartActionEnum.FAILED_PROCESSING, "Failed processing"],
+    [RunStepPartActionEnum.REWORK, "Rework"],
+  ]);
+
+  return actionsMap.get(actionId) ?? "NOT FOUND";
 }
