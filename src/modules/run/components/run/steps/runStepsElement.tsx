@@ -195,7 +195,7 @@ export default function RunStepsElement() {
                             step={step}
                             parts={runParts}
                             stepParts={runStepParts.filter(
-                              (part) => part.step.id === (requirement.requirement_for_step?.id ?? requirement.step.id)
+                              (part) => part.step_id === (requirement.requirement_for_step?.id ?? requirement.step.id)
                             )}
                             refetchFn={reloadQueriesByKey}
                           />
@@ -206,7 +206,7 @@ export default function RunStepsElement() {
                         run={run}
                         step={step}
                         parts={runParts}
-                        stepParts={runStepParts.filter((part) => part.step.id === step.id)}
+                        stepParts={runStepParts.filter((part) => part.step_id === step.id)}
                         monitoredBy={monitoredSteps[step.id]}
                         refetchFn={reloadQueriesByKey}
                       />
