@@ -31,7 +31,7 @@ const RunStepPartProductionTableRow = (props: Props) => {
   const [runStepPart, setRunStepPart] = useState<RunStepPart | undefined>();
 
   useEffect(() => {
-    const match = props.runStepParts.find((sp) => sp.part.id === props.runPart.id);
+    const match = props.runStepParts.find((sp) => sp.part_id === props.runPart.id);
     setRunStepPart(match);
   }, [props.runStepParts, props.runPart.id]);
 
@@ -45,7 +45,7 @@ const RunStepPartProductionTableRow = (props: Props) => {
       return;
     }
 
-    const partId = runStepPart ? runStepPart.part.id : props.runPart.id;
+    const partId = runStepPart ? runStepPart.part_id : props.runPart.id;
     if (partId !== undefined) {
       props.setPartAsSelected(partId);
     }
@@ -134,12 +134,12 @@ const RunStepPartProductionTableRow = (props: Props) => {
         {props.setPartAsSelected && (
           <input
             type="checkbox"
-            id={`part-select-${runStepPart.part.id}`}
+            id={`part-select-${runStepPart.part_id}`}
             name="tomato"
             className={"form-check-input"}
             checked={props.partIsSelected}
             onChange={() => {
-              props.setPartAsSelected?.(runStepPart.part.id);
+              props.setPartAsSelected?.(runStepPart.part_id);
             }}
           />
         )}
