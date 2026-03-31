@@ -11,6 +11,7 @@ import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/r
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import { PERFORM_ACTION_TRIGER, ScannedKeysType } from "../../../utils/parseScannerForRun";
 import { notification } from "@jield/solodb-react-components/utils/notification";
+import { actionEnumToName, actionLabelToEnum } from "@jield/solodb-typescript-core";
 
 export interface UsePartActionsOptions<T> {
   runStep: RunStep;
@@ -90,14 +91,9 @@ export function usePartActions<T>({
 
       const parsedScanner = keys.split("/");
 
-      const actions = [
-        RunStepPartActionEnum.START_PROCESSING,
-        RunStepPartActionEnum.REWORK,
-        RunStepPartActionEnum.FAILED_PROCESSING,
-        RunStepPartActionEnum.FINISH_PROCESSING,
-      ];
+      const action = actionLabelToEnum(parsedScanner[1]);
 
-      if (!actions.includes(Number(parsedScanner[1]))) {
+      if (!action) {
         notification({
           notificationHeader: "Part scanner",
           notificationBody: "Non valid action found in the scanned text",
@@ -106,11 +102,9 @@ export function usePartActions<T>({
         return;
       }
 
-      const action = Number(parsedScanner[1]) as RunStepPartActionEnum;
-
       notification({
         notificationHeader: "Part scanner",
-        notificationBody: `Performin action ${actionIdToName(action)} in selected parts`,
+        notificationBody: `Performin action ${actionEnumToName(action)} in selected parts`,
         notificationType: "success",
       });
 
@@ -158,18 +152,7 @@ export function usePartActions<T>({
 
 function validScannerInput(input: string) {
   // The regex pattern
-  const pattern = new RegExp(`^${PERFORM_ACTION_TRIGER}/\\d+$`);
+  const pattern = new RegExp(`^${PERFORM_ACTION_TRIGER}/.+`);
 
   return pattern.test(input);
-}
-
-function actionIdToName(actionId: number): string {
-  const actionsMap: Map<number, string> = new Map([
-    [RunStepPartActionEnum.START_PROCESSING, "Start processing"],
-    [RunStepPartActionEnum.FINISH_PROCESSING, "Finish processing"],
-    [RunStepPartActionEnum.FAILED_PROCESSING, "Failed processing"],
-    [RunStepPartActionEnum.REWORK, "Rework"],
-  ]);
-
-  return actionsMap.get(actionId) ?? "NOT FOUND";
 }

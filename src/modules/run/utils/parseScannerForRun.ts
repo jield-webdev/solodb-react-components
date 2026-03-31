@@ -3,10 +3,10 @@ export enum ScannedKeysType {
   PERFORM_ACTION,
 }
 
-export const PERFORM_ACTION_TRIGER = "rpa";
+export const PERFORM_ACTION_TRIGER = "_qr";
 
 export default function parseScannerForRun(scannedKeys: string): ScannedKeysType {
-    if (scannedKeys.includes(PERFORM_ACTION_TRIGER)) {
+    if (scannedKeys.startsWith(PERFORM_ACTION_TRIGER)) {
         return ScannedKeysType.PERFORM_ACTION;
     }
     
