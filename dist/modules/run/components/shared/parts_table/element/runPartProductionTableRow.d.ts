@@ -1,13 +1,14 @@
 import { RunPart, RunStepPart, RunStep } from '@jield/solodb-typescript-core';
-declare const RunStepPartProductionTableRow: ({ runPart, runStepParts, runStep, refetchFn, partIsSelected, setPartAsSelected, dropdown, layout, onRunStepPartUpdated, }: {
+type Props = {
     runPart: RunPart;
-    runStepParts: RunStepPart[];
-    runStep: RunStep;
-    refetchFn?: () => void;
     partIsSelected?: boolean;
     setPartAsSelected?: (partID: number) => void;
-    dropdown?: boolean;
-    layout?: "default" | "research";
+    runStepParts: RunStepPart[];
+    canInit: boolean;
+    runStep: RunStep;
+    refetchFn?: () => void;
+    dropdown: boolean;
     onRunStepPartUpdated?: (runStepPart: RunStepPart) => void;
-}) => import("react/jsx-runtime").JSX.Element;
+};
+declare const RunStepPartProductionTableRow: (props: Props) => import("react/jsx-runtime").JSX.Element | null;
 export default RunStepPartProductionTableRow;

@@ -6,12 +6,13 @@ import {
   RunStepPart,
   RunStep,
   getAvailableRunStepPartActions,
+  actionLabelToEnum,
+  actionEnumToName,
 } from "@jield/solodb-typescript-core";
 import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import { PERFORM_ACTION_TRIGER, ScannedKeysType } from "../../../utils/parseScannerForRun";
 import { notification } from "@jield/solodb-react-components/utils/notification";
-import { actionEnumToName, actionLabelToEnum } from "@jield/solodb-typescript-core";
 
 export interface UsePartActionsOptions<T> {
   runStep: RunStep;

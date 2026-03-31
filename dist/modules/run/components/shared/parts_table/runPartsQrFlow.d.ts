@@ -1,10 +1,8 @@
-import { Run, RunStep, RunStepPart, RunPart } from '@jield/solodb-typescript-core';
+import { Run, RunStep } from '@jield/solodb-typescript-core';
 type Props = {
     run: Run;
     runStep: RunStep;
-    runStepParts?: RunStepPart[];
-    runParts?: RunPart[];
     refetchFn?: () => void;
 };
-declare const RunPartsQrFlow: ({ run, runStep, runStepParts, runParts, refetchFn }: Props) => import("react/jsx-runtime").JSX.Element;
+declare const RunPartsQrFlow: ({ run, runStep, refetchFn }: Props) => import("react/jsx-runtime").JSX.Element;
 export default RunPartsQrFlow;

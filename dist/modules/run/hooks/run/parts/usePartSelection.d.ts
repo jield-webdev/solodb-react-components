@@ -1,10 +1,11 @@
-import { RunPart, RunStepPart } from '@jield/solodb-typescript-core';
+import { RunPart } from '@jield/solodb-typescript-core';
 export interface UsePartSelectionOptions {
-    parts: RunPart[] | RunStepPart[];
+    parts: RunPart[];
 }
 export interface UsePartSelectionResult {
     selectedParts: Map<number, boolean>;
     setPartAsSelected: (partID: number) => void;
+    setPartsSelection: (partIDs: number[], nextSelected: boolean) => void;
     selectAllParts: () => void;
     selectNoneParts: () => void;
     hasSelectedParts: boolean;

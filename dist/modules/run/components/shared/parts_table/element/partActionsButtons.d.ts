@@ -11,4 +11,4 @@ export interface PartActionsDropdownProps {
  * Renders a dropdown menu with available actions (Start, Finish, Failed, Repair, Testing, Rework)
  * and optionally an Init action for production runs.
  */
-export declare const PartActionsDropdown: ({ availableActions, onActionSelected, showInitAction, onInitSelected, }: PartActionsDropdownProps) => import("react/jsx-runtime").JSX.Element | null;
+export declare const PartActionsButtons: ({ availableActions, onActionSelected, showInitAction, onInitSelected, }: PartActionsDropdownProps) => import("react/jsx-runtime").JSX.Element | null;

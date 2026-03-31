@@ -6,6 +6,7 @@ export interface UsePartActionsOptions<T> {
     getPartId: (part: T) => number;
     getRunStepPart: (part: T) => RunStepPart | undefined;
     refetchFn?: () => void;
+    actionsFromScanner?: boolean;
 }
 export interface UsePartActionsResult {
     performActionToSelectedParts: (action: RunStepPartActionEnum) => void;
@@ -17,4 +18,4 @@ export interface UsePartActionsResult {
  * @param options Configuration object with parts, selection state, and action mappings
  * @returns Functions for performing and querying available actions
  */
-export declare function usePartActions<T>({ runStep, parts, selectedParts, getPartId, getRunStepPart, refetchFn, }: UsePartActionsOptions<T>): UsePartActionsResult;
+export declare function usePartActions<T>({ runStep, parts, selectedParts, getPartId, getRunStepPart, refetchFn, actionsFromScanner, }: UsePartActionsOptions<T>): UsePartActionsResult;
