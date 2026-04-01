@@ -44,31 +44,11 @@ const updateStepParts = (
   const { runStepPart, action, latestAction } = options;
 
   return stepParts.map((item) => {
-    const shouldMarkFailedPart =
-      action === RunStepPartActionEnum.FAILED_PROCESSING && item.part.id === runStepPart.part.id;
-    const shouldUpdateItem = item.id === runStepPart.id;
-
-    if (!shouldMarkFailedPart && !shouldUpdateItem) {
+    if (item.id !== runStepPart.id) {
       return item;
     }
 
-    let next = item;
-
-    if (shouldMarkFailedPart) {
-      next = {
-        ...next,
-        part: {
-          ...next.part,
-          part_processing_failed: true,
-        },
-      };
-    }
-
-    if (shouldUpdateItem) {
-      next = applyActionToRunStepPart(next, action, latestAction);
-    }
-
-    return next;
+    return applyActionToRunStepPart(item, action, latestAction);
   });
 };
 

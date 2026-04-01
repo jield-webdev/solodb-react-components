@@ -117,7 +117,7 @@ describe("usePartSelection", () => {
   });
 
   it("deduplicates buffered scanned keys before applying selection", async () => {
-    const bufferedPart = { id: 1, short_label: "ABC-123" } as RunPart;
+    const bufferedPart = { id: 1, short_label: "ABC-123", scanner_label: "ABC-123" } as RunPart;
     let latestResult: UsePartSelectionResult | null = null;
 
     const Inner = ({ parts, onChange }: { parts: RunPart[]; onChange: (result: UsePartSelectionResult) => void }) => {

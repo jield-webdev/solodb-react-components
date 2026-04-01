@@ -170,7 +170,7 @@ const RunPartsQrFlow = ({ run, runStep, refetchFn = () => {} }: Props) => {
 };
 
 const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart): boolean => {
-  const stepPart = runStepParts.find((p) => p.part.id == part.id);
+  const stepPart = runStepParts.find((p) => p.part_id == part.id);
 
   if (stepPart === null || stepPart === undefined) return false;
 

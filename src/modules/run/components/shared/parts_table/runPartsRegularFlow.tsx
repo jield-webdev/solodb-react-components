@@ -88,7 +88,7 @@ const RunPartsRegularFlow = ({ run, runStep, refetchFn }: Props) => {
     runStep,
     parts: runStepParts,
     selectedParts,
-    getPartId: (part) => part.part.id,
+    getPartId: (part) => part.part_id,
     getRunStepPart: (part) => part,
     refetchFn: effectiveRefetchFn,
   });
@@ -99,14 +99,15 @@ const RunPartsRegularFlow = ({ run, runStep, refetchFn }: Props) => {
     const trayPartsMap = new Map<number, { id: number; label: string; partIds: number[] }>();
 
     runStepParts.forEach((stepPart) => {
-      const tray = stepPart.part.tray;
+      const runPart = runParts.find((p) => p.id === stepPart.part_id);
+      const tray = runPart?.tray;
       if (!tray) return;
       const entry = trayPartsMap.get(tray.id) ?? {
         id: tray.id,
         label: tray.name ?? tray.label ?? `Tray ${tray.id}`,
         partIds: [] as number[],
       };
-      entry.partIds.push(stepPart.part.id);
+      entry.partIds.push(stepPart.part_id);
       trayPartsMap.set(tray.id, entry);
     });
 

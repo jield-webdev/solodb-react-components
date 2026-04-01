@@ -25,7 +25,7 @@ export const RunPartList = ({
       return a.left - b.left;
     });
 
-  const stepPartsById = new Map(stepParts.filter((sp) => sp.step.id === step.id).map((sp) => [sp.part.id, sp]));
+  const stepPartsById = new Map(stepParts.filter((sp) => sp.step_id === step.id).map((sp) => [sp.part_id, sp]));
 
   const trays = [...(run.run_trays ?? [])].sort((a, b) => a.sequence - b.sequence);
 
