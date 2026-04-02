@@ -57,9 +57,6 @@ export default function StepInList({
             parts={parts}
             stepParts={stepParts}
             run={run}
-            reloadFn={() => {
-              refetchFn(["runStepParts"]);
-            }}
           />
         </td>
         <td>

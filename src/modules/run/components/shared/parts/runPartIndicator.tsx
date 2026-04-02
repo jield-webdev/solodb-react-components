@@ -1,7 +1,8 @@
 import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
-import { RunPart, RunStep } from "@jield/solodb-typescript-core";
+import { RunPart, RunStep, RunStepPart } from "@jield/solodb-typescript-core";
+import { upsertRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 
 const RunPartIndicator = ({
   runPart,
@@ -11,7 +12,6 @@ const RunPartIndicator = ({
   hasStepPart = false,
   isSelected = false,
   runStep,
-  reloadFn = () => {},
 }: {
   runPart: RunPart | null;
   statusClass?: string;
@@ -20,7 +20,6 @@ const RunPartIndicator = ({
   hasStepPart?: boolean;
   isSelected?: boolean;
   runStep?: RunStep;
-  reloadFn?: () => void;
 }) => {
   const queryClient = useQueryClient();
 
@@ -31,11 +30,9 @@ const RunPartIndicator = ({
         run_part_id: runPart.id,
         run_step_id: runStep.id,
       })
-      .then(() => {
-        reloadFn();
-        queryClient.invalidateQueries({
-          queryKey: ["runSteps", "runStepParts"],
-        });
+      .then((response) => {
+        const nextStepPart = { ...response.data } as RunStepPart;
+        upsertRunStepPartCache(queryClient, runStep, nextStepPart);
       });
   };
 

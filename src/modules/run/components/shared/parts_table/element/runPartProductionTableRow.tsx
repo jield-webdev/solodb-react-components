@@ -12,7 +12,7 @@ import {
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import RunPartProductionActionsDropdown from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsDropdown";
 import RunPartProductionActionsButtons from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsButtons";
-import { upsertRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
+import { upsertRunStepPartCache, updateRunStepPartCacheByRunStep } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 
 type Props = {
   runPart: RunPart;
@@ -97,6 +97,12 @@ const RunStepPartProductionTableRow = ({
         failed,
         started,
       };
+    });
+
+    updateRunStepPartCacheByRunStep(queryClient, runStep, {
+      runStepPart: targetStepPart,
+      action: runStepPartAction,
+      latestAction,
     });
   };
 

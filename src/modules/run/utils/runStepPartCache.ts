@@ -99,14 +99,14 @@ export const updateRunStepPartCacheByRunStep = (
   runStep: RunStep,
   options: UpdateRunStepPartCacheOptions
 ) => {
-  queryClient.setQueriesData({ queryKey: ["runStepParts", runStep.id] }, (data) =>
-    updateRunStepPartsData(data, options)
-  );
+  // Broad prefix covers both table-level queries (["runStepParts", runStep.id])
+  // and run-level queries (["runStepParts", JSON.stringify(run)]) used in runStepsElement.
+  // The updater only modifies items whose id matches, so applying to all caches is safe.
+  queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => updateRunStepPartsData(data, options));
   queryClient.setQueriesData({ queryKey: ["stepParts", runStep.id] }, (data) => updateRunStepPartsData(data, options));
 };
 
 export const upsertRunStepPartCache = (queryClient: QueryClient, runStep: RunStep, runStepPart: RunStepPart) => {
-  queryClient.setQueriesData({ queryKey: ["runStepParts", runStep.id] }, (data) =>
-    upsertRunStepPartInData(data, runStepPart)
-  );
+  // Broad prefix covers both table-level and run-level queries.
+  queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => upsertRunStepPartInData(data, runStepPart));
 };
