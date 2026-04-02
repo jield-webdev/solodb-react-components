@@ -48,15 +48,12 @@ const RunPartsRegularFlow = ({ run, runStep, refetchFn }: Props) => {
   const isLoading = queries.some((q) => q.isLoading);
   const isError = queries.some((q) => q.isError);
 
-  const runParts = useMemo<RunPart[]>(
-    () => (runPartQuery.data?.items as RunPart[]) ?? [],
-    [runPartQuery.data]
-  );
+  const runParts = useMemo<RunPart[]>(() => (runPartQuery.data?.items as RunPart[]) ?? [], [runPartQuery.data]);
 
   const runStepParts = useMemo<RunStepPart[]>(
     () => (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
     [runStepPartsQuery.data]
-  );
+ );
 
   const effectiveRefetchFn = () => {
     queryClient.invalidateQueries({ queryKey: ["runParts", run.id, runStep.part_level] });
@@ -89,7 +86,7 @@ const RunPartsRegularFlow = ({ run, runStep, refetchFn }: Props) => {
     parts: runParts,
     selectedParts,
     getRunPart: undefined, // Not needed when passing RunPart[]
-    getRunStepPart: (part) => runStepParts.find(sp => sp.part_id === part.id),
+    getRunStepPart: (part) => runStepParts.find((sp) => sp.part_id === part.id),
     refetchFn: effectiveRefetchFn,
   });
 
@@ -175,7 +172,6 @@ const RunPartsRegularFlow = ({ run, runStep, refetchFn }: Props) => {
                     runStepParts={runStepParts}
                     key={`key-${i}-${runPart.id}`}
                     canInit={run.run_type === RunTypeEnum.PRODUCTION}
-                    refetchFn={effectiveRefetchFn}
                     partIsSelected={partIsSelected}
                     setPartAsSelected={setPartAsSelected}
                     dropdown={USE_DROPDOWN}

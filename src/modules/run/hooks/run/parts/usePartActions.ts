@@ -99,7 +99,7 @@ export function usePartActions({
         }
 
         if (runStepPart && runPart) {
-          const availableActions = getAvailableRunStepPartActions(runStepPart, runPart);
+          const availableActions = getAvailableRunStepPartActions(runStepPart);
           if (availableActions.includes(action)) {
             promises.push(
               performRunStepPartAction(runStepPart, action, runStep).then((latestAction) => {

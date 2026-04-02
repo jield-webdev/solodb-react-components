@@ -1,9 +1,8 @@
 import { Button } from "react-bootstrap";
-import { RunStepPartActionEnum, RunStepPart, RunPart, getAvailableRunStepPartActions } from "@jield/solodb-typescript-core";
+import { RunStepPartActionEnum, RunStepPart, getAvailableRunStepPartActions } from "@jield/solodb-typescript-core";
 
 type Props = {
   runStepPart: RunStepPart;
-  runPart: RunPart;
   setRunStepPartAction: ({
     runStepPart,
     runStepPartAction,
@@ -13,8 +12,8 @@ type Props = {
   }) => void;
 };
 
-const RunPartProductionActionsButtons = ({ runStepPart, runPart, setRunStepPartAction }: Props) => {
-  const availableActions = getAvailableRunStepPartActions(runStepPart, runPart);
+const RunPartProductionActionsButtons = ({ runStepPart, setRunStepPartAction }: Props) => {
+  const availableActions = getAvailableRunStepPartActions(runStepPart);
 
   return (
     <div className={"d-flex justify-content-between gap-1"}>

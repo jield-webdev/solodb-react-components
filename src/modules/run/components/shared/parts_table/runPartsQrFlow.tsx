@@ -79,12 +79,16 @@ const RunPartsQrFlow = ({ run, runStep, refetchFn = () => {} }: Props) => {
     [leveledParts, runStepParts, selectedParts, showCompletedParts]
   );
 
-  const reloadData = () => {
+  const reloadAllData = () => {
     // Reload the data
     queryClient.invalidateQueries({ queryKey: ["runParts", run.id, runStep.part_level] });
     queryClient.invalidateQueries({ queryKey: ["runStepParts", runStep.id] });
     refetchFn();
   };
+
+  const reloadPartData = (partId: number) => {
+
+  }
 
   // Handle notifying when a part is completed and therefore is not shown
   const { lastlyReadedKeys, addCallbackFn, removeCallbackFn } = useScannerContext();
@@ -148,7 +152,6 @@ const RunPartsQrFlow = ({ run, runStep, refetchFn = () => {} }: Props) => {
               runPart={runPart}
               runStepParts={runStepParts}
               canInit={false}
-              refetchFn={reloadData}
               key={`${runPart.parsed_label}${i}`}
               partIsSelected={selectedParts.get(runPart.id) ?? false}
               dropdown={false}

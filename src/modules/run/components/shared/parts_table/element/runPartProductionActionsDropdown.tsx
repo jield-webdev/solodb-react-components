@@ -4,7 +4,6 @@ import { RunStepPartActionEnum, RunStepPart, RunPart, getAvailableRunStepPartAct
 
 type Props = {
   runStepPart: RunStepPart;
-  runPart: RunPart;
   createRunStepPart: () => void;
   setRunStepPartAction: ({
     runStepPart,
@@ -15,8 +14,8 @@ type Props = {
   }) => void;
 };
 
-const RunPartProductionActionsDropdown = ({ runStepPart, runPart, setRunStepPartAction, createRunStepPart }: Props) => {
-  const availableActions = getAvailableRunStepPartActions(runStepPart, runPart);
+const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, createRunStepPart }: Props) => {
+  const availableActions = getAvailableRunStepPartActions(runStepPart);
 
   return (
     <Dropdown align="end">
