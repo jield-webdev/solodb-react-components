@@ -6,9 +6,7 @@ type Props = {
     runStepParts: RunStepPart[];
     canInit: boolean;
     runStep: RunStep;
-    refetchFn?: () => void;
     dropdown: boolean;
-    onRunStepPartUpdated?: (runStepPart: RunStepPart) => void;
 };
-declare const RunStepPartProductionTableRow: (props: Props) => import("react/jsx-runtime").JSX.Element | null;
+declare const RunStepPartProductionTableRow: ({ runPart, partIsSelected, setPartAsSelected, runStepParts, canInit, runStep, dropdown, }: Props) => import("react/jsx-runtime").JSX.Element | null;
 export default RunStepPartProductionTableRow;

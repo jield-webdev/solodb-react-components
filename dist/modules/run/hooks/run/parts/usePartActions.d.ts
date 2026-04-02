@@ -1,10 +1,10 @@
-import { RunStepPartActionEnum, RunStepPart, RunStep } from '@jield/solodb-typescript-core';
-export interface UsePartActionsOptions<T> {
+import { RunStepPartActionEnum, RunStepPart, RunStep, RunPart } from '@jield/solodb-typescript-core';
+export interface UsePartActionsOptions {
     runStep: RunStep;
-    parts: T[];
+    parts: RunStepPart[] | RunPart[];
     selectedParts: Map<number, boolean>;
-    getPartId: (part: T) => number;
-    getRunStepPart: (part: T) => RunStepPart | undefined;
+    getRunPart?: (part: RunStepPart) => number;
+    getRunStepPart?: (part: RunPart) => RunStepPart | undefined;
     refetchFn?: () => void;
     actionsFromScanner?: boolean;
 }
@@ -18,4 +18,4 @@ export interface UsePartActionsResult {
  * @param options Configuration object with parts, selection state, and action mappings
  * @returns Functions for performing and querying available actions
  */
-export declare function usePartActions<T>({ runStep, parts, selectedParts, getPartId, getRunStepPart, refetchFn, actionsFromScanner, }: UsePartActionsOptions<T>): UsePartActionsResult;
+export declare function usePartActions({ runStep, parts, selectedParts, getRunPart, getRunStepPart, refetchFn, actionsFromScanner, }: UsePartActionsOptions): UsePartActionsResult;

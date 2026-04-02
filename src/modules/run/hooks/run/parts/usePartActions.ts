@@ -208,7 +208,7 @@ export function usePartActions({
       }
 
       if (runStepPart && runPart) {
-        const actionsForPart = getAvailableRunStepPartActions(runStepPart, runPart);
+        const actionsForPart = getAvailableRunStepPartActions(runStepPart);
         actionsForPart.forEach((action) => actionSet.add(action));
       }
     });

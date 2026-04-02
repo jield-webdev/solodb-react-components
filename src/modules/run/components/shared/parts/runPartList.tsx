@@ -8,13 +8,11 @@ export const RunPartList = ({
   parts,
   stepParts,
   run,
-  reloadFn,
 }: {
   step: RunStep;
   parts: RunPart[];
   stepParts: RunStepPart[];
   run: Run;
-  reloadFn?: () => void;
 }) => {
   const leveledParts = parts
     .filter((p) => p.part_level === step.part_level)
@@ -69,7 +67,6 @@ export const RunPartList = ({
             hasStepPart={stepPartsById.has(runPart.id)}
             isSelected={selectedPartIds.includes(runPart.id)}
             runStep={step}
-            reloadFn={reloadFn}
           />
         ))}
       </div>
@@ -147,7 +144,6 @@ export const RunPartList = ({
               hasStepPart={runPart ? stepPartsById.has(runPart.id) : false}
               isSelected={runPart ? selectedPartIds.includes(runPart.id) : false}
               runStep={step}
-              reloadFn={reloadFn}
             />
           );
         })}
@@ -183,7 +179,6 @@ export const RunPartList = ({
                     hasStepPart={stepPartsById.has(runPart.id)}
                     isSelected={selectedPartIds.includes(runPart.id)}
                     runStep={step}
-                    reloadFn={reloadFn}
                   />
                 ))}
               </div>
@@ -234,7 +229,6 @@ export const RunPartList = ({
                     hasStepPart={runPart ? stepPartsById.has(runPart.id) : false}
                     isSelected={runPart ? selectedPartIds.includes(runPart.id) : false}
                     runStep={step}
-                    reloadFn={reloadFn}
                   />
                 );
               })}
