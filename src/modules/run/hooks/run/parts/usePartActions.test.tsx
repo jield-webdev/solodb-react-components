@@ -46,8 +46,8 @@ describe("usePartActions", () => {
     { id: 30, part: { id: 3 } } as RunStepPart,
   ];
 
-  const getPartId = (part: MockPart) => part.id;
-  const getRunStepPart = (part: MockPart) => mockRunStepParts.find((sp) => sp.id === part.stepPartId);
+  const getRunPart = (part: any) => part.id || part.part_id;
+  const getRunStepPart = (part: any) => mockRunStepParts.find((sp) => sp.id === part.stepPartId);
 
   beforeEach(() => {
     queryClient = new QueryClient({
@@ -75,7 +75,7 @@ describe("usePartActions", () => {
           runStep: mockRunStep,
           parts: mockParts,
           selectedParts,
-          getPartId,
+          getRunPart,
           getRunStepPart,
         }),
       { wrapper }
@@ -104,7 +104,7 @@ describe("usePartActions", () => {
           runStep: mockRunStep,
           parts: mockParts,
           selectedParts,
-          getPartId,
+          getRunPart,
           getRunStepPart,
         }),
       { wrapper }
@@ -139,7 +139,7 @@ describe("usePartActions", () => {
           runStep: mockRunStep,
           parts: mockParts,
           selectedParts,
-          getPartId,
+          getRunPart,
           getRunStepPart,
           refetchFn,
         }),
@@ -155,7 +155,8 @@ describe("usePartActions", () => {
       expect(performRunStepPartActionMock).toHaveBeenCalledTimes(1);
       expect(performRunStepPartActionMock).toHaveBeenCalledWith(
         mockRunStepParts[0],
-        RunStepPartActionEnum.START_PROCESSING
+        RunStepPartActionEnum.START_PROCESSING,
+        mockRunStep
       );
     });
 
@@ -178,7 +179,7 @@ describe("usePartActions", () => {
           runStep: mockRunStep,
           parts: mockParts,
           selectedParts,
-          getPartId,
+          getRunPart,
           getRunStepPart,
         }),
       { wrapper }
@@ -209,7 +210,7 @@ describe("usePartActions", () => {
           runStep: mockRunStep,
           parts: partsWithoutStepPart,
           selectedParts,
-          getPartId,
+          getRunPart,
           getRunStepPart,
         }),
       { wrapper }
@@ -241,7 +242,7 @@ describe("usePartActions", () => {
           runStep: mockRunStep,
           parts: mockParts,
           selectedParts,
-          getPartId,
+          getRunPart,
           getRunStepPart,
           refetchFn,
         }),

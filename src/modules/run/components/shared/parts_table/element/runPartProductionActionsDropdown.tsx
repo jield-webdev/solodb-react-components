@@ -1,9 +1,10 @@
 import React from "react";
 import { Dropdown } from "react-bootstrap";
-import { RunStepPartActionEnum, RunStepPart } from "@jield/solodb-typescript-core";
+import { RunStepPartActionEnum, RunStepPart, RunPart, getAvailableRunStepPartActions } from "@jield/solodb-typescript-core";
 
 type Props = {
   runStepPart: RunStepPart;
+  runPart: RunPart;
   createRunStepPart: () => void;
   setRunStepPartAction: ({
     runStepPart,
@@ -14,21 +15,8 @@ type Props = {
   }) => void;
 };
 
-const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, createRunStepPart }: Props) => {
-  const lastAction = runStepPart.latest_action?.type.id ?? null;
-  const showStart = runStepPart.actions === 0 || lastAction === RunStepPartActionEnum.REWORK;
-  const showFinishFailed =
-    runStepPart.actions > 0 &&
-    (lastAction === RunStepPartActionEnum.START_PROCESSING || lastAction === null);
-  const showTesting =
-    lastAction === RunStepPartActionEnum.FINISH_PROCESSING || lastAction === RunStepPartActionEnum.REPAIR;
-  const showRepair =
-    lastAction === RunStepPartActionEnum.FAILED_PROCESSING || lastAction === RunStepPartActionEnum.TESTING;
-  const showRework =
-    lastAction === RunStepPartActionEnum.FINISH_PROCESSING ||
-    lastAction === RunStepPartActionEnum.FAILED_PROCESSING ||
-    lastAction === RunStepPartActionEnum.REPAIR ||
-    lastAction === RunStepPartActionEnum.TESTING;
+const RunPartProductionActionsDropdown = ({ runStepPart, runPart, setRunStepPartAction, createRunStepPart }: Props) => {
+  const availableActions = getAvailableRunStepPartActions(runStepPart, runPart);
 
   return (
     <Dropdown align="end">
@@ -37,7 +25,7 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, c
         Actions
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        {showStart && (
+        {availableActions.includes(RunStepPartActionEnum.START_PROCESSING) && (
           <Dropdown.Item
             onClick={() =>
               setRunStepPartAction({
@@ -49,7 +37,7 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, c
             Start
           </Dropdown.Item>
         )}
-        {showFinishFailed && (
+        {availableActions.includes(RunStepPartActionEnum.FINISH_PROCESSING) && (
           <Dropdown.Item
             onClick={() =>
               setRunStepPartAction({
@@ -61,7 +49,7 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, c
             Finish
           </Dropdown.Item>
         )}
-        {showFinishFailed && (
+        {availableActions.includes(RunStepPartActionEnum.FAILED_PROCESSING) && (
           <Dropdown.Item
             onClick={() =>
               setRunStepPartAction({
@@ -73,7 +61,7 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, c
             Failed
           </Dropdown.Item>
         )}
-        {showTesting && (
+        {availableActions.includes(RunStepPartActionEnum.TESTING) && (
           <Dropdown.Item
             onClick={() =>
               setRunStepPartAction({
@@ -85,7 +73,7 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, c
             Testing
           </Dropdown.Item>
         )}
-        {showRepair && (
+        {availableActions.includes(RunStepPartActionEnum.REPAIR) && (
           <Dropdown.Item
             onClick={() =>
               setRunStepPartAction({
@@ -97,7 +85,7 @@ const RunPartProductionActionsDropdown = ({ runStepPart, setRunStepPartAction, c
             Repair
           </Dropdown.Item>
         )}
-        {showRework && (
+        {availableActions.includes(RunStepPartActionEnum.REWORK) && (
           <Dropdown.Item
             onClick={() =>
               setRunStepPartAction({

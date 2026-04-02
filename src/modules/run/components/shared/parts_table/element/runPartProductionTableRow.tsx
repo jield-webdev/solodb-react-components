@@ -86,7 +86,8 @@ const RunStepPartProductionTableRow = (props: Props) => {
   }) => {
     const latestAction = (await performRunStepPartAction(
       targetStepPart,
-      runStepPartAction
+      runStepPartAction,
+      props.runStep
     )) as RunStepPart["latest_action"];
 
     setRunStepPart((current) => {
@@ -155,12 +156,13 @@ const RunStepPartProductionTableRow = (props: Props) => {
         {props.dropdown && (
           <RunPartProductionActionsDropdown
             runStepPart={runStepPart}
+            runPart={props.runPart}
             setRunStepPartAction={setRunStepPartAction}
             createRunStepPart={createRunStepPart}
           />
         )}
         {!props.dropdown && (
-          <RunPartProductionActionsButtons runStepPart={runStepPart} setRunStepPartAction={setRunStepPartAction} />
+          <RunPartProductionActionsButtons runStepPart={runStepPart} runPart={props.runPart} setRunStepPartAction={setRunStepPartAction} />
         )}
       </td>
       <td>

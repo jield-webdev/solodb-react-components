@@ -5,6 +5,7 @@ import {
   RunStepPartActionEnum,
   RunStepPart,
   RunStep,
+  RunPart,
   getAvailableRunStepPartActions,
   actionLabelToEnum,
   actionEnumToName,
@@ -14,12 +15,12 @@ import { useScannerContext } from "@jield/solodb-react-components/modules/core/c
 import { PERFORM_ACTION_TRIGER, ScannedKeysType } from "../../../utils/parseScannerForRun";
 import { notification } from "@jield/solodb-react-components/utils/notification";
 
-export interface UsePartActionsOptions<T> {
+export interface UsePartActionsOptions {
   runStep: RunStep;
-  parts: T[];
+  parts: RunStepPart[] | RunPart[];
   selectedParts: Map<number, boolean>;
-  getPartId: (part: T) => number;
-  getRunStepPart: (part: T) => RunStepPart | undefined;
+  getRunPart?: (part: RunStepPart) => number;
+  getRunStepPart?: (part: RunPart) => RunStepPart | undefined;
   refetchFn?: () => void;
   actionsFromScanner?: boolean;
 }
@@ -35,42 +36,83 @@ export interface UsePartActionsResult {
  * @param options Configuration object with parts, selection state, and action mappings
  * @returns Functions for performing and querying available actions
  */
-export function usePartActions<T>({
+export function usePartActions({
   runStep,
   parts,
   selectedParts,
-  getPartId,
+  getRunPart,
   getRunStepPart,
   refetchFn,
   actionsFromScanner = true,
-}: UsePartActionsOptions<T>): UsePartActionsResult {
+}: UsePartActionsOptions): UsePartActionsResult {
   const queryClient = useQueryClient();
 
   // read keys from the scanner
   const { addCallbackFn, removeCallbackFn } = useScannerContext();
   const callbackId = useId();
 
+  // Helper to determine if we're working with RunStepPart or RunPart
+  const isRunStepPart = (part: RunStepPart | RunPart): part is RunStepPart => {
+    return 'step_id' in part && 'part_id' in part;
+  };
+
   const performActionToSelectedParts = useCallback(
     (action: RunStepPartActionEnum) => {
-      const selectedItems = parts.filter((part) => selectedParts.get(getPartId(part)));
+      let selectedItems: (RunStepPart | RunPart)[] = [];
+
+      // Filter selected parts based on their type
+      if (parts.length > 0 && isRunStepPart(parts[0])) {
+        // Working with RunStepPart[]
+        // In this case, we need getRunPart to map to the actual RunPart ID
+        selectedItems = (parts as RunStepPart[]).filter((part) => {
+          const partId = getRunPart ? getRunPart(part) : part.part_id;
+          return selectedParts.get(partId);
+        });
+      } else {
+        // Working with RunPart[]
+        selectedItems = (parts as RunPart[]).filter((part) => selectedParts.get(part.id));
+      }
 
       if (selectedItems.length === 0) {
         return;
       }
 
-      const promises = selectedItems
-        .map((item) => getRunStepPart(item))
-        .filter((runStepPart): runStepPart is RunStepPart => runStepPart !== undefined)
-        .filter((runStepPart) => getAvailableRunStepPartActions(runStepPart).some((a) => a === action))
-        .map((runStepPart) =>
-          performRunStepPartAction(runStepPart, action).then((latestAction) => {
-            updateRunStepPartCache(queryClient, {
-              runStepPart,
-              action,
-              latestAction: latestAction as RunStepPart["latest_action"],
-            });
-          })
-        );
+      const promises: Promise<void>[] = [];
+
+      for (const item of selectedItems) {
+        let runStepPart: RunStepPart | undefined;
+        let runPart: RunPart | undefined;
+
+        if (isRunStepPart(item)) {
+          // We have a RunStepPart but need a RunPart for getAvailableRunStepPartActions
+          runStepPart = item;
+          // Since we can't get the actual RunPart when working with RunStepPart[],
+          // we'll check if the part has the failed flag from previous step
+          runPart = {
+            id: getRunPart ? getRunPart(item) : item.part_id,
+            part_processing_failed: item.part_processing_failed_in_previous_step || false
+          } as RunPart;
+        } else {
+          // We have a RunPart and need to find the corresponding RunStepPart
+          runPart = item;
+          runStepPart = getRunStepPart ? getRunStepPart(item) : undefined;
+        }
+
+        if (runStepPart && runPart) {
+          const availableActions = getAvailableRunStepPartActions(runStepPart, runPart);
+          if (availableActions.includes(action)) {
+            promises.push(
+              performRunStepPartAction(runStepPart, action, runStep).then((latestAction) => {
+                updateRunStepPartCache(queryClient, {
+                  runStepPart,
+                  action,
+                  latestAction: latestAction as RunStepPart["latest_action"],
+                });
+              })
+            );
+          }
+        }
+      }
 
       Promise.all(promises).then(() => {
         queryClient.refetchQueries({ queryKey: ["stepParts", runStep.id] });
@@ -80,7 +122,7 @@ export function usePartActions<T>({
         }
       });
     },
-    [parts, selectedParts, getPartId, getRunStepPart, queryClient, runStep.id, refetchFn]
+    [parts, selectedParts, getRunPart, getRunStepPart, queryClient, runStep.id, refetchFn]
   );
 
   const onScanner = useCallback(
@@ -126,7 +168,19 @@ export function usePartActions<T>({
   }, [parts, performActionToSelectedParts]);
 
   const getAvailableActionsForSelection = useCallback((): Set<RunStepPartActionEnum> => {
-    const selectedItems = parts.filter((part) => selectedParts.get(getPartId(part)));
+    let selectedItems: (RunStepPart | RunPart)[] = [];
+
+    // Filter selected parts based on their type
+    if (parts.length > 0 && isRunStepPart(parts[0])) {
+      // Working with RunStepPart[]
+      selectedItems = (parts as RunStepPart[]).filter((part) => {
+        const partId = getRunPart ? getRunPart(part) : part.part_id;
+        return selectedParts.get(partId);
+      });
+    } else {
+      // Working with RunPart[]
+      selectedItems = (parts as RunPart[]).filter((part) => selectedParts.get(part.id));
+    }
 
     if (selectedItems.length === 0) {
       return new Set();
@@ -135,15 +189,32 @@ export function usePartActions<T>({
     const actionSet = new Set<RunStepPartActionEnum>();
 
     selectedItems.forEach((item) => {
-      const runStepPart = getRunStepPart(item);
-      if (runStepPart) {
-        const actionsForPart = getAvailableRunStepPartActions(runStepPart);
+      let runStepPart: RunStepPart | undefined;
+      let runPart: RunPart | undefined;
+
+      if (isRunStepPart(item)) {
+        // We have a RunStepPart but need a RunPart for getAvailableRunStepPartActions
+        runStepPart = item;
+        // Since we can't get the actual RunPart when working with RunStepPart[],
+        // we'll check if the part has the failed flag from previous step
+        runPart = {
+          id: getRunPart ? getRunPart(item) : item.part_id,
+          part_processing_failed: item.part_processing_failed_in_previous_step || false
+        } as RunPart;
+      } else {
+        // We have a RunPart and need to find the corresponding RunStepPart
+        runPart = item;
+        runStepPart = getRunStepPart ? getRunStepPart(item) : undefined;
+      }
+
+      if (runStepPart && runPart) {
+        const actionsForPart = getAvailableRunStepPartActions(runStepPart, runPart);
         actionsForPart.forEach((action) => actionSet.add(action));
       }
     });
 
     return actionSet;
-  }, [parts, selectedParts, getPartId, getRunStepPart]);
+  }, [parts, selectedParts, getRunPart, getRunStepPart]);
 
   return {
     performActionToSelectedParts,

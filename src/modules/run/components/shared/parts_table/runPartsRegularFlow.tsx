@@ -86,10 +86,10 @@ const RunPartsRegularFlow = ({ run, runStep, refetchFn }: Props) => {
 
   const { performActionToSelectedParts, getAvailableActionsForSelection } = usePartActions({
     runStep,
-    parts: runStepParts,
+    parts: runParts,
     selectedParts,
-    getPartId: (part) => part.part_id,
-    getRunStepPart: (part) => part,
+    getRunPart: undefined, // Not needed when passing RunPart[]
+    getRunStepPart: (part) => runStepParts.find(sp => sp.part_id === part.id),
     refetchFn: effectiveRefetchFn,
   });
 
