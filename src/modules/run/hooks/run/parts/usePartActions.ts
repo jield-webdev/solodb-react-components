@@ -9,6 +9,7 @@ import {
   getAvailableRunStepPartActions,
   actionLabelToEnum,
   actionEnumToName,
+  RunStepPartAction,
 } from "@jield/solodb-typescript-core";
 import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
@@ -21,7 +22,6 @@ export interface UsePartActionsOptions {
   selectedParts: Map<number, boolean>;
   getRunPart?: (part: RunStepPart) => number;
   getRunStepPart?: (part: RunPart) => RunStepPart | undefined;
-  refetchFn?: () => void;
   actionsFromScanner?: boolean;
 }
 
@@ -42,7 +42,6 @@ export function usePartActions({
   selectedParts,
   getRunPart,
   getRunStepPart,
-  refetchFn,
   actionsFromScanner = true,
 }: UsePartActionsOptions): UsePartActionsResult {
   const queryClient = useQueryClient();
@@ -53,7 +52,7 @@ export function usePartActions({
 
   // Helper to determine if we're working with RunStepPart or RunPart
   const isRunStepPart = (part: RunStepPart | RunPart): part is RunStepPart => {
-    return 'step_id' in part && 'part_id' in part;
+    return "step_id" in part && "part_id" in part;
   };
 
   const performActionToSelectedParts = useCallback(
@@ -90,7 +89,7 @@ export function usePartActions({
           // we'll check if the part has the failed flag from previous step
           runPart = {
             id: getRunPart ? getRunPart(item) : item.part_id,
-            part_processing_failed: item.part_processing_failed_in_previous_step || false
+            part_processing_failed: item.part_processing_failed_in_previous_step || false,
           } as RunPart;
         } else {
           // We have a RunPart and need to find the corresponding RunStepPart
@@ -102,11 +101,11 @@ export function usePartActions({
           const availableActions = getAvailableRunStepPartActions(runStepPart);
           if (availableActions.includes(action)) {
             promises.push(
-              performRunStepPartAction(runStepPart, action, runStep).then((latestAction) => {
+              performRunStepPartAction(runStepPart, action, runStep).then((latestAction: RunStepPartAction) => {
                 updateRunStepPartCache(queryClient, {
                   runStepPart,
                   action,
-                  latestAction: latestAction as RunStepPart["latest_action"],
+                  latestAction
                 });
               })
             );
@@ -114,15 +113,9 @@ export function usePartActions({
         }
       }
 
-      Promise.all(promises).then(() => {
-        queryClient.refetchQueries({ queryKey: ["stepParts", runStep.id] });
-        queryClient.refetchQueries({ queryKey: ["runStepParts", runStep.id] });
-        if (refetchFn) {
-          refetchFn();
-        }
-      });
+      Promise.all(promises);
     },
-    [parts, selectedParts, getRunPart, getRunStepPart, queryClient, runStep.id, refetchFn]
+    [parts, selectedParts, getRunPart, getRunStepPart, queryClient, runStep.id]
   );
 
   const onScanner = useCallback(
@@ -199,7 +192,7 @@ export function usePartActions({
         // we'll check if the part has the failed flag from previous step
         runPart = {
           id: getRunPart ? getRunPart(item) : item.part_id,
-          part_processing_failed: item.part_processing_failed_in_previous_step || false
+          part_processing_failed: item.part_processing_failed_in_previous_step || false,
         } as RunPart;
       } else {
         // We have a RunPart and need to find the corresponding RunStepPart
