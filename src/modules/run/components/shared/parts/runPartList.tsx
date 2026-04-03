@@ -100,6 +100,7 @@ export const RunPartList = ({
           slots[slotIndex].push(runPart);
           return;
         }
+        unassigned.push(runPart);
       } else {
         unassigned.push(runPart);
       }
