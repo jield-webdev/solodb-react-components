@@ -25,10 +25,9 @@ const USE_DROPDOWN = false;
 type Props = {
   run: Run;
   runStep: RunStep;
-  refetchFn?: () => void;
 };
 
-const RunPartsRegularFlow = ({ run, runStep, refetchFn }: Props) => {
+const RunPartsRegularFlow = ({ run, runStep }: Props) => {
   const queryClient = useQueryClient();
   const queries = useQueries({
     queries: [
@@ -54,13 +53,6 @@ const RunPartsRegularFlow = ({ run, runStep, refetchFn }: Props) => {
     () => (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
     [runStepPartsQuery.data]
  );
-
-  const effectiveRefetchFn = () => {
-    queryClient.invalidateQueries({ queryKey: ["runParts", run.id, runStep.part_level] });
-    queryClient.invalidateQueries({ queryKey: ["runStepParts", runStep.id] });
-
-    if (refetchFn) refetchFn();
-  };
 
   useEffect(() => {
     const partsToVerify = runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [];

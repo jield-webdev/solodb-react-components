@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import { RunStepParametersTable } from "@jield/solodb-react-components/modules/run/components/shared/parameters/runStepParametersTable";
 import { EmphasizedParametersContext } from "@jield/solodb-react-components/modules/run/contexts/emphasizedParametersContext";
@@ -33,9 +33,6 @@ export default function StepDetails({
             <RunPartsRegularFlow
               run={resolvedRun}
               runStep={step}
-              refetchFn={() => {
-                refetchFn(["runStepParts"]);
-              }}
             />
             {step.has_remark && (
               <>

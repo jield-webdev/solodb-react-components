@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { keepPreviousData, useQueries, useQueryClient } from "@tanstack/react-query";
-import { Table } from "react-bootstrap";
+import { Table, Placeholder } from "react-bootstrap";
 
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
@@ -95,7 +95,71 @@ export default function RunStepsElement() {
     });
   }, [runSteps]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div>
+        <h2>Run steps</h2>
+        <div className="d-flex justify-content-between align-items-center">
+          <div className="form-check form-switch">
+            <Placeholder animation="glow" as="span">
+              <Placeholder style={{ width: "2rem", height: "1rem", borderRadius: "0.5rem" }} />
+            </Placeholder>
+            <Placeholder animation="glow" as="span" className="ms-2">
+              <Placeholder style={{ width: "15rem" }} />
+            </Placeholder>
+          </div>
+        </div>
+        <Table borderless hover striped size="sm">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Parts</th>
+              <th></th>
+              <th>Process</th>
+              <th>Equipment</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[1, 2].map((group) => (
+              <React.Fragment key={group}>
+                <tr style={{ pointerEvents: "none" }}>
+                  <td colSpan={5} className="bg-info">
+                    <Placeholder animation="glow" as="span">
+                      <Placeholder style={{ width: "5rem" }} />
+                    </Placeholder>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Placeholder animation="glow" as="span">
+                      <Placeholder style={{ width: "0.75rem" }} />
+                    </Placeholder>
+                  </td>
+                  <td colSpan={2}>
+                    <Placeholder animation="glow" as="div" className="d-flex flex-wrap gap-1">
+                      {Array.from({ length: 48 }).map((_, j) => (
+                        <Placeholder key={j} style={{ width: "4.5rem", height: "1.5rem", borderRadius: "3px" }} />
+                      ))}
+                    </Placeholder>
+                  </td>
+                  <td>
+                    <Placeholder animation="glow" as="span">
+                      <Placeholder style={{ width: "10rem" }} />
+                    </Placeholder>
+                  </td>
+                  <td>
+                    <Placeholder animation="glow" as="span">
+                      <Placeholder style={{ width: "12rem" }} />
+                    </Placeholder>
+                  </td>
+                </tr>
+              </React.Fragment>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+    );
+  }
   if (isError) return <div className="text-danger">Error loading run steps.</div>;
 
   const seenGroups = new Set<string>();

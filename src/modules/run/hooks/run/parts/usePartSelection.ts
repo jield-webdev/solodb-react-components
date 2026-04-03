@@ -68,11 +68,12 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
       const foundPart = parts.find((p) => normalizedRead.includes(p.scanner_label));
 
       if (!foundPart) {
-        notification({
-          notificationHeader: "Part scanner",
-          notificationBody: "Part not found",
-          notificationType: "danger",
-        });
+        // COMENTED OUT BECAUSE IT TRIGERS ON FALSE POSITIVES
+        //notification({
+        //  notificationHeader: "Part scanner",
+        //  notificationBody: "Part not found",
+        //  notificationType: "danger",
+        //});
         return;
       }
 

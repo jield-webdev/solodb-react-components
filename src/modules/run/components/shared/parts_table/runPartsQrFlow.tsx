@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { Table } from "react-bootstrap";
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
 import {
   finishStepWhenAllPartsAreFinished,
@@ -21,11 +21,9 @@ import { ScannedKeysType } from "../../../utils/parseScannerForRun";
 type Props = {
   run: Run;
   runStep: RunStep;
-  refetchFn?: () => void;
 };
 
-const RunPartsQrFlow = ({ run, runStep, refetchFn = () => {} }: Props) => {
-  const queryClient = useQueryClient();
+const RunPartsQrFlow = ({ run, runStep }: Props) => {
   const queries = useQueries({
     queries: [
       {
@@ -41,7 +39,6 @@ const RunPartsQrFlow = ({ run, runStep, refetchFn = () => {} }: Props) => {
 
   const [runPartQuery, runStepPartsQuery] = queries;
 
-  const isLoading = queries.some((q) => q.isLoading);
   const isError = queries.some((q) => q.isError);
 
   const runParts = useMemo<RunPart[]>(
@@ -78,17 +75,6 @@ const RunPartsQrFlow = ({ run, runStep, refetchFn = () => {} }: Props) => {
       ),
     [leveledParts, runStepParts, selectedParts, showCompletedParts]
   );
-
-  const reloadAllData = () => {
-    // Reload the data
-    queryClient.invalidateQueries({ queryKey: ["runParts", run.id, runStep.part_level] });
-    queryClient.invalidateQueries({ queryKey: ["runStepParts", runStep.id] });
-    refetchFn();
-  };
-
-  const reloadPartData = (partId: number) => {
-
-  }
 
   // Handle notifying when a part is completed and therefore is not shown
   const { lastlyReadedKeys, addCallbackFn, removeCallbackFn } = useScannerContext();
@@ -127,9 +113,6 @@ const RunPartsQrFlow = ({ run, runStep, refetchFn = () => {} }: Props) => {
     };
   }, [runParts, runStepParts]);
 
-  if (isLoading) {
-    return <LoadingComponent message={"Loading run parts"} />;
-  }
   if (isError) {
     return <div className="text-danger">Error loading run parts.</div>;
   }
