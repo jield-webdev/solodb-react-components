@@ -55,7 +55,6 @@ export default function RunStepsElement() {
   };
 
   const [runStepsQuery, runPartQuery, requirementsQuery] = queries;
-
   const {
     data: runStepPartsData,
     isError: isInfiniteQueryError,
@@ -67,7 +66,7 @@ export default function RunStepsElement() {
     queryFn: async ({ pageParam }) => {
       const res = await listRunStepParts({
         run: run,
-        page_size: 150,
+        page_size: 150, // fetch all parts in one go to avoid pagination issues with the step parts
         page: pageParam,
       });
       return {

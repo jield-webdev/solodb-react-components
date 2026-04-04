@@ -83,9 +83,7 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart) => {
 
   return {
     ...data,
-    items: exists
-      ? items.map((item) => (item.id === runStepPart.id ? runStepPart : item))
-      : [...items, runStepPart],
+    items: exists ? items.map((item) => (item.id === runStepPart.id ? runStepPart : item)) : [...items, runStepPart],
   };
 };
 
