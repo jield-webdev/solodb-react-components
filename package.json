@@ -1,15 +1,15 @@
 {
   "name": "@jield/solodb-react-components",
-  "version": "1.0.32",
+  "version": "1.0.33",
   "type": "module",
   "repository": "jield-webdev/solodb-react-components",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/src/index.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/src/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "default": "./dist/index.js"
