@@ -16,18 +16,18 @@ const RunPartProductionActionsButtons = ({ runStepPart, setRunStepPartAction }: 
   if (runStepPart.available_actions.length === 0) return null;
 
   return (
-    <div className="btn-group btn-group-sm" role="group" aria-label="Part actions">
+    <>
       {runStepPart.available_actions.map(({ id, name }) => (
         <button
           key={id}
           type="button"
-          className={`btn ${ACTION_VARIANT[id]}`}
+          className={`btn btn-sm me-2 ${ACTION_VARIANT[id]}`}
           onClick={() => setRunStepPartAction({ runStepPart, runStepPartAction: id })}
         >
           {name}
         </button>
       ))}
-    </div>
+    </>
   );
 };
 
