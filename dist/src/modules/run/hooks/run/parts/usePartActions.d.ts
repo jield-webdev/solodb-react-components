@@ -5,7 +5,6 @@ export interface UsePartActionsOptions {
     selectedParts: Map<number, boolean>;
     getRunPart?: (part: RunStepPart) => number;
     getRunStepPart?: (part: RunPart) => RunStepPart | undefined;
-    refetchFn?: () => void;
     actionsFromScanner?: boolean;
 }
 export interface UsePartActionsResult {
@@ -18,4 +17,4 @@ export interface UsePartActionsResult {
  * @param options Configuration object with parts, selection state, and action mappings
  * @returns Functions for performing and querying available actions
  */
-export declare function usePartActions({ runStep, parts, selectedParts, getRunPart, getRunStepPart, refetchFn, actionsFromScanner, }: UsePartActionsOptions): UsePartActionsResult;
+export declare function usePartActions({ runStep, parts, selectedParts, getRunPart, getRunStepPart, actionsFromScanner, }: UsePartActionsOptions): UsePartActionsResult;

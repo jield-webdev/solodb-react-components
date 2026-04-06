@@ -1,4 +1,4 @@
-import { ScannedKeysType } from '../../../run/utils/parseScannerForRun';
+import { ScannedKeysType } from '../../../../../modules/run/utils/parseScannerForRun';
 export interface ScannerContext {
     lastlyReadedKeys: string;
     addCallbackFn: (type: ScannedKeysType, id: string, fun: (readedKeys: string) => void) => void;
