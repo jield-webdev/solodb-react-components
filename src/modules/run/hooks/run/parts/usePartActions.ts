@@ -3,13 +3,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   performRunStepPartAction,
   RunStepPartActionEnum,
+  RunStepPartStateEnum,
+  RunStepPartState,
   RunStepPart,
   RunStep,
   RunPart,
-  getAvailableRunStepPartActions,
   actionLabelToEnum,
   actionEnumToName,
-  RunStepPartAction,
 } from "@jield/solodb-typescript-core";
 import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
@@ -27,17 +27,21 @@ export interface UsePartActionsOptions {
 
 export interface UsePartActionsResult {
   performActionToSelectedParts: (action: RunStepPartActionEnum) => void;
-  getAvailableActionsForSelection: () => Set<RunStepPartActionEnum>;
+  getAvailableActionsForSelection: () => { id: RunStepPartActionEnum; name: string }[];
 }
 
+const isRunStepPart = (part: RunStepPart | RunPart): part is RunStepPart => {
+  return "step_id" in part && "part_id" in part;
+};
+
 /**
- * Hook for managing bulk actions on selected parts
+ * Hook for managing bulk actions on selected parts.
  *
- * @param options Configuration object with parts, selection state, and action mappings
- * @returns Functions for performing and querying available actions
+ * With the new backend architecture, the frontend no longer computes which actions
+ * are allowed — it reads `runStepPart.available_actions` (server-provided) directly
+ * and forwards the chosen action id to `performRunStepPartAction`.
  */
 export function usePartActions({
-  runStep,
   parts,
   selectedParts,
   getRunPart,
@@ -46,87 +50,64 @@ export function usePartActions({
 }: UsePartActionsOptions): UsePartActionsResult {
   const queryClient = useQueryClient();
 
-  // read keys from the scanner
   const { addCallbackFn, removeCallbackFn } = useScannerContext();
   const callbackId = useId();
 
-  // Helper to determine if we're working with RunStepPart or RunPart
-  const isRunStepPart = (part: RunStepPart | RunPart): part is RunStepPart => {
-    return "step_id" in part && "part_id" in part;
-  };
+  // Resolves the currently-selected items (from either a RunStepPart[] or RunPart[])
+  // into their corresponding RunStepParts. Items without a matching RunStepPart are dropped.
+  const getSelectedRunStepParts = useCallback((): RunStepPart[] => {
+    if (parts.length === 0) return [];
+
+    if (isRunStepPart(parts[0])) {
+      return (parts as RunStepPart[]).filter((part) => {
+        const partId = getRunPart ? getRunPart(part) : part.part_id;
+        return selectedParts.get(partId);
+      });
+    }
+
+    return (parts as RunPart[])
+      .filter((part) => selectedParts.get(part.id))
+      .map((part) => (getRunStepPart ? getRunStepPart(part) : undefined))
+      .filter((stepPart): stepPart is RunStepPart => stepPart !== undefined);
+  }, [parts, selectedParts, getRunPart, getRunStepPart]);
 
   const performActionToSelectedParts = useCallback(
     (action: RunStepPartActionEnum) => {
-      let selectedItems: (RunStepPart | RunPart)[] = [];
+      const selectedStepParts = getSelectedRunStepParts();
+      if (selectedStepParts.length === 0) return;
 
-      // Filter selected parts based on their type
-      if (parts.length > 0 && isRunStepPart(parts[0])) {
-        // Working with RunStepPart[]
-        // In this case, we need getRunPart to map to the actual RunPart ID
-        selectedItems = (parts as RunStepPart[]).filter((part) => {
-          const partId = getRunPart ? getRunPart(part) : part.part_id;
-          return selectedParts.get(partId);
-        });
-      } else {
-        // Working with RunPart[]
-        selectedItems = (parts as RunPart[]).filter((part) => selectedParts.get(part.id));
+      const promises: Promise<unknown>[] = [];
+
+      for (const runStepPart of selectedStepParts) {
+        // Server-provided: no client-side calculation.
+        const isAvailable = runStepPart.available_actions.some(({ id }) => id === action);
+        if (!isAvailable) continue;
+
+        promises.push(
+          performRunStepPartAction({
+            runStepPart,
+            // NOTE: the core library currently types this param as `RunStepPartStateEnum`
+            // even though `available_actions` entries are `RunStepPartActionEnum`.
+            // The numeric value is sent as-is to the backend, so this cast is safe until
+            // the core library's typing is corrected.
+            runStepPartAction: action as unknown as RunStepPartStateEnum,
+          }).then((latestAction: RunStepPartState) => {
+            updateRunStepPartCache(queryClient, { runStepPart, latestAction });
+          })
+        );
       }
 
-      if (selectedItems.length === 0) {
-        return;
-      }
-
-      const promises: Promise<void>[] = [];
-
-      for (const item of selectedItems) {
-        let runStepPart: RunStepPart | undefined;
-        let runPart: RunPart | undefined;
-
-        if (isRunStepPart(item)) {
-          // We have a RunStepPart but need a RunPart for getAvailableRunStepPartActions
-          runStepPart = item;
-          // Since we can't get the actual RunPart when working with RunStepPart[],
-          // we'll check if the part has the failed flag from previous step
-          runPart = {
-            id: getRunPart ? getRunPart(item) : item.part_id,
-            part_processing_failed: item.part_processing_failed_in_previous_step || false,
-          } as RunPart;
-        } else {
-          // We have a RunPart and need to find the corresponding RunStepPart
-          runPart = item;
-          runStepPart = getRunStepPart ? getRunStepPart(item) : undefined;
-        }
-
-        if (runStepPart && runPart) {
-          const availableActions = getAvailableRunStepPartActions(runStepPart);
-          if (availableActions.includes(action)) {
-            promises.push(
-              performRunStepPartAction(runStepPart, action, runStep).then((latestAction: RunStepPartAction) => {
-                updateRunStepPartCache(queryClient, {
-                  runStepPart,
-                  action,
-                  latestAction
-                });
-              })
-            );
-          }
-        }
-      }
-
-      Promise.all(promises);
+      void Promise.all(promises);
     },
-    [parts, selectedParts, getRunPart, getRunStepPart, queryClient, runStep.id]
+    [getSelectedRunStepParts, queryClient]
   );
 
   const onScanner = useCallback(
     (keys: string) => {
-      // TO prevent empty values
       if (!keys) return;
-
       if (!validScannerInput(keys)) return;
 
       const parsedScanner = keys.split("/");
-
       const action = actionLabelToEnum(parsedScanner[1]);
 
       if (!action) {
@@ -140,7 +121,7 @@ export function usePartActions({
 
       notification({
         notificationHeader: "Part scanner",
-        notificationBody: `Performin action ${actionEnumToName(action)} in selected parts`,
+        notificationBody: `Performing action ${actionEnumToName(action)} on selected parts`,
         notificationType: "success",
       });
 
@@ -158,56 +139,27 @@ export function usePartActions({
     return () => {
       removeCallbackFn(ScannedKeysType.PERFORM_ACTION, callbackId);
     };
-  }, [parts, performActionToSelectedParts]);
+  }, [actionsFromScanner, onScanner, addCallbackFn, removeCallbackFn, callbackId]);
 
-  const getAvailableActionsForSelection = useCallback((): Set<RunStepPartActionEnum> => {
-    let selectedItems: (RunStepPart | RunPart)[] = [];
+  const getAvailableActionsForSelection = useCallback(
+    (): { id: RunStepPartActionEnum; name: string }[] => {
+      // Union of all selected parts' available_actions, deduplicated by id.
+      // Names are taken from the first part that exposes each action — the server
+      // returns consistent names, so all occurrences will be the same string.
+      const seen = new Map<RunStepPartActionEnum, string>();
 
-    // Filter selected parts based on their type
-    if (parts.length > 0 && isRunStepPart(parts[0])) {
-      // Working with RunStepPart[]
-      selectedItems = (parts as RunStepPart[]).filter((part) => {
-        const partId = getRunPart ? getRunPart(part) : part.part_id;
-        return selectedParts.get(partId);
-      });
-    } else {
-      // Working with RunPart[]
-      selectedItems = (parts as RunPart[]).filter((part) => selectedParts.get(part.id));
-    }
-
-    if (selectedItems.length === 0) {
-      return new Set();
-    }
-
-    const actionSet = new Set<RunStepPartActionEnum>();
-
-    selectedItems.forEach((item) => {
-      let runStepPart: RunStepPart | undefined;
-      let runPart: RunPart | undefined;
-
-      if (isRunStepPart(item)) {
-        // We have a RunStepPart but need a RunPart for getAvailableRunStepPartActions
-        runStepPart = item;
-        // Since we can't get the actual RunPart when working with RunStepPart[],
-        // we'll check if the part has the failed flag from previous step
-        runPart = {
-          id: getRunPart ? getRunPart(item) : item.part_id,
-          part_processing_failed: item.part_processing_failed_in_previous_step || false,
-        } as RunPart;
-      } else {
-        // We have a RunPart and need to find the corresponding RunStepPart
-        runPart = item;
-        runStepPart = getRunStepPart ? getRunStepPart(item) : undefined;
+      for (const runStepPart of getSelectedRunStepParts()) {
+        for (const { id, name } of runStepPart.available_actions) {
+          if (!seen.has(id)) {
+            seen.set(id, name);
+          }
+        }
       }
 
-      if (runStepPart && runPart) {
-        const actionsForPart = getAvailableRunStepPartActions(runStepPart);
-        actionsForPart.forEach((action) => actionSet.add(action));
-      }
-    });
-
-    return actionSet;
-  }, [parts, selectedParts, getRunPart, getRunStepPart]);
+      return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
+    },
+    [getSelectedRunStepParts]
+  );
 
   return {
     performActionToSelectedParts,
@@ -216,8 +168,6 @@ export function usePartActions({
 }
 
 function validScannerInput(input: string) {
-  // The regex pattern
   const pattern = new RegExp(`^${PERFORM_ACTION_TRIGER}/.+`);
-
   return pattern.test(input);
 }

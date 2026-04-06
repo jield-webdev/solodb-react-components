@@ -2,27 +2,17 @@ import { Dropdown } from "react-bootstrap";
 import { RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 
 export interface PartActionsDropdownProps {
-  availableActions: Set<RunStepPartActionEnum>;
+  availableActions: { id: RunStepPartActionEnum; name: string }[];
   onActionSelected: (action: RunStepPartActionEnum) => void;
-  showInitAction?: boolean;
-  onInitSelected?: () => void;
 }
 
 /**
- * Dropdown component for bulk part actions
+ * Dropdown component for bulk part actions.
  *
- * Renders a dropdown menu with available actions (Start, Finish, Failed, Repair, Testing, Rework)
- * and optionally an Init action for production runs.
+ * Renders a dropdown menu driven by the server-provided `available_actions` array.
  */
-export const PartActionsDropdown = ({
-  availableActions,
-  onActionSelected,
-  showInitAction = false,
-  onInitSelected,
-}: PartActionsDropdownProps) => {
-  if (availableActions.size === 0 && !showInitAction) {
-    return null;
-  }
+export const PartActionsDropdown = ({ availableActions, onActionSelected }: PartActionsDropdownProps) => {
+  if (availableActions.length === 0) return null;
 
   return (
     <Dropdown align="end">
@@ -30,51 +20,11 @@ export const PartActionsDropdown = ({
         Actions
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        {showInitAction && onInitSelected && (
-          <Dropdown.Item onClick={onInitSelected}>Init</Dropdown.Item>
-        )}
-
-        {availableActions.has(RunStepPartActionEnum.START_PROCESSING) && (
-          <Dropdown.Item
-            onClick={() => onActionSelected(RunStepPartActionEnum.START_PROCESSING)}
-          >
-            Start
+        {availableActions.map(({ id, name }) => (
+          <Dropdown.Item key={id} onClick={() => onActionSelected(id)}>
+            {name}
           </Dropdown.Item>
-        )}
-
-        {availableActions.has(RunStepPartActionEnum.FINISH_PROCESSING) && (
-          <Dropdown.Item
-            onClick={() => onActionSelected(RunStepPartActionEnum.FINISH_PROCESSING)}
-          >
-            Finish
-          </Dropdown.Item>
-        )}
-
-        {availableActions.has(RunStepPartActionEnum.FAILED_PROCESSING) && (
-          <Dropdown.Item
-            onClick={() => onActionSelected(RunStepPartActionEnum.FAILED_PROCESSING)}
-          >
-            Failed
-          </Dropdown.Item>
-        )}
-
-        {availableActions.has(RunStepPartActionEnum.REPAIR) && (
-          <Dropdown.Item onClick={() => onActionSelected(RunStepPartActionEnum.REPAIR)}>
-            Repair
-          </Dropdown.Item>
-        )}
-
-        {availableActions.has(RunStepPartActionEnum.TESTING) && (
-          <Dropdown.Item onClick={() => onActionSelected(RunStepPartActionEnum.TESTING)}>
-            Testing
-          </Dropdown.Item>
-        )}
-
-        {availableActions.has(RunStepPartActionEnum.REWORK) && (
-          <Dropdown.Item onClick={() => onActionSelected(RunStepPartActionEnum.REWORK)}>
-            Rework
-          </Dropdown.Item>
-        )}
+        ))}
       </Dropdown.Menu>
     </Dropdown>
   );

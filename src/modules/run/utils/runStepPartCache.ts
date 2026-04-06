@@ -1,92 +1,120 @@
 import { QueryClient } from "@tanstack/react-query";
-import { RunStep, RunStepPart, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
+import { RunStep, RunStepPart, RunStepPartState } from "@jield/solodb-typescript-core";
 
 type UpdateRunStepPartCacheOptions = {
   runStepPart: RunStepPart;
-  action: RunStepPartActionEnum;
-  latestAction?: RunStepPart["latest_action"] | null;
+  latestAction: RunStepPartState;
 };
 
 const applyActionToRunStepPart = (
   runStepPart: RunStepPart,
-  action: RunStepPartActionEnum,
-  latestAction?: RunStepPart["latest_action"] | null
+  latestAction: RunStepPartState
 ): RunStepPart => {
-  if (latestAction?.updated_run_step_part_status) {
-    const { status, processed, failed, started } = latestAction.updated_run_step_part_status;
-    return {
-      ...runStepPart,
-      latest_action: latestAction,
-      actions: runStepPart.actions + 1,
-      status,
-      processed,
-      failed,
-      started,
-    };
-  }
+  const { status, processed, failed, started, available_actions } =
+    latestAction.updated_run_step_part_state;
 
-  let next: RunStepPart = {
+  return {
     ...runStepPart,
-    latest_action: latestAction ?? runStepPart.latest_action,
+    latest_action: latestAction,
     actions: runStepPart.actions + 1,
+    status,
+    processed,
+    failed,
+    started,
+    available_actions,
   };
-
-  if (action === RunStepPartActionEnum.START_PROCESSING) {
-    next = { ...next, started: true, processed: false, failed: false };
-  }
-
-  if (action === RunStepPartActionEnum.FINISH_PROCESSING) {
-    next = { ...next, started: true, processed: true, failed: false };
-  }
-
-  if (action === RunStepPartActionEnum.FAILED_PROCESSING) {
-    next = { ...next, started: true, processed: false, failed: true };
-  }
-
-  if (action === RunStepPartActionEnum.REWORK) {
-    next = { ...next, started: false, processed: false, failed: false };
-  }
-
-  return next;
 };
 
-const updateStepParts = (stepParts: RunStepPart[], options: UpdateRunStepPartCacheOptions): RunStepPart[] => {
-  const { runStepPart, action, latestAction } = options;
+const updateStepParts = (
+  stepParts: RunStepPart[],
+  options: UpdateRunStepPartCacheOptions
+): RunStepPart[] => {
+  const { runStepPart, latestAction } = options;
 
-  return stepParts.map((item) => {
-    if (item.id !== runStepPart.id) {
-      return item;
-    }
-
-    return applyActionToRunStepPart(item, action, latestAction);
-  });
+  return stepParts.map((item) =>
+    item.id === runStepPart.id ? applyActionToRunStepPart(item, latestAction) : item
+  );
 };
 
 const updateRunStepPartsData = (data: any, options: UpdateRunStepPartCacheOptions) => {
-  if (!data || !Array.isArray(data.items)) {
-    return data;
+  if (!data) return data;
+
+  // Infinite query format: { pages: [{ items: [...] }, ...], pageParams: [...] }
+  if (Array.isArray(data.pages)) {
+    return {
+      ...data,
+      pages: data.pages.map((page: any) => {
+        if (!page || !Array.isArray(page.items)) return page;
+        return { ...page, items: updateStepParts(page.items as RunStepPart[], options) };
+      }),
+    };
   }
 
-  return {
-    ...data,
-    items: updateStepParts(data.items as RunStepPart[], options),
-  };
+  // Regular query format: { items: [...] }
+  if (Array.isArray(data.items)) {
+    return {
+      ...data,
+      items: updateStepParts(data.items as RunStepPart[], options),
+    };
+  }
+
+  return data;
 };
 
 const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart) => {
-  if (!data || !Array.isArray(data.items)) {
+  if (!data) return data;
+
+  // Infinite query format: { pages: [{ items: [...] }, ...], pageParams: [...] }
+  if (Array.isArray(data.pages)) {
+    const pages = data.pages as any[];
+    const existsInAnyPage = pages.some(
+      (page) => Array.isArray(page?.items) && page.items.some((item: RunStepPart) => item.id === runStepPart.id)
+    );
+
+    if (existsInAnyPage) {
+      return {
+        ...data,
+        pages: pages.map((page: any) => {
+          if (!page || !Array.isArray(page.items)) return page;
+          return {
+            ...page,
+            items: (page.items as RunStepPart[]).map((item) =>
+              item.id === runStepPart.id ? runStepPart : item
+            ),
+          };
+        }),
+      };
+    }
+
+    // Append to last page
+    if (pages.length > 0) {
+      const lastIndex = pages.length - 1;
+      return {
+        ...data,
+        pages: pages.map((page: any, i: number) => {
+          if (i !== lastIndex || !page || !Array.isArray(page.items)) return page;
+          return { ...page, items: [...page.items, runStepPart] };
+        }),
+      };
+    }
+
     return data;
   }
 
-  const items = data.items as RunStepPart[];
-  const exists = items.some((item) => item.id === runStepPart.id);
+  // Regular query format: { items: [...] }
+  if (Array.isArray(data.items)) {
+    const items = data.items as RunStepPart[];
+    const exists = items.some((item) => item.id === runStepPart.id);
 
-  return {
-    ...data,
-    items: exists
-      ? items.map((item) => (item.id === runStepPart.id ? runStepPart : item))
-      : [...items, runStepPart],
-  };
+    return {
+      ...data,
+      items: exists
+        ? items.map((item) => (item.id === runStepPart.id ? runStepPart : item))
+        : [...items, runStepPart],
+    };
+  }
+
+  return data;
 };
 
 export const updateRunStepPartCache = (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions) => {

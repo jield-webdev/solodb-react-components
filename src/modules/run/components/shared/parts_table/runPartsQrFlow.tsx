@@ -1,20 +1,20 @@
 import React, { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { Table } from "react-bootstrap";
 import { useQueries } from "@tanstack/react-query";
+import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
 import {
   finishStepWhenAllPartsAreFinished,
   Run,
   RunStep,
-  RunStepPart,
   RunPart,
   listRunParts,
   listRunStepParts,
-  RunStepPartActionEnum,
+  RunStepPartStateEnum,
 } from "@jield/solodb-typescript-core";
+import type {  RunStepPart} from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
 import { notification } from "@jield/solodb-react-components/utils/notification";
-import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import { ScannedKeysType } from "../../../utils/parseScannerForRun";
 
@@ -39,6 +39,7 @@ const RunPartsQrFlow = ({ run, runStep }: Props) => {
 
   const [runPartQuery, runStepPartsQuery] = queries;
 
+  const isLoading = queries.some((q) => q.isLoading);
   const isError = queries.some((q) => q.isError);
 
   const runParts = useMemo<RunPart[]>(
@@ -113,6 +114,10 @@ const RunPartsQrFlow = ({ run, runStep }: Props) => {
     };
   }, [runParts, runStepParts]);
 
+  if (isLoading) {
+    return <LoadingComponent message={"Loading run parts"} />;
+  }
+
   if (isError) {
     return <div className="text-danger">Error loading run parts.</div>;
   }
@@ -155,12 +160,12 @@ const RunPartsQrFlow = ({ run, runStep }: Props) => {
   );
 };
 
-const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart): boolean => {
+const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart) => {
   const stepPart = runStepParts.find((p) => p.part_id == part.id);
 
   if (stepPart === null || stepPart === undefined) return false;
 
-  return stepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
+  return stepPart.latest_action?.type.id === RunStepPartStateEnum.FINISHED;
 };
 
 const DisplayStepPartsInfo = ({
@@ -179,7 +184,7 @@ const DisplayStepPartsInfo = ({
   const finishedParts = useMemo(() => {
     let counter = 0;
     runStepParts.forEach((part) =>
-      part.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING ? counter++ : null
+      part.latest_action?.type.id === RunStepPartStateEnum.FINISHED ? counter++ : null
     );
     return counter;
   }, [runStepParts]);

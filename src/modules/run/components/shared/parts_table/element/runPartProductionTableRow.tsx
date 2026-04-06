@@ -2,17 +2,21 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  RunStepPartActionEnum,
   RunPart,
-  RunStepPart,
   RunStep,
+  RunStepPart,
+  RunStepPartActionEnum,
+  RunStepPartState,
+  RunStepPartStateEnum,
   performRunStepPartAction,
-  RunStepPartAction,
 } from "@jield/solodb-typescript-core";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import RunPartProductionActionsDropdown from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsDropdown";
 import RunPartProductionActionsButtons from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsButtons";
-import { upsertRunStepPartCache, updateRunStepPartCacheByRunStep } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
+import {
+  upsertRunStepPartCache,
+  updateRunStepPartCacheByRunStep,
+} from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 
 type Props = {
   runPart: RunPart;
@@ -81,12 +85,20 @@ const RunStepPartProductionTableRow = ({
     runStepPart: RunStepPart;
     runStepPartAction: RunStepPartActionEnum;
   }) => {
-    const latestAction: RunStepPartAction = await performRunStepPartAction(targetStepPart, runStepPartAction, runStep);
+    const latestAction: RunStepPartState = await performRunStepPartAction({
+      runStepPart: targetStepPart,
+      // NOTE: the core library currently types this param as `RunStepPartStateEnum`
+      // even though `available_actions` entries are `RunStepPartActionEnum`.
+      // The numeric value is sent as-is to the backend, so this cast is safe until
+      // the core library's typing is corrected.
+      runStepPartAction: runStepPartAction as unknown as RunStepPartStateEnum,
+    });
 
     setRunStepPart((current) => {
       if (!current) return current;
 
-      const { status, processed, failed, started } = latestAction.updated_run_step_part_status;
+      const { status, processed, failed, started, available_actions } =
+        latestAction.updated_run_step_part_state;
 
       return {
         ...current,
@@ -96,12 +108,12 @@ const RunStepPartProductionTableRow = ({
         processed,
         failed,
         started,
+        available_actions,
       };
     });
 
     updateRunStepPartCacheByRunStep(queryClient, runStep, {
       runStepPart: targetStepPart,
-      action: runStepPartAction,
       latestAction,
     });
   };
