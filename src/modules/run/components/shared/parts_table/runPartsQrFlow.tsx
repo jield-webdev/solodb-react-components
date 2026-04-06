@@ -12,7 +12,7 @@ import {
   listRunStepParts,
   RunStepPartStateEnum,
 } from "@jield/solodb-typescript-core";
-import type {  RunStepPart} from "@jield/solodb-typescript-core";
+import type { RunStepPart } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
 import { notification } from "@jield/solodb-react-components/utils/notification";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
@@ -165,7 +165,7 @@ const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart) => {
 
   if (stepPart === null || stepPart === undefined) return false;
 
-  return stepPart.latest_action?.type.id === RunStepPartStateEnum.FINISHED;
+  return stepPart.processed;
 };
 
 const DisplayStepPartsInfo = ({
@@ -183,9 +183,7 @@ const DisplayStepPartsInfo = ({
 }) => {
   const finishedParts = useMemo(() => {
     let counter = 0;
-    runStepParts.forEach((part) =>
-      part.latest_action?.type.id === RunStepPartStateEnum.FINISHED ? counter++ : null
-    );
+    runStepParts.forEach((part) => (part.processed ? counter++ : null));
     return counter;
   }, [runStepParts]);
 

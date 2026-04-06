@@ -1,4 +1,4 @@
-import { RunStepPartActionEnum, RunStepPart } from '@jield/solodb-typescript-core';
+import { RunStepPart, RunStepPartActionEnum } from '@jield/solodb-typescript-core';
 type Props = {
     runStepPart: RunStepPart;
     setRunStepPartAction: ({ runStepPart, runStepPartAction, }: {
@@ -6,5 +6,5 @@ type Props = {
         runStepPartAction: RunStepPartActionEnum;
     }) => void;
 };
-declare const RunPartProductionActionsButtons: ({ runStepPart, setRunStepPartAction }: Props) => import("react/jsx-runtime").JSX.Element;
+declare const RunPartProductionActionsButtons: ({ runStepPart, setRunStepPartAction }: Props) => import("react/jsx-runtime").JSX.Element | null;
 export default RunPartProductionActionsButtons;

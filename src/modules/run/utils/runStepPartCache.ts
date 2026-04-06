@@ -6,17 +6,11 @@ type UpdateRunStepPartCacheOptions = {
   latestAction: RunStepPartState;
 };
 
-const applyActionToRunStepPart = (
-  runStepPart: RunStepPart,
-  latestAction: RunStepPartState
-): RunStepPart => {
-  const { status, processed, failed, started, available_actions } =
-    latestAction.updated_run_step_part_state;
+const applyActionToRunStepPart = (runStepPart: RunStepPart, latestAction: RunStepPartState): RunStepPart => {
+  const { status, processed, failed, started, available_actions } = latestAction.updated_run_step_part_state;
 
   return {
     ...runStepPart,
-    latest_action: latestAction,
-    actions: runStepPart.actions + 1,
     status,
     processed,
     failed,
@@ -25,15 +19,10 @@ const applyActionToRunStepPart = (
   };
 };
 
-const updateStepParts = (
-  stepParts: RunStepPart[],
-  options: UpdateRunStepPartCacheOptions
-): RunStepPart[] => {
+const updateStepParts = (stepParts: RunStepPart[], options: UpdateRunStepPartCacheOptions): RunStepPart[] => {
   const { runStepPart, latestAction } = options;
 
-  return stepParts.map((item) =>
-    item.id === runStepPart.id ? applyActionToRunStepPart(item, latestAction) : item
-  );
+  return stepParts.map((item) => (item.id === runStepPart.id ? applyActionToRunStepPart(item, latestAction) : item));
 };
 
 const updateRunStepPartsData = (data: any, options: UpdateRunStepPartCacheOptions) => {
@@ -78,9 +67,7 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart) => {
           if (!page || !Array.isArray(page.items)) return page;
           return {
             ...page,
-            items: (page.items as RunStepPart[]).map((item) =>
-              item.id === runStepPart.id ? runStepPart : item
-            ),
+            items: (page.items as RunStepPart[]).map((item) => (item.id === runStepPart.id ? runStepPart : item)),
           };
         }),
       };
@@ -108,9 +95,7 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart) => {
 
     return {
       ...data,
-      items: exists
-        ? items.map((item) => (item.id === runStepPart.id ? runStepPart : item))
-        : [...items, runStepPart],
+      items: exists ? items.map((item) => (item.id === runStepPart.id ? runStepPart : item)) : [...items, runStepPart],
     };
   }
 
@@ -119,7 +104,7 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart) => {
 
 export const updateRunStepPartCache = (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions) => {
   queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => updateRunStepPartsData(data, options));
-  queryClient.setQueriesData({ queryKey: ["stepParts"] }, (data) => updateRunStepPartsData(data, options));
+  // queryClient.setQueriesData({ queryKey: ["stepParts"] }, (data) => updateRunStepPartsData(data, options));
 };
 
 export const updateRunStepPartCacheByRunStep = (
@@ -131,7 +116,7 @@ export const updateRunStepPartCacheByRunStep = (
   // and run-level queries (["runStepParts", JSON.stringify(run)]) used in runStepsElement.
   // The updater only modifies items whose id matches, so applying to all caches is safe.
   queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => updateRunStepPartsData(data, options));
-  queryClient.setQueriesData({ queryKey: ["stepParts", runStep.id] }, (data) => updateRunStepPartsData(data, options));
+  // queryClient.setQueriesData({ queryKey: ["stepParts", runStep.id] }, (data) => updateRunStepPartsData(data, options));
 };
 
 export const upsertRunStepPartCache = (queryClient: QueryClient, runStep: RunStep, runStepPart: RunStepPart) => {

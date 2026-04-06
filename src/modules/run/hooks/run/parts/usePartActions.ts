@@ -141,25 +141,22 @@ export function usePartActions({
     };
   }, [actionsFromScanner, onScanner, addCallbackFn, removeCallbackFn, callbackId]);
 
-  const getAvailableActionsForSelection = useCallback(
-    (): { id: RunStepPartActionEnum; name: string }[] => {
-      // Union of all selected parts' available_actions, deduplicated by id.
-      // Names are taken from the first part that exposes each action — the server
-      // returns consistent names, so all occurrences will be the same string.
-      const seen = new Map<RunStepPartActionEnum, string>();
+  const getAvailableActionsForSelection = useCallback((): { id: RunStepPartActionEnum; name: string }[] => {
+    // Union of all selected parts' available_actions, deduplicated by id.
+    // Names are taken from the first part that exposes each action — the server
+    // returns consistent names, so all occurrences will be the same string.
+    const seen = new Map<RunStepPartActionEnum, string>();
 
-      for (const runStepPart of getSelectedRunStepParts()) {
-        for (const { id, name } of runStepPart.available_actions) {
-          if (!seen.has(id)) {
-            seen.set(id, name);
-          }
+    for (const runStepPart of getSelectedRunStepParts()) {
+      for (const { id, name } of runStepPart.available_actions) {
+        if (!seen.has(id)) {
+          seen.set(id, name);
         }
       }
+    }
 
-      return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
-    },
-    [getSelectedRunStepParts]
-  );
+    return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
+  }, [getSelectedRunStepParts]);
 
   return {
     performActionToSelectedParts,

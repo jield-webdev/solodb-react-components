@@ -1,4 +1,4 @@
-import { RunPart, RunStepPart, RunStep } from '@jield/solodb-typescript-core';
+import { RunPart, RunStep, RunStepPart } from '@jield/solodb-typescript-core';
 type Props = {
     runPart: RunPart;
     partIsSelected?: boolean;

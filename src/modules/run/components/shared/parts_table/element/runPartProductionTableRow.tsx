@@ -97,13 +97,10 @@ const RunStepPartProductionTableRow = ({
     setRunStepPart((current) => {
       if (!current) return current;
 
-      const { status, processed, failed, started, available_actions } =
-        latestAction.updated_run_step_part_state;
+      const { status, processed, failed, started, available_actions } = latestAction.updated_run_step_part_state;
 
       return {
         ...current,
-        latest_action: latestAction,
-        actions: current.actions + 1,
         status,
         processed,
         failed,

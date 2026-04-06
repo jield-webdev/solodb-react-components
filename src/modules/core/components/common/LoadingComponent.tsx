@@ -12,7 +12,10 @@ const LoadingComponent: React.FC<LoadingComponentProps> = ({ message }) => {
   const displayMessage = message || "Loading...";
 
   return (
-    <div className="d-flex flex-column justify-content-center align-items-center w-100 h-100">
+    <div
+      className="d-flex flex-column justify-content-center align-items-center"
+      style={{ height: "100vh" }}
+    >
       <div className="spinner-border" role="status" aria-label="Loading"></div>
       <p className="mt-3 mb-0">{displayMessage}</p>
     </div>

@@ -39,7 +39,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
             return (
                 <div style={{ padding: 16 }}>
-                    <h3>Something went wrong.</h3>
+                    <h3>Ssomething went wrong.</h3>
                     {this.state.error && (
                         <pre style={{ color: '#c00', whiteSpace: 'pre-wrap' }}>
                             {this.state.error.message}

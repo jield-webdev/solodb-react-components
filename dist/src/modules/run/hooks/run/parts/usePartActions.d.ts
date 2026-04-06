@@ -9,12 +9,16 @@ export interface UsePartActionsOptions {
 }
 export interface UsePartActionsResult {
     performActionToSelectedParts: (action: RunStepPartActionEnum) => void;
-    getAvailableActionsForSelection: () => Set<RunStepPartActionEnum>;
+    getAvailableActionsForSelection: () => {
+        id: RunStepPartActionEnum;
+        name: string;
+    }[];
 }
 /**
- * Hook for managing bulk actions on selected parts
+ * Hook for managing bulk actions on selected parts.
  *
- * @param options Configuration object with parts, selection state, and action mappings
- * @returns Functions for performing and querying available actions
+ * With the new backend architecture, the frontend no longer computes which actions
+ * are allowed — it reads `runStepPart.available_actions` (server-provided) directly
+ * and forwards the chosen action id to `performRunStepPartAction`.
  */
-export declare function usePartActions({ runStep, parts, selectedParts, getRunPart, getRunStepPart, actionsFromScanner, }: UsePartActionsOptions): UsePartActionsResult;
+export declare function usePartActions({ parts, selectedParts, getRunPart, getRunStepPart, actionsFromScanner, }: UsePartActionsOptions): UsePartActionsResult;

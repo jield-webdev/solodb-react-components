@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ErrorBoundary>
       <AuthContext.Provider value={{ user, setUser, isLoadingUser }}>
-        <Suspense fallback={<LoadingComponent message="Loading..." />}>{children}</Suspense>
+        {children}
       </AuthContext.Provider>
     </ErrorBoundary>
   );

@@ -8,11 +8,7 @@ export default function RunProvider({ children }: { children: React.ReactNode })
   const { run, reloadRun } = useRun();
 
   if (null === run) {
-    return (
-      <ErrorBoundary>
-        <LoadingComponent message="Loading run..." />
-      </ErrorBoundary>
-    );
+    return <LoadingComponent message="Loading run..." />;
   }
 
   return (
@@ -23,7 +19,7 @@ export default function RunProvider({ children }: { children: React.ReactNode })
           reloadRun,
         }}
       >
-        <Suspense fallback={<LoadingComponent message="Loading..." />}>{children}</Suspense>
+        <Suspense fallback={<LoadingComponent message="Loading rest of run..." />}>{children}</Suspense>
       </RunContext.Provider>
     </ErrorBoundary>
   );

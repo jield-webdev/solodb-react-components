@@ -1,14 +1,14 @@
 import { RunStepPartActionEnum } from '@jield/solodb-typescript-core';
 export interface PartActionsDropdownProps {
-    availableActions: Set<RunStepPartActionEnum>;
+    availableActions: {
+        id: RunStepPartActionEnum;
+        name: string;
+    }[];
     onActionSelected: (action: RunStepPartActionEnum) => void;
-    showInitAction?: boolean;
-    onInitSelected?: () => void;
 }
 /**
- * Dropdown component for bulk part actions
+ * Dropdown component for bulk part actions.
  *
- * Renders a dropdown menu with available actions (Start, Finish, Failed, Repair, Testing, Rework)
- * and optionally an Init action for production runs.
+ * Renders a dropdown menu driven by the server-provided `available_actions` array.
  */
-export declare const PartActionsDropdown: ({ availableActions, onActionSelected, showInitAction, onInitSelected, }: PartActionsDropdownProps) => import("react/jsx-runtime").JSX.Element | null;
+export declare const PartActionsDropdown: ({ availableActions, onActionSelected }: PartActionsDropdownProps) => import("react/jsx-runtime").JSX.Element | null;
