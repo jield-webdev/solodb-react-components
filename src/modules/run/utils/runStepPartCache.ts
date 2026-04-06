@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import { RunStep, RunStepPart, RunStepPartState } from "@jield/solodb-typescript-core";
+import { listRunStepParts, RunPart, RunStep, RunStepPart, RunStepPartState } from "@jield/solodb-typescript-core";
 
 type UpdateRunStepPartCacheOptions = {
   runStepPart: RunStepPart;
@@ -102,9 +102,57 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart) => {
   return data;
 };
 
-export const updateRunStepPartCache = (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions) => {
+const updateRunStepPartsDataById = (data: any, updatesById: Map<number, RunStepPart>) => {
+  if (!data) return data;
+
+  const updateItems = (items: RunStepPart[]) =>
+    items.map((item) => {
+      const updated = updatesById.get(item.id);
+      return updated ?? item;
+    });
+
+  // Infinite query format: { pages: [{ items: [...] }, ...], pageParams: [...] }
+  if (Array.isArray(data.pages)) {
+    return {
+      ...data,
+      pages: data.pages.map((page: any) => {
+        if (!page || !Array.isArray(page.items)) return page;
+        return { ...page, items: updateItems(page.items as RunStepPart[]) };
+      }),
+    };
+  }
+
+  // Regular query format: { items: [...] }
+  if (Array.isArray(data.items)) {
+    return {
+      ...data,
+      items: updateItems(data.items as RunStepPart[]),
+    };
+  }
+
+  return data;
+};
+
+const refreshRunStepPartCacheForRunPart = async (queryClient: QueryClient, runStepPart: RunStepPart) => {
+  const runPart: RunPart = { id: runStepPart.part_id } as RunPart;
+  const result = await listRunStepParts({ runPart });
+  const updatesById = new Map(result.items.map((item) => [item.id, item]));
+
+  if (updatesById.size === 0) return;
+
+  queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => updateRunStepPartsDataById(data, updatesById));
+};
+
+const updateRunStepPartCacheInternal = (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions) => {
   queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => updateRunStepPartsData(data, options));
-  // queryClient.setQueriesData({ queryKey: ["stepParts"] }, (data) => updateRunStepPartsData(data, options));
+
+  void refreshRunStepPartCacheForRunPart(queryClient, options.runStepPart).catch((error) => {
+    console.error("Failed to refresh run step part cache from run part.", error);
+  });
+};
+
+export const updateRunStepPartCache = (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions) => {
+  updateRunStepPartCacheInternal(queryClient, options);
 };
 
 export const updateRunStepPartCacheByRunStep = (
@@ -112,11 +160,7 @@ export const updateRunStepPartCacheByRunStep = (
   runStep: RunStep,
   options: UpdateRunStepPartCacheOptions
 ) => {
-  // Broad prefix covers both table-level queries (["runStepParts", runStep.id])
-  // and run-level queries (["runStepParts", JSON.stringify(run)]) used in runStepsElement.
-  // The updater only modifies items whose id matches, so applying to all caches is safe.
-  queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => updateRunStepPartsData(data, options));
-  // queryClient.setQueriesData({ queryKey: ["stepParts", runStep.id] }, (data) => updateRunStepPartsData(data, options));
+  updateRunStepPartCacheInternal(queryClient, options);
 };
 
 export const upsertRunStepPartCache = (queryClient: QueryClient, runStep: RunStep, runStepPart: RunStepPart) => {

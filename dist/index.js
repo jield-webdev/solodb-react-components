@@ -28070,12 +28070,32 @@ var KI = ({ runStepPart: e, setRunStepPart: t, editable: n = !0 }) => {
 	}
 	return e;
 }, eL = (e, t) => {
-	e.setQueriesData({ queryKey: ["runStepParts"] }, (e) => QI(e, t));
-}, tL = (e, t, n) => {
-	e.setQueriesData({ queryKey: ["runStepParts"] }, (e) => QI(e, n));
-}, nL = (e, t, n) => {
+	if (!e) return e;
+	let n = (e) => e.map((e) => t.get(e.id) ?? e);
+	return Array.isArray(e.pages) ? {
+		...e,
+		pages: e.pages.map((e) => !e || !Array.isArray(e.items) ? e : {
+			...e,
+			items: n(e.items)
+		})
+	} : Array.isArray(e.items) ? {
+		...e,
+		items: n(e.items)
+	} : e;
+}, tL = async (e, t) => {
+	let n = await ft({ runPart: { id: t.part_id } }), r = new Map(n.items.map((e) => [e.id, e]));
+	r.size !== 0 && e.setQueriesData({ queryKey: ["runStepParts"] }, (e) => eL(e, r));
+}, nL = (e, t) => {
+	e.setQueriesData({ queryKey: ["runStepParts"] }, (e) => QI(e, t)), tL(e, t.runStepPart).catch((e) => {
+		console.error("Failed to refresh run step part cache from run part.", e);
+	});
+}, rL = (e, t) => {
+	nL(e, t);
+}, iL = (e, t, n) => {
+	nL(e, n);
+}, aL = (e, t, n) => {
 	e.setQueriesData({ queryKey: ["runStepParts"] }, (e) => $I(e, n));
-}, rL = (e) => !!e.closest("button, a, input, textarea, select, option, label"), iL = ({ runPart: e, partIsSelected: t, setPartAsSelected: n, runStepParts: r, canInit: i, runStep: a, dropdown: o }) => {
+}, oL = (e) => !!e.closest("button, a, input, textarea, select, option, label"), sL = ({ runPart: e, partIsSelected: t, setPartAsSelected: n, runStepParts: r, canInit: i, runStep: a, dropdown: o }) => {
 	let [s, c] = v(), l = A();
 	d(() => {
 		c(r.find((t) => t.part_id === e.id));
@@ -28083,7 +28103,7 @@ var KI = ({ runStepPart: e, setRunStepPart: t, editable: n = !0 }) => {
 	let u = (t) => {
 		if (!n) return;
 		let r = t.target;
-		if (rL(r)) return;
+		if (oL(r)) return;
 		let i = s ? s.part_id : e.id;
 		i !== void 0 && n(i);
 	}, f = () => {
@@ -28092,7 +28112,7 @@ var KI = ({ runStepPart: e, setRunStepPart: t, editable: n = !0 }) => {
 			run_step_id: a.id
 		}).then((e) => {
 			let t = { ...e.data };
-			c(t), nL(l, a, t);
+			c(t), aL(l, a, t);
 		});
 	}, p = async ({ runStepPart: e, runStepPartAction: t }) => {
 		let n = await pt({
@@ -28110,7 +28130,7 @@ var KI = ({ runStepPart: e, setRunStepPart: t, editable: n = !0 }) => {
 				started: a,
 				available_actions: o
 			};
-		}), tL(l, a, {
+		}), iL(l, a, {
 			runStepPart: e,
 			latestAction: n
 		});
@@ -28152,25 +28172,25 @@ var KI = ({ runStepPart: e, setRunStepPart: t, editable: n = !0 }) => {
 			}) })
 		]
 	}) : null;
-}, aL = o({
+}, cL = o({
 	lastlyReadedKeys: "",
 	addCallbackFn: () => {},
 	removeCallbackFn: () => {},
 	addReadingCallbackFn: () => {},
 	removeReadingCallbackFn: () => {}
-}), oL = () => {
-	let e = u(aL);
+}), lL = () => {
+	let e = u(cL);
 	if (e === void 0) throw Error("useScannerContext must be used within a ScannerProvider");
 	return e;
-}, sL = null;
-function cL(e) {
-	if (!sL) {
+}, uL = null;
+function dL(e) {
+	if (!uL) {
 		console.warn("notification() called before NotificationProvider is mounted");
 		return;
 	}
-	sL(e);
+	uL(e);
 }
-function lL({ children: e }) {
+function fL({ children: e }) {
 	let [t, n] = v([]), r = _(0), i = l((e) => {
 		let t = ++r.current;
 		n((n) => [...n, {
@@ -28178,8 +28198,8 @@ function lL({ children: e }) {
 			id: t
 		}]);
 	}, []);
-	d(() => (sL = i, () => {
-		sL = null;
+	d(() => (uL = i, () => {
+		uL = null;
 	}), [i]);
 	let a = l((e) => {
 		n((t) => t.filter((t) => t.id !== e));
@@ -28203,22 +28223,22 @@ function lL({ children: e }) {
 }
 //#endregion
 //#region src/modules/run/utils/parseScannerForRun.ts
-var uL = /* @__PURE__ */ function(e) {
+var pL = /* @__PURE__ */ function(e) {
 	return e[e.SELECT = 0] = "SELECT", e[e.PERFORM_ACTION = 1] = "PERFORM_ACTION", e;
 }({});
-function dL(e) {
-	return e.startsWith("_qr") ? uL.PERFORM_ACTION : uL.SELECT;
+function mL(e) {
+	return e.startsWith("_qr") ? pL.PERFORM_ACTION : pL.SELECT;
 }
 //#endregion
 //#region src/modules/run/hooks/run/parts/usePartSelection.ts
-function fL({ parts: e }) {
+function hL({ parts: e }) {
 	let [t, n] = v(/* @__PURE__ */ new Map()), r = l((e) => {
 		n((t) => {
 			let n = new Map(t);
 			return n.set(e, !(t.get(e) ?? !1)), n;
 		});
-	}, []), { lastlyReadedKeys: i, addCallbackFn: a, removeCallbackFn: o } = oL(), s = f(), c = _(/* @__PURE__ */ new Set()), u = l((t) => {
-		if (dL(t) != uL.SELECT) return;
+	}, []), { lastlyReadedKeys: i, addCallbackFn: a, removeCallbackFn: o } = lL(), s = f(), c = _(/* @__PURE__ */ new Set()), u = l((t) => {
+		if (mL(t) != pL.SELECT) return;
 		let n = t.replace(/_/g, "-").toUpperCase();
 		if (!n) return;
 		if (e.length == 0) {
@@ -28230,14 +28250,14 @@ function fL({ parts: e }) {
 			return;
 		}
 		let i = e.find((e) => n.includes(e.scanner_label));
-		i && (cL({
+		i && (dL({
 			notificationHeader: "Part scanner",
 			notificationBody: `Found part: ${i.scanner_label}`,
 			notificationType: "success"
 		}), r(i.id));
 	}, [e, r]);
-	return d(() => (o(uL.SELECT, s), u(i), a(uL.SELECT, s, u), () => {
-		o(uL.SELECT, s);
+	return d(() => (o(pL.SELECT, s), u(i), a(pL.SELECT, s, u), () => {
+		o(pL.SELECT, s);
 	}), [e]), d(() => {
 		let r = /* @__PURE__ */ new Map();
 		for (let n of e) {
@@ -28273,9 +28293,9 @@ function fL({ parts: e }) {
 }
 //#endregion
 //#region src/modules/run/hooks/run/parts/usePartActions.ts
-var pL = (e) => "step_id" in e && "part_id" in e;
-function mL({ parts: e, selectedParts: t, getRunPart: n, getRunStepPart: r, actionsFromScanner: i = !0 }) {
-	let a = A(), { addCallbackFn: o, removeCallbackFn: s } = oL(), c = f(), u = l(() => e.length === 0 ? [] : pL(e[0]) ? e.filter((e) => {
+var gL = (e) => "step_id" in e && "part_id" in e;
+function _L({ parts: e, selectedParts: t, getRunPart: n, getRunStepPart: r, actionsFromScanner: i = !0 }) {
+	let a = A(), { addCallbackFn: o, removeCallbackFn: s } = lL(), c = f(), u = l(() => e.length === 0 ? [] : gL(e[0]) ? e.filter((e) => {
 		let r = n ? n(e) : e.part_id;
 		return t.get(r);
 	}) : e.filter((e) => t.get(e.id)).map((e) => r ? r(e) : void 0).filter((e) => e !== void 0), [
@@ -28291,32 +28311,32 @@ function mL({ parts: e, selectedParts: t, getRunPart: n, getRunStepPart: r, acti
 			runStepPart: r,
 			runStepPartAction: e
 		}).then((e) => {
-			eL(a, {
+			rL(a, {
 				runStepPart: r,
 				latestAction: e
 			});
 		}));
 		Promise.all(n);
 	}, [u, a]), m = l((e) => {
-		if (!e || !hL(e)) return;
+		if (!e || !vL(e)) return;
 		let t = _t(e.split("/")[1]);
 		if (!t) {
-			cL({
+			dL({
 				notificationHeader: "Part scanner",
 				notificationBody: "Non valid action found in the scanned text",
 				notificationType: "danger"
 			});
 			return;
 		}
-		cL({
+		dL({
 			notificationHeader: "Part scanner",
 			notificationBody: `Performing action ${gt(t)} on selected parts`,
 			notificationType: "success"
 		}), p(t);
 	}, [p]);
 	return d(() => {
-		if (i) return s(uL.PERFORM_ACTION, c), o(uL.PERFORM_ACTION, c, m), () => {
-			s(uL.PERFORM_ACTION, c);
+		if (i) return s(pL.PERFORM_ACTION, c), o(pL.PERFORM_ACTION, c, m), () => {
+			s(pL.PERFORM_ACTION, c);
 		};
 	}, [
 		i,
@@ -28336,12 +28356,12 @@ function mL({ parts: e, selectedParts: t, getRunPart: n, getRunStepPart: r, acti
 		}, [u])
 	};
 }
-function hL(e) {
+function vL(e) {
 	return RegExp("^_qr/.+").test(e);
 }
 //#endregion
 //#region src/modules/run/components/shared/parts_table/element/partSelectionControls.tsx
-var gL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdown: r, traySelections: i, onToggleTray: a }) => {
+var yL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdown: r, traySelections: i, onToggleTray: a }) => {
 	let o = (i ?? []).length > 0;
 	return /* @__PURE__ */ S("div", {
 		className: "d-flex flex-wrap gap-3",
@@ -28378,12 +28398,12 @@ var gL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdow
 			n && r
 		]
 	});
-}, _L = ({ availableActions: e, onActionSelected: t }) => e.length === 0 ? null : (console.log(e), /* @__PURE__ */ x(b, { children: e.map(({ id: e, name: n }) => /* @__PURE__ */ x("button", {
+}, bL = ({ availableActions: e, onActionSelected: t }) => e.length === 0 ? null : (console.log(e), /* @__PURE__ */ x(b, { children: e.map(({ id: e, name: n }) => /* @__PURE__ */ x("button", {
 	type: "button",
 	className: `btn btn-sm ${JI[e]}`,
 	onClick: () => t(e),
 	children: n
-}, e)) })), vL = !1, yL = ({ run: e, runStep: t }) => {
+}, e)) })), xL = !1, SL = ({ run: e, runStep: t }) => {
 	let n = A(), i = O({ queries: [{
 		queryKey: [
 			"runParts",
@@ -28401,7 +28421,7 @@ var gL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdow
 	d(() => {
 		mt(t, u ?? o.data?.items ?? []);
 	}, [u]);
-	let { selectedParts: f, setPartAsSelected: p, setPartsSelection: m, selectAllParts: g, selectNoneParts: _, hasSelectedParts: v } = fL({ parts: l ?? [] });
+	let { selectedParts: f, setPartAsSelected: p, setPartsSelection: m, selectAllParts: g, selectNoneParts: _, hasSelectedParts: v } = hL({ parts: l ?? [] });
 	d(() => {
 		let e = Array.from(f.entries()).filter(([, e]) => e).map(([e]) => e);
 		n.setQueryData(["runPartSelection", t.id], e);
@@ -28410,7 +28430,7 @@ var gL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdow
 		t.id,
 		f
 	]);
-	let { performActionToSelectedParts: y, getAvailableActionsForSelection: C } = mL({
+	let { performActionToSelectedParts: y, getAvailableActionsForSelection: C } = _L({
 		runStep: t,
 		parts: l,
 		selectedParts: f,
@@ -28467,23 +28487,23 @@ var gL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdow
 			/* @__PURE__ */ x("th", { children: "Comment" })
 		] }) }), /* @__PURE__ */ x("tbody", { children: l.map((n, r) => {
 			let i = f.get(n.id) ?? !1;
-			return /* @__PURE__ */ x(iL, {
+			return /* @__PURE__ */ x(sL, {
 				runStep: t,
 				runPart: n,
 				runStepParts: u,
 				canInit: e.run_type === Wt.PRODUCTION,
 				partIsSelected: i,
 				setPartAsSelected: p,
-				dropdown: vL
+				dropdown: xL
 			}, `key-${r}-${n.id}`);
 		}) })]
-	}), /* @__PURE__ */ x(gL, {
+	}), /* @__PURE__ */ x(yL, {
 		onSelectAll: g,
 		onSelectNone: _,
 		hasSelectedParts: v,
 		traySelections: T,
 		onToggleTray: (e, t) => m(e, t),
-		actionsDropdown: /* @__PURE__ */ x(_L, {
+		actionsDropdown: /* @__PURE__ */ x(bL, {
 			availableActions: w,
 			onActionSelected: y
 		})
@@ -28491,7 +28511,7 @@ var gL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdow
 };
 //#endregion
 //#region src/modules/run/components/run/steps/element/stepDetails.tsx
-function bL({ run: e, step: t, refetchFn: n = () => null }) {
+function CL({ run: e, step: t, refetchFn: n = () => null }) {
 	let { run: r } = u(NI), { showOnlyEmphasizedParameters: i } = u(VI), a = e ?? r;
 	return a ? /* @__PURE__ */ x(mi, {
 		className: "p-4 my-3",
@@ -28499,7 +28519,7 @@ function bL({ run: e, step: t, refetchFn: n = () => null }) {
 			md: "6",
 			children: [
 				/* @__PURE__ */ x("h4", { children: "Experimental split" }),
-				/* @__PURE__ */ x(yL, {
+				/* @__PURE__ */ x(SL, {
 					run: a,
 					runStep: t
 				}),
@@ -28529,7 +28549,7 @@ function bL({ run: e, step: t, refetchFn: n = () => null }) {
 }
 //#endregion
 //#region src/modules/run/components/shared/parts/runPartIndicator.tsx
-var xL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !1, hasStepPart: i = !1, isSelected: a = !1, runStep: o }) => {
+var wL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !1, hasStepPart: i = !1, isSelected: a = !1, runStep: o }) => {
 	let s = A(), c = !i || !e ? null : r && !i ? /* @__PURE__ */ S(H, {
 		size: "sm",
 		variant: "outline-secondary",
@@ -28539,7 +28559,7 @@ var xL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 				run_part_id: e.id,
 				run_step_id: o.id
 			}).then((e) => {
-				nL(s, o, { ...e.data });
+				aL(s, o, { ...e.data });
 			});
 		},
 		children: ["Init ", e.scanner_label]
@@ -28551,7 +28571,7 @@ var xL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 		className: `tray-grid__cell${e ? "" : " tray-grid__cell--empty"}`,
 		children: c
 	}) : c;
-}, SL = ({ step: e, parts: t, stepParts: n, run: r }) => {
+}, TL = ({ step: e, parts: t, stepParts: n, run: r }) => {
 	let i = t.filter((t) => t.part_level === e.part_level).sort((e, t) => e.root_id && t.root_id && e.root_id !== t.root_id ? e.root_id - t.root_id : e.left - t.left), a = new Map(n.filter((t) => t.step_id === e.id).map((e) => [e.part_id, e])), o = [...r.run_trays ?? []].sort((e, t) => e.sequence - t.sequence), s = i.reduce((e, t) => {
 		if (!t.tray) return e;
 		let n = e.get(t.tray.id) ?? [];
@@ -28566,7 +28586,7 @@ var xL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 		return t ? t.status.class : "step-part-inactive";
 	}, f = (t, n) => /* @__PURE__ */ x("div", {
 		className: `tray-grid__cell${t.length ? "" : " tray-grid__cell--empty"}${t.length > 1 ? " tray-grid__cell--multi" : ""}`,
-		children: t.map((t) => /* @__PURE__ */ x(xL, {
+		children: t.map((t) => /* @__PURE__ */ x(wL, {
 			runPart: t,
 			statusClass: d(t),
 			allowCreate: c,
@@ -28608,7 +28628,7 @@ var xL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 			children: o.map((t, n) => {
 				if (l) return f(t, `slot-no-tray-${n}`);
 				let r = t[0] ?? null;
-				return /* @__PURE__ */ x(xL, {
+				return /* @__PURE__ */ x(wL, {
 					runPart: r,
 					statusClass: r ? d(r) : void 0,
 					withTrayCell: !0,
@@ -28634,7 +28654,7 @@ var xL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 						children: t.name ?? t.label
 					}), /* @__PURE__ */ x("div", {
 						className: "d-flex flex-wrap gap-2",
-						children: n.map((t) => /* @__PURE__ */ x(xL, {
+						children: n.map((t) => /* @__PURE__ */ x(wL, {
 							runPart: t,
 							statusClass: d(t),
 							allowCreate: c,
@@ -28670,7 +28690,7 @@ var xL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 					children: m.map((n, r) => {
 						if (l) return f(n, `slot-${t.id}-${r}`);
 						let i = n[0] ?? null;
-						return /* @__PURE__ */ x(xL, {
+						return /* @__PURE__ */ x(wL, {
 							runPart: i,
 							statusClass: i ? d(i) : void 0,
 							withTrayCell: !0,
@@ -28687,7 +28707,7 @@ var xL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 };
 //#endregion
 //#region src/modules/run/components/run/steps/element/stepInList.tsx
-function CL({ run: e, step: t, parts: n, stepParts: r, monitoredBy: i, refetchFn: a }) {
+function EL({ run: e, step: t, parts: n, stepParts: r, monitoredBy: i, refetchFn: a }) {
 	let { environment: o } = F(), [s, c] = v(!1), l = () => {
 		c(!s);
 	}, [u, f] = v(t.process_module.module);
@@ -28701,7 +28721,7 @@ function CL({ run: e, step: t, parts: n, stepParts: r, monitoredBy: i, refetchFn
 		}) }),
 		/* @__PURE__ */ x("td", {
 			className: u.latest_module_status && u.latest_module_status.status.is_down_status ? "table-danger" : "",
-			children: /* @__PURE__ */ x(SL, {
+			children: /* @__PURE__ */ x(TL, {
 				step: t,
 				parts: n,
 				stepParts: r,
@@ -28749,7 +28769,7 @@ function CL({ run: e, step: t, parts: n, stepParts: r, monitoredBy: i, refetchFn
 		})] })
 	] }), s && /* @__PURE__ */ x("tr", { children: /* @__PURE__ */ x("td", {
 		colSpan: n.length + 6,
-		children: /* @__PURE__ */ x(bL, {
+		children: /* @__PURE__ */ x(CL, {
 			step: t,
 			refetchFn: a
 		})
@@ -28757,7 +28777,7 @@ function CL({ run: e, step: t, parts: n, stepParts: r, monitoredBy: i, refetchFn
 }
 //#endregion
 //#region src/modules/run/components/shared/requirement/fillValueModal.tsx
-var wL = ({ requirement: e, result: t, show: n, setShow: r, refetchFn: i, part: a, stepPart: o }) => {
+var DL = ({ requirement: e, result: t, show: n, setShow: r, refetchFn: i, part: a, stepPart: o }) => {
 	let [s, c] = v({}), [l, u] = v(!1), [f, p] = v(null), [m, h] = v(!1);
 	d(() => {
 		if (Object.keys(s).length > 0) return;
@@ -28884,7 +28904,7 @@ var wL = ({ requirement: e, result: t, show: n, setShow: r, refetchFn: i, part: 
 			})] })]
 		})]
 	});
-}, TL = o({
+}, OL = o({
 	runStep: {},
 	setRunStep: (e) => {},
 	reloadRunStep: () => {},
@@ -28894,8 +28914,8 @@ var wL = ({ requirement: e, result: t, show: n, setShow: r, refetchFn: i, part: 
 });
 //#endregion
 //#region src/modules/run/components/shared/requirement/requirementValuesWithPartTable.tsx
-function EL({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i, refetchFn: a, editOnly: o = !1 }) {
-	let { run: s } = u(TL), [c, l] = v(r ?? []), [f, p] = v(n ?? []), [m, h] = v(i ?? []), g = A(), _ = O({ queries: [
+function kL({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i, refetchFn: a, editOnly: o = !1 }) {
+	let { run: s } = u(OL), [c, l] = v(r ?? []), [f, p] = v(n ?? []), [m, h] = v(i ?? []), g = A(), _ = O({ queries: [
 		{
 			queryKey: ["runParts", `${s?.id ?? "unknown"}`],
 			queryFn: async () => await rt({ run: s }),
@@ -29040,7 +29060,7 @@ function EL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 		}) })]
 	}), !o && j.map((t) => {
 		let n = m.find((e) => e.values.some((e) => e.step_part_id === t.id));
-		return /* @__PURE__ */ x(wL, {
+		return /* @__PURE__ */ x(DL, {
 			requirement: e,
 			...n ? { result: n } : {
 				part: k.find((e) => e.id === t.part_id),
@@ -29060,7 +29080,7 @@ function EL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 }
 //#endregion
 //#region src/modules/run/components/shared/requirement/requirementValuesByStep.tsx
-function DL({ requirement: e, measurementResults: t, refetchFn: n, editOnly: r = !1 }) {
+function AL({ requirement: e, measurementResults: t, refetchFn: n, editOnly: r = !1 }) {
 	let [i, a] = v(t ?? []), o = A(), s = O({ queries: [{
 		queryKey: [
 			"requirement",
@@ -29129,7 +29149,7 @@ function DL({ requirement: e, measurementResults: t, refetchFn: n, editOnly: r =
 							/* @__PURE__ */ x("td", { children: e.logging_parameter.unit?.abbr ?? "" })
 						] }, `value:${e.id}`)) })]
 					}),
-					/* @__PURE__ */ x(wL, {
+					/* @__PURE__ */ x(DL, {
 						requirement: e,
 						result: t,
 						show: u === t.id,
@@ -29148,7 +29168,7 @@ function DL({ requirement: e, measurementResults: t, refetchFn: n, editOnly: r =
 					children: [/* @__PURE__ */ x("i", { className: "fa fa-plus" }), " Add results"]
 				})
 			}),
-			/* @__PURE__ */ x(wL, {
+			/* @__PURE__ */ x(DL, {
 				requirement: e,
 				show: p,
 				setShow: (e) => {
@@ -29161,7 +29181,7 @@ function DL({ requirement: e, measurementResults: t, refetchFn: n, editOnly: r =
 }
 //#endregion
 //#region src/modules/run/components/run/steps/element/requirementDetails.tsx
-function OL({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i, refetchFn: a }) {
+function jL({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i, refetchFn: a }) {
 	let { environment: o } = F();
 	return /* @__PURE__ */ x(mi, {
 		className: "p-4 my-3",
@@ -29169,7 +29189,7 @@ function OL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 			md: "7",
 			children: [
 				/* @__PURE__ */ x("h4", { children: "Measurements by part" }),
-				/* @__PURE__ */ x(EL, {
+				/* @__PURE__ */ x(kL, {
 					requirement: e,
 					step: t,
 					stepParts: n,
@@ -29178,7 +29198,7 @@ function OL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 					refetchFn: a
 				}),
 				/* @__PURE__ */ x("h4", { children: "Measurements for whole step" }),
-				/* @__PURE__ */ x(DL, {
+				/* @__PURE__ */ x(AL, {
 					requirement: e,
 					measurementResults: i,
 					refetchFn: a
@@ -29228,7 +29248,7 @@ function OL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 }
 //#endregion
 //#region src/modules/run/components/shared/requirement/measurementResultsBadge.tsx
-var kL = ({ requirement: e, step: t, measurementResults: n, parts: r, stepParts: i }) => {
+var ML = ({ requirement: e, step: t, measurementResults: n, parts: r, stepParts: i }) => {
 	let a = r.filter((e) => e.part_level === t.part_level).sort((e, t) => e.root_id && t.root_id && e.root_id !== t.root_id ? e.root_id - t.root_id : e.left - t.left), o = a.reduce((e, t) => {
 		let n = t.root_id ?? t.id;
 		return e[n] || (e[n] = []), e[n].push(t), e;
@@ -29271,7 +29291,7 @@ var kL = ({ requirement: e, step: t, measurementResults: n, parts: r, stepParts:
 };
 //#endregion
 //#region src/modules/run/components/run/steps/element/requirementStepInList.tsx
-function AL({ requirement: e, step: t, parts: n, stepParts: r, refetchFn: i }) {
+function NL({ requirement: e, step: t, parts: n, stepParts: r, refetchFn: i }) {
 	let { environment: a } = F(), [o, s] = v(!1), [c, l] = v(t.process_module.module);
 	d(() => {
 		l(t.process_module.module);
@@ -29308,7 +29328,7 @@ function AL({ requirement: e, step: t, parts: n, stepParts: r, refetchFn: i }) {
 				style: { cursor: "pointer" },
 				onClick: u
 			}) }),
-			/* @__PURE__ */ x("td", { children: /* @__PURE__ */ x(kL, {
+			/* @__PURE__ */ x("td", { children: /* @__PURE__ */ x(ML, {
 				requirement: e,
 				step: t,
 				measurementResults: h.data?.items ?? [],
@@ -29354,7 +29374,7 @@ function AL({ requirement: e, step: t, parts: n, stepParts: r, refetchFn: i }) {
 		]
 	}), o && /* @__PURE__ */ x("tr", { children: /* @__PURE__ */ x("td", {
 		colSpan: n.length + 5,
-		children: g ? "Loading..." : /* @__PURE__ */ x(OL, {
+		children: g ? "Loading..." : /* @__PURE__ */ x(jL, {
 			requirement: e,
 			step: t,
 			stepParts: r,
@@ -29366,7 +29386,7 @@ function AL({ requirement: e, step: t, parts: n, stepParts: r, refetchFn: i }) {
 }
 //#endregion
 //#region src/modules/run/components/run/steps/runStepsElement.tsx
-function jL() {
+function PL() {
 	let { run: e } = u(NI), { showOnlyEmphasizedParameters: n, setShowOnlyEmphasizedParameters: r } = u(VI), [i, a] = v(1), [o] = v(25), [s, c] = v(/* @__PURE__ */ new Map()), l = A(), f = O({ queries: [
 		{
 			queryKey: [
@@ -29585,14 +29605,14 @@ function jL() {
 				let r = `step-${n.id}`;
 				return /* @__PURE__ */ S(t.Fragment, { children: [n.has_label && ie(n), (!n.has_label || s.get(n.label?.id ?? -1)) && /* @__PURE__ */ S(b, { children: [n.has_step_group && ne.includes(n) && I(n), n.has_requirement ? (() => {
 					let e = te.find((e) => e.step.id === n.id);
-					return /* @__PURE__ */ x(AL, {
+					return /* @__PURE__ */ x(NL, {
 						requirement: e,
 						step: n,
 						parts: ee,
 						stepParts: P.filter((t) => t.step_id === (e.requirement_for_step?.id ?? e.step.id)),
 						refetchFn: p
 					});
-				})() : /* @__PURE__ */ x(CL, {
+				})() : /* @__PURE__ */ x(EL, {
 					run: e,
 					step: n,
 					parts: ee,
@@ -29611,7 +29631,7 @@ function jL() {
 }
 //#endregion
 //#region src/modules/run/components/run/steps/runInformationElement.tsx
-function ML() {
+function FL() {
 	let { run: e } = u(NI);
 	return /* @__PURE__ */ S("div", { children: [
 		/* @__PURE__ */ x("h2", { children: "Run information" }),
@@ -29623,7 +29643,7 @@ function ML() {
 }
 //#endregion
 //#region src/modules/run/hooks/useRunStep.ts
-var NL = () => {
+var IL = () => {
 	let [e, t] = v(null), [n, r] = v(null), { id: i } = F();
 	d(() => {
 		(e === null || i !== e.id.toString()) && et({ id: parseInt(i) }).then((e) => ($e({ id: e.run_id }).then(r), e)).then(t);
@@ -29640,13 +29660,13 @@ var NL = () => {
 };
 //#endregion
 //#region src/modules/run/providers/runStepProvider.tsx
-function PL({ children: e }) {
-	let { runStep: t, setRunStep: n, run: r, reloadRunStep: a } = NL(), [o, s] = v({});
+function LL({ children: e }) {
+	let { runStep: t, setRunStep: n, run: r, reloadRunStep: a } = IL(), [o, s] = v({});
 	if (t === null || r === null) {
 		let e = "Loading run...";
 		return t === null && r === null ? e = "Loading run and run step..." : r === null && (e = "Loading run step..."), /* @__PURE__ */ x(rn, { children: /* @__PURE__ */ x(Qt, { message: e }) });
 	}
-	return /* @__PURE__ */ x(rn, { children: /* @__PURE__ */ x(TL.Provider, {
+	return /* @__PURE__ */ x(rn, { children: /* @__PURE__ */ x(OL.Provider, {
 		value: {
 			runStep: t,
 			setRunStep: n,
@@ -29663,18 +29683,18 @@ function PL({ children: e }) {
 }
 //#endregion
 //#region src/modules/run/components/step/runStepHeaderElement.tsx
-function FL() {
-	return /* @__PURE__ */ x(PL, { children: /* @__PURE__ */ x(wi, {
+function RL() {
+	return /* @__PURE__ */ x(LL, { children: /* @__PURE__ */ x(wi, {
 		fluid: !0,
 		children: /* @__PURE__ */ x(ee, {})
 	}) });
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/stepLabel.tsx
-var IL = ({ label: e }) => /* @__PURE__ */ x("div", {
+var zL = ({ label: e }) => /* @__PURE__ */ x("div", {
 	className: "p-2 h4 mb-1 bg-info text-white",
 	children: e.label
-}), LL = ({ runStep: e }) => {
+}), BL = ({ runStep: e }) => {
 	let { environment: t } = F();
 	return /* @__PURE__ */ S("h2", { children: [
 		" ",
@@ -29693,7 +29713,7 @@ var IL = ({ label: e }) => /* @__PURE__ */ x("div", {
 			]
 		})
 	] });
-}, RL = ({ checklistItem: e, show: t, setModalShow: n, mutation: r }) => /* @__PURE__ */ S(G, {
+}, VL = ({ checklistItem: e, show: t, setModalShow: n, mutation: r }) => /* @__PURE__ */ S(G, {
 	show: t,
 	size: "lg",
 	onHide: () => n(!1),
@@ -29719,7 +29739,7 @@ var IL = ({ label: e }) => /* @__PURE__ */ x("div", {
 });
 //#endregion
 //#region src/modules/run/components/step/view/element/checklist/checklistItemElement.tsx
-function zL({ checklistItem: e, onOpenModal: t, onMarkDone: n }) {
+function HL({ checklistItem: e, onOpenModal: t, onMarkDone: n }) {
 	return e.can_finish ? e.description === "" ? /* @__PURE__ */ x(H, {
 		className: "float-end",
 		size: "sm",
@@ -29733,7 +29753,7 @@ function zL({ checklistItem: e, onOpenModal: t, onMarkDone: n }) {
 		children: "Execute checklist step"
 	}) : null;
 }
-var BL = ({ checklistItem: e, refetch: t }) => {
+var UL = ({ checklistItem: e, refetch: t }) => {
 	let [n, r] = v(!1), i = D({
 		mutationFn: async () => (await y.create().patch("update/run/step/checklist/done/" + e.id, {})).data,
 		onSuccess: (e) => {
@@ -29753,13 +29773,13 @@ var BL = ({ checklistItem: e, refetch: t }) => {
 			}),
 			/* @__PURE__ */ x("div", {
 				className: "flex-shrink-0",
-				children: /* @__PURE__ */ x(zL, {
+				children: /* @__PURE__ */ x(HL, {
 					checklistItem: e,
 					onOpenModal: () => r(!0),
 					onMarkDone: () => i.mutate()
 				})
 			}),
-			/* @__PURE__ */ x(RL, {
+			/* @__PURE__ */ x(VL, {
 				checklistItem: e,
 				show: n,
 				setModalShow: r,
@@ -29767,7 +29787,7 @@ var BL = ({ checklistItem: e, refetch: t }) => {
 			})
 		]
 	});
-}, VL = {
+}, WL = {
 	movingOut: "Moving out...",
 	skipping: "Skipping...",
 	unskipping: "Unskipping...",
@@ -29775,8 +29795,8 @@ var BL = ({ checklistItem: e, refetch: t }) => {
 	operationSkipped: "Operation skipped",
 	operationUnskipped: "Operation unskipped"
 };
-function HL({ run: e, runStep: t, reloadRunStep: n }) {
-	let r = te(), { environment: i } = F(), [a, o] = v(null), [s, c] = v(!1), { run: f, runStep: p, reloadRunStep: m } = u(TL);
+function GL({ run: e, runStep: t, reloadRunStep: n }) {
+	let r = te(), { environment: i } = F(), [a, o] = v(null), [s, c] = v(!1), { run: f, runStep: p, reloadRunStep: m } = u(OL);
 	d(() => {
 		if (a) {
 			let e = setTimeout(() => {
@@ -29790,10 +29810,10 @@ function HL({ run: e, runStep: t, reloadRunStep: n }) {
 		queryFn: () => st({ runStep: _ }),
 		enabled: !!_
 	}), O = l(async (e) => {
-		o(VL.movingOut), c(!0);
+		o(WL.movingOut), c(!0);
 		try {
 			let t = await lt(e);
-			o(VL.operationFinished), t.data.next_step_id === null ? C() : r(`/${i}/operator/run/step/${t.data.next_step_id}`);
+			o(WL.operationFinished), t.data.next_step_id === null ? C() : r(`/${i}/operator/run/step/${t.data.next_step_id}`);
 		} finally {
 			c(!1);
 		}
@@ -29802,16 +29822,16 @@ function HL({ run: e, runStep: t, reloadRunStep: n }) {
 		r,
 		C
 	]), A = l(async (e) => {
-		o(VL.skipping), c(!0);
+		o(WL.skipping), c(!0);
 		try {
-			await y.create().patch(`update/run/step/skip/${e.id}`, {}), o(VL.operationSkipped), C();
+			await y.create().patch(`update/run/step/skip/${e.id}`, {}), o(WL.operationSkipped), C();
 		} finally {
 			c(!1);
 		}
 	}, [C]), j = l(async (e) => {
-		o(VL.unskipping), c(!0);
+		o(WL.unskipping), c(!0);
 		try {
-			await y.create().patch(`update/run/step/un-skip/${e.id}`, {}), o(VL.operationUnskipped), C();
+			await y.create().patch(`update/run/step/un-skip/${e.id}`, {}), o(WL.operationUnskipped), C();
 		} finally {
 			c(!1);
 		}
@@ -29833,7 +29853,7 @@ function HL({ run: e, runStep: t, reloadRunStep: n }) {
 			variant: "info",
 			children: "No checklist found"
 		}),
-		M.length > 0 && /* @__PURE__ */ x(jc, { children: M.map((e) => /* @__PURE__ */ x(BL, {
+		M.length > 0 && /* @__PURE__ */ x(jc, { children: M.map((e) => /* @__PURE__ */ x(UL, {
 			checklistItem: e,
 			refetch: D
 		}, e.id)) }),
@@ -29846,19 +29866,19 @@ function HL({ run: e, runStep: t, reloadRunStep: n }) {
 						variant: "success",
 						onClick: () => O(_),
 						disabled: s,
-						children: a === VL.operationFinished || a === VL.movingOut ? a : "Move out"
+						children: a === WL.operationFinished || a === WL.movingOut ? a : "Move out"
 					}) }),
 					g.access.edit && !_.is_skipped && /* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(H, {
 						variant: "primary",
 						onClick: () => A(_),
 						disabled: s,
-						children: a === VL.operationSkipped || a === VL.skipping ? a : "Skip operation"
+						children: a === WL.operationSkipped || a === WL.skipping ? a : "Skip operation"
 					}) }),
 					g.access.edit && _.is_skipped && /* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(H, {
 						variant: "warning",
 						onClick: () => j(_),
 						disabled: s,
-						children: a === VL.operationUnskipped || a === VL.unskipping ? a : "Unskip operation"
+						children: a === WL.operationUnskipped || a === WL.unskipping ? a : "Unskip operation"
 					}) })
 				]
 			}), /* @__PURE__ */ x("div", {
@@ -29874,9 +29894,9 @@ function HL({ run: e, runStep: t, reloadRunStep: n }) {
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/stepRemark.tsx
-var UL = () => void 0;
-function WL({ runStep: e, reloadRunStep: t, title: n = "Remark", titleClassName: r = "mb-2 text-start" }) {
-	let { runStep: i, setRunStep: a } = u(TL), o = e ?? i, s = t ? () => t() : e ? UL : a ?? UL, [c, f] = v(!1), p = o ? !o.is_finished : !1, m = !!o?.remark?.trim(), { register: h, handleSubmit: g, formState: _, reset: C } = sf({ defaultValues: { remark: o?.remark_unparsed ?? "" } }), { isSubmitting: w } = _;
+var KL = () => void 0;
+function qL({ runStep: e, reloadRunStep: t, title: n = "Remark", titleClassName: r = "mb-2 text-start" }) {
+	let { runStep: i, setRunStep: a } = u(OL), o = e ?? i, s = t ? () => t() : e ? KL : a ?? KL, [c, f] = v(!1), p = o ? !o.is_finished : !1, m = !!o?.remark?.trim(), { register: h, handleSubmit: g, formState: _, reset: C } = sf({ defaultValues: { remark: o?.remark_unparsed ?? "" } }), { isSubmitting: w } = _;
 	d(() => {
 		C({ remark: o?.remark_unparsed ?? "" });
 	}, [C, o?.remark_unparsed]);
@@ -29950,7 +29970,7 @@ function WL({ runStep: e, reloadRunStep: t, title: n = "Remark", titleClassName:
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/hold-code/holdCodeModal.tsx
-var GL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) => {
+var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) => {
 	let [o, s] = t.useState(!1), { register: c, control: l, setValue: u, handleSubmit: d, formState: f } = sf({ defaultValues: {
 		holdCode: i ? {
 			value: i.hold_code.id,
@@ -30050,8 +30070,8 @@ var GL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 			]
 		})
 	});
-}, KL = () => {
-	let { run: e } = u(TL), [t, n] = v(!1), [r, i] = v(e.hold_code), a = () => {
+}, YL = () => {
+	let { run: e } = u(OL), [t, n] = v(!1), [r, i] = v(e.hold_code), a = () => {
 		n(!0);
 	};
 	return /* @__PURE__ */ S(b, { children: [
@@ -30076,7 +30096,7 @@ var GL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 			},
 			children: "No hold code"
 		}),
-		/* @__PURE__ */ x(GL, {
+		/* @__PURE__ */ x(JL, {
 			run: e,
 			show: t,
 			setShow: n,
@@ -30084,8 +30104,8 @@ var GL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 			setRunHoldCode: i
 		})
 	] });
-}, qL = () => {
-	let { run: e } = u(TL), [n, r] = v(e.priority);
+}, XL = () => {
+	let { run: e } = u(OL), [n, r] = v(e.priority);
 	return /* @__PURE__ */ S(t.Fragment, { children: [n && /* @__PURE__ */ x("span", {
 		className: "badge",
 		style: {
@@ -30099,7 +30119,7 @@ var GL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 		style: { fontSize: "1.5rem" },
 		children: "NORMAL"
 	})] });
-}, JL = ({ run: e, runStep: t, showOnlyEmphasizedParameters: n }) => /* @__PURE__ */ x("div", {
+}, ZL = ({ run: e, runStep: t, showOnlyEmphasizedParameters: n }) => /* @__PURE__ */ x("div", {
 	className: "border rounded px-3 py-3",
 	children: /* @__PURE__ */ S("div", {
 		className: "d-flex flex-wrap gap-3",
@@ -30108,7 +30128,7 @@ var GL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 				flexGrow: 1,
 				flex: "1 1 360px"
 			},
-			children: /* @__PURE__ */ x(yL, {
+			children: /* @__PURE__ */ x(SL, {
 				run: e,
 				runStep: t
 			})
@@ -30128,8 +30148,8 @@ var GL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 			]
 		})]
 	})
-}), YL = ({ run: e, monitoredBy: t, runStep: n, runParts: r, runStepParts: i, hideLabel: a, firstInGroup: o }) => {
-	let { environment: s } = F(), [c, l] = v(!1), { runStep: d } = u(TL);
+}), QL = ({ run: e, monitoredBy: t, runStep: n, runParts: r, runStepParts: i, hideLabel: a, firstInGroup: o }) => {
+	let { environment: s } = F(), [c, l] = v(!1), { runStep: d } = u(OL);
 	return /* @__PURE__ */ S(b, { children: [
 		!a && n.has_label && n.is_own_label && /* @__PURE__ */ x("div", {
 			className: "bg-info text-white rounded px-3 py-1",
@@ -30161,7 +30181,7 @@ var GL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 					children: [
 						/* @__PURE__ */ x("div", {
 							className: "flex-shrink-0",
-							children: /* @__PURE__ */ x(SL, {
+							children: /* @__PURE__ */ x(TL, {
 								step: n,
 								parts: r,
 								stepParts: i,
@@ -30224,7 +30244,7 @@ var GL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 				})
 			]
 		}),
-		c && /* @__PURE__ */ x(JL, {
+		c && /* @__PURE__ */ x(ZL, {
 			run: e,
 			runStep: n,
 			showOnlyEmphasizedParameters: !1
@@ -30233,7 +30253,7 @@ var GL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 };
 //#endregion
 //#region src/modules/run/components/step/view/element/step-overview/requirementDetails.tsx
-function XL({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i }) {
+function $L({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i }) {
 	let a = n.filter((t) => t.step_id === (e.requirement_for_step?.id ?? e.step.id)), { environment: o } = F();
 	return /* @__PURE__ */ x(b, { children: /* @__PURE__ */ x("div", {
 		className: "border rounded px-3 py-3",
@@ -30244,7 +30264,7 @@ function XL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 					flexGrow: 1,
 					flex: "1 1 360px"
 				},
-				children: [/* @__PURE__ */ x("h4", { children: "Measurement results" }), /* @__PURE__ */ x(EL, {
+				children: [/* @__PURE__ */ x("h4", { children: "Measurement results" }), /* @__PURE__ */ x(kL, {
 					requirement: e,
 					step: t,
 					stepParts: a,
@@ -30291,8 +30311,8 @@ function XL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/step-overview/requirementElement.tsx
-function ZL({ requirement: e, runParts: t, runStepParts: n, hideLabel: r, firstInGroup: i }) {
-	let a = e.step, { environment: o } = F(), { runStep: s } = u(TL), [c, l] = v(!1), [d] = O({ queries: [{
+function eR({ requirement: e, runParts: t, runStepParts: n, hideLabel: r, firstInGroup: i }) {
+	let a = e.step, { environment: o } = F(), { runStep: s } = u(OL), [c, l] = v(!1), [d] = O({ queries: [{
 		queryKey: [
 			"requirement",
 			"measurementResults",
@@ -30340,7 +30360,7 @@ function ZL({ requirement: e, runParts: t, runStepParts: n, hideLabel: r, firstI
 					children: [
 						/* @__PURE__ */ x("div", {
 							className: "flex-shrink-0",
-							children: /* @__PURE__ */ x(kL, {
+							children: /* @__PURE__ */ x(ML, {
 								requirement: e,
 								step: a,
 								parts: t,
@@ -30401,7 +30421,7 @@ function ZL({ requirement: e, runParts: t, runStepParts: n, hideLabel: r, firstI
 				})
 			]
 		}),
-		c && /* @__PURE__ */ x(XL, {
+		c && /* @__PURE__ */ x($L, {
 			requirement: e,
 			step: a,
 			stepParts: n,
@@ -30412,8 +30432,8 @@ function ZL({ requirement: e, runParts: t, runStepParts: n, hideLabel: r, firstI
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/runStepSimpleList.tsx
-var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
-	let { runStep: r, run: i } = u(TL), [a, o] = v(1);
+var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
+	let { runStep: r, run: i } = u(OL), [a, o] = v(1);
 	d(() => {
 		r?.sequence && o(Math.max(1, Math.ceil(r.sequence / e)));
 	}, [r?.sequence, e]);
@@ -30466,12 +30486,12 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 	]), /* @__PURE__ */ S("div", { children: [
 		m ? /* @__PURE__ */ x("div", { children: "Loading..." }) : h ? /* @__PURE__ */ S("div", { children: ["Error: ", String(g?.message ?? g)] }) : /* @__PURE__ */ x("div", {
 			className: "d-flex flex-column gap-2",
-			children: b.map((e, r) => /* @__PURE__ */ x(t.Fragment, { children: e.has_requirement ? /* @__PURE__ */ x(ZL, {
+			children: b.map((e, r) => /* @__PURE__ */ x(t.Fragment, { children: e.has_requirement ? /* @__PURE__ */ x(eR, {
 				requirement: C.find((t) => t.step.id === e.id),
 				runParts: _,
 				runStepParts: y,
 				firstInGroup: E.includes(e)
-			}, e.id ?? e.sequence ?? r) : /* @__PURE__ */ x(YL, {
+			}, e.id ?? e.sequence ?? r) : /* @__PURE__ */ x(QL, {
 				run: i,
 				monitoredBy: D[e.id],
 				runParts: _,
@@ -30488,8 +30508,8 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 		}),
 		f.isFetching ? /* @__PURE__ */ x("span", { children: " Loading..." }) : null
 	] });
-}, $L = ({ show: e, setModalShow: t }) => {
-	let { run: n } = u(TL), [r, i] = v(1), { isPending: a, isLoading: o, isError: s, error: c, data: l, isFetching: d, isPlaceholderData: f } = k({
+}, nR = ({ show: e, setModalShow: t }) => {
+	let { run: n } = u(OL), [r, i] = v(1), { isPending: a, isLoading: o, isError: s, error: c, data: l, isFetching: d, isPlaceholderData: f } = k({
 		queryKey: [
 			"run_changelog",
 			n,
@@ -30546,19 +30566,19 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 			}) })
 		]
 	});
-}, eR = ({ size: e }) => {
+}, rR = ({ size: e }) => {
 	let [t, n] = v(!1);
 	return /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x(H, {
 		size: e,
 		variant: "primary",
 		onClick: () => n(!t),
 		children: "Run history"
-	}), t && /* @__PURE__ */ x($L, {
+	}), t && /* @__PURE__ */ x(nR, {
 		show: t,
 		setModalShow: n
 	})] });
-}, tR = ({ show: e, setModalShow: t }) => {
-	let { run: n } = u(TL);
+}, iR = ({ show: e, setModalShow: t }) => {
+	let { run: n } = u(OL);
 	return /* @__PURE__ */ S(G, {
 		show: e,
 		size: "xl",
@@ -30568,7 +30588,7 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 				closeButton: !0,
 				children: /* @__PURE__ */ S(G.Title, { children: ["All steps of run ", n.label] })
 			}),
-			/* @__PURE__ */ x(G.Body, { children: /* @__PURE__ */ x(QL, { hideLabel: !1 }) }),
+			/* @__PURE__ */ x(G.Body, { children: /* @__PURE__ */ x(tR, { hideLabel: !1 }) }),
 			/* @__PURE__ */ x(G.Footer, { children: /* @__PURE__ */ x(H, {
 				className: "float-end",
 				variant: "secondary",
@@ -30579,19 +30599,19 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 			}) })
 		]
 	});
-}, nR = ({ size: e }) => {
+}, aR = ({ size: e }) => {
 	let [n, r] = v(!1);
 	return /* @__PURE__ */ S(t.Fragment, { children: [/* @__PURE__ */ x(H, {
 		size: e,
 		variant: "primary",
 		onClick: () => r(!0),
 		children: "All run steps"
-	}), n && /* @__PURE__ */ x(tR, {
+	}), n && /* @__PURE__ */ x(iR, {
 		show: n,
 		setModalShow: r
 	})] });
-}, rR = () => {
-	let { runStep: e, run: t } = u(TL), [n, r] = v(!1), [i, a] = v({}), [o, s] = v(null), [c, l] = v([]), [f, p] = v([]), [m, h] = v([]), [g, _] = v(""), [C, w] = v(!1);
+}, oR = () => {
+	let { runStep: e, run: t } = u(OL), [n, r] = v(!1), [i, a] = v({}), [o, s] = v(null), [c, l] = v([]), [f, p] = v([]), [m, h] = v([]), [g, _] = v(""), [C, w] = v(!1);
 	if (!e.has_recipe) return "Reworks are only possible for steps with a recipe";
 	let [T, E, D] = O({ queries: [
 		{
@@ -30809,8 +30829,8 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 		onClick: () => r(!0),
 		children: "Set Rework"
 	})] });
-}, iR = () => {
-	let { environment: e } = F(), { runStep: t, run: n } = u(TL), r = O({ queries: [
+}, sR = () => {
+	let { environment: e } = F(), { runStep: t, run: n } = u(OL), r = O({ queries: [
 		{
 			queryKey: ["monitors", t.process_module.module.equipment],
 			queryFn: () => qe({ equipment: t.process_module.module.equipment })
@@ -30830,7 +30850,7 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 				step: t
 			})
 		}
-	] }), [i, a, o, s] = r, [c, l] = v(!0), { addReadingCallbackFn: p, removeReadingCallbackFn: m } = oL(), [h, g] = v(""), _ = f();
+	] }), [i, a, o, s] = r, [c, l] = v(!0), { addReadingCallbackFn: p, removeReadingCallbackFn: m } = lL(), [h, g] = v(""), _ = f();
 	d(() => (p(_, g), () => {
 		m(_);
 	}), []);
@@ -30870,8 +30890,8 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 								className: "mx-1 badge bg-primary",
 								children: "Rework"
 							}),
-							/* @__PURE__ */ x(qL, {}),
-							/* @__PURE__ */ x(KL, {}),
+							/* @__PURE__ */ x(XL, {}),
+							/* @__PURE__ */ x(YL, {}),
 							t.is_skipped && /* @__PURE__ */ x("span", {
 								style: { fontSize: "1.5rem" },
 								className: "badge bg-info",
@@ -30881,8 +30901,8 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 					})]
 				}),
 				/* @__PURE__ */ x(LI, { run: n }),
-				t.label && /* @__PURE__ */ x(IL, { label: t.label }),
-				/* @__PURE__ */ x(LL, { runStep: t }),
+				t.label && /* @__PURE__ */ x(zL, { label: t.label }),
+				/* @__PURE__ */ x(BL, { runStep: t }),
 				t.is_finished && /* @__PURE__ */ S(Qr, {
 					variant: "success",
 					children: [
@@ -30909,18 +30929,18 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 				}),
 				s.data?.items.length == 1 && /* @__PURE__ */ S(b, { children: [
 					/* @__PURE__ */ x("h4", { children: "Measurements by part" }),
-					/* @__PURE__ */ x(EL, {
+					/* @__PURE__ */ x(kL, {
 						requirement: s.data.items[0],
 						step: t,
 						editOnly: !1
 					}),
 					/* @__PURE__ */ x("h4", { children: "Measurements for whole step" }),
-					/* @__PURE__ */ x(DL, {
+					/* @__PURE__ */ x(AL, {
 						requirement: s.data.items[0],
 						editOnly: !1
 					})
 				] }),
-				s.data?.items.length != 1 && /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x("h3", { children: "Experimental split" }), /* @__PURE__ */ x(yL, {
+				s.data?.items.length != 1 && /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x("h3", { children: "Experimental split" }), /* @__PURE__ */ x(SL, {
 					run: n,
 					runStep: t
 				})] }),
@@ -30932,7 +30952,7 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 					className: "pm-3",
 					children: [/* @__PURE__ */ S(Ci, { children: [
 						/* @__PURE__ */ x("h3", { children: "Checklist" }),
-						/* @__PURE__ */ x(HL, {}),
+						/* @__PURE__ */ x(GL, {}),
 						/* @__PURE__ */ x("h2", {
 							className: "mt-2",
 							children: "Step files"
@@ -30959,12 +30979,12 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 							showOnlyEmphasizedParameters: c
 						}),
 						t.has_instructions && t.instructions && /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x("h3", { children: "Instructions" }), /* @__PURE__ */ x("span", { dangerouslySetInnerHTML: { __html: t.instructions } })] }),
-						/* @__PURE__ */ x(WL, {}),
+						/* @__PURE__ */ x(qL, {}),
 						/* @__PURE__ */ x("h3", {
 							className: "pt-3",
 							children: "Rework"
 						}),
-						/* @__PURE__ */ x(rR, {})
+						/* @__PURE__ */ x(oR, {})
 					] })]
 				}),
 				/* @__PURE__ */ S("div", {
@@ -30972,8 +30992,8 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 					children: [/* @__PURE__ */ x("h2", { children: "Run steps" }), /* @__PURE__ */ S("div", {
 						className: "d-flex gap-2 flex-wrap justify-content-end",
 						children: [
-							/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(nR, { size: void 0 }) }),
-							/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(eR, { size: void 0 }) }),
+							/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(aR, { size: void 0 }) }),
+							/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(rR, { size: void 0 }) }),
 							/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(NF, {
 								size: void 0,
 								moduleId: t.process_module.module.id
@@ -30981,7 +31001,7 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 						]
 					})]
 				}),
-				/* @__PURE__ */ x(QL, {
+				/* @__PURE__ */ x(tR, {
 					pageSize: n.run_type === Wt.RESEARCH ? 5 : 1e3,
 					hideLabel: !0
 				})
@@ -31027,8 +31047,8 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 			})
 		})] })
 	});
-}, aR = () => {
-	let [e, t] = v(!1), { modalProperties: n } = u(TL), r = () => {
+}, cR = () => {
+	let [e, t] = v(!1), { modalProperties: n } = u(OL), r = () => {
 		t(!1), n.show = !1;
 	};
 	return d(() => {
@@ -31053,25 +31073,25 @@ var QL = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 };
 //#endregion
 //#region src/utils/keySequenceListener.ts
-function oR(e) {
+function lR(e) {
 	switch (e) {
 		case "Shift": return !0;
 	}
 	return !1;
 }
-function sR(e) {
+function uR(e) {
 	return /^[a-zA-Z0-9-]$/.test(e);
 }
-function cR(e) {
+function dR(e) {
 	return e.length === 1;
 }
-function lR(e) {
+function fR(e) {
 	switch (e) {
 		case "Enter": return !0;
 		default: return !1;
 	}
 }
-function uR(e, t, n, r) {
+function pR(e, t, n, r) {
 	let i = r?.requireEndCharacter ?? !1, a = 0, o = "", s = () => {
 		a = 0, o = "", n && n(o);
 	};
@@ -31081,8 +31101,8 @@ function uR(e, t, n, r) {
 			s();
 			return;
 		}
-		if (!oR(c)) {
-			if (lR(c)) {
+		if (!lR(c)) {
+			if (fR(c)) {
 				t(o), s();
 				return;
 			}
@@ -31094,10 +31114,10 @@ function uR(e, t, n, r) {
 					} else a = (a + 1) % e.length;
 					break;
 				case "*":
-					if (!cR(c)) return;
+					if (!dR(c)) return;
 					break;
 				default:
-					if (!sR(e[a])) throw Error("Invalid character expression in makeKeySequenceListener call");
+					if (!uR(e[a])) throw Error("Invalid character expression in makeKeySequenceListener call");
 					if (c != e[a]) {
 						s();
 						return;
@@ -31114,24 +31134,24 @@ function uR(e, t, n, r) {
 }
 //#endregion
 //#region src/modules/core/contexts/scanner/ScannerProvider.tsx
-var dR = ({ children: e }) => {
+var mR = ({ children: e }) => {
 	let [t, n] = v(""), r = _(/* @__PURE__ */ new Map()), i = _(/* @__PURE__ */ new Map()), a = (e) => {
 		c(() => {
 			i.current.forEach((t) => t(e));
 		});
 	}, o = (e) => {
 		n(e);
-		let t = dL(e);
+		let t = mL(e);
 		c(() => {
 			r.current.get(t)?.forEach((t) => t(e));
 		});
 	};
 	return d(() => {
-		let e = uR("*", o, a, { requireEndCharacter: !0 });
+		let e = pR("*", o, a, { requireEndCharacter: !0 });
 		return document.addEventListener("keyup", e), () => {
 			document.removeEventListener("keyup", e);
 		};
-	}, [o, a]), /* @__PURE__ */ x(aL.Provider, {
+	}, [o, a]), /* @__PURE__ */ x(cL.Provider, {
 		value: {
 			lastlyReadedKeys: t,
 			addCallbackFn: (e, t, n) => {
@@ -31152,17 +31172,17 @@ var dR = ({ children: e }) => {
 };
 //#endregion
 //#region src/modules/run/components/step/view/runStepExecuteElement.tsx
-function fR() {
-	return /* @__PURE__ */ x(lL, { children: /* @__PURE__ */ x(dR, { children: /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x(iR, {}), /* @__PURE__ */ x(aR, {})] }) }) });
+function hR() {
+	return /* @__PURE__ */ x(fL, { children: /* @__PURE__ */ x(mR, { children: /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x(sR, {}), /* @__PURE__ */ x(cR, {})] }) }) });
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/runStepChecklistExecute.tsx
-var pR = {
+var gR = {
 	movingOut: "Moving out...",
 	movingIn: "Moving in..."
 };
-function mR({ run: e, runStep: t, reloadRunStep: n }) {
-	let { run: r, runStep: i, reloadRunStep: a } = u(TL), [o, s] = v(null), [c, l] = v(!1), f = e ?? r, p = t ?? i, m = n ?? a ?? (() => null);
+function _R({ run: e, runStep: t, reloadRunStep: n }) {
+	let { run: r, runStep: i, reloadRunStep: a } = u(OL), [o, s] = v(null), [c, l] = v(!1), f = e ?? r, p = t ?? i, m = n ?? a ?? (() => null);
 	d(() => {
 		if (o) {
 			let e = setTimeout(() => {
@@ -31180,12 +31200,12 @@ function mR({ run: e, runStep: t, reloadRunStep: n }) {
 	if (p.is_finished) return /* @__PURE__ */ x("div", { children: "Step is finished" });
 	if (g) return /* @__PURE__ */ x(Qt, { message: "Loading..." });
 	function y(e) {
-		s(pR.movingOut), l(!0), lt(e).then(() => {
+		s(gR.movingOut), l(!0), lt(e).then(() => {
 			l(!1), s(null), m();
 		});
 	}
 	function C(e) {
-		s(pR.movingIn), l(!0), ct(e).then(() => {
+		s(gR.movingIn), l(!0), ct(e).then(() => {
 			l(!1), s(null), m();
 		});
 	}
@@ -31194,7 +31214,7 @@ function mR({ run: e, runStep: t, reloadRunStep: n }) {
 			variant: "info",
 			children: "No checklist found"
 		}),
-		h.items.length > 0 && /* @__PURE__ */ x(jc, { children: h.items.map((e) => /* @__PURE__ */ x(BL, {
+		h.items.length > 0 && /* @__PURE__ */ x(jc, { children: h.items.map((e) => /* @__PURE__ */ x(UL, {
 			checklistItem: e,
 			refetch: _
 		}, e.id)) }),
@@ -31219,7 +31239,7 @@ function mR({ run: e, runStep: t, reloadRunStep: n }) {
 }
 //#endregion
 //#region src/modules/run/components/shared/parts_table/runPartsQrFlow.tsx
-var hR = ({ run: e, runStep: n }) => {
+var vR = ({ run: e, runStep: n }) => {
 	let r = O({ queries: [{
 		queryKey: [
 			"runParts",
@@ -31237,23 +31257,23 @@ var hR = ({ run: e, runStep: n }) => {
 	d(() => {
 		mt(n, u);
 	}, [u]);
-	let p = h(() => c.filter((e) => e.part_level === n.part_level), [c, n.part_level]), [m, g] = v(!1), { selectedParts: _, selectAllParts: y } = fL({ parts: p }), b = h(() => p.filter((e) => _.get(e.id) && (m || !gR(u, e))), [
+	let p = h(() => c.filter((e) => e.part_level === n.part_level), [c, n.part_level]), [m, g] = v(!1), { selectedParts: _, selectAllParts: y } = hL({ parts: p }), b = h(() => p.filter((e) => _.get(e.id) && (m || !yR(u, e))), [
 		p,
 		u,
 		_,
 		m
-	]), { lastlyReadedKeys: C, addCallbackFn: w, removeCallbackFn: T } = oL(), E = f(), D = l((e) => {
+	]), { lastlyReadedKeys: C, addCallbackFn: w, removeCallbackFn: T } = lL(), E = f(), D = l((e) => {
 		let t = e.replace(/_/g, "-").toUpperCase();
 		if (!t) return;
 		let n = c.find((e) => t.includes(e.short_label));
-		n && !m && gR(u, n) && cL({
+		n && !m && yR(u, n) && dL({
 			notificationHeader: "Run parts table",
 			notificationBody: `Part ${n.parsed_label ?? n.short_label} is already completed`,
 			notificationType: "danger"
 		});
 	}, [c, u]);
-	return d(() => (T(uL.SELECT, E), w(uL.SELECT, E, D), D(C), () => {
-		T(uL.SELECT, E);
+	return d(() => (T(pL.SELECT, E), w(pL.SELECT, E, D), D(C), () => {
+		T(pL.SELECT, E);
 	}), [c, u]), o ? /* @__PURE__ */ x(Qt, { message: "Loading run parts" }) : s ? /* @__PURE__ */ x("div", {
 		className: "text-danger",
 		children: "Error loading run parts."
@@ -31269,7 +31289,7 @@ var hR = ({ run: e, runStep: n }) => {
 			/* @__PURE__ */ x("th", { children: "Status" }),
 			/* @__PURE__ */ x("th", { children: "Actions" }),
 			/* @__PURE__ */ x("th", { children: "Comment" })
-		] }) }), /* @__PURE__ */ x("tbody", { children: b.map((e, t) => /* @__PURE__ */ x(iL, {
+		] }) }), /* @__PURE__ */ x("tbody", { children: b.map((e, t) => /* @__PURE__ */ x(sL, {
 			runStep: n,
 			runPart: e,
 			runStepParts: u,
@@ -31277,7 +31297,7 @@ var hR = ({ run: e, runStep: n }) => {
 			partIsSelected: _.get(e.id) ?? !1,
 			dropdown: !1
 		}, `${e.parsed_label}${t}`)) })]
-	}), /* @__PURE__ */ x(_R, {
+	}), /* @__PURE__ */ x(bR, {
 		runStepParts: u,
 		selectedPartsLength: b.length,
 		totalParts: p.length,
@@ -31286,10 +31306,10 @@ var hR = ({ run: e, runStep: n }) => {
 			g(!m);
 		}
 	})] });
-}, gR = (e, t) => {
+}, yR = (e, t) => {
 	let n = e.find((e) => e.part_id == t.id);
 	return n == null ? !1 : n.processed;
-}, _R = ({ runStepParts: e, selectedPartsLength: t, totalParts: n, onSelectAll: r, toggleShowCompletedParts: i }) => {
+}, bR = ({ runStepParts: e, selectedPartsLength: t, totalParts: n, onSelectAll: r, toggleShowCompletedParts: i }) => {
 	let a = h(() => {
 		let t = 0;
 		return e.forEach((e) => e.processed ? t++ : null), t;
@@ -31333,12 +31353,12 @@ var hR = ({ run: e, runStep: n }) => {
 };
 //#endregion
 //#region src/modules/run/components/step/view/runStepExecuteMinimal.tsx
-function vR({ run: e, runStep: n, showOnlyEmphasizedParameters: r, reloadRunStepFn: i }) {
+function xR({ run: e, runStep: n, showOnlyEmphasizedParameters: r, reloadRunStepFn: i }) {
 	return /* @__PURE__ */ S(b, { children: [
 		/* @__PURE__ */ S("div", { children: [/* @__PURE__ */ x("h3", {
 			className: "mb-2 text-start",
 			children: "Parts"
-		}), /* @__PURE__ */ x(hR, {
+		}), /* @__PURE__ */ x(vR, {
 			run: e,
 			runStep: n
 		})] }),
@@ -31354,7 +31374,7 @@ function vR({ run: e, runStep: n, showOnlyEmphasizedParameters: r, reloadRunStep
 			className: "row row-cols-2",
 			children: [/* @__PURE__ */ x("div", {
 				className: "col",
-				children: /* @__PURE__ */ x(WL, {
+				children: /* @__PURE__ */ x(qL, {
 					runStep: n,
 					reloadRunStep: i
 				})
@@ -31373,7 +31393,7 @@ function vR({ run: e, runStep: n, showOnlyEmphasizedParameters: r, reloadRunStep
 				children: [/* @__PURE__ */ x("h3", {
 					className: "mt-2",
 					children: "Checklist"
-				}), /* @__PURE__ */ x(mR, {
+				}), /* @__PURE__ */ x(_R, {
 					run: e,
 					runStep: n,
 					reloadRunStep: i
@@ -31390,13 +31410,13 @@ function vR({ run: e, runStep: n, showOnlyEmphasizedParameters: r, reloadRunStep
 }
 //#endregion
 //#region src/modules/run/components/shared/qr-scanner/selectRunWithQrScanner.tsx
-function yR({ runsList: e, setRun: t, setRunPartLabel: n }) {
-	let { lastlyReadedKeys: r, addCallbackFn: i, removeCallbackFn: a, addReadingCallbackFn: o, removeReadingCallbackFn: s } = oL(), c = f(), [u, p] = v("");
+function SR({ runsList: e, setRun: t, setRunPartLabel: n }) {
+	let { lastlyReadedKeys: r, addCallbackFn: i, removeCallbackFn: a, addReadingCallbackFn: o, removeReadingCallbackFn: s } = lL(), c = f(), [u, p] = v("");
 	d(() => (o(c, p), () => s(c)), []);
 	let m = l((r) => {
 		let i = r.replace(/_/g, "-").toUpperCase(), a = i.split("-");
 		if (!(a.length == 4 || a.length == 3)) {
-			cL({
+			dL({
 				notificationHeader: "Run scanner",
 				notificationBody: "Part not found, found " + a.length + " splits in " + i,
 				notificationType: "danger"
@@ -31405,7 +31425,7 @@ function yR({ runsList: e, setRun: t, setRunPartLabel: n }) {
 		}
 		let o = e.find((e) => e.label === `${a[0]}-${a[1]}`), s = i;
 		if (!o) {
-			cL({
+			dL({
 				notificationHeader: "Run scanner",
 				notificationBody: "Run not found",
 				notificationType: "danger"
@@ -31413,14 +31433,14 @@ function yR({ runsList: e, setRun: t, setRunPartLabel: n }) {
 			return;
 		}
 		if (!s) {
-			cL({
+			dL({
 				notificationHeader: "Run scanner",
 				notificationBody: "Part label not found",
 				notificationType: "danger"
 			});
 			return;
 		}
-		t !== void 0 && cL({
+		t !== void 0 && dL({
 			notificationHeader: "Run scanner",
 			notificationBody: `Found run ${o.label}`,
 			notificationType: "success"
@@ -31430,8 +31450,8 @@ function yR({ runsList: e, setRun: t, setRunPartLabel: n }) {
 		t,
 		n
 	]);
-	return d(() => (a(uL.SELECT, c), m(r), i(uL.SELECT, c, m), () => {
-		a(uL.SELECT, c);
+	return d(() => (a(pL.SELECT, c), m(r), i(pL.SELECT, c, m), () => {
+		a(pL.SELECT, c);
 	}), [e]), /* @__PURE__ */ x("div", {
 		className: "d-flex flex-row gap-3",
 		children: /* @__PURE__ */ x("div", {
@@ -31448,7 +31468,7 @@ function yR({ runsList: e, setRun: t, setRunPartLabel: n }) {
 }
 //#endregion
 //#region src/modules/run/providers/emphasizedParametersProvider.tsx
-function bR({ children: e }) {
+function CR({ children: e }) {
 	let [t, n] = v(!1);
 	return /* @__PURE__ */ x(rn, { children: /* @__PURE__ */ x(VI.Provider, {
 		value: {
@@ -31463,7 +31483,7 @@ function bR({ children: e }) {
 }
 //#endregion
 //#region src/modules/chemical/components/chemicalHeaderElement.tsx
-function xR() {
+function wR() {
 	return /* @__PURE__ */ x(wi, {
 		fluid: !0,
 		children: /* @__PURE__ */ x(ee, {})
@@ -31471,7 +31491,7 @@ function xR() {
 }
 //#endregion
 //#region src/modules/chemical/form/roomSelectElement.tsx
-function SR({ control: e, name: t }) {
+function TR({ control: e, name: t }) {
 	let { environment: n } = F(), [r, i] = v([]), [a, o] = v(!0);
 	return d(() => {
 		async function e() {
@@ -31512,7 +31532,7 @@ function SR({ control: e, name: t }) {
 }
 //#endregion
 //#region src/modules/chemical/components/chemical/barcodeScanElement.tsx
-function CR({ control: e }) {
+function ER({ control: e }) {
 	return /* @__PURE__ */ x(W.Group, {
 		className: "mb-3",
 		controlId: "chemical.scanBarcode",
@@ -31532,21 +31552,21 @@ function CR({ control: e }) {
 }
 //#endregion
 //#region node_modules/qrcode.react/lib/esm/index.js
-var wR = Object.defineProperty, TR = Object.getOwnPropertySymbols, ER = Object.prototype.hasOwnProperty, DR = Object.prototype.propertyIsEnumerable, OR = (e, t, n) => t in e ? wR(e, t, {
+var DR = Object.defineProperty, OR = Object.getOwnPropertySymbols, kR = Object.prototype.hasOwnProperty, AR = Object.prototype.propertyIsEnumerable, jR = (e, t, n) => t in e ? DR(e, t, {
 	enumerable: !0,
 	configurable: !0,
 	writable: !0,
 	value: n
-}) : e[t] = n, kR = (e, t) => {
-	for (var n in t || (t = {})) ER.call(t, n) && OR(e, n, t[n]);
-	if (TR) for (var n of TR(t)) DR.call(t, n) && OR(e, n, t[n]);
+}) : e[t] = n, MR = (e, t) => {
+	for (var n in t || (t = {})) kR.call(t, n) && jR(e, n, t[n]);
+	if (OR) for (var n of OR(t)) AR.call(t, n) && jR(e, n, t[n]);
 	return e;
-}, AR = (e, t) => {
+}, NR = (e, t) => {
 	var n = {};
-	for (var r in e) ER.call(e, r) && t.indexOf(r) < 0 && (n[r] = e[r]);
-	if (e != null && TR) for (var r of TR(e)) t.indexOf(r) < 0 && DR.call(e, r) && (n[r] = e[r]);
+	for (var r in e) kR.call(e, r) && t.indexOf(r) < 0 && (n[r] = e[r]);
+	if (e != null && OR) for (var r of OR(e)) t.indexOf(r) < 0 && AR.call(e, r) && (n[r] = e[r]);
 	return n;
-}, jR;
+}, PR;
 ((e) => {
 	let t = class t {
 		constructor(e, n, r, a) {
@@ -32236,7 +32256,7 @@ var wR = Object.defineProperty, TR = Object.getOwnPropertySymbols, ER = Object.p
 	a.NUMERIC_REGEX = /^[0-9]*$/, a.ALPHANUMERIC_REGEX = /^[A-Z0-9 $%*+.\/:-]*$/, a.ALPHANUMERIC_CHARSET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 	let o = a;
 	e.QrSegment = a;
-})(jR || (jR = {})), ((e) => {
+})(PR || (PR = {})), ((e) => {
 	((e) => {
 		let t = class {
 			constructor(e, t) {
@@ -32245,7 +32265,7 @@ var wR = Object.defineProperty, TR = Object.getOwnPropertySymbols, ER = Object.p
 		};
 		t.LOW = new t(0, 1), t.MEDIUM = new t(1, 0), t.QUARTILE = new t(2, 3), t.HIGH = new t(3, 2), e.Ecc = t;
 	})(e.QrCode || (e.QrCode = {}));
-})(jR || (jR = {})), ((e) => {
+})(PR || (PR = {})), ((e) => {
 	((e) => {
 		let t = class {
 			constructor(e, t) {
@@ -32277,14 +32297,14 @@ var wR = Object.defineProperty, TR = Object.getOwnPropertySymbols, ER = Object.p
 			0
 		]), e.Mode = t;
 	})(e.QrSegment || (e.QrSegment = {}));
-})(jR || (jR = {}));
-var MR = jR, NR = {
-	L: MR.QrCode.Ecc.LOW,
-	M: MR.QrCode.Ecc.MEDIUM,
-	Q: MR.QrCode.Ecc.QUARTILE,
-	H: MR.QrCode.Ecc.HIGH
-}, PR = 128, FR = "L", IR = "#FFFFFF", LR = "#000000", RR = !1, zR = 1, BR = 4, VR = 0, HR = .1;
-function UR(e, t = 0) {
+})(PR || (PR = {}));
+var FR = PR, IR = {
+	L: FR.QrCode.Ecc.LOW,
+	M: FR.QrCode.Ecc.MEDIUM,
+	Q: FR.QrCode.Ecc.QUARTILE,
+	H: FR.QrCode.Ecc.HIGH
+}, LR = 128, RR = "L", zR = "#FFFFFF", BR = "#000000", VR = !1, HR = 1, UR = 4, WR = 0, GR = .1;
+function KR(e, t = 0) {
 	let n = [];
 	return e.forEach(function(e, r) {
 		let i = null;
@@ -32302,12 +32322,12 @@ function UR(e, t = 0) {
 		});
 	}), n.join("");
 }
-function WR(e, t) {
+function qR(e, t) {
 	return e.slice().map((e, n) => n < t.y || n >= t.y + t.h ? e : e.map((e, n) => n < t.x || n >= t.x + t.w ? e : !1));
 }
-function GR(e, t, n, r) {
+function JR(e, t, n, r) {
 	if (r == null) return null;
-	let i = e.length + n * 2, a = Math.floor(t * HR), o = i / t, s = (r.width || a) * o, c = (r.height || a) * o, l = r.x == null ? e.length / 2 - s / 2 : r.x * o, u = r.y == null ? e.length / 2 - c / 2 : r.y * o, d = r.opacity == null ? 1 : r.opacity, f = null;
+	let i = e.length + n * 2, a = Math.floor(t * GR), o = i / t, s = (r.width || a) * o, c = (r.height || a) * o, l = r.x == null ? e.length / 2 - s / 2 : r.x * o, u = r.y == null ? e.length / 2 - c / 2 : r.y * o, d = r.opacity == null ? 1 : r.opacity, f = null;
 	if (r.excavate) {
 		let e = Math.floor(l), t = Math.floor(u);
 		f = {
@@ -32328,25 +32348,25 @@ function GR(e, t, n, r) {
 		crossOrigin: p
 	};
 }
-function KR(e, t) {
-	return t == null ? e ? BR : VR : Math.max(Math.floor(t), 0);
+function YR(e, t) {
+	return t == null ? e ? UR : WR : Math.max(Math.floor(t), 0);
 }
-function qR({ value: e, level: n, minVersion: r, includeMargin: i, marginSize: a, imageSettings: o, size: s, boostLevel: c }) {
+function XR({ value: e, level: n, minVersion: r, includeMargin: i, marginSize: a, imageSettings: o, size: s, boostLevel: c }) {
 	let l = t.useMemo(() => {
-		let t = (Array.isArray(e) ? e : [e]).reduce((e, t) => (e.push(...MR.QrSegment.makeSegments(t)), e), []);
-		return MR.QrCode.encodeSegments(t, NR[n], r, void 0, void 0, c);
+		let t = (Array.isArray(e) ? e : [e]).reduce((e, t) => (e.push(...FR.QrSegment.makeSegments(t)), e), []);
+		return FR.QrCode.encodeSegments(t, IR[n], r, void 0, void 0, c);
 	}, [
 		e,
 		n,
 		r,
 		c
 	]), { cells: u, margin: d, numCells: f, calculatedImageSettings: p } = t.useMemo(() => {
-		let e = l.getModules(), t = KR(i, a);
+		let e = l.getModules(), t = YR(i, a);
 		return {
 			cells: e,
 			margin: t,
 			numCells: e.length + t * 2,
-			calculatedImageSettings: GR(e, s, t, o)
+			calculatedImageSettings: JR(e, s, t, o)
 		};
 	}, [
 		l,
@@ -32363,15 +32383,15 @@ function qR({ value: e, level: n, minVersion: r, includeMargin: i, marginSize: a
 		calculatedImageSettings: p
 	};
 }
-var JR = function() {
+var ZR = function() {
 	try {
 		new Path2D().addPath(new Path2D());
 	} catch {
 		return !1;
 	}
 	return !0;
-}(), YR = t.forwardRef(function(e, n) {
-	let r = e, { value: i, size: a = PR, level: o = FR, bgColor: s = IR, fgColor: c = LR, includeMargin: l = RR, minVersion: u = zR, boostLevel: d, marginSize: f, imageSettings: p } = r, m = AR(r, [
+}(), QR = t.forwardRef(function(e, n) {
+	let r = e, { value: i, size: a = LR, level: o = RR, bgColor: s = zR, fgColor: c = BR, includeMargin: l = VR, minVersion: u = HR, boostLevel: d, marginSize: f, imageSettings: p } = r, m = NR(r, [
 		"value",
 		"size",
 		"level",
@@ -32382,9 +32402,9 @@ var JR = function() {
 		"boostLevel",
 		"marginSize",
 		"imageSettings"
-	]), { style: h } = m, g = AR(m, ["style"]), _ = p?.src, v = t.useRef(null), y = t.useRef(null), b = t.useCallback((e) => {
+	]), { style: h } = m, g = NR(m, ["style"]), _ = p?.src, v = t.useRef(null), y = t.useRef(null), b = t.useCallback((e) => {
 		v.current = e, typeof n == "function" ? n(e) : n && (n.current = e);
-	}, [n]), [x, S] = t.useState(!1), { margin: C, cells: w, numCells: T, calculatedImageSettings: E } = qR({
+	}, [n]), [x, S] = t.useState(!1), { margin: C, cells: w, numCells: T, calculatedImageSettings: E } = XR({
 		value: i,
 		level: o,
 		minVersion: u,
@@ -32399,11 +32419,11 @@ var JR = function() {
 			let e = v.current, t = e.getContext("2d");
 			if (!t) return;
 			let n = w, r = y.current, i = E != null && r !== null && r.complete && r.naturalHeight !== 0 && r.naturalWidth !== 0;
-			i && E.excavation != null && (n = WR(w, E.excavation));
+			i && E.excavation != null && (n = qR(w, E.excavation));
 			let o = window.devicePixelRatio || 1;
 			e.height = e.width = a * o;
 			let l = a / T * o;
-			t.scale(l, l), t.fillStyle = s, t.fillRect(0, 0, T, T), t.fillStyle = c, JR ? t.fill(new Path2D(UR(n, C))) : w.forEach(function(e, n) {
+			t.scale(l, l), t.fillStyle = s, t.fillRect(0, 0, T, T), t.fillStyle = c, ZR ? t.fill(new Path2D(KR(n, C))) : w.forEach(function(e, n) {
 				e.forEach(function(e, r) {
 					e && t.fillRect(r + C, n + C, 1, 1);
 				});
@@ -32412,7 +32432,7 @@ var JR = function() {
 	}), t.useEffect(() => {
 		S(!1);
 	}, [_]);
-	let D = kR({
+	let D = MR({
 		height: a,
 		width: a
 	}, h), O = null;
@@ -32425,7 +32445,7 @@ var JR = function() {
 		},
 		ref: y,
 		crossOrigin: E?.crossOrigin
-	})), /* @__PURE__ */ t.createElement(t.Fragment, null, /* @__PURE__ */ t.createElement("canvas", kR({
+	})), /* @__PURE__ */ t.createElement(t.Fragment, null, /* @__PURE__ */ t.createElement("canvas", MR({
 		style: D,
 		height: a,
 		width: a,
@@ -32433,9 +32453,9 @@ var JR = function() {
 		role: "img"
 	}, g)), O);
 });
-YR.displayName = "QRCodeCanvas";
-var XR = t.forwardRef(function(e, n) {
-	let r = e, { value: i, size: a = PR, level: o = FR, bgColor: s = IR, fgColor: c = LR, includeMargin: l = RR, minVersion: u = zR, boostLevel: d, title: f, marginSize: p, imageSettings: m } = r, h = AR(r, [
+QR.displayName = "QRCodeCanvas";
+var $R = t.forwardRef(function(e, n) {
+	let r = e, { value: i, size: a = LR, level: o = RR, bgColor: s = zR, fgColor: c = BR, includeMargin: l = VR, minVersion: u = HR, boostLevel: d, title: f, marginSize: p, imageSettings: m } = r, h = NR(r, [
 		"value",
 		"size",
 		"level",
@@ -32447,7 +32467,7 @@ var XR = t.forwardRef(function(e, n) {
 		"title",
 		"marginSize",
 		"imageSettings"
-	]), { margin: g, cells: _, numCells: v, calculatedImageSettings: y } = qR({
+	]), { margin: g, cells: _, numCells: v, calculatedImageSettings: y } = XR({
 		value: i,
 		level: o,
 		minVersion: u,
@@ -32457,7 +32477,7 @@ var XR = t.forwardRef(function(e, n) {
 		imageSettings: m,
 		size: a
 	}), b = _, x = null;
-	m != null && y != null && (y.excavation != null && (b = WR(_, y.excavation)), x = /* @__PURE__ */ t.createElement("image", {
+	m != null && y != null && (y.excavation != null && (b = qR(_, y.excavation)), x = /* @__PURE__ */ t.createElement("image", {
 		href: m.src,
 		height: y.h,
 		width: y.w,
@@ -32467,8 +32487,8 @@ var XR = t.forwardRef(function(e, n) {
 		opacity: y.opacity,
 		crossOrigin: y.crossOrigin
 	}));
-	let S = UR(b, g);
-	return /* @__PURE__ */ t.createElement("svg", kR({
+	let S = KR(b, g);
+	return /* @__PURE__ */ t.createElement("svg", MR({
 		height: a,
 		width: a,
 		viewBox: `0 0 ${v} ${v}`,
@@ -32484,10 +32504,10 @@ var XR = t.forwardRef(function(e, n) {
 		shapeRendering: "crispEdges"
 	}), x);
 });
-XR.displayName = "QRCodeSVG";
+$R.displayName = "QRCodeSVG";
 //#endregion
 //#region src/modules/chemical/form/locationSelectFormElement.tsx
-function ZR({ control: e, name: t, room: n }) {
+function ez({ control: e, name: t, room: n }) {
 	let [r, i] = v([]), [a, o] = v(!0);
 	return d(() => {
 		async function e() {
@@ -32531,7 +32551,7 @@ function ZR({ control: e, name: t, room: n }) {
 								textAlign: "center",
 								marginTop: "10px"
 							},
-							children: [/* @__PURE__ */ x(XR, {
+							children: [/* @__PURE__ */ x($R, {
 								value: "/l/" + n.id.toString(),
 								size: 128
 							}), " "]
@@ -32544,7 +32564,7 @@ function ZR({ control: e, name: t, room: n }) {
 }
 //#endregion
 //#region src/modules/chemical/components/modal/createChemicalModal.tsx
-var QR = ({ show: e, setShow: t, onChemicalCreate: n }) => {
+var tz = ({ show: e, setShow: t, onChemicalCreate: n }) => {
 	let { register: r, control: i, setValue: a, handleSubmit: o, formState: { errors: s, isSubmitting: c } } = sf({ defaultValues: {} }), l = async (e) => {
 		try {
 			let t = await y.post("create/chemical", e);
@@ -32691,7 +32711,7 @@ var QR = ({ show: e, setShow: t, onChemicalCreate: n }) => {
 };
 //#endregion
 //#region src/modules/chemical/form/chemicalSelectFormElement.tsx
-function $R({ control: e, name: t, setValue: n, errors: r }) {
+function nz({ control: e, name: t, setValue: n, errors: r }) {
 	let [i, a] = v({}), [o, s] = v(!1), [c, l] = v(null), u = (e, t) => {
 		try {
 			Ee({ query: e }).then((e) => {
@@ -32737,7 +32757,7 @@ function $R({ control: e, name: t, setValue: n, errors: r }) {
 				children: "Create New Chemical"
 			}) })
 		] })]
-	}), /* @__PURE__ */ x(QR, {
+	}), /* @__PURE__ */ x(tz, {
 		show: o,
 		setShow: s,
 		onChemicalCreate: async (e) => {
@@ -32758,14 +32778,14 @@ function $R({ control: e, name: t, setValue: n, errors: r }) {
 }
 //#endregion
 //#region src/modules/chemical/components/chemical/registerBarcodeElement.tsx
-function ez(e) {
+function rz(e) {
 	return /\/l\/\d+$/.test(e);
 }
-function tz(e) {
+function iz(e) {
 	let t = e.match(/\/l\/(\d+)$/);
 	return t ? parseInt(t[1], 10) : null;
 }
-var nz = [
+var az = [
 	{
 		value: "g",
 		label: "Gram"
@@ -32875,7 +32895,7 @@ var nz = [
 		label: "Microliter"
 	}
 ].sort((e, t) => e.label.localeCompare(t.label));
-function rz({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) {
+function oz({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) {
 	let { user: a } = u(ge), { environment: o } = F(), [s, c] = v(null), l = /* @__PURE__ */ new Date();
 	l.setFullYear(l.getFullYear() + 5);
 	let { register: f, control: p, handleSubmit: m, watch: h, setValue: g, formState: { errors: _, isSubmitting: C } } = sf({ defaultValues: {
@@ -32892,8 +32912,8 @@ function rz({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 	}, [w]), d(() => {
 		let e = "", t = (t) => {
 			if (!(t.target instanceof HTMLInputElement || t.target instanceof HTMLTextAreaElement) && !(t.key.length > 1 && t.key !== "Enter")) if (t.key === "Enter") {
-				if (ez(e)) {
-					let t = tz(e);
+				if (rz(e)) {
+					let t = iz(e);
 					t !== null && (He({ id: t }).then((e) => {
 						i(e);
 					}), g("location", t));
@@ -32921,7 +32941,7 @@ function rz({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 	return /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ S(W, {
 		onSubmit: m(T),
 		children: [
-			!r && /* @__PURE__ */ x(ZR, {
+			!r && /* @__PURE__ */ x(ez, {
 				room: e,
 				control: p,
 				name: "location"
@@ -32935,7 +32955,7 @@ function rz({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 						children: r.name
 					}), /* @__PURE__ */ S("div", {
 						className: "d-flex flex-column",
-						children: [/* @__PURE__ */ x(XR, {
+						children: [/* @__PURE__ */ x($R, {
 							value: "reset-scan-location",
 							size: 100,
 							onClick: () => E()
@@ -32947,7 +32967,7 @@ function rz({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 				}) })]
 			}),
 			r && /* @__PURE__ */ S(b, { children: [
-				/* @__PURE__ */ x($R, {
+				/* @__PURE__ */ x(nz, {
 					control: p,
 					errors: _,
 					setValue: g,
@@ -32997,7 +33017,7 @@ function rz({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 									children: [/* @__PURE__ */ x(Vs.Item, {
 										eventKey: "",
 										children: "(no unit)"
-									}, 0), nz.map((e) => /* @__PURE__ */ S(Vs.Item, {
+									}, 0), az.map((e) => /* @__PURE__ */ S(Vs.Item, {
 										eventKey: e.value,
 										children: [
 											e.label,
@@ -33049,7 +33069,7 @@ function rz({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 				className: "btn btn-primary",
 				href: `${o}/chemical/container/details/${s.id}/general.html`,
 				children: "Go to container"
-			}) }), /* @__PURE__ */ x(XR, {
+			}) }), /* @__PURE__ */ x($R, {
 				value: "reset-form",
 				size: 100,
 				className: "float-end",
@@ -33060,7 +33080,7 @@ function rz({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 }
 //#endregion
 //#region src/modules/chemical/form/chemicalContainerTypeSelectFormElement.tsx
-function iz({ control: e, errors: t }) {
+function sz({ control: e, errors: t }) {
 	let [n, r] = v({}), i = (e, t) => {
 		try {
 			Te({ query: e }).then((e) => {
@@ -33094,7 +33114,7 @@ function iz({ control: e, errors: t }) {
 }
 //#endregion
 //#region src/modules/chemical/components/chemical/registerContainerElement.tsx
-function az({ room: e, resetForm: t, location: n, setLocation: r }) {
+function cz({ room: e, resetForm: t, location: n, setLocation: r }) {
 	let { user: i } = u(ge), { environment: a } = F(), [o, s] = v(null), c = /* @__PURE__ */ new Date();
 	c.setFullYear(c.getFullYear() + 5);
 	let { register: l, control: f, handleSubmit: p, watch: m, setValue: h, formState: { errors: g, isSubmitting: _ } } = sf({ defaultValues: {
@@ -33111,8 +33131,8 @@ function az({ room: e, resetForm: t, location: n, setLocation: r }) {
 	}, [C]), d(() => {
 		let e = "", t = (t) => {
 			if (!(t.target instanceof HTMLInputElement || t.target instanceof HTMLTextAreaElement) && !(t.key.length > 1 && t.key !== "Enter")) if (t.key === "Enter") {
-				if (ez(e)) {
-					let t = tz(e);
+				if (rz(e)) {
+					let t = iz(e);
 					t !== null && (He({ id: t }).then((e) => {
 						r(e);
 					}), h("location", t));
@@ -33132,7 +33152,7 @@ function az({ room: e, resetForm: t, location: n, setLocation: r }) {
 	return /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ S(W, {
 		onSubmit: p(w),
 		children: [
-			!n && /* @__PURE__ */ x(ZR, {
+			!n && /* @__PURE__ */ x(ez, {
 				room: e,
 				control: f,
 				name: "location"
@@ -33146,7 +33166,7 @@ function az({ room: e, resetForm: t, location: n, setLocation: r }) {
 						children: n.name
 					}), /* @__PURE__ */ S("div", {
 						className: "d-flex flex-column",
-						children: [/* @__PURE__ */ x(XR, {
+						children: [/* @__PURE__ */ x($R, {
 							value: "reset-scan-location",
 							size: 100,
 							onClick: () => T()
@@ -33158,7 +33178,7 @@ function az({ room: e, resetForm: t, location: n, setLocation: r }) {
 				}) })]
 			}),
 			n && /* @__PURE__ */ S(b, { children: [
-				/* @__PURE__ */ x($R, {
+				/* @__PURE__ */ x(nz, {
 					control: f,
 					errors: g,
 					setValue: h,
@@ -33208,7 +33228,7 @@ function az({ room: e, resetForm: t, location: n, setLocation: r }) {
 									children: [/* @__PURE__ */ x(Vs.Item, {
 										eventKey: "",
 										children: "(no unit)"
-									}, 0), nz.map((e) => /* @__PURE__ */ S(Vs.Item, {
+									}, 0), az.map((e) => /* @__PURE__ */ S(Vs.Item, {
 										eventKey: e.value,
 										children: [
 											e.label,
@@ -33231,7 +33251,7 @@ function az({ room: e, resetForm: t, location: n, setLocation: r }) {
 					className: "mb-3 row",
 					children: [
 						/* @__PURE__ */ x(W.Label, { children: "Container type" }),
-						/* @__PURE__ */ x(iz, {
+						/* @__PURE__ */ x(sz, {
 							control: f,
 							...l("container_type", { required: "Container type is required" }),
 							errors: g
@@ -33283,7 +33303,7 @@ function az({ room: e, resetForm: t, location: n, setLocation: r }) {
 					href: `${a}/chemical/container/details/${o.id}/general.html`,
 					children: "Go to container"
 				}) }),
-				/* @__PURE__ */ x(XR, {
+				/* @__PURE__ */ x($R, {
 					value: "reset-form",
 					size: 100,
 					className: "float-end",
@@ -33295,7 +33315,7 @@ function az({ room: e, resetForm: t, location: n, setLocation: r }) {
 }
 //#endregion
 //#region src/modules/chemical/components/chemical/chemicalIntakeElement.tsx
-function oz() {
+function lz() {
 	let { environment: e } = F(), [t, n] = v(null), [r, i] = v([]), [a, o] = v(null), [s, c] = v(!1), [l, u] = v(!1), [f, p] = v(null), [m, h] = v(null), { control: g, watch: _, reset: y, setValue: C } = sf({ defaultValues: {
 		room: f,
 		barcode: ""
@@ -33355,12 +33375,12 @@ function oz() {
 	return /* @__PURE__ */ S("div", { children: [
 		/* @__PURE__ */ S("div", {
 			className: "d-flex justify-content-between",
-			children: [/* @__PURE__ */ x(SR, {
+			children: [/* @__PURE__ */ x(TR, {
 				control: g,
 				name: "room"
 			}), /* @__PURE__ */ S("div", {
 				className: "d-flex flex-column",
-				children: [/* @__PURE__ */ x(XR, {
+				children: [/* @__PURE__ */ x($R, {
 					value: "reset-form",
 					size: 100,
 					className: "float-end",
@@ -33381,7 +33401,7 @@ function oz() {
 			f.name,
 			" has no external labels, labels can be printed via the intake form"
 		] }),
-		f !== null && !t && l && /* @__PURE__ */ x(CR, { control: g }),
+		f !== null && !t && l && /* @__PURE__ */ x(ER, { control: g }),
 		t && a && /* @__PURE__ */ S(Qr, {
 			variant: "info d-flex flex-column gap-3",
 			children: [
@@ -33419,14 +33439,14 @@ function oz() {
 				children: t.container.location.name
 			}) })
 		] }, t.id)) })] }) }),
-		!a && s && f && t && /* @__PURE__ */ x(rz, {
+		!a && s && f && t && /* @__PURE__ */ x(oz, {
 			room: f,
 			barcode: t,
 			location: m,
 			setLocation: h,
 			resetForm: E
 		}),
-		!a && f && !l && /* @__PURE__ */ x(az, {
+		!a && f && !l && /* @__PURE__ */ x(cz, {
 			room: f,
 			location: m,
 			setLocation: h,
@@ -33436,7 +33456,7 @@ function oz() {
 }
 //#endregion
 //#region src/modules/admin/components/goldsteinClientsDashboard/cardReadedValue.tsx
-function sz({ badge_uuid: e }) {
+function uz({ badge_uuid: e }) {
 	return /* @__PURE__ */ S("span", {
 		className: "rounded p-2 bg-success",
 		children: ["Card read: ", e]
@@ -33444,10 +33464,10 @@ function sz({ badge_uuid: e }) {
 }
 //#endregion
 //#region src/modules/admin/components/goldsteinClientsDashboard/userAuthenticated.tsx
-function cz({ user_id: e }) {
+function dz({ user_id: e }) {
 	let [t, n] = v("");
 	return d(() => {
-		let t = "https://" + dz + `/api/onelab/view/user/${e}`;
+		let t = "https://" + mz + `/api/onelab/view/user/${e}`;
 		(async () => {
 			try {
 				let e = await fetch(t);
@@ -33464,18 +33484,18 @@ function cz({ user_id: e }) {
 }
 //#endregion
 //#region src/modules/admin/components/goldsteinClientsDashboard/equipmentConnected.tsx
-function lz() {
+function fz() {
 	return /* @__PURE__ */ x("div", {});
 }
 //#endregion
 //#region src/modules/admin/components/goldsteinClientsDashboard.tsx
-var uz = [
+var pz = [
 	"all",
 	"equipment",
 	"not_set"
-], dz = document.getElementById("root")?.dataset.goldsteinEndpoint ?? "", fz = "mock-token", pz = 10, mz = 15;
-async function hz(e) {
-	let t = "https://" + dz + "/api/update/client-association", n = prompt("Select the new association for the client:", e);
+], mz = document.getElementById("root")?.dataset.goldsteinEndpoint ?? "", hz = "mock-token", gz = 10, _z = 15;
+async function vz(e) {
+	let t = "https://" + mz + "/api/update/client-association", n = prompt("Select the new association for the client:", e);
 	if (n === null) {
 		alert("Please enter a not null value");
 		return;
@@ -33485,7 +33505,7 @@ async function hz(e) {
 		alert("Please follow the correct format: $item:$id");
 		return;
 	}
-	if (!uz.slice(1).includes(r)) {
+	if (!pz.slice(1).includes(r)) {
 		alert("Please select a valid $item: (equipment, not_set)");
 		return;
 	}
@@ -33501,10 +33521,10 @@ async function hz(e) {
 	let s = await o.text();
 	alert(s);
 }
-function gz() {
+function yz() {
 	let e = _(null), [t, n] = v(/* @__PURE__ */ new Map());
 	async function r(e) {
-		n(uy(e.notifications_list, /* @__PURE__ */ new Date(), pz, mz));
+		n(uy(e.notifications_list, /* @__PURE__ */ new Date(), gz, _z));
 	}
 	function i() {
 		let t = `
@@ -33527,7 +33547,7 @@ function gz() {
 			(e.current === null || e.current.readyState === WebSocket.CLOSED || e.current.readyState === WebSocket.CLOSING) && o();
 		}, 1e3);
 	}, o = () => {
-		cy("wss://" + dz + "/ws", fz).then((t) => {
+		cy("wss://" + mz + "/ws", hz).then((t) => {
 			e.current !== null && e.current.close(), t.onmessage = (e) => {
 				sy(e, r);
 			}, t.onclose = () => {
@@ -33545,7 +33565,7 @@ function gz() {
 	d(() => (o(), () => {
 		e.current && (e.current.close(), console.log("Web socket disconnected"));
 	}), []);
-	let [s, c] = v(uz[0]);
+	let [s, c] = v(pz[0]);
 	return d(() => {
 		i();
 	}, [s]), /* @__PURE__ */ S("div", { children: [
@@ -33558,7 +33578,7 @@ function gz() {
 			id: "typeFilter",
 			value: s,
 			onChange: (e) => c(e.target.value),
-			children: uz.map((e) => /* @__PURE__ */ x("option", {
+			children: pz.map((e) => /* @__PURE__ */ x("option", {
 				value: e,
 				children: e
 			}, e))
@@ -33575,13 +33595,13 @@ function gz() {
 			] }) }), /* @__PURE__ */ x("tbody", { children: Array.from(t.entries()).map(([e, t]) => /* @__PURE__ */ S("tr", { children: [
 				/* @__PURE__ */ x("td", { children: e }),
 				/* @__PURE__ */ S("td", { children: [
-					t.status === ly.CLIENT_CONNECTED && /* @__PURE__ */ x(lz, {}),
-					t.status === ly.CARD_READED && /* @__PURE__ */ x(sz, { badge_uuid: t.message.badgeUUID }),
-					t.status === ly.USER_AUTHENTICATED && /* @__PURE__ */ x(cz, { user_id: t.message.userID })
+					t.status === ly.CLIENT_CONNECTED && /* @__PURE__ */ x(fz, {}),
+					t.status === ly.CARD_READED && /* @__PURE__ */ x(uz, { badge_uuid: t.message.badgeUUID }),
+					t.status === ly.USER_AUTHENTICATED && /* @__PURE__ */ x(dz, { user_id: t.message.userID })
 				] }),
 				/* @__PURE__ */ x("td", { children: /* @__PURE__ */ x("button", {
 					className: "btn btn-primary",
-					onClick: () => hz(e),
+					onClick: () => vz(e),
 					children: "Edit association"
 				}) })
 			] }, e)) })]
@@ -33590,7 +33610,7 @@ function gz() {
 }
 //#endregion
 //#region src/modules/service/components/report/Criterion.tsx
-function _z({ result: e, status: t, onAutoSave: n, onDirty: r }) {
+function bz({ result: e, status: t, onAutoSave: n, onDirty: r }) {
 	let { control: i, formState: a } = ed(), o = e.criterion_version, s = String(e.id), c = o.criterion.background_color && o.criterion.has_background_color ? { backgroundColor: o.criterion.background_color } : void 0, l = a.errors[s]?.message, u = o.required, d = (e) => u ? Array.isArray(e) ? e.length > 0 || "This field is required." : typeof e == "boolean" || e != null && e !== "" ? !0 : "This field is required." : !0, f = l ? "is-invalid" : t?.state === "saved" ? "is-valid" : t?.state === "dirty" ? "border-warning" : "", p = l ? "border border-danger rounded p-2" : t?.state === "saved" ? "border border-success rounded p-2" : t?.state === "dirty" ? "border border-warning rounded p-2" : "", m = (e) => typeof e == "string" ? e : "", h = o.criterion.values ?? {};
 	return /* @__PURE__ */ S("div", {
 		className: `form-group mb-3 rounded ${o.highlighted ? "border border-warning" : ""}`,
@@ -33781,7 +33801,7 @@ function _z({ result: e, status: t, onAutoSave: n, onDirty: r }) {
 }
 //#endregion
 //#region src/modules/service/components/report/Category.tsx
-function vz({ categoryId: e, label: t, results: n }) {
+function xz({ categoryId: e, label: t, results: n }) {
 	let r = _({}), i = _({}), [a, o] = v({}), s = l((e) => {
 		let t = {}, n = (e) => e === null ? null : String(e);
 		return e.forEach((e) => {
@@ -33862,7 +33882,7 @@ function vz({ categoryId: e, label: t, results: n }) {
 		return window.addEventListener("beforeunload", e), () => window.removeEventListener("beforeunload", e);
 	}, [w]), /* @__PURE__ */ S(td, {
 		...c,
-		children: [/* @__PURE__ */ x("legend", { children: t }), n.map((e) => /* @__PURE__ */ x(_z, {
+		children: [/* @__PURE__ */ x("legend", { children: t }), n.map((e) => /* @__PURE__ */ x(bz, {
 			result: e,
 			status: a[e.id],
 			onAutoSave: b,
@@ -33872,7 +33892,7 @@ function vz({ categoryId: e, label: t, results: n }) {
 }
 //#endregion
 //#region src/modules/service/components/ReportResult.tsx
-function yz() {
+function Sz() {
 	let { id: e } = F(), n = P(), r = te(), [i, a] = v(), [o, s] = v({}), [c, l] = v({}), [u, f] = v(0), [p, m] = v(null);
 	d(() => {
 		e && (vt({ id: Number(e) }).then((e) => {
@@ -33948,7 +33968,7 @@ function yz() {
 				children: "Next"
 			})
 		]
-	}), /* @__PURE__ */ x(vz, {
+	}), /* @__PURE__ */ x(xz, {
 		categoryId: g[u],
 		label: o[g[u]],
 		results: i[g[u]]
@@ -33956,7 +33976,7 @@ function yz() {
 }
 //#endregion
 //#region src/modules/iris/components/irisOperatorDashboardUtils.ts
-var bz = {
+var Cz = {
 	active: "text-bg-warning",
 	approved: "text-bg-success",
 	canceled: "text-bg-secondary",
@@ -33976,16 +33996,16 @@ var bz = {
 	success: "text-bg-success",
 	uploaded: "text-bg-success"
 };
-function xz(e) {
+function wz(e) {
 	let t = e.trim().toLowerCase();
-	return t in bz ? bz[t] : /(fail|error|reject|invalid|deny)/.test(t) ? "text-bg-danger" : /(complete|done|success|approve|upload|finish|ready|ok)/.test(t) ? "text-bg-success" : /(run|process|progress|pending|queue|start|wait|active)/.test(t) ? "text-bg-warning" : /(cancel|skip|expire|close|stop)/.test(t) ? "text-bg-secondary" : "text-bg-info";
+	return t in Cz ? Cz[t] : /(fail|error|reject|invalid|deny)/.test(t) ? "text-bg-danger" : /(complete|done|success|approve|upload|finish|ready|ok)/.test(t) ? "text-bg-success" : /(run|process|progress|pending|queue|start|wait|active)/.test(t) ? "text-bg-warning" : /(cancel|skip|expire|close|stop)/.test(t) ? "text-bg-secondary" : "text-bg-info";
 }
-function Sz(e) {
+function Tz(e) {
 	return e instanceof Map ? Array.from(e.entries()) : Array.isArray(e) ? e.flatMap((e) => Array.isArray(e) && e.length === 2 && typeof e[0] == "string" && typeof e[1] == "string" ? [[e[0], e[1]]] : []) : typeof e == "object" && e ? Object.entries(e).flatMap(([e, t]) => typeof t == "string" ? [[e, t]] : []) : [];
 }
 //#endregion
 //#region src/modules/iris/components/operatorDashboard/irisOperatorEventDetailsUtils.ts
-var Cz = {
+var Ez = {
 	approve: {
 		action: "approve",
 		buttonClassName: "btn-success",
@@ -34010,7 +34030,7 @@ var Cz = {
 		label: "Reject",
 		successMessage: "Upload rejected."
 	}
-}, wz = {
+}, Dz = {
 	awaiting_approval: [
 		"approve",
 		"reject",
@@ -34024,10 +34044,10 @@ var Cz = {
 		"fail"
 	]
 };
-function Tz(e) {
-	return (wz[e] ?? []).map((e) => Cz[e]);
+function Oz(e) {
+	return (Dz[e] ?? []).map((e) => Ez[e]);
 }
-function Ez(e) {
+function kz(e) {
 	if (typeof e == "object" && e && "response" in e) {
 		let t = e.response;
 		if (typeof t?.data?.message == "string") return t.data.message;
@@ -34036,8 +34056,8 @@ function Ez(e) {
 }
 //#endregion
 //#region src/modules/iris/components/operatorDashboard/IrisOperatorEventDetails.tsx
-function Dz({ event: e, contentEntries: t, irisEndpoint: n, onEventUpdated: r }) {
-	let [i, a] = v(null), [o, s] = v(""), [c, u] = v(""), d = h(() => e ? Tz(e.state) : [], [e]), f = l(async (t) => {
+function Az({ event: e, contentEntries: t, irisEndpoint: n, onEventUpdated: r }) {
+	let [i, a] = v(null), [o, s] = v(""), [c, u] = v(""), d = h(() => e ? Oz(e.state) : [], [e]), f = l(async (t) => {
 		if (e) {
 			a(t), s(""), u("");
 			try {
@@ -34049,7 +34069,7 @@ function Dz({ event: e, contentEntries: t, irisEndpoint: n, onEventUpdated: r })
 				let o = d.find((e) => e.action === t);
 				r(a), u(o?.successMessage ?? "Action completed.");
 			} catch (e) {
-				s(Ez(e));
+				s(kz(e));
 			} finally {
 				a(null);
 			}
@@ -34091,7 +34111,7 @@ function Dz({ event: e, contentEntries: t, irisEndpoint: n, onEventUpdated: r })
 						})] }), /* @__PURE__ */ x("div", {
 							className: "d-flex align-items-start",
 							children: /* @__PURE__ */ x("span", {
-								className: `badge ${xz(e.state)}`,
+								className: `badge ${wz(e.state)}`,
 								children: e.state
 							})
 						})]
@@ -34249,7 +34269,7 @@ function Dz({ event: e, contentEntries: t, irisEndpoint: n, onEventUpdated: r })
 }
 //#endregion
 //#region src/modules/iris/components/operatorDashboard/IrisOperatorEventList.tsx
-function Oz({ activeContext: e, events: t, selectedEventUid: n, onSelectEvent: r }) {
+function jz({ activeContext: e, events: t, selectedEventUid: n, onSelectEvent: r }) {
 	return /* @__PURE__ */ S("div", {
 		className: "border rounded overflow-hidden h-100",
 		children: [/* @__PURE__ */ S("div", {
@@ -34276,7 +34296,7 @@ function Oz({ activeContext: e, events: t, selectedEventUid: n, onSelectEvent: r
 								className: t ? "text-white" : "",
 								children: e.uid
 							}), /* @__PURE__ */ x("span", {
-								className: `badge ${xz(e.state)}`,
+								className: `badge ${wz(e.state)}`,
 								children: e.state
 							})]
 						}), /* @__PURE__ */ S("div", {
@@ -34299,7 +34319,7 @@ function Oz({ activeContext: e, events: t, selectedEventUid: n, onSelectEvent: r
 }
 //#endregion
 //#region src/modules/iris/hooks/useIrisStreamContextEvents.ts
-function kz({ irisEndpoint: e, context: t, onMessage: n, onError: r }) {
+function Mz({ irisEndpoint: e, context: t, onMessage: n, onError: r }) {
 	let i = _(null), a = _(null), o = _(!0), s = _(0), [c, l] = v(!1);
 	return d(() => {
 		if (!t) return;
@@ -34344,7 +34364,7 @@ function kz({ irisEndpoint: e, context: t, onMessage: n, onError: r }) {
 }
 //#endregion
 //#region src/modules/iris/components/IrisOperatorDashboard.tsx
-function Az() {
+function Nz() {
 	let [e, t] = v(""), [n, r] = v(""), [i, a] = v([]), [o, s] = v(""), [c, u] = v(""), f = Xt();
 	d(() => {
 		n && Ot({
@@ -34356,7 +34376,7 @@ function Az() {
 	}, [n]);
 	let p = l((e) => {
 		n !== "" && e.context === n && (u(""), a((t) => [e, ...t.filter((t) => t.uid !== e.uid)]), s(e.uid));
-	}, [n]), { isConnected: m } = kz({
+	}, [n]), { isConnected: m } = Mz({
 		irisEndpoint: f,
 		context: n,
 		onMessage: p,
@@ -34373,7 +34393,7 @@ function Az() {
 		}, [n])
 	}), g = l((t) => {
 		t.preventDefault(), r(e), a([]), s(""), u("");
-	}, [e]), _ = h(() => i.length === 0 ? null : i.find((e) => e.uid === o) ?? i[0], [i, o]), y = h(() => _ ? Sz(_.content) : [], [_]);
+	}, [e]), _ = h(() => i.length === 0 ? null : i.find((e) => e.uid === o) ?? i[0], [i, o]), y = h(() => _ ? Tz(_.content) : [], [_]);
 	return /* @__PURE__ */ x("div", {
 		className: "w-100",
 		children: /* @__PURE__ */ x("div", {
@@ -34420,7 +34440,7 @@ function Az() {
 						className: "row g-3",
 						children: [/* @__PURE__ */ x("div", {
 							className: "col-xl-5",
-							children: /* @__PURE__ */ x(Oz, {
+							children: /* @__PURE__ */ x(jz, {
 								activeContext: n,
 								events: i,
 								selectedEventUid: _?.uid || "",
@@ -34428,7 +34448,7 @@ function Az() {
 							})
 						}), /* @__PURE__ */ x("div", {
 							className: "col-xl-7",
-							children: /* @__PURE__ */ x(Dz, {
+							children: /* @__PURE__ */ x(Az, {
 								event: _,
 								contentEntries: y,
 								irisEndpoint: f,
@@ -34443,18 +34463,18 @@ function Az() {
 }
 //#endregion
 //#region src/modules/run/hooks/useSelectRunWithScanner.ts
-var jz = /* @__PURE__ */ function(e) {
+var Pz = /* @__PURE__ */ function(e) {
 	return e.RunNotFound = "Run not found", e;
 }({});
-function Mz({ runsList: e, onFail: t = (e) => null }) {
-	let [n, r] = v(null), { lastlyReadedKeys: i } = oL();
+function Fz({ runsList: e, onFail: t = (e) => null }) {
+	let [n, r] = v(null), { lastlyReadedKeys: i } = lL();
 	return d(() => {
 		let n = i.replace(/_/g, "-").toUpperCase(), a = e.find((e) => n.includes(e.label));
 		if (!a) {
-			t(jz.RunNotFound);
+			t(Pz.RunNotFound);
 			return;
 		}
-		cL({
+		dL({
 			notificationHeader: "Run scanner",
 			notificationBody: `Run ${a.label} found`,
 			notificationType: "success"
@@ -34462,6 +34482,6 @@ function Mz({ runsList: e, onFail: t = (e) => null }) {
 	}, [i]), { selectedRun: n };
 }
 //#endregion
-export { ge as AuthContext, an as AuthProvider, LI as BatchCardElement, xR as ChemicalHeaderElement, oz as ChemicalIntakeElement, II as DateFormat, VI as EmphasizedParametersContext, bR as EmphasizedParametersProvider, PF as EquipmentContext, RF as EquipmentDashboard, HF as EquipmentHeaderElement, BF as EquipmentProvider, gz as GoldsteinClientsDashboard, Ly as GoldsteinEquipmentDashboard, aR as InputModal, Az as IrisOperatorDashboard, cf as ModuleStatusElement, MF as MonitorCard, AI as MonitorContext, OI as MonitorHeaderElement, DI as MonitorPage, jI as MonitorProvider, lL as NotificationProvider, xI as PaginationLinks, yz as ReportResults, NI as RunContext, BI as RunHeaderElement, ML as RunInformationElement, PI as RunProvider, HL as RunStepChecklist, TL as RunStepContext, fR as RunStepExecuteElement, vR as RunStepExecuteMinimal, FL as RunStepHeaderElement, PL as RunStepProvider, jL as RunStepsElement, aL as ScannerContext, dR as ScannerProvider, yR as SelectRunWithQrScanner, $v as SetupUpdateEquipment, OF as StatusMailComponent, Ry as StatusMailContext, UF as StatusMailProvider, bL as StepDetails, Jt as initSolodbComponents, cL as notification, Zt as useAuth, oL as useScannerContext, Mz as useSelectRunWithScanner };
+export { ge as AuthContext, an as AuthProvider, LI as BatchCardElement, wR as ChemicalHeaderElement, lz as ChemicalIntakeElement, II as DateFormat, VI as EmphasizedParametersContext, CR as EmphasizedParametersProvider, PF as EquipmentContext, RF as EquipmentDashboard, HF as EquipmentHeaderElement, BF as EquipmentProvider, yz as GoldsteinClientsDashboard, Ly as GoldsteinEquipmentDashboard, cR as InputModal, Nz as IrisOperatorDashboard, cf as ModuleStatusElement, MF as MonitorCard, AI as MonitorContext, OI as MonitorHeaderElement, DI as MonitorPage, jI as MonitorProvider, fL as NotificationProvider, xI as PaginationLinks, Sz as ReportResults, NI as RunContext, BI as RunHeaderElement, FL as RunInformationElement, PI as RunProvider, GL as RunStepChecklist, OL as RunStepContext, hR as RunStepExecuteElement, xR as RunStepExecuteMinimal, RL as RunStepHeaderElement, LL as RunStepProvider, PL as RunStepsElement, cL as ScannerContext, mR as ScannerProvider, SR as SelectRunWithQrScanner, $v as SetupUpdateEquipment, OF as StatusMailComponent, Ry as StatusMailContext, UF as StatusMailProvider, CL as StepDetails, Jt as initSolodbComponents, dL as notification, Zt as useAuth, lL as useScannerContext, Fz as useSelectRunWithScanner };
 
 //# sourceMappingURL=index.js.map
