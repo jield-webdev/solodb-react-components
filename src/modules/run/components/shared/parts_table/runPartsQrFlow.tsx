@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useId, useMemo, useState } from "react";
-import { Table } from "react-bootstrap";
+import { Placeholder, Table } from "react-bootstrap";
 import { useQueries } from "@tanstack/react-query";
 import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
@@ -79,10 +79,6 @@ const RunPartsQrFlow = ({ run, runStep }: Props) => {
   );
 
 
-  if (isLoading) {
-    return <LoadingComponent message={"Loading run parts"} />;
-  }
-
   if (isError) {
     return <div className="text-danger">Error loading run parts.</div>;
   }
@@ -99,7 +95,32 @@ const RunPartsQrFlow = ({ run, runStep }: Props) => {
           </tr>
         </thead>
         <tbody>
-          {partsToRender.map((runPart: RunPart, i: React.Key) => (
+          {isLoading &&
+            Array.from({ length: 1 }).map((_, i) => (
+              <tr key={`placeholder-${i}`}>
+                <td colSpan={2}>
+                  <Placeholder as="div" animation="glow">
+                    <Placeholder xs={6} />
+                  </Placeholder>
+                </td>
+                <td>
+                  <Placeholder as="div" animation="glow">
+                    <Placeholder xs={5} />
+                  </Placeholder>
+                </td>
+                <td>
+                  <Placeholder as="div" animation="glow">
+                    <Placeholder xs={4} />
+                  </Placeholder>
+                </td>
+                <td>
+                  <Placeholder as="div" animation="glow">
+                    <Placeholder xs={7} />
+                  </Placeholder>
+                </td>
+              </tr>
+            ))}
+          {!isLoading && partsToRender.map((runPart: RunPart, i: React.Key) => (
             <RunPartProductionTableRow
               runStep={runStep}
               runPart={runPart}
