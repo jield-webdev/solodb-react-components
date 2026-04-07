@@ -6,54 +6,52 @@ type UpdateRunStepPartCacheOptions = {
   latestAction: RunStepPartState;
 };
 
+// --- Item transformers ---
+
 const applyActionToRunStepPart = (runStepPart: RunStepPart, latestAction: RunStepPartState): RunStepPart => {
   const { status, processed, failed, started, available_actions } = latestAction.updated_run_step_part_state;
-
-  return {
-    ...runStepPart,
-    status,
-    processed,
-    failed,
-    started,
-    available_actions,
-  };
+  return { ...runStepPart, status, processed, failed, started, available_actions };
 };
 
-const updateStepParts = (stepParts: RunStepPart[], options: UpdateRunStepPartCacheOptions): RunStepPart[] => {
-  const { runStepPart, latestAction } = options;
+// --- Data shape helpers ---
 
-  return stepParts.map((item) => (item.id === runStepPart.id ? applyActionToRunStepPart(item, latestAction) : item));
-};
-
-const updateRunStepPartsData = (data: any, options: UpdateRunStepPartCacheOptions) => {
+// Queries store items either as { items: [...] } (regular) or { pages: [{ items: [...] }, ...] } (infinite).
+// This helper abstracts over both formats so callers only need to supply an items transform.
+const mapOverItems = (data: any, transform: (items: RunStepPart[]) => RunStepPart[]): any => {
   if (!data) return data;
 
-  // Infinite query format: { pages: [{ items: [...] }, ...], pageParams: [...] }
   if (Array.isArray(data.pages)) {
     return {
       ...data,
       pages: data.pages.map((page: any) => {
         if (!page || !Array.isArray(page.items)) return page;
-        return { ...page, items: updateStepParts(page.items as RunStepPart[], options) };
+        return { ...page, items: transform(page.items as RunStepPart[]) };
       }),
     };
   }
 
-  // Regular query format: { items: [...] }
   if (Array.isArray(data.items)) {
-    return {
-      ...data,
-      items: updateStepParts(data.items as RunStepPart[], options),
-    };
+    return { ...data, items: transform(data.items as RunStepPart[]) };
   }
 
   return data;
 };
 
-const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart) => {
+// --- Cache data transformers ---
+
+const applyOptimisticUpdate = (data: any, options: UpdateRunStepPartCacheOptions): any => {
+  const { runStepPart, latestAction } = options;
+  return mapOverItems(data, (items) =>
+    items.map((item) => (item.id === runStepPart.id ? applyActionToRunStepPart(item, latestAction) : item))
+  );
+};
+
+const applyBatchUpdate = (data: any, updatesById: Map<number, RunStepPart>): any =>
+  mapOverItems(data, (items) => items.map((item) => updatesById.get(item.id) ?? item));
+
+const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart): any => {
   if (!data) return data;
 
-  // Infinite query format: { pages: [{ items: [...] }, ...], pageParams: [...] }
   if (Array.isArray(data.pages)) {
     const pages = data.pages as any[];
     const existsInAnyPage = pages.some(
@@ -61,19 +59,10 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart) => {
     );
 
     if (existsInAnyPage) {
-      return {
-        ...data,
-        pages: pages.map((page: any) => {
-          if (!page || !Array.isArray(page.items)) return page;
-          return {
-            ...page,
-            items: (page.items as RunStepPart[]).map((item) => (item.id === runStepPart.id ? runStepPart : item)),
-          };
-        }),
-      };
+      return mapOverItems(data, (items) => items.map((item) => (item.id === runStepPart.id ? runStepPart : item)));
     }
 
-    // Append to last page
+    // Append to last page if not found in any page
     if (pages.length > 0) {
       const lastIndex = pages.length - 1;
       return {
@@ -88,11 +77,9 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart) => {
     return data;
   }
 
-  // Regular query format: { items: [...] }
   if (Array.isArray(data.items)) {
     const items = data.items as RunStepPart[];
     const exists = items.some((item) => item.id === runStepPart.id);
-
     return {
       ...data,
       items: exists ? items.map((item) => (item.id === runStepPart.id ? runStepPart : item)) : [...items, runStepPart],
@@ -102,56 +89,29 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart) => {
   return data;
 };
 
-const updateRunStepPartsDataById = (data: any, updatesById: Map<number, RunStepPart>) => {
-  if (!data) return data;
+// --- Cache operations ---
 
-  const updateItems = (items: RunStepPart[]) =>
-    items.map((item) => {
-      const updated = updatesById.get(item.id);
-      return updated ?? item;
-    });
-
-  // Infinite query format: { pages: [{ items: [...] }, ...], pageParams: [...] }
-  if (Array.isArray(data.pages)) {
-    return {
-      ...data,
-      pages: data.pages.map((page: any) => {
-        if (!page || !Array.isArray(page.items)) return page;
-        return { ...page, items: updateItems(page.items as RunStepPart[]) };
-      }),
-    };
-  }
-
-  // Regular query format: { items: [...] }
-  if (Array.isArray(data.items)) {
-    return {
-      ...data,
-      items: updateItems(data.items as RunStepPart[]),
-    };
-  }
-
-  return data;
-};
-
-const refreshRunStepPartCacheForRunPart = async (queryClient: QueryClient, runStepPart: RunStepPart) => {
-  const runPart: RunPart = { id: runStepPart.part_id } as RunPart;
-  const result = await listRunStepParts({ runPart });
+const refreshRunStepPartCacheForRunPart = async (queryClient: QueryClient, runStepPart: RunStepPart): Promise<void> => {
+  const result = await listRunStepParts({ runPart: { id: runStepPart.part_id } as RunPart });
   const updatesById = new Map(result.items.map((item) => [item.id, item]));
 
   if (updatesById.size === 0) return;
 
-  queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => updateRunStepPartsDataById(data, updatesById));
+  queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => applyBatchUpdate(data, updatesById));
 };
 
-const updateRunStepPartCacheInternal = (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions) => {
-  queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => updateRunStepPartsData(data, options));
+const updateRunStepPartCacheInternal = (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions): void => {
+  // Apply optimistic update immediately, then reconcile with fresh server data
+  queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => applyOptimisticUpdate(data, options));
 
   void refreshRunStepPartCacheForRunPart(queryClient, options.runStepPart).catch((error) => {
     console.error("Failed to refresh run step part cache from run part.", error);
   });
 };
 
-export const updateRunStepPartCache = (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions) => {
+// --- Exports ---
+
+export const updateRunStepPartCache = (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions): void => {
   updateRunStepPartCacheInternal(queryClient, options);
 };
 
@@ -159,11 +119,10 @@ export const updateRunStepPartCacheByRunStep = (
   queryClient: QueryClient,
   runStep: RunStep,
   options: UpdateRunStepPartCacheOptions
-) => {
+): void => {
   updateRunStepPartCacheInternal(queryClient, options);
 };
 
-export const upsertRunStepPartCache = (queryClient: QueryClient, runStep: RunStep, runStepPart: RunStepPart) => {
-  // Broad prefix covers both table-level and run-level queries.
+export const upsertRunStepPartCache = (queryClient: QueryClient, runStep: RunStep, runStepPart: RunStepPart): void => {
   queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => upsertRunStepPartInData(data, runStepPart));
 };

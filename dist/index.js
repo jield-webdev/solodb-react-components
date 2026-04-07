@@ -28026,29 +28026,23 @@ var KI = ({ runStepPart: e, setRunStepPart: t, editable: n = !0 }) => {
 		started: a,
 		available_actions: o
 	};
-}, ZI = (e, t) => {
-	let { runStepPart: n, latestAction: r } = t;
-	return e.map((e) => e.id === n.id ? XI(e, r) : e);
-}, QI = (e, t) => e && (Array.isArray(e.pages) ? {
+}, ZI = (e, t) => e && (Array.isArray(e.pages) ? {
 	...e,
 	pages: e.pages.map((e) => !e || !Array.isArray(e.items) ? e : {
 		...e,
-		items: ZI(e.items, t)
+		items: t(e.items)
 	})
 } : Array.isArray(e.items) ? {
 	...e,
-	items: ZI(e.items, t)
-} : e), $I = (e, t) => {
+	items: t(e.items)
+} : e), QI = (e, t) => {
+	let { runStepPart: n, latestAction: r } = t;
+	return ZI(e, (e) => e.map((e) => e.id === n.id ? XI(e, r) : e));
+}, $I = (e, t) => ZI(e, (e) => e.map((e) => t.get(e.id) ?? e)), eL = (e, t) => {
 	if (!e) return e;
 	if (Array.isArray(e.pages)) {
 		let n = e.pages;
-		if (n.some((e) => Array.isArray(e?.items) && e.items.some((e) => e.id === t.id))) return {
-			...e,
-			pages: n.map((e) => !e || !Array.isArray(e.items) ? e : {
-				...e,
-				items: e.items.map((e) => e.id === t.id ? t : e)
-			})
-		};
+		if (n.some((e) => Array.isArray(e?.items) && e.items.some((e) => e.id === t.id))) return ZI(e, (e) => e.map((e) => e.id === t.id ? t : e));
 		if (n.length > 0) {
 			let r = n.length - 1;
 			return {
@@ -28069,22 +28063,9 @@ var KI = ({ runStepPart: e, setRunStepPart: t, editable: n = !0 }) => {
 		};
 	}
 	return e;
-}, eL = (e, t) => {
-	if (!e) return e;
-	let n = (e) => e.map((e) => t.get(e.id) ?? e);
-	return Array.isArray(e.pages) ? {
-		...e,
-		pages: e.pages.map((e) => !e || !Array.isArray(e.items) ? e : {
-			...e,
-			items: n(e.items)
-		})
-	} : Array.isArray(e.items) ? {
-		...e,
-		items: n(e.items)
-	} : e;
 }, tL = async (e, t) => {
 	let n = await ft({ runPart: { id: t.part_id } }), r = new Map(n.items.map((e) => [e.id, e]));
-	r.size !== 0 && e.setQueriesData({ queryKey: ["runStepParts"] }, (e) => eL(e, r));
+	r.size !== 0 && e.setQueriesData({ queryKey: ["runStepParts"] }, (e) => $I(e, r));
 }, nL = (e, t) => {
 	e.setQueriesData({ queryKey: ["runStepParts"] }, (e) => QI(e, t)), tL(e, t.runStepPart).catch((e) => {
 		console.error("Failed to refresh run step part cache from run part.", e);
@@ -28094,7 +28075,7 @@ var KI = ({ runStepPart: e, setRunStepPart: t, editable: n = !0 }) => {
 }, iL = (e, t, n) => {
 	nL(e, n);
 }, aL = (e, t, n) => {
-	e.setQueriesData({ queryKey: ["runStepParts"] }, (e) => $I(e, n));
+	e.setQueriesData({ queryKey: ["runStepParts"] }, (e) => eL(e, n));
 }, oL = (e) => !!e.closest("button, a, input, textarea, select, option, label"), sL = ({ runPart: e, partIsSelected: t, setPartAsSelected: n, runStepParts: r, canInit: i, runStep: a, dropdown: o }) => {
 	let [s, c] = v(), l = A();
 	d(() => {
@@ -28182,63 +28163,22 @@ var KI = ({ runStepPart: e, setRunStepPart: t, editable: n = !0 }) => {
 	let e = u(cL);
 	if (e === void 0) throw Error("useScannerContext must be used within a ScannerProvider");
 	return e;
-}, uL = null;
-function dL(e) {
-	if (!uL) {
-		console.warn("notification() called before NotificationProvider is mounted");
-		return;
-	}
-	uL(e);
-}
-function fL({ children: e }) {
-	let [t, n] = v([]), r = _(0), i = l((e) => {
-		let t = ++r.current;
-		n((n) => [...n, {
-			...e,
-			id: t
-		}]);
-	}, []);
-	d(() => (uL = i, () => {
-		uL = null;
-	}), [i]);
-	let a = l((e) => {
-		n((t) => t.filter((t) => t.id !== e));
-	}, []);
-	return /* @__PURE__ */ S(b, { children: [e, /* @__PURE__ */ x(vu, {
-		containerPosition: "fixed",
-		position: "top-end",
-		children: t.map(({ id: e, notificationHeader: t, notificationBody: n, notificationType: r }) => /* @__PURE__ */ S(gu, {
-			show: !0,
-			delay: 3e3 + (r == "danger" ? 150 : 0),
-			autohide: !0,
-			bg: r,
-			onClose: () => a(e),
-			className: "m-5",
-			children: [/* @__PURE__ */ x(gu.Header, { children: /* @__PURE__ */ x("span", {
-				className: "me-auto",
-				children: t
-			}) }), /* @__PURE__ */ x(gu.Body, { children: n })]
-		}, e))
-	})] });
-}
-//#endregion
-//#region src/modules/run/utils/parseScannerForRun.ts
-var pL = /* @__PURE__ */ function(e) {
+}, uL = /* @__PURE__ */ function(e) {
 	return e[e.SELECT = 0] = "SELECT", e[e.PERFORM_ACTION = 1] = "PERFORM_ACTION", e;
 }({});
-function mL(e) {
-	return e.startsWith("_qr") ? pL.PERFORM_ACTION : pL.SELECT;
+function dL(e) {
+	return e.startsWith("_qr") ? uL.PERFORM_ACTION : uL.SELECT;
 }
 //#endregion
 //#region src/modules/run/hooks/run/parts/usePartSelection.ts
-function hL({ parts: e }) {
+function fL({ parts: e }) {
 	let [t, n] = v(/* @__PURE__ */ new Map()), r = l((e) => {
 		n((t) => {
 			let n = new Map(t);
 			return n.set(e, !(t.get(e) ?? !1)), n;
 		});
 	}, []), { lastlyReadedKeys: i, addCallbackFn: a, removeCallbackFn: o } = lL(), s = f(), c = _(/* @__PURE__ */ new Set()), u = l((t) => {
-		if (mL(t) != pL.SELECT) return;
+		if (dL(t) != uL.SELECT) return;
 		let n = t.replace(/_/g, "-").toUpperCase();
 		if (!n) return;
 		if (e.length == 0) {
@@ -28250,14 +28190,10 @@ function hL({ parts: e }) {
 			return;
 		}
 		let i = e.find((e) => n.includes(e.scanner_label));
-		i && (dL({
-			notificationHeader: "Part scanner",
-			notificationBody: `Found part: ${i.scanner_label}`,
-			notificationType: "success"
-		}), r(i.id));
+		i && r(i.id);
 	}, [e, r]);
-	return d(() => (o(pL.SELECT, s), u(i), a(pL.SELECT, s, u), () => {
-		o(pL.SELECT, s);
+	return d(() => (o(uL.SELECT, s), u(i), a(uL.SELECT, s, u), () => {
+		o(uL.SELECT, s);
 	}), [e]), d(() => {
 		let r = /* @__PURE__ */ new Map();
 		for (let n of e) {
@@ -28292,6 +28228,47 @@ function hL({ parts: e }) {
 	};
 }
 //#endregion
+//#region src/utils/notification.tsx
+var pL = null;
+function mL(e) {
+	if (!pL) {
+		console.warn("notification() called before NotificationProvider is mounted");
+		return;
+	}
+	pL(e);
+}
+function hL({ children: e }) {
+	let [t, n] = v([]), r = _(0), i = l((e) => {
+		let t = ++r.current;
+		n((n) => [...n, {
+			...e,
+			id: t
+		}]);
+	}, []);
+	d(() => (pL = i, () => {
+		pL = null;
+	}), [i]);
+	let a = l((e) => {
+		n((t) => t.filter((t) => t.id !== e));
+	}, []);
+	return /* @__PURE__ */ S(b, { children: [e, /* @__PURE__ */ x(vu, {
+		containerPosition: "fixed",
+		position: "top-end",
+		children: t.map(({ id: e, notificationHeader: t, notificationBody: n, notificationType: r }) => /* @__PURE__ */ S(gu, {
+			show: !0,
+			delay: 3e3 + (r == "danger" ? 150 : 0),
+			autohide: !0,
+			bg: r,
+			onClose: () => a(e),
+			className: "m-5",
+			children: [/* @__PURE__ */ x(gu.Header, { children: /* @__PURE__ */ x("span", {
+				className: "me-auto",
+				children: t
+			}) }), /* @__PURE__ */ x(gu.Body, { children: n })]
+		}, e))
+	})] });
+}
+//#endregion
 //#region src/modules/run/hooks/run/parts/usePartActions.ts
 var gL = (e) => "step_id" in e && "part_id" in e;
 function _L({ parts: e, selectedParts: t, getRunPart: n, getRunStepPart: r, actionsFromScanner: i = !0 }) {
@@ -28321,22 +28298,22 @@ function _L({ parts: e, selectedParts: t, getRunPart: n, getRunStepPart: r, acti
 		if (!e || !vL(e)) return;
 		let t = _t(e.split("/")[1]);
 		if (!t) {
-			dL({
+			mL({
 				notificationHeader: "Part scanner",
 				notificationBody: "Non valid action found in the scanned text",
 				notificationType: "danger"
 			});
 			return;
 		}
-		dL({
+		mL({
 			notificationHeader: "Part scanner",
 			notificationBody: `Performing action ${gt(t)} on selected parts`,
 			notificationType: "success"
 		}), p(t);
 	}, [p]);
 	return d(() => {
-		if (i) return s(pL.PERFORM_ACTION, c), o(pL.PERFORM_ACTION, c, m), () => {
-			s(pL.PERFORM_ACTION, c);
+		if (i) return s(uL.PERFORM_ACTION, c), o(uL.PERFORM_ACTION, c, m), () => {
+			s(uL.PERFORM_ACTION, c);
 		};
 	}, [
 		i,
@@ -28403,7 +28380,142 @@ var yL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdow
 	className: `btn btn-sm ${JI[e]}`,
 	onClick: () => t(e),
 	children: n
-}, e)) })), xL = !1, SL = ({ run: e, runStep: t }) => {
+}, e)) })), xL = ({ run: e, runStep: n }) => {
+	let r = O({ queries: [{
+		queryKey: [
+			"runParts",
+			e.id,
+			n.part_level
+		],
+		queryFn: () => rt({
+			run: e,
+			level: n.part_level
+		})
+	}, {
+		queryKey: ["runStepParts", n.id],
+		queryFn: () => ft({ step: n })
+	}] }), [i, a] = r, o = r.some((e) => e.isLoading), s = r.some((e) => e.isError), c = h(() => i.data?.items ?? [], [i.data]), l = h(() => a.data?.items ?? [], [a.data]);
+	d(() => {
+		mt(n, l);
+	}, [l]);
+	let u = h(() => c.filter((e) => e.part_level === n.part_level), [c, n.part_level]), [f, p] = v(!1), { selectedParts: m, selectAllParts: g } = fL({ parts: u });
+	wL({
+		runStepParts: l,
+		runParts: u
+	});
+	let _ = h(() => u.filter((e) => m.get(e.id) && (f || !SL(l, e))), [
+		u,
+		l,
+		m,
+		f
+	]);
+	return o ? /* @__PURE__ */ x(Qt, { message: "Loading run parts" }) : s ? /* @__PURE__ */ x("div", {
+		className: "text-danger",
+		children: "Error loading run parts."
+	}) : /* @__PURE__ */ S(t.Fragment, { children: [/* @__PURE__ */ S(lu, {
+		size: "sm",
+		striped: !0,
+		hover: !0,
+		children: [/* @__PURE__ */ x("thead", { children: /* @__PURE__ */ S("tr", { children: [
+			/* @__PURE__ */ x("th", {
+				colSpan: 2,
+				children: "Part"
+			}),
+			/* @__PURE__ */ x("th", { children: "Status" }),
+			/* @__PURE__ */ x("th", { children: "Actions" }),
+			/* @__PURE__ */ x("th", { children: "Comment" })
+		] }) }), /* @__PURE__ */ x("tbody", { children: _.map((e, t) => /* @__PURE__ */ x(sL, {
+			runStep: n,
+			runPart: e,
+			runStepParts: l,
+			canInit: !1,
+			partIsSelected: m.get(e.id) ?? !1,
+			dropdown: !1
+		}, `${e.parsed_label}${t}`)) })]
+	}), /* @__PURE__ */ x(CL, {
+		runStepParts: l,
+		selectedPartsLength: _.length,
+		totalParts: u.length,
+		onSelectAll: g,
+		toggleShowCompletedParts: () => {
+			p(!f);
+		}
+	})] });
+}, SL = (e, t) => {
+	let n = e.find((e) => e.part_id == t.id);
+	return n == null ? !1 : n.processed;
+}, CL = ({ runStepParts: e, selectedPartsLength: t, totalParts: n, onSelectAll: r, toggleShowCompletedParts: i }) => {
+	let a = h(() => {
+		let t = 0;
+		return e.forEach((e) => e.processed ? t++ : null), t;
+	}, [e]);
+	return /* @__PURE__ */ S("div", {
+		className: "d-flex flex-column flex-sm-row flex-wrap gap-2 mt-2",
+		children: [
+			/* @__PURE__ */ S("span", {
+				className: "badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fw-semibold",
+				role: "button",
+				title: "Show all the parts",
+				onClick: r,
+				style: { cursor: "pointer" },
+				children: [
+					"This step has ",
+					h(() => n - t, [n, t]),
+					" more parts"
+				]
+			}),
+			/* @__PURE__ */ S("span", {
+				className: "badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-2 fw-semibold",
+				children: [
+					"This step has ",
+					t,
+					" scanned parts"
+				]
+			}),
+			/* @__PURE__ */ S("span", {
+				title: "Show all the parts",
+				style: { cursor: "pointer" },
+				onClick: i,
+				className: "badge rounded-pill bg-success-subtle text-success-emphasis border border-success-subtle px-3 py-2 fw-semibold",
+				children: [
+					"This step has ",
+					a,
+					" finished parts"
+				]
+			})
+		]
+	});
+};
+//#endregion
+//#region src/modules/run/hooks/run/parts/useQrPartNotifications.ts
+function wL({ runStepParts: e, runParts: t }) {
+	let { lastlyReadedKeys: n, addCallbackFn: r, removeCallbackFn: i } = lL(), a = f(), o = l((n) => {
+		let r = n.replace(/_/g, "-").toUpperCase();
+		if (!r) return;
+		let i = t.find((e) => r.includes(e.short_label.toUpperCase()));
+		if (i) {
+			if (SL(e, i)) {
+				mL({
+					notificationHeader: "Run parts table",
+					notificationBody: `Part ${i.parsed_label ?? i.short_label} is already completed`,
+					notificationType: "danger"
+				});
+				return;
+			}
+			mL({
+				notificationHeader: "Part scanner",
+				notificationBody: `Found part: ${i.scanner_label}`,
+				notificationType: "success"
+			});
+		}
+	}, [t, e]);
+	d(() => (i(uL.SELECT, a), r(uL.SELECT, a, o), o(n), () => {
+		i(uL.SELECT, a);
+	}), [t, e]);
+}
+//#endregion
+//#region src/modules/run/components/shared/parts_table/runPartsRegularFlow.tsx
+var TL = !1, EL = ({ run: e, runStep: t }) => {
 	let n = A(), i = O({ queries: [{
 		queryKey: [
 			"runParts",
@@ -28421,8 +28533,11 @@ var yL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdow
 	d(() => {
 		mt(t, u ?? o.data?.items ?? []);
 	}, [u]);
-	let { selectedParts: f, setPartAsSelected: p, setPartsSelection: m, selectAllParts: g, selectNoneParts: _, hasSelectedParts: v } = hL({ parts: l ?? [] });
-	d(() => {
+	let { selectedParts: f, setPartAsSelected: p, setPartsSelection: m, selectAllParts: g, selectNoneParts: _, hasSelectedParts: v } = fL({ parts: l });
+	wL({
+		runStepParts: u,
+		runParts: l
+	}), d(() => {
 		let e = Array.from(f.entries()).filter(([, e]) => e).map(([e]) => e);
 		n.setQueryData(["runPartSelection", t.id], e);
 	}, [
@@ -28494,7 +28609,7 @@ var yL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdow
 				canInit: e.run_type === Wt.PRODUCTION,
 				partIsSelected: i,
 				setPartAsSelected: p,
-				dropdown: xL
+				dropdown: TL
 			}, `key-${r}-${n.id}`);
 		}) })]
 	}), /* @__PURE__ */ x(yL, {
@@ -28511,7 +28626,7 @@ var yL = ({ onSelectAll: e, onSelectNone: t, hasSelectedParts: n, actionsDropdow
 };
 //#endregion
 //#region src/modules/run/components/run/steps/element/stepDetails.tsx
-function CL({ run: e, step: t, refetchFn: n = () => null }) {
+function DL({ run: e, step: t, refetchFn: n = () => null }) {
 	let { run: r } = u(NI), { showOnlyEmphasizedParameters: i } = u(VI), a = e ?? r;
 	return a ? /* @__PURE__ */ x(mi, {
 		className: "p-4 my-3",
@@ -28519,7 +28634,7 @@ function CL({ run: e, step: t, refetchFn: n = () => null }) {
 			md: "6",
 			children: [
 				/* @__PURE__ */ x("h4", { children: "Experimental split" }),
-				/* @__PURE__ */ x(SL, {
+				/* @__PURE__ */ x(EL, {
 					run: a,
 					runStep: t
 				}),
@@ -28549,7 +28664,7 @@ function CL({ run: e, step: t, refetchFn: n = () => null }) {
 }
 //#endregion
 //#region src/modules/run/components/shared/parts/runPartIndicator.tsx
-var wL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !1, hasStepPart: i = !1, isSelected: a = !1, runStep: o }) => {
+var OL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !1, hasStepPart: i = !1, isSelected: a = !1, runStep: o }) => {
 	let s = A(), c = !i || !e ? null : r && !i ? /* @__PURE__ */ S(H, {
 		size: "sm",
 		variant: "outline-secondary",
@@ -28571,7 +28686,7 @@ var wL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 		className: `tray-grid__cell${e ? "" : " tray-grid__cell--empty"}`,
 		children: c
 	}) : c;
-}, TL = ({ step: e, parts: t, stepParts: n, run: r }) => {
+}, kL = ({ step: e, parts: t, stepParts: n, run: r }) => {
 	let i = t.filter((t) => t.part_level === e.part_level).sort((e, t) => e.root_id && t.root_id && e.root_id !== t.root_id ? e.root_id - t.root_id : e.left - t.left), a = new Map(n.filter((t) => t.step_id === e.id).map((e) => [e.part_id, e])), o = [...r.run_trays ?? []].sort((e, t) => e.sequence - t.sequence), s = i.reduce((e, t) => {
 		if (!t.tray) return e;
 		let n = e.get(t.tray.id) ?? [];
@@ -28586,7 +28701,7 @@ var wL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 		return t ? t.status.class : "step-part-inactive";
 	}, f = (t, n) => /* @__PURE__ */ x("div", {
 		className: `tray-grid__cell${t.length ? "" : " tray-grid__cell--empty"}${t.length > 1 ? " tray-grid__cell--multi" : ""}`,
-		children: t.map((t) => /* @__PURE__ */ x(wL, {
+		children: t.map((t) => /* @__PURE__ */ x(OL, {
 			runPart: t,
 			statusClass: d(t),
 			allowCreate: c,
@@ -28628,7 +28743,7 @@ var wL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 			children: o.map((t, n) => {
 				if (l) return f(t, `slot-no-tray-${n}`);
 				let r = t[0] ?? null;
-				return /* @__PURE__ */ x(wL, {
+				return /* @__PURE__ */ x(OL, {
 					runPart: r,
 					statusClass: r ? d(r) : void 0,
 					withTrayCell: !0,
@@ -28654,7 +28769,7 @@ var wL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 						children: t.name ?? t.label
 					}), /* @__PURE__ */ x("div", {
 						className: "d-flex flex-wrap gap-2",
-						children: n.map((t) => /* @__PURE__ */ x(wL, {
+						children: n.map((t) => /* @__PURE__ */ x(OL, {
 							runPart: t,
 							statusClass: d(t),
 							allowCreate: c,
@@ -28690,7 +28805,7 @@ var wL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 					children: m.map((n, r) => {
 						if (l) return f(n, `slot-${t.id}-${r}`);
 						let i = n[0] ?? null;
-						return /* @__PURE__ */ x(wL, {
+						return /* @__PURE__ */ x(OL, {
 							runPart: i,
 							statusClass: i ? d(i) : void 0,
 							withTrayCell: !0,
@@ -28707,7 +28822,7 @@ var wL = ({ runPart: e, statusClass: t, withTrayCell: n = !1, allowCreate: r = !
 };
 //#endregion
 //#region src/modules/run/components/run/steps/element/stepInList.tsx
-function EL({ run: e, step: t, parts: n, stepParts: r, monitoredBy: i, refetchFn: a }) {
+function AL({ run: e, step: t, parts: n, stepParts: r, monitoredBy: i, refetchFn: a }) {
 	let { environment: o } = F(), [s, c] = v(!1), l = () => {
 		c(!s);
 	}, [u, f] = v(t.process_module.module);
@@ -28721,7 +28836,7 @@ function EL({ run: e, step: t, parts: n, stepParts: r, monitoredBy: i, refetchFn
 		}) }),
 		/* @__PURE__ */ x("td", {
 			className: u.latest_module_status && u.latest_module_status.status.is_down_status ? "table-danger" : "",
-			children: /* @__PURE__ */ x(TL, {
+			children: /* @__PURE__ */ x(kL, {
 				step: t,
 				parts: n,
 				stepParts: r,
@@ -28769,7 +28884,7 @@ function EL({ run: e, step: t, parts: n, stepParts: r, monitoredBy: i, refetchFn
 		})] })
 	] }), s && /* @__PURE__ */ x("tr", { children: /* @__PURE__ */ x("td", {
 		colSpan: n.length + 6,
-		children: /* @__PURE__ */ x(CL, {
+		children: /* @__PURE__ */ x(DL, {
 			step: t,
 			refetchFn: a
 		})
@@ -28777,7 +28892,7 @@ function EL({ run: e, step: t, parts: n, stepParts: r, monitoredBy: i, refetchFn
 }
 //#endregion
 //#region src/modules/run/components/shared/requirement/fillValueModal.tsx
-var DL = ({ requirement: e, result: t, show: n, setShow: r, refetchFn: i, part: a, stepPart: o }) => {
+var jL = ({ requirement: e, result: t, show: n, setShow: r, refetchFn: i, part: a, stepPart: o }) => {
 	let [s, c] = v({}), [l, u] = v(!1), [f, p] = v(null), [m, h] = v(!1);
 	d(() => {
 		if (Object.keys(s).length > 0) return;
@@ -28904,7 +29019,7 @@ var DL = ({ requirement: e, result: t, show: n, setShow: r, refetchFn: i, part: 
 			})] })]
 		})]
 	});
-}, OL = o({
+}, ML = o({
 	runStep: {},
 	setRunStep: (e) => {},
 	reloadRunStep: () => {},
@@ -28914,8 +29029,8 @@ var DL = ({ requirement: e, result: t, show: n, setShow: r, refetchFn: i, part: 
 });
 //#endregion
 //#region src/modules/run/components/shared/requirement/requirementValuesWithPartTable.tsx
-function kL({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i, refetchFn: a, editOnly: o = !1 }) {
-	let { run: s } = u(OL), [c, l] = v(r ?? []), [f, p] = v(n ?? []), [m, h] = v(i ?? []), g = A(), _ = O({ queries: [
+function NL({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i, refetchFn: a, editOnly: o = !1 }) {
+	let { run: s } = u(ML), [c, l] = v(r ?? []), [f, p] = v(n ?? []), [m, h] = v(i ?? []), g = A(), _ = O({ queries: [
 		{
 			queryKey: ["runParts", `${s?.id ?? "unknown"}`],
 			queryFn: async () => await rt({ run: s }),
@@ -29060,7 +29175,7 @@ function kL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 		}) })]
 	}), !o && j.map((t) => {
 		let n = m.find((e) => e.values.some((e) => e.step_part_id === t.id));
-		return /* @__PURE__ */ x(DL, {
+		return /* @__PURE__ */ x(jL, {
 			requirement: e,
 			...n ? { result: n } : {
 				part: k.find((e) => e.id === t.part_id),
@@ -29080,7 +29195,7 @@ function kL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 }
 //#endregion
 //#region src/modules/run/components/shared/requirement/requirementValuesByStep.tsx
-function AL({ requirement: e, measurementResults: t, refetchFn: n, editOnly: r = !1 }) {
+function PL({ requirement: e, measurementResults: t, refetchFn: n, editOnly: r = !1 }) {
 	let [i, a] = v(t ?? []), o = A(), s = O({ queries: [{
 		queryKey: [
 			"requirement",
@@ -29149,7 +29264,7 @@ function AL({ requirement: e, measurementResults: t, refetchFn: n, editOnly: r =
 							/* @__PURE__ */ x("td", { children: e.logging_parameter.unit?.abbr ?? "" })
 						] }, `value:${e.id}`)) })]
 					}),
-					/* @__PURE__ */ x(DL, {
+					/* @__PURE__ */ x(jL, {
 						requirement: e,
 						result: t,
 						show: u === t.id,
@@ -29168,7 +29283,7 @@ function AL({ requirement: e, measurementResults: t, refetchFn: n, editOnly: r =
 					children: [/* @__PURE__ */ x("i", { className: "fa fa-plus" }), " Add results"]
 				})
 			}),
-			/* @__PURE__ */ x(DL, {
+			/* @__PURE__ */ x(jL, {
 				requirement: e,
 				show: p,
 				setShow: (e) => {
@@ -29181,7 +29296,7 @@ function AL({ requirement: e, measurementResults: t, refetchFn: n, editOnly: r =
 }
 //#endregion
 //#region src/modules/run/components/run/steps/element/requirementDetails.tsx
-function jL({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i, refetchFn: a }) {
+function FL({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i, refetchFn: a }) {
 	let { environment: o } = F();
 	return /* @__PURE__ */ x(mi, {
 		className: "p-4 my-3",
@@ -29189,7 +29304,7 @@ function jL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 			md: "7",
 			children: [
 				/* @__PURE__ */ x("h4", { children: "Measurements by part" }),
-				/* @__PURE__ */ x(kL, {
+				/* @__PURE__ */ x(NL, {
 					requirement: e,
 					step: t,
 					stepParts: n,
@@ -29198,7 +29313,7 @@ function jL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 					refetchFn: a
 				}),
 				/* @__PURE__ */ x("h4", { children: "Measurements for whole step" }),
-				/* @__PURE__ */ x(AL, {
+				/* @__PURE__ */ x(PL, {
 					requirement: e,
 					measurementResults: i,
 					refetchFn: a
@@ -29248,7 +29363,7 @@ function jL({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 }
 //#endregion
 //#region src/modules/run/components/shared/requirement/measurementResultsBadge.tsx
-var ML = ({ requirement: e, step: t, measurementResults: n, parts: r, stepParts: i }) => {
+var IL = ({ requirement: e, step: t, measurementResults: n, parts: r, stepParts: i }) => {
 	let a = r.filter((e) => e.part_level === t.part_level).sort((e, t) => e.root_id && t.root_id && e.root_id !== t.root_id ? e.root_id - t.root_id : e.left - t.left), o = a.reduce((e, t) => {
 		let n = t.root_id ?? t.id;
 		return e[n] || (e[n] = []), e[n].push(t), e;
@@ -29291,7 +29406,7 @@ var ML = ({ requirement: e, step: t, measurementResults: n, parts: r, stepParts:
 };
 //#endregion
 //#region src/modules/run/components/run/steps/element/requirementStepInList.tsx
-function NL({ requirement: e, step: t, parts: n, stepParts: r, refetchFn: i }) {
+function LL({ requirement: e, step: t, parts: n, stepParts: r, refetchFn: i }) {
 	let { environment: a } = F(), [o, s] = v(!1), [c, l] = v(t.process_module.module);
 	d(() => {
 		l(t.process_module.module);
@@ -29328,7 +29443,7 @@ function NL({ requirement: e, step: t, parts: n, stepParts: r, refetchFn: i }) {
 				style: { cursor: "pointer" },
 				onClick: u
 			}) }),
-			/* @__PURE__ */ x("td", { children: /* @__PURE__ */ x(ML, {
+			/* @__PURE__ */ x("td", { children: /* @__PURE__ */ x(IL, {
 				requirement: e,
 				step: t,
 				measurementResults: h.data?.items ?? [],
@@ -29374,7 +29489,7 @@ function NL({ requirement: e, step: t, parts: n, stepParts: r, refetchFn: i }) {
 		]
 	}), o && /* @__PURE__ */ x("tr", { children: /* @__PURE__ */ x("td", {
 		colSpan: n.length + 5,
-		children: g ? "Loading..." : /* @__PURE__ */ x(jL, {
+		children: g ? "Loading..." : /* @__PURE__ */ x(FL, {
 			requirement: e,
 			step: t,
 			stepParts: r,
@@ -29386,7 +29501,7 @@ function NL({ requirement: e, step: t, parts: n, stepParts: r, refetchFn: i }) {
 }
 //#endregion
 //#region src/modules/run/components/run/steps/runStepsElement.tsx
-function PL() {
+function RL() {
 	let { run: e } = u(NI), { showOnlyEmphasizedParameters: n, setShowOnlyEmphasizedParameters: r } = u(VI), [i, a] = v(1), [o] = v(25), [s, c] = v(/* @__PURE__ */ new Map()), l = A(), f = O({ queries: [
 		{
 			queryKey: [
@@ -29605,14 +29720,14 @@ function PL() {
 				let r = `step-${n.id}`;
 				return /* @__PURE__ */ S(t.Fragment, { children: [n.has_label && ie(n), (!n.has_label || s.get(n.label?.id ?? -1)) && /* @__PURE__ */ S(b, { children: [n.has_step_group && ne.includes(n) && I(n), n.has_requirement ? (() => {
 					let e = te.find((e) => e.step.id === n.id);
-					return /* @__PURE__ */ x(NL, {
+					return /* @__PURE__ */ x(LL, {
 						requirement: e,
 						step: n,
 						parts: ee,
 						stepParts: P.filter((t) => t.step_id === (e.requirement_for_step?.id ?? e.step.id)),
 						refetchFn: p
 					});
-				})() : /* @__PURE__ */ x(EL, {
+				})() : /* @__PURE__ */ x(AL, {
 					run: e,
 					step: n,
 					parts: ee,
@@ -29631,7 +29746,7 @@ function PL() {
 }
 //#endregion
 //#region src/modules/run/components/run/steps/runInformationElement.tsx
-function FL() {
+function zL() {
 	let { run: e } = u(NI);
 	return /* @__PURE__ */ S("div", { children: [
 		/* @__PURE__ */ x("h2", { children: "Run information" }),
@@ -29643,7 +29758,7 @@ function FL() {
 }
 //#endregion
 //#region src/modules/run/hooks/useRunStep.ts
-var IL = () => {
+var BL = () => {
 	let [e, t] = v(null), [n, r] = v(null), { id: i } = F();
 	d(() => {
 		(e === null || i !== e.id.toString()) && et({ id: parseInt(i) }).then((e) => ($e({ id: e.run_id }).then(r), e)).then(t);
@@ -29660,13 +29775,13 @@ var IL = () => {
 };
 //#endregion
 //#region src/modules/run/providers/runStepProvider.tsx
-function LL({ children: e }) {
-	let { runStep: t, setRunStep: n, run: r, reloadRunStep: a } = IL(), [o, s] = v({});
+function VL({ children: e }) {
+	let { runStep: t, setRunStep: n, run: r, reloadRunStep: a } = BL(), [o, s] = v({});
 	if (t === null || r === null) {
 		let e = "Loading run...";
 		return t === null && r === null ? e = "Loading run and run step..." : r === null && (e = "Loading run step..."), /* @__PURE__ */ x(rn, { children: /* @__PURE__ */ x(Qt, { message: e }) });
 	}
-	return /* @__PURE__ */ x(rn, { children: /* @__PURE__ */ x(OL.Provider, {
+	return /* @__PURE__ */ x(rn, { children: /* @__PURE__ */ x(ML.Provider, {
 		value: {
 			runStep: t,
 			setRunStep: n,
@@ -29683,18 +29798,18 @@ function LL({ children: e }) {
 }
 //#endregion
 //#region src/modules/run/components/step/runStepHeaderElement.tsx
-function RL() {
-	return /* @__PURE__ */ x(LL, { children: /* @__PURE__ */ x(wi, {
+function HL() {
+	return /* @__PURE__ */ x(VL, { children: /* @__PURE__ */ x(wi, {
 		fluid: !0,
 		children: /* @__PURE__ */ x(ee, {})
 	}) });
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/stepLabel.tsx
-var zL = ({ label: e }) => /* @__PURE__ */ x("div", {
+var UL = ({ label: e }) => /* @__PURE__ */ x("div", {
 	className: "p-2 h4 mb-1 bg-info text-white",
 	children: e.label
-}), BL = ({ runStep: e }) => {
+}), WL = ({ runStep: e }) => {
 	let { environment: t } = F();
 	return /* @__PURE__ */ S("h2", { children: [
 		" ",
@@ -29713,7 +29828,7 @@ var zL = ({ label: e }) => /* @__PURE__ */ x("div", {
 			]
 		})
 	] });
-}, VL = ({ checklistItem: e, show: t, setModalShow: n, mutation: r }) => /* @__PURE__ */ S(G, {
+}, GL = ({ checklistItem: e, show: t, setModalShow: n, mutation: r }) => /* @__PURE__ */ S(G, {
 	show: t,
 	size: "lg",
 	onHide: () => n(!1),
@@ -29739,7 +29854,7 @@ var zL = ({ label: e }) => /* @__PURE__ */ x("div", {
 });
 //#endregion
 //#region src/modules/run/components/step/view/element/checklist/checklistItemElement.tsx
-function HL({ checklistItem: e, onOpenModal: t, onMarkDone: n }) {
+function KL({ checklistItem: e, onOpenModal: t, onMarkDone: n }) {
 	return e.can_finish ? e.description === "" ? /* @__PURE__ */ x(H, {
 		className: "float-end",
 		size: "sm",
@@ -29753,7 +29868,7 @@ function HL({ checklistItem: e, onOpenModal: t, onMarkDone: n }) {
 		children: "Execute checklist step"
 	}) : null;
 }
-var UL = ({ checklistItem: e, refetch: t }) => {
+var qL = ({ checklistItem: e, refetch: t }) => {
 	let [n, r] = v(!1), i = D({
 		mutationFn: async () => (await y.create().patch("update/run/step/checklist/done/" + e.id, {})).data,
 		onSuccess: (e) => {
@@ -29773,13 +29888,13 @@ var UL = ({ checklistItem: e, refetch: t }) => {
 			}),
 			/* @__PURE__ */ x("div", {
 				className: "flex-shrink-0",
-				children: /* @__PURE__ */ x(HL, {
+				children: /* @__PURE__ */ x(KL, {
 					checklistItem: e,
 					onOpenModal: () => r(!0),
 					onMarkDone: () => i.mutate()
 				})
 			}),
-			/* @__PURE__ */ x(VL, {
+			/* @__PURE__ */ x(GL, {
 				checklistItem: e,
 				show: n,
 				setModalShow: r,
@@ -29787,7 +29902,7 @@ var UL = ({ checklistItem: e, refetch: t }) => {
 			})
 		]
 	});
-}, WL = {
+}, JL = {
 	movingOut: "Moving out...",
 	skipping: "Skipping...",
 	unskipping: "Unskipping...",
@@ -29795,8 +29910,8 @@ var UL = ({ checklistItem: e, refetch: t }) => {
 	operationSkipped: "Operation skipped",
 	operationUnskipped: "Operation unskipped"
 };
-function GL({ run: e, runStep: t, reloadRunStep: n }) {
-	let r = te(), { environment: i } = F(), [a, o] = v(null), [s, c] = v(!1), { run: f, runStep: p, reloadRunStep: m } = u(OL);
+function YL({ run: e, runStep: t, reloadRunStep: n }) {
+	let r = te(), { environment: i } = F(), [a, o] = v(null), [s, c] = v(!1), { run: f, runStep: p, reloadRunStep: m } = u(ML);
 	d(() => {
 		if (a) {
 			let e = setTimeout(() => {
@@ -29810,10 +29925,10 @@ function GL({ run: e, runStep: t, reloadRunStep: n }) {
 		queryFn: () => st({ runStep: _ }),
 		enabled: !!_
 	}), O = l(async (e) => {
-		o(WL.movingOut), c(!0);
+		o(JL.movingOut), c(!0);
 		try {
 			let t = await lt(e);
-			o(WL.operationFinished), t.data.next_step_id === null ? C() : r(`/${i}/operator/run/step/${t.data.next_step_id}`);
+			o(JL.operationFinished), t.data.next_step_id === null ? C() : r(`/${i}/operator/run/step/${t.data.next_step_id}`);
 		} finally {
 			c(!1);
 		}
@@ -29822,16 +29937,16 @@ function GL({ run: e, runStep: t, reloadRunStep: n }) {
 		r,
 		C
 	]), A = l(async (e) => {
-		o(WL.skipping), c(!0);
+		o(JL.skipping), c(!0);
 		try {
-			await y.create().patch(`update/run/step/skip/${e.id}`, {}), o(WL.operationSkipped), C();
+			await y.create().patch(`update/run/step/skip/${e.id}`, {}), o(JL.operationSkipped), C();
 		} finally {
 			c(!1);
 		}
 	}, [C]), j = l(async (e) => {
-		o(WL.unskipping), c(!0);
+		o(JL.unskipping), c(!0);
 		try {
-			await y.create().patch(`update/run/step/un-skip/${e.id}`, {}), o(WL.operationUnskipped), C();
+			await y.create().patch(`update/run/step/un-skip/${e.id}`, {}), o(JL.operationUnskipped), C();
 		} finally {
 			c(!1);
 		}
@@ -29853,7 +29968,7 @@ function GL({ run: e, runStep: t, reloadRunStep: n }) {
 			variant: "info",
 			children: "No checklist found"
 		}),
-		M.length > 0 && /* @__PURE__ */ x(jc, { children: M.map((e) => /* @__PURE__ */ x(UL, {
+		M.length > 0 && /* @__PURE__ */ x(jc, { children: M.map((e) => /* @__PURE__ */ x(qL, {
 			checklistItem: e,
 			refetch: D
 		}, e.id)) }),
@@ -29866,19 +29981,19 @@ function GL({ run: e, runStep: t, reloadRunStep: n }) {
 						variant: "success",
 						onClick: () => O(_),
 						disabled: s,
-						children: a === WL.operationFinished || a === WL.movingOut ? a : "Move out"
+						children: a === JL.operationFinished || a === JL.movingOut ? a : "Move out"
 					}) }),
 					g.access.edit && !_.is_skipped && /* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(H, {
 						variant: "primary",
 						onClick: () => A(_),
 						disabled: s,
-						children: a === WL.operationSkipped || a === WL.skipping ? a : "Skip operation"
+						children: a === JL.operationSkipped || a === JL.skipping ? a : "Skip operation"
 					}) }),
 					g.access.edit && _.is_skipped && /* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(H, {
 						variant: "warning",
 						onClick: () => j(_),
 						disabled: s,
-						children: a === WL.operationUnskipped || a === WL.unskipping ? a : "Unskip operation"
+						children: a === JL.operationUnskipped || a === JL.unskipping ? a : "Unskip operation"
 					}) })
 				]
 			}), /* @__PURE__ */ x("div", {
@@ -29894,9 +30009,9 @@ function GL({ run: e, runStep: t, reloadRunStep: n }) {
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/stepRemark.tsx
-var KL = () => void 0;
-function qL({ runStep: e, reloadRunStep: t, title: n = "Remark", titleClassName: r = "mb-2 text-start" }) {
-	let { runStep: i, setRunStep: a } = u(OL), o = e ?? i, s = t ? () => t() : e ? KL : a ?? KL, [c, f] = v(!1), p = o ? !o.is_finished : !1, m = !!o?.remark?.trim(), { register: h, handleSubmit: g, formState: _, reset: C } = sf({ defaultValues: { remark: o?.remark_unparsed ?? "" } }), { isSubmitting: w } = _;
+var XL = () => void 0;
+function ZL({ runStep: e, reloadRunStep: t, title: n = "Remark", titleClassName: r = "mb-2 text-start" }) {
+	let { runStep: i, setRunStep: a } = u(ML), o = e ?? i, s = t ? () => t() : e ? XL : a ?? XL, [c, f] = v(!1), p = o ? !o.is_finished : !1, m = !!o?.remark?.trim(), { register: h, handleSubmit: g, formState: _, reset: C } = sf({ defaultValues: { remark: o?.remark_unparsed ?? "" } }), { isSubmitting: w } = _;
 	d(() => {
 		C({ remark: o?.remark_unparsed ?? "" });
 	}, [C, o?.remark_unparsed]);
@@ -29970,7 +30085,7 @@ function qL({ runStep: e, reloadRunStep: t, title: n = "Remark", titleClassName:
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/hold-code/holdCodeModal.tsx
-var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) => {
+var QL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) => {
 	let [o, s] = t.useState(!1), { register: c, control: l, setValue: u, handleSubmit: d, formState: f } = sf({ defaultValues: {
 		holdCode: i ? {
 			value: i.hold_code.id,
@@ -30070,8 +30185,8 @@ var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 			]
 		})
 	});
-}, YL = () => {
-	let { run: e } = u(OL), [t, n] = v(!1), [r, i] = v(e.hold_code), a = () => {
+}, $L = () => {
+	let { run: e } = u(ML), [t, n] = v(!1), [r, i] = v(e.hold_code), a = () => {
 		n(!0);
 	};
 	return /* @__PURE__ */ S(b, { children: [
@@ -30096,7 +30211,7 @@ var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 			},
 			children: "No hold code"
 		}),
-		/* @__PURE__ */ x(JL, {
+		/* @__PURE__ */ x(QL, {
 			run: e,
 			show: t,
 			setShow: n,
@@ -30104,8 +30219,8 @@ var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 			setRunHoldCode: i
 		})
 	] });
-}, XL = () => {
-	let { run: e } = u(OL), [n, r] = v(e.priority);
+}, eR = () => {
+	let { run: e } = u(ML), [n, r] = v(e.priority);
 	return /* @__PURE__ */ S(t.Fragment, { children: [n && /* @__PURE__ */ x("span", {
 		className: "badge",
 		style: {
@@ -30119,7 +30234,7 @@ var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 		style: { fontSize: "1.5rem" },
 		children: "NORMAL"
 	})] });
-}, ZL = ({ run: e, runStep: t, showOnlyEmphasizedParameters: n }) => /* @__PURE__ */ x("div", {
+}, tR = ({ run: e, runStep: t, showOnlyEmphasizedParameters: n }) => /* @__PURE__ */ x("div", {
 	className: "border rounded px-3 py-3",
 	children: /* @__PURE__ */ S("div", {
 		className: "d-flex flex-wrap gap-3",
@@ -30128,7 +30243,7 @@ var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 				flexGrow: 1,
 				flex: "1 1 360px"
 			},
-			children: /* @__PURE__ */ x(SL, {
+			children: /* @__PURE__ */ x(EL, {
 				run: e,
 				runStep: t
 			})
@@ -30148,8 +30263,8 @@ var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 			]
 		})]
 	})
-}), QL = ({ run: e, monitoredBy: t, runStep: n, runParts: r, runStepParts: i, hideLabel: a, firstInGroup: o }) => {
-	let { environment: s } = F(), [c, l] = v(!1), { runStep: d } = u(OL);
+}), nR = ({ run: e, monitoredBy: t, runStep: n, runParts: r, runStepParts: i, hideLabel: a, firstInGroup: o }) => {
+	let { environment: s } = F(), [c, l] = v(!1), { runStep: d } = u(ML);
 	return /* @__PURE__ */ S(b, { children: [
 		!a && n.has_label && n.is_own_label && /* @__PURE__ */ x("div", {
 			className: "bg-info text-white rounded px-3 py-1",
@@ -30181,7 +30296,7 @@ var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 					children: [
 						/* @__PURE__ */ x("div", {
 							className: "flex-shrink-0",
-							children: /* @__PURE__ */ x(TL, {
+							children: /* @__PURE__ */ x(kL, {
 								step: n,
 								parts: r,
 								stepParts: i,
@@ -30244,7 +30359,7 @@ var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 				})
 			]
 		}),
-		c && /* @__PURE__ */ x(ZL, {
+		c && /* @__PURE__ */ x(tR, {
 			run: e,
 			runStep: n,
 			showOnlyEmphasizedParameters: !1
@@ -30253,7 +30368,7 @@ var JL = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 };
 //#endregion
 //#region src/modules/run/components/step/view/element/step-overview/requirementDetails.tsx
-function $L({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i }) {
+function rR({ requirement: e, step: t, stepParts: n, parts: r, measurementResults: i }) {
 	let a = n.filter((t) => t.step_id === (e.requirement_for_step?.id ?? e.step.id)), { environment: o } = F();
 	return /* @__PURE__ */ x(b, { children: /* @__PURE__ */ x("div", {
 		className: "border rounded px-3 py-3",
@@ -30264,7 +30379,7 @@ function $L({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 					flexGrow: 1,
 					flex: "1 1 360px"
 				},
-				children: [/* @__PURE__ */ x("h4", { children: "Measurement results" }), /* @__PURE__ */ x(kL, {
+				children: [/* @__PURE__ */ x("h4", { children: "Measurement results" }), /* @__PURE__ */ x(NL, {
 					requirement: e,
 					step: t,
 					stepParts: a,
@@ -30311,8 +30426,8 @@ function $L({ requirement: e, step: t, stepParts: n, parts: r, measurementResult
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/step-overview/requirementElement.tsx
-function eR({ requirement: e, runParts: t, runStepParts: n, hideLabel: r, firstInGroup: i }) {
-	let a = e.step, { environment: o } = F(), { runStep: s } = u(OL), [c, l] = v(!1), [d] = O({ queries: [{
+function iR({ requirement: e, runParts: t, runStepParts: n, hideLabel: r, firstInGroup: i }) {
+	let a = e.step, { environment: o } = F(), { runStep: s } = u(ML), [c, l] = v(!1), [d] = O({ queries: [{
 		queryKey: [
 			"requirement",
 			"measurementResults",
@@ -30360,7 +30475,7 @@ function eR({ requirement: e, runParts: t, runStepParts: n, hideLabel: r, firstI
 					children: [
 						/* @__PURE__ */ x("div", {
 							className: "flex-shrink-0",
-							children: /* @__PURE__ */ x(ML, {
+							children: /* @__PURE__ */ x(IL, {
 								requirement: e,
 								step: a,
 								parts: t,
@@ -30421,7 +30536,7 @@ function eR({ requirement: e, runParts: t, runStepParts: n, hideLabel: r, firstI
 				})
 			]
 		}),
-		c && /* @__PURE__ */ x($L, {
+		c && /* @__PURE__ */ x(rR, {
 			requirement: e,
 			step: a,
 			stepParts: n,
@@ -30432,8 +30547,8 @@ function eR({ requirement: e, runParts: t, runStepParts: n, hideLabel: r, firstI
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/runStepSimpleList.tsx
-var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
-	let { runStep: r, run: i } = u(OL), [a, o] = v(1);
+var aR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
+	let { runStep: r, run: i } = u(ML), [a, o] = v(1);
 	d(() => {
 		r?.sequence && o(Math.max(1, Math.ceil(r.sequence / e)));
 	}, [r?.sequence, e]);
@@ -30486,12 +30601,12 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 	]), /* @__PURE__ */ S("div", { children: [
 		m ? /* @__PURE__ */ x("div", { children: "Loading..." }) : h ? /* @__PURE__ */ S("div", { children: ["Error: ", String(g?.message ?? g)] }) : /* @__PURE__ */ x("div", {
 			className: "d-flex flex-column gap-2",
-			children: b.map((e, r) => /* @__PURE__ */ x(t.Fragment, { children: e.has_requirement ? /* @__PURE__ */ x(eR, {
+			children: b.map((e, r) => /* @__PURE__ */ x(t.Fragment, { children: e.has_requirement ? /* @__PURE__ */ x(iR, {
 				requirement: C.find((t) => t.step.id === e.id),
 				runParts: _,
 				runStepParts: y,
 				firstInGroup: E.includes(e)
-			}, e.id ?? e.sequence ?? r) : /* @__PURE__ */ x(QL, {
+			}, e.id ?? e.sequence ?? r) : /* @__PURE__ */ x(nR, {
 				run: i,
 				monitoredBy: D[e.id],
 				runParts: _,
@@ -30508,8 +30623,8 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 		}),
 		f.isFetching ? /* @__PURE__ */ x("span", { children: " Loading..." }) : null
 	] });
-}, nR = ({ show: e, setModalShow: t }) => {
-	let { run: n } = u(OL), [r, i] = v(1), { isPending: a, isLoading: o, isError: s, error: c, data: l, isFetching: d, isPlaceholderData: f } = k({
+}, oR = ({ show: e, setModalShow: t }) => {
+	let { run: n } = u(ML), [r, i] = v(1), { isPending: a, isLoading: o, isError: s, error: c, data: l, isFetching: d, isPlaceholderData: f } = k({
 		queryKey: [
 			"run_changelog",
 			n,
@@ -30566,19 +30681,19 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 			}) })
 		]
 	});
-}, rR = ({ size: e }) => {
+}, sR = ({ size: e }) => {
 	let [t, n] = v(!1);
 	return /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x(H, {
 		size: e,
 		variant: "primary",
 		onClick: () => n(!t),
 		children: "Run history"
-	}), t && /* @__PURE__ */ x(nR, {
+	}), t && /* @__PURE__ */ x(oR, {
 		show: t,
 		setModalShow: n
 	})] });
-}, iR = ({ show: e, setModalShow: t }) => {
-	let { run: n } = u(OL);
+}, cR = ({ show: e, setModalShow: t }) => {
+	let { run: n } = u(ML);
 	return /* @__PURE__ */ S(G, {
 		show: e,
 		size: "xl",
@@ -30588,7 +30703,7 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 				closeButton: !0,
 				children: /* @__PURE__ */ S(G.Title, { children: ["All steps of run ", n.label] })
 			}),
-			/* @__PURE__ */ x(G.Body, { children: /* @__PURE__ */ x(tR, { hideLabel: !1 }) }),
+			/* @__PURE__ */ x(G.Body, { children: /* @__PURE__ */ x(aR, { hideLabel: !1 }) }),
 			/* @__PURE__ */ x(G.Footer, { children: /* @__PURE__ */ x(H, {
 				className: "float-end",
 				variant: "secondary",
@@ -30599,19 +30714,19 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 			}) })
 		]
 	});
-}, aR = ({ size: e }) => {
+}, lR = ({ size: e }) => {
 	let [n, r] = v(!1);
 	return /* @__PURE__ */ S(t.Fragment, { children: [/* @__PURE__ */ x(H, {
 		size: e,
 		variant: "primary",
 		onClick: () => r(!0),
 		children: "All run steps"
-	}), n && /* @__PURE__ */ x(iR, {
+	}), n && /* @__PURE__ */ x(cR, {
 		show: n,
 		setModalShow: r
 	})] });
-}, oR = () => {
-	let { runStep: e, run: t } = u(OL), [n, r] = v(!1), [i, a] = v({}), [o, s] = v(null), [c, l] = v([]), [f, p] = v([]), [m, h] = v([]), [g, _] = v(""), [C, w] = v(!1);
+}, uR = () => {
+	let { runStep: e, run: t } = u(ML), [n, r] = v(!1), [i, a] = v({}), [o, s] = v(null), [c, l] = v([]), [f, p] = v([]), [m, h] = v([]), [g, _] = v(""), [C, w] = v(!1);
 	if (!e.has_recipe) return "Reworks are only possible for steps with a recipe";
 	let [T, E, D] = O({ queries: [
 		{
@@ -30829,8 +30944,8 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 		onClick: () => r(!0),
 		children: "Set Rework"
 	})] });
-}, sR = () => {
-	let { environment: e } = F(), { runStep: t, run: n } = u(OL), r = O({ queries: [
+}, dR = () => {
+	let { environment: e } = F(), { runStep: t, run: n } = u(ML), r = O({ queries: [
 		{
 			queryKey: ["monitors", t.process_module.module.equipment],
 			queryFn: () => qe({ equipment: t.process_module.module.equipment })
@@ -30890,8 +31005,8 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 								className: "mx-1 badge bg-primary",
 								children: "Rework"
 							}),
-							/* @__PURE__ */ x(XL, {}),
-							/* @__PURE__ */ x(YL, {}),
+							/* @__PURE__ */ x(eR, {}),
+							/* @__PURE__ */ x($L, {}),
 							t.is_skipped && /* @__PURE__ */ x("span", {
 								style: { fontSize: "1.5rem" },
 								className: "badge bg-info",
@@ -30901,8 +31016,8 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 					})]
 				}),
 				/* @__PURE__ */ x(LI, { run: n }),
-				t.label && /* @__PURE__ */ x(zL, { label: t.label }),
-				/* @__PURE__ */ x(BL, { runStep: t }),
+				t.label && /* @__PURE__ */ x(UL, { label: t.label }),
+				/* @__PURE__ */ x(WL, { runStep: t }),
 				t.is_finished && /* @__PURE__ */ S(Qr, {
 					variant: "success",
 					children: [
@@ -30929,18 +31044,18 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 				}),
 				s.data?.items.length == 1 && /* @__PURE__ */ S(b, { children: [
 					/* @__PURE__ */ x("h4", { children: "Measurements by part" }),
-					/* @__PURE__ */ x(kL, {
+					/* @__PURE__ */ x(NL, {
 						requirement: s.data.items[0],
 						step: t,
 						editOnly: !1
 					}),
 					/* @__PURE__ */ x("h4", { children: "Measurements for whole step" }),
-					/* @__PURE__ */ x(AL, {
+					/* @__PURE__ */ x(PL, {
 						requirement: s.data.items[0],
 						editOnly: !1
 					})
 				] }),
-				s.data?.items.length != 1 && /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x("h3", { children: "Experimental split" }), /* @__PURE__ */ x(SL, {
+				s.data?.items.length != 1 && /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x("h3", { children: "Experimental split" }), /* @__PURE__ */ x(EL, {
 					run: n,
 					runStep: t
 				})] }),
@@ -30952,7 +31067,7 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 					className: "pm-3",
 					children: [/* @__PURE__ */ S(Ci, { children: [
 						/* @__PURE__ */ x("h3", { children: "Checklist" }),
-						/* @__PURE__ */ x(GL, {}),
+						/* @__PURE__ */ x(YL, {}),
 						/* @__PURE__ */ x("h2", {
 							className: "mt-2",
 							children: "Step files"
@@ -30979,12 +31094,12 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 							showOnlyEmphasizedParameters: c
 						}),
 						t.has_instructions && t.instructions && /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x("h3", { children: "Instructions" }), /* @__PURE__ */ x("span", { dangerouslySetInnerHTML: { __html: t.instructions } })] }),
-						/* @__PURE__ */ x(qL, {}),
+						/* @__PURE__ */ x(ZL, {}),
 						/* @__PURE__ */ x("h3", {
 							className: "pt-3",
 							children: "Rework"
 						}),
-						/* @__PURE__ */ x(oR, {})
+						/* @__PURE__ */ x(uR, {})
 					] })]
 				}),
 				/* @__PURE__ */ S("div", {
@@ -30992,8 +31107,8 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 					children: [/* @__PURE__ */ x("h2", { children: "Run steps" }), /* @__PURE__ */ S("div", {
 						className: "d-flex gap-2 flex-wrap justify-content-end",
 						children: [
-							/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(aR, { size: void 0 }) }),
-							/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(rR, { size: void 0 }) }),
+							/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(lR, { size: void 0 }) }),
+							/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(sR, { size: void 0 }) }),
 							/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(NF, {
 								size: void 0,
 								moduleId: t.process_module.module.id
@@ -31001,7 +31116,7 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 						]
 					})]
 				}),
-				/* @__PURE__ */ x(tR, {
+				/* @__PURE__ */ x(aR, {
 					pageSize: n.run_type === Wt.RESEARCH ? 5 : 1e3,
 					hideLabel: !0
 				})
@@ -31047,8 +31162,8 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 			})
 		})] })
 	});
-}, cR = () => {
-	let [e, t] = v(!1), { modalProperties: n } = u(OL), r = () => {
+}, fR = () => {
+	let [e, t] = v(!1), { modalProperties: n } = u(ML), r = () => {
 		t(!1), n.show = !1;
 	};
 	return d(() => {
@@ -31073,25 +31188,25 @@ var tR = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 };
 //#endregion
 //#region src/utils/keySequenceListener.ts
-function lR(e) {
+function pR(e) {
 	switch (e) {
 		case "Shift": return !0;
 	}
 	return !1;
 }
-function uR(e) {
+function mR(e) {
 	return /^[a-zA-Z0-9-]$/.test(e);
 }
-function dR(e) {
+function hR(e) {
 	return e.length === 1;
 }
-function fR(e) {
+function gR(e) {
 	switch (e) {
 		case "Enter": return !0;
 		default: return !1;
 	}
 }
-function pR(e, t, n, r) {
+function _R(e, t, n, r) {
 	let i = r?.requireEndCharacter ?? !1, a = 0, o = "", s = () => {
 		a = 0, o = "", n && n(o);
 	};
@@ -31101,8 +31216,8 @@ function pR(e, t, n, r) {
 			s();
 			return;
 		}
-		if (!lR(c)) {
-			if (fR(c)) {
+		if (!pR(c)) {
+			if (gR(c)) {
 				t(o), s();
 				return;
 			}
@@ -31114,10 +31229,10 @@ function pR(e, t, n, r) {
 					} else a = (a + 1) % e.length;
 					break;
 				case "*":
-					if (!dR(c)) return;
+					if (!hR(c)) return;
 					break;
 				default:
-					if (!uR(e[a])) throw Error("Invalid character expression in makeKeySequenceListener call");
+					if (!mR(e[a])) throw Error("Invalid character expression in makeKeySequenceListener call");
 					if (c != e[a]) {
 						s();
 						return;
@@ -31134,20 +31249,20 @@ function pR(e, t, n, r) {
 }
 //#endregion
 //#region src/modules/core/contexts/scanner/ScannerProvider.tsx
-var mR = ({ children: e }) => {
+var vR = ({ children: e }) => {
 	let [t, n] = v(""), r = _(/* @__PURE__ */ new Map()), i = _(/* @__PURE__ */ new Map()), a = (e) => {
 		c(() => {
 			i.current.forEach((t) => t(e));
 		});
 	}, o = (e) => {
 		n(e);
-		let t = mL(e);
+		let t = dL(e);
 		c(() => {
 			r.current.get(t)?.forEach((t) => t(e));
 		});
 	};
 	return d(() => {
-		let e = pR("*", o, a, { requireEndCharacter: !0 });
+		let e = _R("*", o, a, { requireEndCharacter: !0 });
 		return document.addEventListener("keyup", e), () => {
 			document.removeEventListener("keyup", e);
 		};
@@ -31172,17 +31287,17 @@ var mR = ({ children: e }) => {
 };
 //#endregion
 //#region src/modules/run/components/step/view/runStepExecuteElement.tsx
-function hR() {
-	return /* @__PURE__ */ x(fL, { children: /* @__PURE__ */ x(mR, { children: /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x(sR, {}), /* @__PURE__ */ x(cR, {})] }) }) });
+function yR() {
+	return /* @__PURE__ */ x(hL, { children: /* @__PURE__ */ x(vR, { children: /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x(dR, {}), /* @__PURE__ */ x(fR, {})] }) }) });
 }
 //#endregion
 //#region src/modules/run/components/step/view/element/runStepChecklistExecute.tsx
-var gR = {
+var bR = {
 	movingOut: "Moving out...",
 	movingIn: "Moving in..."
 };
-function _R({ run: e, runStep: t, reloadRunStep: n }) {
-	let { run: r, runStep: i, reloadRunStep: a } = u(OL), [o, s] = v(null), [c, l] = v(!1), f = e ?? r, p = t ?? i, m = n ?? a ?? (() => null);
+function xR({ run: e, runStep: t, reloadRunStep: n }) {
+	let { run: r, runStep: i, reloadRunStep: a } = u(ML), [o, s] = v(null), [c, l] = v(!1), f = e ?? r, p = t ?? i, m = n ?? a ?? (() => null);
 	d(() => {
 		if (o) {
 			let e = setTimeout(() => {
@@ -31200,12 +31315,12 @@ function _R({ run: e, runStep: t, reloadRunStep: n }) {
 	if (p.is_finished) return /* @__PURE__ */ x("div", { children: "Step is finished" });
 	if (g) return /* @__PURE__ */ x(Qt, { message: "Loading..." });
 	function y(e) {
-		s(gR.movingOut), l(!0), lt(e).then(() => {
+		s(bR.movingOut), l(!0), lt(e).then(() => {
 			l(!1), s(null), m();
 		});
 	}
 	function C(e) {
-		s(gR.movingIn), l(!0), ct(e).then(() => {
+		s(bR.movingIn), l(!0), ct(e).then(() => {
 			l(!1), s(null), m();
 		});
 	}
@@ -31214,7 +31329,7 @@ function _R({ run: e, runStep: t, reloadRunStep: n }) {
 			variant: "info",
 			children: "No checklist found"
 		}),
-		h.items.length > 0 && /* @__PURE__ */ x(jc, { children: h.items.map((e) => /* @__PURE__ */ x(UL, {
+		h.items.length > 0 && /* @__PURE__ */ x(jc, { children: h.items.map((e) => /* @__PURE__ */ x(qL, {
 			checklistItem: e,
 			refetch: _
 		}, e.id)) }),
@@ -31238,127 +31353,13 @@ function _R({ run: e, runStep: t, reloadRunStep: n }) {
 	] });
 }
 //#endregion
-//#region src/modules/run/components/shared/parts_table/runPartsQrFlow.tsx
-var vR = ({ run: e, runStep: n }) => {
-	let r = O({ queries: [{
-		queryKey: [
-			"runParts",
-			e.id,
-			n.part_level
-		],
-		queryFn: () => rt({
-			run: e,
-			level: n.part_level
-		})
-	}, {
-		queryKey: ["runStepParts", n.id],
-		queryFn: () => ft({ step: n })
-	}] }), [i, a] = r, o = r.some((e) => e.isLoading), s = r.some((e) => e.isError), c = h(() => i.data?.items ?? [], [i.data]), u = h(() => a.data?.items ?? [], [a.data]);
-	d(() => {
-		mt(n, u);
-	}, [u]);
-	let p = h(() => c.filter((e) => e.part_level === n.part_level), [c, n.part_level]), [m, g] = v(!1), { selectedParts: _, selectAllParts: y } = hL({ parts: p }), b = h(() => p.filter((e) => _.get(e.id) && (m || !yR(u, e))), [
-		p,
-		u,
-		_,
-		m
-	]), { lastlyReadedKeys: C, addCallbackFn: w, removeCallbackFn: T } = lL(), E = f(), D = l((e) => {
-		let t = e.replace(/_/g, "-").toUpperCase();
-		if (!t) return;
-		let n = c.find((e) => t.includes(e.short_label));
-		n && !m && yR(u, n) && dL({
-			notificationHeader: "Run parts table",
-			notificationBody: `Part ${n.parsed_label ?? n.short_label} is already completed`,
-			notificationType: "danger"
-		});
-	}, [c, u]);
-	return d(() => (T(pL.SELECT, E), w(pL.SELECT, E, D), D(C), () => {
-		T(pL.SELECT, E);
-	}), [c, u]), o ? /* @__PURE__ */ x(Qt, { message: "Loading run parts" }) : s ? /* @__PURE__ */ x("div", {
-		className: "text-danger",
-		children: "Error loading run parts."
-	}) : /* @__PURE__ */ S(t.Fragment, { children: [/* @__PURE__ */ S(lu, {
-		size: "sm",
-		striped: !0,
-		hover: !0,
-		children: [/* @__PURE__ */ x("thead", { children: /* @__PURE__ */ S("tr", { children: [
-			/* @__PURE__ */ x("th", {
-				colSpan: 2,
-				children: "Part"
-			}),
-			/* @__PURE__ */ x("th", { children: "Status" }),
-			/* @__PURE__ */ x("th", { children: "Actions" }),
-			/* @__PURE__ */ x("th", { children: "Comment" })
-		] }) }), /* @__PURE__ */ x("tbody", { children: b.map((e, t) => /* @__PURE__ */ x(sL, {
-			runStep: n,
-			runPart: e,
-			runStepParts: u,
-			canInit: !1,
-			partIsSelected: _.get(e.id) ?? !1,
-			dropdown: !1
-		}, `${e.parsed_label}${t}`)) })]
-	}), /* @__PURE__ */ x(bR, {
-		runStepParts: u,
-		selectedPartsLength: b.length,
-		totalParts: p.length,
-		onSelectAll: y,
-		toggleShowCompletedParts: () => {
-			g(!m);
-		}
-	})] });
-}, yR = (e, t) => {
-	let n = e.find((e) => e.part_id == t.id);
-	return n == null ? !1 : n.processed;
-}, bR = ({ runStepParts: e, selectedPartsLength: t, totalParts: n, onSelectAll: r, toggleShowCompletedParts: i }) => {
-	let a = h(() => {
-		let t = 0;
-		return e.forEach((e) => e.processed ? t++ : null), t;
-	}, [e]);
-	return /* @__PURE__ */ S("div", {
-		className: "d-flex flex-column flex-sm-row flex-wrap gap-2 mt-2",
-		children: [
-			/* @__PURE__ */ S("span", {
-				className: "badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fw-semibold",
-				role: "button",
-				title: "Show all the parts",
-				onClick: r,
-				style: { cursor: "pointer" },
-				children: [
-					"This step has ",
-					h(() => n - t, [n, t]),
-					" more parts"
-				]
-			}),
-			/* @__PURE__ */ S("span", {
-				className: "badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-2 fw-semibold",
-				children: [
-					"This step has ",
-					t,
-					" scanned parts"
-				]
-			}),
-			/* @__PURE__ */ S("span", {
-				title: "Show all the parts",
-				style: { cursor: "pointer" },
-				onClick: i,
-				className: "badge rounded-pill bg-success-subtle text-success-emphasis border border-success-subtle px-3 py-2 fw-semibold",
-				children: [
-					"This step has ",
-					a,
-					" finished parts"
-				]
-			})
-		]
-	});
-};
-//#endregion
 //#region src/modules/run/components/step/view/runStepExecuteMinimal.tsx
-function xR({ run: e, runStep: n, showOnlyEmphasizedParameters: r, reloadRunStepFn: i }) {
+function SR({ run: e, runStep: n, showOnlyEmphasizedParameters: r, reloadRunStepFn: i }) {
 	return /* @__PURE__ */ S(b, { children: [
 		/* @__PURE__ */ S("div", { children: [/* @__PURE__ */ x("h3", {
 			className: "mb-2 text-start",
 			children: "Parts"
-		}), /* @__PURE__ */ x(vR, {
+		}), /* @__PURE__ */ x(xL, {
 			run: e,
 			runStep: n
 		})] }),
@@ -31374,7 +31375,7 @@ function xR({ run: e, runStep: n, showOnlyEmphasizedParameters: r, reloadRunStep
 			className: "row row-cols-2",
 			children: [/* @__PURE__ */ x("div", {
 				className: "col",
-				children: /* @__PURE__ */ x(qL, {
+				children: /* @__PURE__ */ x(ZL, {
 					runStep: n,
 					reloadRunStep: i
 				})
@@ -31393,7 +31394,7 @@ function xR({ run: e, runStep: n, showOnlyEmphasizedParameters: r, reloadRunStep
 				children: [/* @__PURE__ */ x("h3", {
 					className: "mt-2",
 					children: "Checklist"
-				}), /* @__PURE__ */ x(_R, {
+				}), /* @__PURE__ */ x(xR, {
 					run: e,
 					runStep: n,
 					reloadRunStep: i
@@ -31407,64 +31408,6 @@ function xR({ run: e, runStep: n, showOnlyEmphasizedParameters: r, reloadRunStep
 			})]
 		})
 	] });
-}
-//#endregion
-//#region src/modules/run/components/shared/qr-scanner/selectRunWithQrScanner.tsx
-function SR({ runsList: e, setRun: t, setRunPartLabel: n }) {
-	let { lastlyReadedKeys: r, addCallbackFn: i, removeCallbackFn: a, addReadingCallbackFn: o, removeReadingCallbackFn: s } = lL(), c = f(), [u, p] = v("");
-	d(() => (o(c, p), () => s(c)), []);
-	let m = l((r) => {
-		let i = r.replace(/_/g, "-").toUpperCase(), a = i.split("-");
-		if (!(a.length == 4 || a.length == 3)) {
-			dL({
-				notificationHeader: "Run scanner",
-				notificationBody: "Part not found, found " + a.length + " splits in " + i,
-				notificationType: "danger"
-			});
-			return;
-		}
-		let o = e.find((e) => e.label === `${a[0]}-${a[1]}`), s = i;
-		if (!o) {
-			dL({
-				notificationHeader: "Run scanner",
-				notificationBody: "Run not found",
-				notificationType: "danger"
-			});
-			return;
-		}
-		if (!s) {
-			dL({
-				notificationHeader: "Run scanner",
-				notificationBody: "Part label not found",
-				notificationType: "danger"
-			});
-			return;
-		}
-		t !== void 0 && dL({
-			notificationHeader: "Run scanner",
-			notificationBody: `Found run ${o.label}`,
-			notificationType: "success"
-		}), n !== void 0 && n(a[2]);
-	}, [
-		e,
-		t,
-		n
-	]);
-	return d(() => (a(pL.SELECT, c), m(r), i(pL.SELECT, c, m), () => {
-		a(pL.SELECT, c);
-	}), [e]), /* @__PURE__ */ x("div", {
-		className: "d-flex flex-row gap-3",
-		children: /* @__PURE__ */ x("div", {
-			className: "d-flex flex-column",
-			children: /* @__PURE__ */ S("div", {
-				className: "h3",
-				children: ["Reading: ", /* @__PURE__ */ x("span", {
-					className: "font-monospace",
-					children: u
-				})]
-			})
-		})
-	});
 }
 //#endregion
 //#region src/modules/run/providers/emphasizedParametersProvider.tsx
@@ -34474,7 +34417,7 @@ function Fz({ runsList: e, onFail: t = (e) => null }) {
 			t(Pz.RunNotFound);
 			return;
 		}
-		dL({
+		mL({
 			notificationHeader: "Run scanner",
 			notificationBody: `Run ${a.label} found`,
 			notificationType: "success"
@@ -34482,6 +34425,6 @@ function Fz({ runsList: e, onFail: t = (e) => null }) {
 	}, [i]), { selectedRun: n };
 }
 //#endregion
-export { ge as AuthContext, an as AuthProvider, LI as BatchCardElement, wR as ChemicalHeaderElement, lz as ChemicalIntakeElement, II as DateFormat, VI as EmphasizedParametersContext, CR as EmphasizedParametersProvider, PF as EquipmentContext, RF as EquipmentDashboard, HF as EquipmentHeaderElement, BF as EquipmentProvider, yz as GoldsteinClientsDashboard, Ly as GoldsteinEquipmentDashboard, cR as InputModal, Nz as IrisOperatorDashboard, cf as ModuleStatusElement, MF as MonitorCard, AI as MonitorContext, OI as MonitorHeaderElement, DI as MonitorPage, jI as MonitorProvider, fL as NotificationProvider, xI as PaginationLinks, Sz as ReportResults, NI as RunContext, BI as RunHeaderElement, FL as RunInformationElement, PI as RunProvider, GL as RunStepChecklist, OL as RunStepContext, hR as RunStepExecuteElement, xR as RunStepExecuteMinimal, RL as RunStepHeaderElement, LL as RunStepProvider, PL as RunStepsElement, cL as ScannerContext, mR as ScannerProvider, SR as SelectRunWithQrScanner, $v as SetupUpdateEquipment, OF as StatusMailComponent, Ry as StatusMailContext, UF as StatusMailProvider, CL as StepDetails, Jt as initSolodbComponents, dL as notification, Zt as useAuth, lL as useScannerContext, Fz as useSelectRunWithScanner };
+export { ge as AuthContext, an as AuthProvider, LI as BatchCardElement, wR as ChemicalHeaderElement, lz as ChemicalIntakeElement, II as DateFormat, VI as EmphasizedParametersContext, CR as EmphasizedParametersProvider, PF as EquipmentContext, RF as EquipmentDashboard, HF as EquipmentHeaderElement, BF as EquipmentProvider, yz as GoldsteinClientsDashboard, Ly as GoldsteinEquipmentDashboard, fR as InputModal, Nz as IrisOperatorDashboard, cf as ModuleStatusElement, MF as MonitorCard, AI as MonitorContext, OI as MonitorHeaderElement, DI as MonitorPage, jI as MonitorProvider, hL as NotificationProvider, xI as PaginationLinks, Sz as ReportResults, NI as RunContext, BI as RunHeaderElement, zL as RunInformationElement, PI as RunProvider, YL as RunStepChecklist, ML as RunStepContext, yR as RunStepExecuteElement, SR as RunStepExecuteMinimal, HL as RunStepHeaderElement, VL as RunStepProvider, RL as RunStepsElement, cL as ScannerContext, vR as ScannerProvider, $v as SetupUpdateEquipment, OF as StatusMailComponent, Ry as StatusMailContext, UF as StatusMailProvider, DL as StepDetails, Jt as initSolodbComponents, mL as notification, Zt as useAuth, lL as useScannerContext, Fz as useSelectRunWithScanner };
 
 //# sourceMappingURL=index.js.map

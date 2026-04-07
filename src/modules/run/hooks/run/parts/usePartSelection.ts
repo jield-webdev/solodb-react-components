@@ -1,5 +1,4 @@
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-import { notification } from "@jield/solodb-react-components/utils/notification";
 import { RunPart } from "@jield/solodb-typescript-core";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import parseScannerForRun, { ScannedKeysType } from "../../../utils/parseScannerForRun";
@@ -65,23 +64,10 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
         return;
       }
 
-      const foundPart = parts.find((p) => normalizedRead.includes(p.scanner_label));
+      const foundPart = parts.find((p) => normalizedRead.includes(p.scanner_label.toUpperCase()));
 
-      if (!foundPart) {
-        // COMENTED OUT BECAUSE IT TRIGERS ON FALSE POSITIVES
-        //notification({
-        //  notificationHeader: "Part scanner",
-        //  notificationBody: "Part not found",
-        //  notificationType: "danger",
-        //});
-        return;
-      }
-
-      notification({
-        notificationHeader: "Part scanner",
-        notificationBody: `Found part: ${foundPart.scanner_label}`,
-        notificationType: "success",
-      });
+      if (!foundPart) return;
+      
 
       setPartAsSelected(foundPart.id);
     },

@@ -14,9 +14,8 @@ import {
 } from "@jield/solodb-typescript-core";
 import type { RunStepPart } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
-import { notification } from "@jield/solodb-react-components/utils/notification";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-import { ScannedKeysType } from "../../../utils/parseScannerForRun";
+import useQrPartNotifications from "../../../hooks/run/parts/useQrPartNotifications";
 
 type Props = {
   run: Run;
@@ -69,6 +68,8 @@ const RunPartsQrFlow = ({ run, runStep }: Props) => {
     parts: leveledParts,
   });
 
+  useQrPartNotifications({ runStepParts: runStepParts, runParts: leveledParts });
+
   const partsToRender = useMemo(
     () =>
       leveledParts.filter(
@@ -77,42 +78,6 @@ const RunPartsQrFlow = ({ run, runStep }: Props) => {
     [leveledParts, runStepParts, selectedParts, showCompletedParts]
   );
 
-  // Handle notifying when a part is completed and therefore is not shown
-  const { lastlyReadedKeys, addCallbackFn, removeCallbackFn } = useScannerContext();
-  const callbackId = useId();
-
-  const onReadKeys = useCallback(
-    (keys: string) => {
-      const normalizedRead = keys.replace(/_/g, "-").toUpperCase();
-
-      // TO prevent empty values
-      if (!normalizedRead) return;
-
-      const foundPart = runParts.find((p) => normalizedRead.includes(p.short_label));
-
-      if (!foundPart) return;
-
-      if (!showCompletedParts && isRunPartFinish(runStepParts, foundPart)) {
-        notification({
-          notificationHeader: "Run parts table",
-          notificationBody: `Part ${foundPart.parsed_label ?? foundPart.short_label} is already completed`,
-          notificationType: "danger",
-        });
-      }
-    },
-    [runParts, runStepParts]
-  );
-
-  // update the callback
-  useEffect(() => {
-    removeCallbackFn(ScannedKeysType.SELECT, callbackId);
-    addCallbackFn(ScannedKeysType.SELECT, callbackId, onReadKeys);
-    onReadKeys(lastlyReadedKeys);
-
-    return () => {
-      removeCallbackFn(ScannedKeysType.SELECT, callbackId);
-    };
-  }, [runParts, runStepParts]);
 
   if (isLoading) {
     return <LoadingComponent message={"Loading run parts"} />;
@@ -160,7 +125,7 @@ const RunPartsQrFlow = ({ run, runStep }: Props) => {
   );
 };
 
-const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart) => {
+export const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart) => {
   const stepPart = runStepParts.find((p) => p.part_id == part.id);
 
   if (stepPart === null || stepPart === undefined) return false;

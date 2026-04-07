@@ -18,6 +18,7 @@ import { usePartActions } from "@jield/solodb-react-components/modules/run/hooks
 import { PartActionsDropdown } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partActionsDropdown";
 import { PartSelectionControls } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partSelectionControls";
 import { PartActionsButtons } from "./element/partActionsButtons";
+import useQrPartNotifications from "../../../hooks/run/parts/useQrPartNotifications";
 
 // TODO: use a real way to handle the use of either dropdowns or buttons
 const USE_DROPDOWN = false;
@@ -52,7 +53,7 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
   const runStepParts = useMemo<RunStepPart[]>(
     () => (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
     [runStepPartsQuery.data]
- );
+  );
 
   useEffect(() => {
     const partsToVerify = runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [];
@@ -63,8 +64,10 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
   // Use custom hooks for selection and actions
   const { selectedParts, setPartAsSelected, setPartsSelection, selectAllParts, selectNoneParts, hasSelectedParts } =
     usePartSelection({
-      parts: runParts ?? [],
+      parts: runParts,
     });
+
+  useQrPartNotifications({ runStepParts: runStepParts, runParts: runParts });
 
   useEffect(() => {
     const selectedIds = Array.from(selectedParts.entries())
