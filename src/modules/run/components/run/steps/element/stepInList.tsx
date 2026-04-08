@@ -52,7 +52,7 @@ export default function StepInList({
     queries: [
       {
         queryKey: ["runStepParts", step.id],
-        queryFn: () => listRunStepParts({ run, step }),
+        queryFn: () => listRunStepParts({ step }),
         placeholderData: keepPreviousData,
       },
     ],

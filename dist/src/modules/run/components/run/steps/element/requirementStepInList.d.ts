@@ -1,8 +1,7 @@
-import { Requirement, RunStep, RunPart, RunStepPart } from '@jield/solodb-typescript-core';
-export default function RequirementStepInList({ requirement, step, parts, stepParts, refetchFn, }: {
+import { Requirement, RunStep, RunPart } from '@jield/solodb-typescript-core';
+export default function RequirementStepInList({ requirement, step, parts, refetchFn, }: {
     requirement: Requirement;
     step: RunStep;
     parts: RunPart[];
-    stepParts: RunStepPart[];
     refetchFn: (key: any[]) => void;
 }): import("react/jsx-runtime").JSX.Element;
