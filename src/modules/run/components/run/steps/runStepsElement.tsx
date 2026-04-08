@@ -10,11 +10,9 @@ import RequirementStepInList from "@jield/solodb-react-components/modules/run/co
 import {
   listRunSteps,
   listRunParts,
-  listRunStepParts,
   listRequirements,
   RunStep,
   RunPart,
-  RunStepPart,
   Requirement,
 } from "@jield/solodb-typescript-core";
 
@@ -55,43 +53,11 @@ export default function RunStepsElement() {
   };
 
   const [runStepsQuery, runPartQuery, requirementsQuery] = queries;
-  const {
-    data: runStepPartsData,
-    isError: isInfiniteQueryError,
-    isFetchingNextPage,
-    fetchNextPage,
-    hasNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["runStepParts", JSON.stringify(run)],
-    queryFn: async ({ pageParam }) => {
-      const res = await listRunStepParts({
-        run: run,
-        page_size: 150, // fetch all parts in one go to avoid pagination issues with the step parts
-        page: pageParam,
-      });
-      return {
-        items: res.items,
-        hasMore: res.hasMore,
-        nextPage: pageParam + 1,
-        prevPage: pageParam > 1 ? pageParam - 1 : undefined,
-      };
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.nextPage : undefined),
-    getPreviousPageParam: (firstPage) => firstPage.prevPage ?? undefined,
-  });
-
-  // infinite fetch loop
-  useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const isLoading = queries.some((q) => q.isLoading);
   const isError = queries.some((q) => q.isError);
 
-  if (isError || isInfiniteQueryError) {
+  if (isError) {
     queries
       .filter((q) => q.isError)
       .forEach((q, idx) => {
@@ -101,10 +67,6 @@ export default function RunStepsElement() {
 
   const runSteps = useMemo(() => (runStepsQuery.data?.items ?? []) as RunStep[], [runStepsQuery.data?.items]);
   const runParts = useMemo(() => (runPartQuery.data?.items ?? []) as RunPart[], [runPartQuery.data?.items]);
-  const runStepParts = useMemo(
-    () => (runStepPartsData?.pages.flatMap((p) => p.items) ?? []) as RunStepPart[],
-    [runStepPartsData?.pages]
-  );
   const requirements = useMemo(
     () => (requirementsQuery.data?.items ?? []) as Requirement[],
     [requirementsQuery.data?.items]
@@ -165,7 +127,7 @@ export default function RunStepsElement() {
                   </td>
                   <td colSpan={2}>
                     <Placeholder animation="glow" as="div" className="d-flex flex-wrap gap-1">
-                      {Array.from({ length: 12 }).map((_, j) => (
+                      {Array.from({ length: 5 }).map((_, j) => (
                         <Placeholder key={j} style={{ width: "4.5rem", height: "1.5rem", borderRadius: "3px" }} />
                       ))}
                     </Placeholder>
@@ -286,9 +248,6 @@ export default function RunStepsElement() {
                             requirement={requirement}
                             step={step}
                             parts={runParts}
-                            stepParts={runStepParts.filter(
-                              (part) => part.step_id === (requirement.requirement_for_step?.id ?? requirement.step.id)
-                            )}
                             refetchFn={reloadQueriesByKey}
                           />
                         );
@@ -298,7 +257,6 @@ export default function RunStepsElement() {
                         run={run}
                         step={step}
                         parts={runParts}
-                        stepParts={runStepParts.filter((part) => part.step_id === step.id)}
                         monitoredBy={monitoredSteps[step.id]}
                         refetchFn={reloadQueriesByKey}
                       />

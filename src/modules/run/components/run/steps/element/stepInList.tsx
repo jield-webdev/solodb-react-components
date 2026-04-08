@@ -1,23 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 import StepDetails from "@jield/solodb-react-components/modules/run/components/run/steps/element/stepDetails";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { Run, RunStep, RunPart, RunStepPart, Requirement, EquipmentModule } from "@jield/solodb-typescript-core";
+import { OverlayTrigger, Placeholder, Tooltip } from "react-bootstrap";
+import {
+  Run,
+  RunStep,
+  RunPart,
+  RunStepPart,
+  Requirement,
+  EquipmentModule,
+  listRunSteps,
+  listRunParts,
+  listRequirements,
+  listRunStepParts,
+} from "@jield/solodb-typescript-core";
 import { RunPartList } from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartList";
+import { keepPreviousData, useQueries, useQueryClient } from "@tanstack/react-query";
+
+
+//runStepParts
 
 export default function StepInList({
   run,
   step,
   parts,
-  stepParts,
   monitoredBy,
   refetchFn,
 }: {
   run: Run;
   step: RunStep;
   parts: RunPart[];
-  stepParts: RunStepPart[];
   monitoredBy: Requirement | undefined;
   refetchFn: (key: any[]) => void;
 }) {
@@ -34,6 +47,20 @@ export default function StepInList({
   useEffect(() => {
     setStepModule(step.process_module.module);
   }, [step.process_module.module]);
+
+  const queries = useQueries({
+    queries: [
+      {
+        queryKey: ["runStepParts", step.id],
+        queryFn: () => listRunStepParts({ run, step }),
+        placeholderData: keepPreviousData,
+      },
+    ],
+  });
+
+  const [runStepPartsQuery] = queries;
+
+  const runStepParts = useMemo(() => (runStepPartsQuery.data?.items ?? []) as RunStepPart[], [runStepPartsQuery.data?.items]);
 
   return (
     <>
@@ -52,12 +79,15 @@ export default function StepInList({
               : ""
           }
         >
-          <RunPartList
-            step={step}
-            parts={parts}
-            stepParts={stepParts}
-            run={run}
-          />
+          {runStepPartsQuery.isLoading ? (
+            <Placeholder animation="glow" as="div" className="d-flex flex-wrap gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Placeholder key={i} style={{ width: "4.5rem", height: "1.5rem", borderRadius: "3px" }} />
+              ))}
+            </Placeholder>
+          ) : (
+            <RunPartList step={step} parts={parts} stepParts={runStepParts} run={run} />
+          )}
         </td>
         <td>
           {monitoredBy && (
