@@ -3,7 +3,6 @@ import { Alert, Table } from "react-bootstrap";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import RunStepPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
 import {
-  finishStepWhenAllPartsAreFinished,
   listRunParts,
   listRunStepParts,
   Run,
@@ -55,12 +54,6 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
     () => (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
     [runStepPartsQuery.data]
   );
-
-  useEffect(() => {
-    const partsToVerify = runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [];
-    // verify for the need to finish the step
-    finishStepWhenAllPartsAreFinished(runStep, partsToVerify);
-  }, [runStepParts]);
 
   // Use custom hooks for selection and actions
   const { selectedParts, setPartAsSelected, setPartsSelection, selectAllParts, selectNoneParts, hasSelectedParts } =

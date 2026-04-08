@@ -1,10 +1,8 @@
-import React, { useCallback, useEffect, useId, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Placeholder, Table } from "react-bootstrap";
 import { useQueries } from "@tanstack/react-query";
-import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
 import {
-  finishStepWhenAllPartsAreFinished,
   Run,
   RunStep,
   RunPart,
@@ -14,7 +12,6 @@ import {
 } from "@jield/solodb-typescript-core";
 import type { RunStepPart } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
-import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import useQrPartNotifications from "../../../hooks/run/parts/useQrPartNotifications";
 
 type Props = {
@@ -50,11 +47,6 @@ const RunPartsQrFlow = ({ run, runStep }: Props) => {
     () => (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
     [runStepPartsQuery.data]
   );
-
-  useEffect(() => {
-    // verify for the need to finish the step
-    finishStepWhenAllPartsAreFinished(runStep, runStepParts);
-  }, [runStepParts]);
 
   const leveledParts = useMemo(
     () => runParts.filter((part) => part.part_level === runStep.part_level),
