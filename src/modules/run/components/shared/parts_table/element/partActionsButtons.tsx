@@ -9,8 +9,6 @@ export interface PartActionsButtonsProps {
 export const PartActionsButtons = ({ availableActions, onActionSelected }: PartActionsButtonsProps) => {
   if (availableActions.length === 0) return null;
 
-  console.log(availableActions);
-
   return (
     <>
       {availableActions.map(({ id, name }) => (

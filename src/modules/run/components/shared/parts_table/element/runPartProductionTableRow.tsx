@@ -17,6 +17,7 @@ import {
   upsertRunStepPartCache,
   updateRunStepPartCacheByRunStep,
 } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
+import isRunStepReadyForProcessing from "@jield/solodb-react-components/modules/run/utils/isRunStepReadyForProcessing";
 
 type Props = {
   runPart: RunPart;
@@ -121,7 +122,7 @@ const RunStepPartProductionTableRow = ({
     <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}>
       {/* Selection checkbox */}
       <td>
-        {setPartAsSelected && (
+        {setPartAsSelected && isRunStepReadyForProcessing(runStep) && (
           <input
             type="checkbox"
             id={`part-select-${runStepPart.part_id}`}
@@ -145,17 +146,20 @@ const RunStepPartProductionTableRow = ({
       </td>
 
       {/* Action buttons / dropdown */}
-      <td>
-        {dropdown ? (
-          <RunPartProductionActionsDropdown
-            runStepPart={runStepPart}
-            setRunStepPartAction={doRunStepPartAction}
-            createRunStepPart={createRunStepPart}
-          />
-        ) : (
-          <RunPartProductionActionsButtons runStepPart={runStepPart} setRunStepPartAction={doRunStepPartAction} />
-        )}
-      </td>
+
+      {isRunStepReadyForProcessing(runStep) && (
+        <td>
+          {dropdown ? (
+            <RunPartProductionActionsDropdown
+              runStepPart={runStepPart}
+              setRunStepPartAction={doRunStepPartAction}
+              createRunStepPart={createRunStepPart}
+            />
+          ) : (
+            <RunPartProductionActionsButtons runStepPart={runStepPart} setRunStepPartAction={doRunStepPartAction} />
+          )}
+        </td>
+      )}
 
       {/* Comment */}
       <td>

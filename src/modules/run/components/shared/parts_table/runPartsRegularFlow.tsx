@@ -19,6 +19,7 @@ import { PartActionsDropdown } from "@jield/solodb-react-components/modules/run/
 import { PartSelectionControls } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partSelectionControls";
 import { PartActionsButtons } from "./element/partActionsButtons";
 import useQrPartNotifications from "../../../hooks/run/parts/useQrPartNotifications";
+import isRunStepReadyForProcessing from "../../../utils/isRunStepReadyForProcessing";
 
 // TODO: use a real way to handle the use of either dropdowns or buttons
 const USE_DROPDOWN = false;
@@ -142,16 +143,23 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
     return <Alert variant={"warning"}>No step parts found for this run step.</Alert>;
   }
 
+  const stepReady = isRunStepReadyForProcessing(runStep);
+
   return (
     <Fragment>
       {runParts && runParts.length > 0 && (
         <>
-          <Table size={"sm"} striped hover>
+          {!stepReady && (
+            <Alert variant="warning" className="py-2 mb-2">
+              <strong>Step locked.</strong> Finish the previous step before processing these parts.
+            </Alert>
+          )}
+          <Table size={"sm"} striped hover className={!stepReady ? "text-muted" : undefined}>
             <thead>
               <tr>
                 <th colSpan={2}>Part</th>
                 <th>Status</th>
-                <th>Actions</th>
+                {stepReady && <th>Actions</th>}
                 <th>Comment</th>
               </tr>
             </thead>
@@ -167,33 +175,35 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
                     key={`key-${i}-${runPart.id}`}
                     canInit={run.run_type === RunTypeEnum.PRODUCTION}
                     partIsSelected={partIsSelected}
-                    setPartAsSelected={setPartAsSelected}
+                    setPartAsSelected={stepReady ? setPartAsSelected : undefined}
                     dropdown={USE_DROPDOWN}
                   />
                 );
               })}
             </tbody>
           </Table>
-          <PartSelectionControls
-            onSelectAll={selectAllParts}
-            onSelectNone={selectNoneParts}
-            hasSelectedParts={hasSelectedParts}
-            traySelections={traySelections}
-            onToggleTray={(partIds, nextSelected) => setPartsSelection(partIds, nextSelected)}
-            actionsDropdown={
-              USE_DROPDOWN ? (
-                <PartActionsDropdown
-                  availableActions={availableActions}
-                  onActionSelected={performActionToSelectedParts}
-                />
-              ) : (
-                <PartActionsButtons
-                  availableActions={availableActions}
-                  onActionSelected={performActionToSelectedParts}
-                />
-              )
-            }
-          />
+          {stepReady && (
+            <PartSelectionControls
+              onSelectAll={selectAllParts}
+              onSelectNone={selectNoneParts}
+              hasSelectedParts={hasSelectedParts}
+              traySelections={traySelections}
+              onToggleTray={(partIds, nextSelected) => setPartsSelection(partIds, nextSelected)}
+              actionsDropdown={
+                USE_DROPDOWN ? (
+                  <PartActionsDropdown
+                    availableActions={availableActions}
+                    onActionSelected={performActionToSelectedParts}
+                  />
+                ) : (
+                  <PartActionsButtons
+                    availableActions={availableActions}
+                    onActionSelected={performActionToSelectedParts}
+                  />
+                )
+              }
+            />
+          )}
         </>
       )}
     </Fragment>
