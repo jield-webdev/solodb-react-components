@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   performRunStepPartAction,
+  performRunStepPartActions,
   RunStepPartActionEnum,
   RunStepPartStateEnum,
   RunStepPartState,
@@ -10,8 +11,12 @@ import {
   RunPart,
   actionLabelToEnum,
   actionEnumToName,
+  ApiFormattedResponse,
 } from "@jield/solodb-typescript-core";
-import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
+import {
+  updateRunStepPartCache,
+  updateRunStepPartCacheByRunStep,
+} from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
 import { PERFORM_ACTION_TRIGER, ScannedKeysType } from "../../../utils/parseScannerForRun";
 import { notification } from "@jield/solodb-react-components/utils/notification";
@@ -42,6 +47,7 @@ const isRunStepPart = (part: RunStepPart | RunPart): part is RunStepPart => {
  * and forwards the chosen action id to `performRunStepPartAction`.
  */
 export function usePartActions({
+  runStep,
   parts,
   selectedParts,
   getRunPart,
@@ -76,30 +82,41 @@ export function usePartActions({
       const selectedStepParts = getSelectedRunStepParts();
       if (selectedStepParts.length === 0) return;
 
-      const promises: Promise<unknown>[] = [];
+      const actionableStepParts = selectedStepParts.filter((runStepPart) =>
+        runStepPart.available_actions.some(({ id }) => id === action)
+      );
 
-      for (const runStepPart of selectedStepParts) {
-        // Server-provided: no client-side calculation.
-        const isAvailable = runStepPart.available_actions.some(({ id }) => id === action);
-        if (!isAvailable) continue;
+      if (actionableStepParts.length === 0) return;
 
-        promises.push(
-          performRunStepPartAction({
-            runStepPart,
-            // NOTE: the core library currently types this param as `RunStepPartStateEnum`
-            // even though `available_actions` entries are `RunStepPartActionEnum`.
-            // The numeric value is sent as-is to the backend, so this cast is safe until
-            // the core library's typing is corrected.
-            runStepPartAction: action as unknown as RunStepPartStateEnum,
-          }).then((latestAction: RunStepPartState) => {
-            updateRunStepPartCache(queryClient, { runStepPart, latestAction });
-          })
-        );
+      if (actionableStepParts.length === 1) {
+        const runStepPart = actionableStepParts[0];
+        void performRunStepPartAction({
+          runStepPart,
+          // NOTE: the core library currently types this param as `RunStepPartStateEnum`
+          // even though `available_actions` entries are `RunStepPartActionEnum`.
+          // The numeric value is sent as-is to the backend, so this cast is safe until
+          // the core library's typing is corrected.
+          runStepPartAction: action as unknown as RunStepPartStateEnum,
+        }).then((latestAction: RunStepPartState) => {
+          updateRunStepPartCache(queryClient, { runStepPart, latestAction });
+        });
+        return;
       }
 
-      void Promise.all(promises);
+      void performRunStepPartActions({
+        runStepPartActions: actionableStepParts.map((runStepPart) => ({
+          runStepPart,
+          // NOTE: the core library currently types this param as `RunStepPartStateEnum`
+          // even though `available_actions` entries are `RunStepPartActionEnum`.
+          // The numeric value is sent as-is to the backend, so this cast is safe until
+          // the core library's typing is corrected.
+          runStepPartAction: action as unknown as RunStepPartStateEnum,
+        })),
+      }).then((latestActions: RunStepPartState[] | ApiFormattedResponse<RunStepPartState>) => {
+        updateRunStepPartCacheByRunStep(queryClient, runStep, { latestActions });
+      });
     },
-    [getSelectedRunStepParts, queryClient]
+    [getSelectedRunStepParts, queryClient, runStep]
   );
 
   const onScanner = useCallback(

@@ -21,4 +21,4 @@ export interface UsePartActionsResult {
  * are allowed — it reads `runStepPart.available_actions` (server-provided) directly
  * and forwards the chosen action id to `performRunStepPartAction`.
  */
-export declare function usePartActions({ parts, selectedParts, getRunPart, getRunStepPart, actionsFromScanner, }: UsePartActionsOptions): UsePartActionsResult;
+export declare function usePartActions({ runStep, parts, selectedParts, getRunPart, getRunStepPart, actionsFromScanner, }: UsePartActionsOptions): UsePartActionsResult;

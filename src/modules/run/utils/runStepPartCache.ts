@@ -1,10 +1,23 @@
 import { QueryClient } from "@tanstack/react-query";
-import { listRunStepParts, RunPart, RunStep, RunStepPart, RunStepPartState } from "@jield/solodb-typescript-core";
+import {
+  ApiFormattedResponse,
+  listRunStepParts,
+  RunPart,
+  RunStep,
+  RunStepPart,
+  RunStepPartState,
+} from "@jield/solodb-typescript-core";
 
 type UpdateRunStepPartCacheOptions = {
   runStepPart: RunStepPart;
   latestAction: RunStepPartState;
 };
+
+type UpdateRunStepPartCacheByRunStepOptions =
+  | UpdateRunStepPartCacheOptions
+  | {
+      latestActions: RunStepPartState[] | ApiFormattedResponse<RunStepPartState>;
+    };
 
 // --- Item transformers ---
 
@@ -49,6 +62,34 @@ const applyOptimisticUpdate = (data: any, options: UpdateRunStepPartCacheOptions
 const applyBatchUpdate = (data: any, updatesById: Map<number, RunStepPart>): any =>
   mapOverItems(data, (items) => items.map((item) => updatesById.get(item.id) ?? item));
 
+const normalizeLatestActions = (
+  latestActions: RunStepPartState[] | ApiFormattedResponse<RunStepPartState>
+): RunStepPartState[] => {
+  if (Array.isArray(latestActions)) return latestActions;
+  return Array.isArray(latestActions.items) ? latestActions.items : [];
+};
+
+const applyBatchActions = (
+  data: any,
+  latestActionsInput: RunStepPartState[] | ApiFormattedResponse<RunStepPartState>
+): any => {
+  const latestActions = normalizeLatestActions(latestActionsInput);
+  if (latestActions.length === 0) return data;
+  const actionsByStepPartId = new Map<number, RunStepPartState>(
+    latestActions.map((action) => [action.updated_run_step_part_state.run_step_part_id, action])
+  );
+  const actionsByRunPartId = new Map<number, RunStepPartState>(
+    latestActions.map((action) => [action.updated_run_step_part_state.run_part_id, action])
+  );
+
+  return mapOverItems(data, (items) =>
+    items.map((item) => {
+      const latestAction = actionsByStepPartId.get(item.id) ?? actionsByRunPartId.get(item.part_id);
+      return latestAction ? applyActionToRunStepPart(item, latestAction) : item;
+    })
+  );
+};
+
 const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart): any => {
   if (!data) return data;
 
@@ -91,8 +132,16 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart): any => {
 
 // --- Cache operations ---
 
-const refreshRunStepPartCacheForRunPart = async (queryClient: QueryClient, runStepPart: RunStepPart): Promise<void> => {
-  const result = await listRunStepParts({ runPart: { id: runStepPart.part_id } as RunPart });
+const refreshRunStepPartCacheForRunStepParts = async (
+  queryClient: QueryClient,
+  runStepParts: RunStepPart[]
+): Promise<void> => {
+  if (runStepParts.length === 0) return;
+
+  const runParts = Array.from(new Set(runStepParts.map((part) => part.part_id))).map((id) => ({ id }) as RunPart);
+  if (runParts.length === 0) return;
+
+  const result = await listRunStepParts({ runPart: runParts });
   const updatesById = new Map(result.items.map((item) => [item.id, item]));
 
   if (updatesById.size === 0) return;
@@ -104,7 +153,7 @@ const updateRunStepPartCacheInternal = (queryClient: QueryClient, options: Updat
   // Apply optimistic update immediately, then reconcile with fresh server data
   queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => applyOptimisticUpdate(data, options));
 
-  void refreshRunStepPartCacheForRunPart(queryClient, options.runStepPart).catch((error) => {
+  void refreshRunStepPartCacheForRunStepParts(queryClient, [options.runStepPart]).catch((error) => {
     console.error("Failed to refresh run step part cache from run part.", error);
   });
 };
@@ -118,8 +167,34 @@ export const updateRunStepPartCache = (queryClient: QueryClient, options: Update
 export const updateRunStepPartCacheByRunStep = (
   queryClient: QueryClient,
   runStep: RunStep,
-  options: UpdateRunStepPartCacheOptions
+  options: UpdateRunStepPartCacheByRunStepOptions
 ): void => {
+  if ("latestActions" in options) {
+    queryClient.setQueriesData(
+      {
+        predicate: (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "runStepParts" &&
+          (query.queryKey.length === 1 || query.queryKey[1] === runStep.id),
+      },
+      (data) => applyBatchActions(data, options.latestActions)
+    );
+
+    const latestActions = normalizeLatestActions(options.latestActions);
+    const runStepParts = latestActions.map(
+      (action) =>
+        ({
+          id: action.updated_run_step_part_state.run_step_part_id,
+          part_id: action.updated_run_step_part_state.run_part_id,
+        }) as RunStepPart
+    );
+
+    void refreshRunStepPartCacheForRunStepParts(queryClient, runStepParts).catch((error) => {
+      console.error("Failed to refresh run step part cache from run parts.", error);
+    });
+    return;
+  }
+
   updateRunStepPartCacheInternal(queryClient, options);
 };
 
