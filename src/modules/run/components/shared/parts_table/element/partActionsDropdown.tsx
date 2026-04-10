@@ -3,7 +3,7 @@ import { RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 
 export interface PartActionsDropdownProps {
   availableActions: { id: RunStepPartActionEnum; name: string }[];
-  onActionSelected: (action: RunStepPartActionEnum) => void;
+  onActionSelected: (action: RunStepPartActionEnum) => Promise<void> | void;
 }
 
 /**
@@ -21,7 +21,7 @@ export const PartActionsDropdown = ({ availableActions, onActionSelected }: Part
       </Dropdown.Toggle>
       <Dropdown.Menu>
         {availableActions.map(({ id, name }) => (
-          <Dropdown.Item key={id} onClick={() => onActionSelected(id)}>
+          <Dropdown.Item key={id} onClick={() => void onActionSelected(id)}>
             {name}
           </Dropdown.Item>
         ))}

@@ -5,13 +5,11 @@ import {
   performRunStepPartActions,
   RunStepPartActionEnum,
   RunStepPartStateEnum,
-  RunStepPartState,
   RunStepPart,
   RunStep,
   RunPart,
   actionLabelToEnum,
   actionEnumToName,
-  ApiFormattedResponse,
 } from "@jield/solodb-typescript-core";
 import {
   updateRunStepPartCache,
@@ -31,7 +29,7 @@ export interface UsePartActionsOptions {
 }
 
 export interface UsePartActionsResult {
-  performActionToSelectedParts: (action: RunStepPartActionEnum) => void;
+  performActionToSelectedParts: (action: RunStepPartActionEnum) => Promise<void>;
   getAvailableActionsForSelection: () => { id: RunStepPartActionEnum; name: string }[];
 }
 
@@ -78,7 +76,7 @@ export function usePartActions({
   }, [parts, selectedParts, getRunPart, getRunStepPart]);
 
   const performActionToSelectedParts = useCallback(
-    (action: RunStepPartActionEnum) => {
+    async (action: RunStepPartActionEnum) => {
       const selectedStepParts = getSelectedRunStepParts();
       if (selectedStepParts.length === 0) return;
 
@@ -90,20 +88,19 @@ export function usePartActions({
 
       if (actionableStepParts.length === 1) {
         const runStepPart = actionableStepParts[0];
-        void performRunStepPartAction({
+        const latestAction = await performRunStepPartAction({
           runStepPart,
           // NOTE: the core library currently types this param as `RunStepPartStateEnum`
           // even though `available_actions` entries are `RunStepPartActionEnum`.
           // The numeric value is sent as-is to the backend, so this cast is safe until
           // the core library's typing is corrected.
           runStepPartAction: action as unknown as RunStepPartStateEnum,
-        }).then((latestAction: RunStepPartState) => {
-          updateRunStepPartCache(queryClient, { runStepPart, latestAction });
         });
+        updateRunStepPartCache(queryClient, { runStepPart, latestAction });
         return;
       }
 
-      void performRunStepPartActions({
+      const latestActions = await performRunStepPartActions({
         runStepPartActions: actionableStepParts.map((runStepPart) => ({
           runStepPart,
           // NOTE: the core library currently types this param as `RunStepPartStateEnum`
@@ -112,9 +109,8 @@ export function usePartActions({
           // the core library's typing is corrected.
           runStepPartAction: action as unknown as RunStepPartStateEnum,
         })),
-      }).then((latestActions: RunStepPartState[] | ApiFormattedResponse<RunStepPartState>) => {
-        updateRunStepPartCacheByRunStep(queryClient, runStep, { latestActions });
       });
+      updateRunStepPartCacheByRunStep(queryClient, runStep, { latestActions });
     },
     [getSelectedRunStepParts, queryClient, runStep]
   );
@@ -142,7 +138,7 @@ export function usePartActions({
         notificationType: "success",
       });
 
-      performActionToSelectedParts(action);
+      void performActionToSelectedParts(action);
     },
     [performActionToSelectedParts]
   );
