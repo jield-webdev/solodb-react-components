@@ -494,8 +494,8 @@ __metadata:
   dependencies:
     "@jield/solodb-typescript-core": "npm:^1.1.4"
     "@originjs/vite-plugin-commonjs": "npm:^1.0.3"
-    "@tanstack/react-query": "npm:~5.97.0"
-    "@tanstack/react-query-devtools": "npm:~5.97.0"
+    "@tanstack/react-query": "npm:~5.99.0"
+    "@tanstack/react-query-devtools": "npm:~5.99.0"
     "@tanstack/react-table": "npm:^8.21.3"
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/jest-dom": "npm:^6.9.1"
@@ -522,13 +522,13 @@ __metadata:
     react-hook-form: "npm:^7.72.1"
     react-intersection-observer: "npm:^10.0.3"
     react-markdown: "npm:^10.1.0"
-    react-router-dom: "npm:^7.14.0"
+    react-router-dom: "npm:^7.14.1"
     react-select: "npm:^5.10.2"
     typescript: "npm:^6.0.2"
     vite: "npm:^8.0.8"
     vite-plugin-dts: "npm:^4.5.4"
     vitest: "npm:^4.1.4"
-    yet-another-react-lightbox: "npm:^3.30.1"
+    yet-another-react-lightbox: "npm:^3.31.0"
   peerDependencies:
     "@tanstack/react-query": ^5.90
     "@tanstack/react-table": ^8.21
@@ -1105,40 +1105,40 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.97.0":
-  version: 5.97.0
-  resolution: "@tanstack/query-core@npm:5.97.0"
-  checksum: 10c0/db2d1cceede8be44826ce2b6d0424caeb77cd6ebf26d3ab066b1e2c7004e73c3a80f81b545771c8237067e857131dae930ef31fcad2a9bb1326d6fa4111b779b
+"@tanstack/query-core@npm:5.99.0":
+  version: 5.99.0
+  resolution: "@tanstack/query-core@npm:5.99.0"
+  checksum: 10c0/e46315e0a532be77b86e3bf47c4395b2ba072251f007794b670f72d36062ae6b5560957400281ece8c177c9518fe6b2fef92d3e56cea3bc12d5c2f750ea7743b
   languageName: node
   linkType: hard
 
-"@tanstack/query-devtools@npm:5.97.0":
-  version: 5.97.0
-  resolution: "@tanstack/query-devtools@npm:5.97.0"
-  checksum: 10c0/7d16de761e9a50d1ca30440e0edb3874f60032c24857ac5d162215a5273270e5cbb61bd2604324df75ca029d9ca1f76b4505d254fa466adcc2cf6a1e16ca6cfe
+"@tanstack/query-devtools@npm:5.99.0":
+  version: 5.99.0
+  resolution: "@tanstack/query-devtools@npm:5.99.0"
+  checksum: 10c0/78c26f6c55e1d8c240fbec7fa7b193d5b600b24e1ab872578e3495df611700908815847d06d5302d4cf264d31ad33113c6cf99f47178494ab29ab26aab33021f
   languageName: node
   linkType: hard
 
-"@tanstack/react-query-devtools@npm:~5.97.0":
-  version: 5.97.0
-  resolution: "@tanstack/react-query-devtools@npm:5.97.0"
+"@tanstack/react-query-devtools@npm:~5.99.0":
+  version: 5.99.0
+  resolution: "@tanstack/react-query-devtools@npm:5.99.0"
   dependencies:
-    "@tanstack/query-devtools": "npm:5.97.0"
+    "@tanstack/query-devtools": "npm:5.99.0"
   peerDependencies:
-    "@tanstack/react-query": ^5.97.0
+    "@tanstack/react-query": ^5.99.0
     react: ^18 || ^19
-  checksum: 10c0/c1e05340bbc48ca4ac95bfd5b78848848ab54b6ba5c24e7b079a923c55981ffc7fbcfbfefe1cc007cf8926d772f6828bb45617b04d10c6c5dc53865f5ee63afd
+  checksum: 10c0/6331b4ff95db45f70394332df4ff74cc6b584879e270d4740e2797d4e17c42b007b741357f9d8af81bed5b86381f1b8eca7f8efc1e3d07651004d44e908043c9
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:~5.97.0":
-  version: 5.97.0
-  resolution: "@tanstack/react-query@npm:5.97.0"
+"@tanstack/react-query@npm:~5.99.0":
+  version: 5.99.0
+  resolution: "@tanstack/react-query@npm:5.99.0"
   dependencies:
-    "@tanstack/query-core": "npm:5.97.0"
+    "@tanstack/query-core": "npm:5.99.0"
   peerDependencies:
     react: ^18 || ^19
-  checksum: 10c0/07055c14f83e2c27cf3a283365e198aac8f7e5b36da4f78702dbc8fec561849bd245c8705c16a90c091ba93a8431ebfc7de153779681a37c2f60ea33e062f276
+  checksum: 10c0/4a4783da869b29f166f13bde592662477b7473e19758f3cdd862538876d237fa0d1593d47c7c758d6b86fecc6a92f7db89c5ba7f5528c705ed0cb8a8e5e5eef0
   languageName: node
   linkType: hard
 
@@ -4330,21 +4330,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:^7.14.0":
-  version: 7.14.0
-  resolution: "react-router-dom@npm:7.14.0"
+"react-router-dom@npm:^7.14.1":
+  version: 7.14.1
+  resolution: "react-router-dom@npm:7.14.1"
   dependencies:
-    react-router: "npm:7.14.0"
+    react-router: "npm:7.14.1"
   peerDependencies:
     react: ">=18"
     react-dom: ">=18"
-  checksum: 10c0/f7130c7083c2a8921aa59e9a9755ae4b79ef98b4df0ae84052ab0fd95b27612a7ebd2539b83d299b8073f8b5fc41595e8cc82bf748837d95d166f8ee19bf5f24
+  checksum: 10c0/aa454069e43263c812424a92fc9c099083034e438f9747efc45558885ec48b3dba46ab55bf84b164feac08c24a65e6ac91a3f8a137fd5e79077c95b8c14ca50a
   languageName: node
   linkType: hard
 
-"react-router@npm:7.14.0":
-  version: 7.14.0
-  resolution: "react-router@npm:7.14.0"
+"react-router@npm:7.14.1":
+  version: 7.14.1
+  resolution: "react-router@npm:7.14.1"
   dependencies:
     cookie: "npm:^1.0.1"
     set-cookie-parser: "npm:^2.6.0"
@@ -4354,7 +4354,7 @@ __metadata:
   peerDependenciesMeta:
     react-dom:
       optional: true
-  checksum: 10c0/a496489973cd5e87dcc5c1c7312f4cc99463eb5e0a0f97b3f298467531b754a3227562a83e0c9019b9d2452fd0681d05882ee061af2e0cafb0818f857578b805
+  checksum: 10c0/57b86accdc50b917509e4b21f821dd432807e3f62b5e978d0d5174fc7da3798ce57ce896cbf70a8ba8f6f3d53515a07021e759829908239b4eee34c804695120
   languageName: node
   linkType: hard
 
@@ -5458,9 +5458,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yet-another-react-lightbox@npm:^3.30.1":
-  version: 3.30.1
-  resolution: "yet-another-react-lightbox@npm:3.30.1"
+"yet-another-react-lightbox@npm:^3.31.0":
+  version: 3.31.0
+  resolution: "yet-another-react-lightbox@npm:3.31.0"
   peerDependencies:
     "@types/react": ^16 || ^17 || ^18 || ^19
     "@types/react-dom": ^16 || ^17 || ^18 || ^19
@@ -5471,7 +5471,7 @@ __metadata:
       optional: true
     "@types/react-dom":
       optional: true
-  checksum: 10c0/dd8531845e0fa298d0e7d1ffe094170ee366ff6ca6c980e3c69937c4be5d52cdc26a923d5936ef6e339306173a4987e873153251fd64b32ea2e855c3a92dfeac
+  checksum: 10c0/7d81300871f44ba49b7764e8543d47fc772eb03cee62802aa84ff5d9896a212e1bbc885c2b36fdf8227e1cd59f453c82ee3f866266ad94fe898ee1ace8cb0ba4
   languageName: node
   linkType: hard
 

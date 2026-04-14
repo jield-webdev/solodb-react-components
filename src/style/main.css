@@ -134,31 +134,6 @@
     color: #f8f9fa;
 }
 
-.step-part-processed {
-    background: #0ca04b;
-    color: #f8f9fa;
-}
-
-.step-part-started {
-    background: #e28b22;
-    color: #f8f9fa;
-}
-
-.step-part-failed {
-    background: #c11a1a;
-    color: #f8f9fa;
-}
-
-.step-part-failed-other {
-    background: #7c0c0c;
-    color: #f8f9fa;
-}
-
-.step-part-inactive {
-    background: #3b4148;
-    color: #f8f9fa;
-}
-
 .step-part-selected {
     box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.35);
 }
