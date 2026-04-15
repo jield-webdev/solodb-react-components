@@ -492,7 +492,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@jield/solodb-react-components@workspace:."
   dependencies:
-    "@jield/solodb-typescript-core": "npm:^1.1.4"
+    "@jield/solodb-typescript-core": "link:../solodb-typescript-core/"
     "@originjs/vite-plugin-commonjs": "npm:^1.0.3"
     "@tanstack/react-query": "npm:~5.97.0"
     "@tanstack/react-query-devtools": "npm:~5.97.0"
@@ -539,14 +539,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@jield/solodb-typescript-core@npm:^1.1.4":
-  version: 1.1.4
-  resolution: "@jield/solodb-typescript-core@npm:1.1.4"
-  peerDependencies:
-    axios: ^1.13.2
-  checksum: 10c0/2d51e1c6f00ada96ac82414ba979fe18c3d529d7cf3700a33bd595539646a0854a375825f48aff536af888f63c757e9bdfcb6d58d6383293c784ea2ebc781085
+"@jield/solodb-typescript-core@link:../solodb-typescript-core/::locator=%40jield%2Fsolodb-react-components%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@jield/solodb-typescript-core@link:../solodb-typescript-core/::locator=%40jield%2Fsolodb-react-components%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@jridgewell/gen-mapping@npm:^0.3.12":
   version: 0.3.13
