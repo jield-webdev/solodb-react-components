@@ -1,7 +1,7 @@
-import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
 import { RunPart } from "@jield/solodb-typescript-core";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import parseScannerForRun, { ScannedKeysType } from "../../../utils/parseScannerForRun";
+import parseScannerForRun, { ScannedKeysType } from "../../../../core/utils/parseScannerType";
 
 export interface UsePartSelectionOptions {
   parts: RunPart[];
@@ -43,7 +43,7 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
   // Update the ref whenever parts or setPartAsSelected changes
   const onScanReadsKey = useCallback(
     (keys: string) => {
-      if (parseScannerForRun(keys) != ScannedKeysType.SELECT) return;
+      if (parseScannerForRun(keys) != ScannedKeysType.WILD_CARD) return;
 
       const normalizedRead = keys.replace(/_/g, "-").toUpperCase();
 
@@ -76,12 +76,12 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
 
   // So when it mounts it tries to pick the lastlyReadedKeys
   useEffect(() => {
-    removeCallbackFn(ScannedKeysType.SELECT, callbackId);
+    removeCallbackFn(ScannedKeysType.WILD_CARD, callbackId);
     onScanReadsKey(lastlyReadedKeys);
-    addCallbackFn(ScannedKeysType.SELECT, callbackId, onScanReadsKey);
+    addCallbackFn(ScannedKeysType.WILD_CARD, callbackId, onScanReadsKey);
 
     return () => {
-      removeCallbackFn(ScannedKeysType.SELECT, callbackId);
+      removeCallbackFn(ScannedKeysType.WILD_CARD, callbackId);
     };
   }, [parts]);
 

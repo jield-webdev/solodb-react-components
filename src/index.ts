@@ -66,8 +66,8 @@ export { EmphasizedParametersContext } from "@jield/solodb-react-components/modu
 export {
   ScannerContext,
   useScannerContext,
-} from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-export { ScannerProvider } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerProvider";
+} from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
+export { ScannerProvider } from "@jield/solodb-react-components/modules/core/providers/scannerProvider";
 
 // Hooks
 export { useAuth } from "@jield/solodb-react-components/modules/core/hooks/useAuth";

@@ -2,8 +2,8 @@ import { RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 import { useCallback, useEffect, useId } from "react";
 import { isRunPartFinish } from "../../../components/shared/parts_table/runPartsQrFlow";
 import { notification } from "@jield/solodb-react-components/utils/notification";
-import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-import { ScannedKeysType } from "../../../utils/parseScannerForRun";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
+import { ScannedKeysType } from "../../../../core/utils/parseScannerType";
 
 type Props = {
   runStepParts: RunStepPart[];
@@ -45,11 +45,11 @@ export default function useQrPartNotifications({ runStepParts, runParts }: Props
   );
 
   useEffect(() => {
-    removeCallbackFn(ScannedKeysType.SELECT, callbackId);
-    addCallbackFn(ScannedKeysType.SELECT, callbackId, onReadKeys);
+    removeCallbackFn(ScannedKeysType.WILD_CARD, callbackId);
+    addCallbackFn(ScannedKeysType.WILD_CARD, callbackId, onReadKeys);
 
     return () => {
-      removeCallbackFn(ScannedKeysType.SELECT, callbackId);
+      removeCallbackFn(ScannedKeysType.WILD_CARD, callbackId);
     };
   }, [runParts, runStepParts]);
 }

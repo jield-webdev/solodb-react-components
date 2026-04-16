@@ -31,7 +31,7 @@ import {
   RunTypeEnum,
   listEcn,
 } from "@jield/solodb-typescript-core";
-import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
 
 const StepDashboard = () => {
   const { environment } = useParams();

@@ -1,4 +1,4 @@
-import { GetServerUri } from "@jield/solodb-react-components/modules/core/functions/getServerUri";
+import { GetServerUri } from "@jield/solodb-react-components/modules/core/utils/getServerUri";
 import { Badge, Button, ListGroup, Table } from "react-bootstrap";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import React, { useMemo, useState } from "react";

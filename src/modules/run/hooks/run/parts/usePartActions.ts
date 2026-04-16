@@ -15,8 +15,8 @@ import {
   updateRunStepPartCache,
   updateRunStepPartCacheByRunStep,
 } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
-import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-import { PERFORM_ACTION_TRIGER, ScannedKeysType } from "../../../utils/parseScannerForRun";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
+import { PERFORM_RUN_ACTION_TRIGER, ScannedKeysType } from "../../../../core/utils/parseScannerType";
 import { notification } from "@jield/solodb-react-components/utils/notification";
 
 export interface UsePartActionsOptions {
@@ -146,11 +146,11 @@ export function usePartActions({
   useEffect(() => {
     if (!actionsFromScanner) return;
 
-    removeCallbackFn(ScannedKeysType.PERFORM_ACTION, callbackId);
-    addCallbackFn(ScannedKeysType.PERFORM_ACTION, callbackId, onScanner);
+    removeCallbackFn(ScannedKeysType.PERFORM_RUN_ACTION, callbackId);
+    addCallbackFn(ScannedKeysType.PERFORM_RUN_ACTION, callbackId, onScanner);
 
     return () => {
-      removeCallbackFn(ScannedKeysType.PERFORM_ACTION, callbackId);
+      removeCallbackFn(ScannedKeysType.PERFORM_RUN_ACTION, callbackId);
     };
   }, [actionsFromScanner, onScanner, addCallbackFn, removeCallbackFn, callbackId]);
 
@@ -178,6 +178,6 @@ export function usePartActions({
 }
 
 function validScannerInput(input: string) {
-  const pattern = new RegExp(`^${PERFORM_ACTION_TRIGER}/.+`);
+  const pattern = new RegExp(`^${PERFORM_RUN_ACTION_TRIGER}/.+`);
   return pattern.test(input);
 }

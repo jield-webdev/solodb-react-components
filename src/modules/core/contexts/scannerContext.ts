@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { ScannedKeysType } from "@jield/solodb-react-components/modules/run/utils/parseScannerForRun";
+import { ScannedKeysType } from "@jield/solodb-react-components/modules/core/utils/parseScannerType";
 
 export interface ScannerContext {
   lastlyReadedKeys: string;
@@ -9,18 +9,12 @@ export interface ScannerContext {
   removeReadingCallbackFn: (id: string) => void;
 }
 
-export const ScannerContext = createContext<ScannerContext>({
-  lastlyReadedKeys: "",
-  addCallbackFn: () => {},
-  removeCallbackFn: () => {},
-  addReadingCallbackFn: () => {},
-  removeReadingCallbackFn: () => {},
-});
+export const ScannerContext = createContext<ScannerContext | null>(null);
 
 export const useScannerContext = () => {
   const context = useContext(ScannerContext);
 
-  if (context === undefined) {
+  if (context === null) {
     throw new Error("useScannerContext must be used within a ScannerProvider");
   }
 

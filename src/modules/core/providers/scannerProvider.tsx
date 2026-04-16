@@ -1,7 +1,7 @@
 import { ReactElement, startTransition, useEffect, useRef, useState } from "react";
-import { ScannerContext } from "./ScannerContext";
-import { makeKeySequenceListener } from "@jield/solodb-react-components/utils/keySequenceListener";
-import parseScannerForRun, { ScannedKeysType } from "@jield/solodb-react-components/modules/run/utils/parseScannerForRun";
+import { makeKeyListener } from "@jield/solodb-react-components/utils/keySequenceListener";
+import parseScannerForRun, { ScannedKeysType } from "@jield/solodb-react-components/modules/core/utils/parseScannerType";
+import { ScannerContext } from "../contexts/scannerContext";
 
 export const ScannerProvider = ({ children }: { children: ReactElement }) => {
   const [lastlyReadedKeys, setLastlyReadedKeys] = useState<string>("");
@@ -26,7 +26,7 @@ export const ScannerProvider = ({ children }: { children: ReactElement }) => {
   };
 
   useEffect(() => {
-    const listener = makeKeySequenceListener("*", onReadKeys, onReadingKeys, { requireEndCharacter: true });
+    const listener = makeKeyListener(onReadKeys, onReadingKeys);
 
     document.addEventListener("keyup", listener);
 

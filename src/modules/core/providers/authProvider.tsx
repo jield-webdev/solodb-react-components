@@ -1,4 +1,4 @@
-import React, { ReactNode, Suspense } from "react";
+import { ReactNode  } from "react";
 import { AuthContext } from "@jield/solodb-react-components/modules/core/contexts/authContext";
 import { useAuth } from "@jield/solodb-react-components/modules/core/hooks/useAuth";
 import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
