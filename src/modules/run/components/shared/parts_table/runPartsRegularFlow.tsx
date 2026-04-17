@@ -138,8 +138,33 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
 
   const stepReady = isRunStepReadyForProcessing(runStep);
 
+  const multipartActionsControllers = () => (
+    <>
+      {stepReady && (
+        <PartSelectionControls
+          onSelectAll={selectAllParts}
+          onSelectNone={selectNoneParts}
+          hasSelectedParts={hasSelectedParts}
+          traySelections={traySelections}
+          onToggleTray={(partIds, nextSelected) => setPartsSelection(partIds, nextSelected)}
+          actionsDropdown={
+            USE_DROPDOWN ? (
+              <PartActionsDropdown
+                availableActions={availableActions}
+                onActionSelected={performActionToSelectedParts}
+              />
+            ) : (
+              <PartActionsButtons availableActions={availableActions} onActionSelected={performActionToSelectedParts} />
+            )
+          }
+        />
+      )}
+    </>
+  );
+
   return (
     <Fragment>
+      {multipartActionsControllers()}
       {runParts && runParts.length > 0 && (
         <>
           {!stepReady && (
@@ -175,30 +200,9 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
               })}
             </tbody>
           </Table>
-          {stepReady && (
-            <PartSelectionControls
-              onSelectAll={selectAllParts}
-              onSelectNone={selectNoneParts}
-              hasSelectedParts={hasSelectedParts}
-              traySelections={traySelections}
-              onToggleTray={(partIds, nextSelected) => setPartsSelection(partIds, nextSelected)}
-              actionsDropdown={
-                USE_DROPDOWN ? (
-                  <PartActionsDropdown
-                    availableActions={availableActions}
-                    onActionSelected={performActionToSelectedParts}
-                  />
-                ) : (
-                  <PartActionsButtons
-                    availableActions={availableActions}
-                    onActionSelected={performActionToSelectedParts}
-                  />
-                )
-              }
-            />
-          )}
         </>
       )}
+      {runStepParts.length >= 25 && multipartActionsControllers()}
     </Fragment>
   );
 };
