@@ -64,7 +64,7 @@ export const RunPartList = ({
             runPart={runPart}
             statusClass={getBadgeStatusClass(runPart)}
             allowCreate={allowCreate}
-            hasStepPart={stepPartsById.has(runPart.id)}
+            stepPart={stepPartsById.get(runPart.id)}
             isSelected={selectedPartIds.includes(runPart.id)}
             runStep={step}
           />
@@ -142,7 +142,7 @@ export const RunPartList = ({
               statusClass={runPart ? getBadgeStatusClass(runPart) : undefined}
               withTrayCell
               allowCreate={allowCreate}
-              hasStepPart={runPart ? stepPartsById.has(runPart.id) : false}
+              stepPart={runPart ? stepPartsById.get(runPart.id) : undefined}
               isSelected={runPart ? selectedPartIds.includes(runPart.id) : false}
               runStep={step}
             />
@@ -177,7 +177,7 @@ export const RunPartList = ({
                     runPart={runPart}
                     statusClass={getBadgeStatusClass(runPart)}
                     allowCreate={allowCreate}
-                    hasStepPart={stepPartsById.has(runPart.id)}
+                    stepPart={stepPartsById.get(runPart.id)}
                     isSelected={selectedPartIds.includes(runPart.id)}
                     runStep={step}
                   />
@@ -227,7 +227,7 @@ export const RunPartList = ({
                     statusClass={statusClass}
                     withTrayCell
                     allowCreate={allowCreate}
-                    hasStepPart={runPart ? stepPartsById.has(runPart.id) : false}
+                    stepPart={runPart ? stepPartsById.get(runPart.id) : undefined}
                     isSelected={runPart ? selectedPartIds.includes(runPart.id) : false}
                     runStep={step}
                   />

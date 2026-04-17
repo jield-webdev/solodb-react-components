@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 import StepDetails from "@jield/solodb-react-components/modules/run/components/run/steps/element/stepDetails";
@@ -10,13 +10,10 @@ import {
   RunStepPart,
   Requirement,
   EquipmentModule,
-  listRunSteps,
-  listRunParts,
-  listRequirements,
   listRunStepParts,
 } from "@jield/solodb-typescript-core";
 import { RunPartList } from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartList";
-import { keepPreviousData, useQueries, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQueries } from "@tanstack/react-query";
 
 
 //runStepParts
