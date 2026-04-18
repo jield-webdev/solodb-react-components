@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import {
   ApiFormattedResponse,
+  getRunStep,
   listRunStepParts,
   RunPart,
   RunStep,
@@ -30,7 +31,7 @@ const applyActionToRunStepPart = (runStepPart: RunStepPart, latestAction: RunSte
 
 // Queries store items either as { items: [...] } (regular) or { pages: [{ items: [...] }, ...] } (infinite).
 // This helper abstracts over both formats so callers only need to supply an items transform.
-const mapOverItems = (data: any, transform: (items: RunStepPart[]) => RunStepPart[]): any => {
+const mapOverItems = <T>(data: any, transform: (items: T[]) => T[]): any => {
   if (!data) return data;
 
   if (Array.isArray(data.pages)) {
@@ -38,13 +39,13 @@ const mapOverItems = (data: any, transform: (items: RunStepPart[]) => RunStepPar
       ...data,
       pages: data.pages.map((page: any) => {
         if (!page || !Array.isArray(page.items)) return page;
-        return { ...page, items: transform(page.items as RunStepPart[]) };
+        return { ...page, items: transform(page.items as T[]) };
       }),
     };
   }
 
   if (Array.isArray(data.items)) {
-    return { ...data, items: transform(data.items as RunStepPart[]) };
+    return { ...data, items: transform(data.items as T[]) };
   }
 
   return data;
@@ -54,13 +55,13 @@ const mapOverItems = (data: any, transform: (items: RunStepPart[]) => RunStepPar
 
 const applyOptimisticUpdate = (data: any, options: UpdateRunStepPartCacheOptions): any => {
   const { runStepPart, latestAction } = options;
-  return mapOverItems(data, (items) =>
+  return mapOverItems<RunStepPart>(data, (items) =>
     items.map((item) => (item.id === runStepPart.id ? applyActionToRunStepPart(item, latestAction) : item))
   );
 };
 
 const applyBatchUpdate = (data: any, updatesById: Map<number, RunStepPart>): any =>
-  mapOverItems(data, (items) => items.map((item) => updatesById.get(item.id) ?? item));
+  mapOverItems<RunStepPart>(data, (items) => items.map((item) => updatesById.get(item.id) ?? item));
 
 const normalizeLatestActions = (
   latestActions: RunStepPartState[] | ApiFormattedResponse<RunStepPartState>
@@ -82,7 +83,7 @@ const applyBatchActions = (
     latestActions.map((action) => [action.updated_run_step_part_state.run_part_id, action])
   );
 
-  return mapOverItems(data, (items) =>
+  return mapOverItems<RunStepPart>(data, (items) =>
     items.map((item) => {
       const latestAction = actionsByStepPartId.get(item.id) ?? actionsByRunPartId.get(item.part_id);
       return latestAction ? applyActionToRunStepPart(item, latestAction) : item;
@@ -100,7 +101,9 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart): any => {
     );
 
     if (existsInAnyPage) {
-      return mapOverItems(data, (items) => items.map((item) => (item.id === runStepPart.id ? runStepPart : item)));
+      return mapOverItems<RunStepPart>(data, (items) =>
+        items.map((item) => (item.id === runStepPart.id ? runStepPart : item))
+      );
     }
 
     // Append to last page if not found in any page
@@ -149,12 +152,31 @@ const refreshRunStepPartCacheForRunStepParts = async (
   queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => applyBatchUpdate(data, updatesById));
 };
 
+const refreshRunStepCacheForRunStepParts = async (
+  queryClient: QueryClient,
+  runStepParts: RunStepPart[]
+): Promise<void> => {
+  const stepIds = Array.from(new Set(runStepParts.map((part) => part.step_id)));
+  if (stepIds.length === 0) return;
+
+  const steps = await Promise.all(stepIds.map((id) => getRunStep({ id })));
+  const updatesById = new Map(steps.map((step) => [step.id, step]));
+
+  queryClient.setQueriesData({ queryKey: ["runSteps"] }, (data) =>
+    mapOverItems<RunStep>(data, (items) => items.map((item) => updatesById.get(item.id) ?? item))
+  );
+};
+
 const updateRunStepPartCacheInternal = (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions): void => {
   // Apply optimistic update immediately, then reconcile with fresh server data
   queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => applyOptimisticUpdate(data, options));
 
   void refreshRunStepPartCacheForRunStepParts(queryClient, [options.runStepPart]).catch((error) => {
     console.error("Failed to refresh run step part cache from run part.", error);
+  });
+
+  void refreshRunStepCacheForRunStepParts(queryClient, [options.runStepPart]).catch((error) => {
+    console.error("Failed to refresh run step cache from run step part.", error);
   });
 };
 
@@ -191,6 +213,10 @@ export const updateRunStepPartCacheByRunStep = (
 
     void refreshRunStepPartCacheForRunStepParts(queryClient, runStepParts).catch((error) => {
       console.error("Failed to refresh run step part cache from run parts.", error);
+    });
+
+    void refreshRunStepCacheForRunStepParts(queryClient, [{ step_id: runStep.id } as RunStepPart]).catch((error) => {
+      console.error("Failed to refresh run step cache from run step.", error);
     });
     return;
   }
