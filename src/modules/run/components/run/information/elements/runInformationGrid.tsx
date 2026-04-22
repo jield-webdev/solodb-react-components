@@ -20,7 +20,7 @@ export default function RunInformationGrid() {
           <i className="fa fa-tag text-primary mt-1" />
           <div>
             <div className="text-muted small">Name</div>
-            <div className="fw-semibold">{run.name ?? "—"}</div>
+            <div className="fw-semibold">{run.name ?? "—"}</div>c
           </div>
         </div>
       </div>

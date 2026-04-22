@@ -1,10 +1,10 @@
-import { RunPart, RunStep } from '@jield/solodb-typescript-core';
-declare const RunPartIndicator: ({ runPart, statusClass, withTrayCell, allowCreate, hasStepPart, isSelected, runStep, }: {
+import { RunPart, RunStep, RunStepPart } from '@jield/solodb-typescript-core';
+declare const RunPartIndicator: ({ runPart, stepPart, statusClass, withTrayCell, allowCreate, isSelected, runStep, }: {
     runPart: RunPart | null;
+    stepPart?: RunStepPart;
     statusClass?: string;
     withTrayCell?: boolean;
     allowCreate?: boolean;
-    hasStepPart?: boolean;
     isSelected?: boolean;
     runStep?: RunStep;
 }) => import("react/jsx-runtime").JSX.Element | null;

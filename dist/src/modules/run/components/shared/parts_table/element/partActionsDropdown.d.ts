@@ -4,7 +4,7 @@ export interface PartActionsDropdownProps {
         id: RunStepPartActionEnum;
         name: string;
     }[];
-    onActionSelected: (action: RunStepPartActionEnum) => void;
+    onActionSelected: (action: RunStepPartActionEnum) => Promise<void> | void;
 }
 /**
  * Dropdown component for bulk part actions.

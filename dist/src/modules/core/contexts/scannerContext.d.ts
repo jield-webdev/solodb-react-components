@@ -1,4 +1,4 @@
-import { ScannedKeysType } from '../../../../../modules/run/utils/parseScannerForRun';
+import { ScannedKeysType } from '../../../../modules/core/utils/parseScannerType';
 export interface ScannerContext {
     lastlyReadedKeys: string;
     addCallbackFn: (type: ScannedKeysType, id: string, fun: (readedKeys: string) => void) => void;
@@ -6,5 +6,5 @@ export interface ScannerContext {
     addReadingCallbackFn: (id: string, fun: (readingKeys: string) => void) => void;
     removeReadingCallbackFn: (id: string) => void;
 }
-export declare const ScannerContext: import('react').Context<ScannerContext>;
+export declare const ScannerContext: import('react').Context<ScannerContext | null>;
 export declare const useScannerContext: () => ScannerContext;

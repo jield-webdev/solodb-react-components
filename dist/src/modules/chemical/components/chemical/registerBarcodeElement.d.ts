@@ -1,20 +1,6 @@
 import { Room, Location } from '@jield/solodb-typescript-core';
-/**
- * Checks if a string ends with "/l/" followed by an integer
- * @param {string} url - The URL to check
- * @returns {boolean} - True if the URL ends with "/l/" followed by an integer, false otherwise
- */
-export declare function scannedCodeIsLocationCode(url: string): boolean;
-/**
- * Extracts the label number if the URL ends with "/l/" followed by an integer
- * @param {string} url - The URL to check
- * @returns {number|null} - The extracted number or null if pattern doesn't match
- */
-export declare function extractLabelNumber(url: string): number | null;
-export declare const AMOUNT_UNITS: {
-    value: string;
-    label: string;
-}[];
+import { AMOUNT_UNITS, scannedCodeIsLocationCode, extractLabelNumber } from '../../../../../modules/chemical/utils/chemicalContainerUtils';
+export { AMOUNT_UNITS, scannedCodeIsLocationCode, extractLabelNumber };
 export default function RegisterBarcodeElement({ room, barcode, resetForm, location, setLocation, }: {
     room: Room;
     barcode: string;
