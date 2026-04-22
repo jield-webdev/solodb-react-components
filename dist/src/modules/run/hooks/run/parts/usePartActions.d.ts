@@ -8,7 +8,7 @@ export interface UsePartActionsOptions {
     actionsFromScanner?: boolean;
 }
 export interface UsePartActionsResult {
-    performActionToSelectedParts: (action: RunStepPartActionEnum) => void;
+    performActionToSelectedParts: (action: RunStepPartActionEnum) => Promise<void>;
     getAvailableActionsForSelection: () => {
         id: RunStepPartActionEnum;
         name: string;
