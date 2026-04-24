@@ -21,7 +21,9 @@ import { ScannedKeysType } from "@jield/solodb-react-components/modules/core/uti
 
 export default function ChemicalIntakeElement() {
   const { environment } = useParams();
-  const { addCallbackFn, removeCallbackFn } = useScannerContext();
+  const { addReadingCallbackFn, removeReadingCallbackFn, addCallbackFn, removeCallbackFn } = useScannerContext();
+
+  const [readingKeys, setReadingKeys] = useState<string>("");
 
   const [foundExternalLabels, setFoundExternalLabels] = useState<ChemicalContainerExternalLabel[]>([]);
   const [foundContainer, setFoundContainer] = useState<ChemicalContainer | null>(null);
@@ -78,6 +80,14 @@ export default function ChemicalIntakeElement() {
   // Scanner: handle QR scans to select chemical container
   const scanCallbackId = useId();
 
+  useEffect(() => {
+    addReadingCallbackFn(scanCallbackId, setReadingKeys);
+
+    return () => {
+      removeReadingCallbackFn(scanCallbackId);
+    };
+  }, []);
+
   const onScanKeys = useCallback(async (keys: string) => {
     if (keys.includes("/l/")) return;
 
@@ -124,7 +134,12 @@ export default function ChemicalIntakeElement() {
   return (
     <div>
       <div className="d-flex justify-content-between">
-        <RoomSelectElement control={control} name="room" />
+        <div>
+          <div style={{ width: "fit-content" }}>
+            <RoomSelectElement control={control} name="room" />
+          </div>
+          <p className={"pt-3"}>Reading from scanner: {readingKeys}</p>
+        </div>
 
         <div className="d-flex flex-column">
           <QRCodeSVG value="reset-form" size={100} className="float-end" onClick={resetForm} />
