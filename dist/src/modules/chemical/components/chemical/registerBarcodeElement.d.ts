@@ -1,5 +1,5 @@
 import { Room, Location } from '@jield/solodb-typescript-core';
-import { AMOUNT_UNITS, scannedCodeIsLocationCode, extractLabelNumber } from '../../../../../modules/chemical/utils/chemicalContainerUtils';
+import { AMOUNT_UNITS, scannedCodeIsLocationCode, extractLabelNumber } from '../../utils/chemicalContainerUtils';
 export { AMOUNT_UNITS, scannedCodeIsLocationCode, extractLabelNumber };
 export default function RegisterBarcodeElement({ room, barcode, resetForm, location, setLocation, }: {
     room: Room;
