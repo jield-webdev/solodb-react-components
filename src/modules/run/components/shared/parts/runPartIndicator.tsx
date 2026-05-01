@@ -14,7 +14,7 @@ import {
   updateRunStepPartCacheByRunStep,
   upsertRunStepPartCache,
 } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import RunPartProductionActionsButtons from "../parts_table/element/runPartProductionActionsButtons";
 import React from "react";
 
@@ -42,6 +42,7 @@ const RunPartIndicator = ({
   const [showPartActions, setShowPartActions] = useState(false);
 
   const target = useRef(null);
+  const showTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const openActions = () => {
@@ -49,13 +50,30 @@ const RunPartIndicator = ({
       clearTimeout(hideTimeout.current);
       hideTimeout.current = null;
     }
-    setShowPartActions(true);
+    if (showPartActions) return;
+    if (showTimeout.current) {
+      clearTimeout(showTimeout.current);
+    }
+    showTimeout.current = setTimeout(() => {
+      setShowPartActions(true);
+    }, 500);
   };
 
   const scheduleHideActions = () => {
+    if (showTimeout.current) {
+      clearTimeout(showTimeout.current);
+      showTimeout.current = null;
+    }
     if (hideTimeout.current) clearTimeout(hideTimeout.current);
     hideTimeout.current = setTimeout(() => setShowPartActions(false), 150);
   };
+
+  useEffect(() => {
+    return () => {
+      if (showTimeout.current) clearTimeout(showTimeout.current);
+      if (hideTimeout.current) clearTimeout(hideTimeout.current);
+    };
+  }, []);
 
   const createRunStepPart = () => {
     if (!runPart || !runStep) return;

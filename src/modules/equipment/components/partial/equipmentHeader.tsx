@@ -34,14 +34,11 @@ export default function EquipmentHeader() {
   //Show a loading screen as long as one of the queries is still loading
   //Create a derived state to keep track of loading state
   const isLoading = queries.some((query) => query.isLoading);
-  const isError = queries.some((query) => query.isError);
   const dataAvailable = queries.every((query) => query.isSuccess);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  const mainTool = moduleQuery.data?.items.findLast((module) => module.is_main_module);
 
   return (
     dataAvailable && (
