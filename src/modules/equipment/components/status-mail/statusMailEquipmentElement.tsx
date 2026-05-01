@@ -62,8 +62,8 @@ export default function StatusMailEquipmentElement({
     setModuleEcnNotes(ecnNotes);
     setModuleIssues(issues);
 
-    setEquipmentModules(modules.filter((module) => module.equipment.id === equipment.id && !module.type.is_main_tool));
-    setMainTool(modules.findLast((module) => module.equipment.id === equipment.id && module.type.is_main_tool));
+    setEquipmentModules(modules.filter((module) => module.equipment.id === equipment.id && !module.is_main_module));
+    setMainTool(modules.findLast((module) => module.equipment.id === equipment.id && module.is_main_module));
   }, [ecnNotes, issues, equipment, modules]);
 
   //This element gets all ECN notes, but we only need those who are related to the module

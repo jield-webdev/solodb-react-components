@@ -41,7 +41,7 @@ export default function EquipmentHeader() {
     return <div>Loading...</div>;
   }
 
-  const mainTool = moduleQuery.data?.items.findLast((module) => module.type.is_main_tool);
+  const mainTool = moduleQuery.data?.items.findLast((module) => module.is_main_module);
 
   return (
     dataAvailable && (

@@ -208,7 +208,7 @@ export default function EquipmentDashboard() {
           {modulesQuery.data?.items.map((module, i) => (
             <React.Fragment key={i}>
               <div className="d-flex justify-content-between">
-                <h3>{!module.type.is_main_tool ? module.name : "Main tool"}</h3>
+                <h3>{!module.is_main_module ? module.name : "Main tool"}</h3>
                 <div>
                   <ModuleStatusElement module={module} />
                 </div>
@@ -227,7 +227,7 @@ export default function EquipmentDashboard() {
                         New ECN
                       </Button>
                     </div>
-                    <div>{module.type.is_main_tool && <LogAssistElement size="sm" moduleId={module.id} />}</div>
+                    <div>{module.is_main_module && <LogAssistElement size="sm" moduleId={module.id} />}</div>
                   </div>
                 </div>
 
