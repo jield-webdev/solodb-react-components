@@ -25073,7 +25073,7 @@ function vF({ equipment: e, modules: t, issues: n, issueAttachments: r, ecnNotes
 		]), O([...D, e]);
 	};
 	d(() => {
-		E(i), O(n), b(t.filter((t) => t.id !== e.main_tool_module_id)), w(t.findLast((t) => t.id === e.main_tool_module_id));
+		E(i), O(n), b(t.filter((t) => t.equipment.id === e.id && t.id !== e.main_tool_module_id)), w(t.findLast((t) => t.equipment.id === e.id && t.id === e.main_tool_module_id));
 	}, [
 		i,
 		n,

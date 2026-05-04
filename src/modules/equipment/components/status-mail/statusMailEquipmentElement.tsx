@@ -7,7 +7,15 @@ import { ButtonGroup, Card, Col, Dropdown, DropdownButton, Row } from "react-boo
 import EcnModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/ecnModalForm";
 import IssueModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/issueModalForm";
 import ReservationElement from "@jield/solodb-react-components/modules/equipment/components/partial/reservationElement";
-import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleReservation } from "@jield/solodb-typescript-core";
+import {
+  Equipment,
+  EquipmentModule,
+  EquipmentModuleEcn,
+  EquipmentModuleEcnAttachment,
+  EquipmentModuleIssue,
+  EquipmentModuleIssueAttachment,
+  EquipmentModuleReservation,
+} from "@jield/solodb-typescript-core";
 
 export default function StatusMailEquipmentElement({
   equipment,
@@ -62,8 +70,8 @@ export default function StatusMailEquipmentElement({
     setModuleEcnNotes(ecnNotes);
     setModuleIssues(issues);
 
-    setEquipmentModules(modules.filter((module) => module.id !== equipment.main_tool_module_id));
-    setMainTool(modules.findLast((module) => module.id === equipment.main_tool_module_id));
+    setEquipmentModules(modules.filter((module) => module.equipment.id === equipment.id && module.id !== equipment.main_tool_module_id));
+    setMainTool(modules.findLast((module) =>  module.equipment.id === equipment.id &&  module.id === equipment.main_tool_module_id));
   }, [ecnNotes, issues, equipment, modules]);
 
   //This element gets all ECN notes, but we only need those who are related to the module
