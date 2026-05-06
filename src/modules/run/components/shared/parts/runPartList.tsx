@@ -15,6 +15,7 @@ import {
 import RunPartIndicator from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartIndicator";
 import { updateRunStepPartCacheByRunStep } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import { PartActionsButtons } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partActionsButtons";
+import { buildDisplaySlotIndexByPartId, buildSplitSlotAssignments } from "./runPartSlotDistribution";
 
 const TrayBulkActions = ({
   label,
@@ -142,6 +143,14 @@ export const RunPartList = ({
     acc.set(part.tray.id, list);
     return acc;
   }, new Map());
+  const allNonTrayParts = parts.filter((part) => !part.tray);
+  const allPartsByTrayId = parts.reduce<Map<number, RunPart[]>>((acc, part) => {
+    if (!part.tray) return acc;
+    const list = acc.get(part.tray.id) ?? [];
+    list.push(part);
+    acc.set(part.tray.id, list);
+    return acc;
+  }, new Map());
 
   const allowCreate = run.run_type === RunTypeEnum.PRODUCTION;
   const isSplitLevel = step.part_level > 0;
@@ -183,56 +192,58 @@ export const RunPartList = ({
 
   if (trays.length === 0) {
     const columnsPerRow = 12;
-    const maxSlotIndex = Math.max(
-      leveledParts.length,
-      leveledParts.reduce((maxValue, runPart) => Math.max(maxValue, runPart.left ?? 0), 0)
-    );
+    const displaySlotIndexByPartId = buildDisplaySlotIndexByPartId({
+      parts: allNonTrayParts,
+      getDirectSlotIndex: (runPart) => (runPart.left >= 1 ? runPart.left - 1 : null),
+    });
+    const maxSlotIndex = isSplitLevel
+      ? leveledParts.reduce(
+          (maxValue, runPart) =>
+            Math.max(maxValue, (displaySlotIndexByPartId.get(runPart.id) ?? -1) + 1),
+          0
+        )
+      : Math.max(
+          leveledParts.length,
+          leveledParts.reduce((maxValue, runPart) => Math.max(maxValue, runPart.left ?? 0), 0)
+        );
     const totalRows = Math.max(1, Math.ceil(maxSlotIndex / columnsPerRow));
     const totalColumns = columnsPerRow;
     const trayStyle: CSSProperties = {
       "--tray-columns": totalColumns,
       "--tray-rows": totalRows,
     } as CSSProperties;
-    const slots = Array.from({ length: totalRows * totalColumns }, () => [] as RunPart[]);
-    const unassigned: RunPart[] = [];
+    const slots = isSplitLevel
+      ? buildSplitSlotAssignments({
+          parts: leveledParts,
+          slotCount: totalRows * totalColumns,
+          getSlotIndex: (runPart) => displaySlotIndexByPartId.get(runPart.id) ?? null,
+        })
+      : Array.from({ length: totalRows * totalColumns }, () => [] as RunPart[]);
 
-    leveledParts.forEach((runPart) => {
-      const column = runPart.left;
-      const slotIndex = column >= 1 && column <= slots.length ? column - 1 : null;
-      if (slotIndex !== null) {
-        if (isSplitLevel) {
-          slots[slotIndex].push(runPart);
-          return;
-        }
-        if (!slots[slotIndex].length) {
-          slots[slotIndex].push(runPart);
-          return;
-        }
-        unassigned.push(runPart);
-      } else {
-        unassigned.push(runPart);
-      }
-    });
+    if (!isSplitLevel) {
+      const unassigned: RunPart[] = [];
 
-    unassigned.forEach((runPart) => {
-      if (isSplitLevel) {
-        const nextIndex = slots.reduce((bestIndex, slot, index) => {
-          if (bestIndex === -1 || slot.length < slots[bestIndex].length) {
-            return index;
+      leveledParts.forEach((runPart) => {
+        const column = runPart.left;
+        const slotIndex = column >= 1 && column <= slots.length ? column - 1 : null;
+        if (slotIndex !== null) {
+          if (!slots[slotIndex].length) {
+            slots[slotIndex].push(runPart);
+            return;
           }
-          return bestIndex;
-        }, -1);
+          unassigned.push(runPart);
+        } else {
+          unassigned.push(runPart);
+        }
+      });
+
+      unassigned.forEach((runPart) => {
+        const nextIndex = slots.findIndex((slot) => slot.length === 0);
         if (nextIndex !== -1) {
           slots[nextIndex].push(runPart);
         }
-        return;
-      }
-
-      const nextIndex = slots.findIndex((slot) => slot.length === 0);
-      if (nextIndex !== -1) {
-        slots[nextIndex].push(runPart);
-      }
-    });
+      });
+    }
 
     return (
       <div className="tray-grid" data-orientation="ltr" style={trayStyle}>
@@ -308,20 +319,30 @@ export const RunPartList = ({
           "--tray-columns": trayType.columns,
           "--tray-rows": trayType.rows,
         } as CSSProperties;
-        const slots = Array.from({ length: trayCapacity }, () => [] as RunPart[]);
         const trayParts = partsByTrayId.get(tray.id) ?? [];
-
-        trayParts.forEach((runPart) => {
-          const slotIndex = getSlotIndex(trayType, runPart.tray_row, runPart.tray_column);
-          if (slotIndex === null) return;
-          if (isSplitLevel) {
-            slots[slotIndex].push(runPart);
-            return;
-          }
-          if (!slots[slotIndex].length) {
-            slots[slotIndex].push(runPart);
-          }
+        const trayAllParts = allPartsByTrayId.get(tray.id) ?? [];
+        const displaySlotIndexByPartId = buildDisplaySlotIndexByPartId({
+          parts: trayAllParts,
+          slotCount: trayCapacity,
+          getDirectSlotIndex: (runPart) => getSlotIndex(trayType, runPart.tray_row, runPart.tray_column),
         });
+        const slots = isSplitLevel
+          ? buildSplitSlotAssignments({
+              parts: trayParts,
+              slotCount: trayCapacity,
+              getSlotIndex: (runPart) => displaySlotIndexByPartId.get(runPart.id) ?? null,
+            })
+          : Array.from({ length: trayCapacity }, () => [] as RunPart[]);
+
+        if (!isSplitLevel) {
+          trayParts.forEach((runPart) => {
+            const slotIndex = getSlotIndex(trayType, runPart.tray_row, runPart.tray_column);
+            if (slotIndex === null) return;
+            if (!slots[slotIndex].length) {
+              slots[slotIndex].push(runPart);
+            }
+          });
+        }
 
         const trayStepParts = trayParts
           .map((p) => stepPartsById.get(p.id))
