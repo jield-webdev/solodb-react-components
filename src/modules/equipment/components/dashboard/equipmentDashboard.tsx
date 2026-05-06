@@ -210,7 +210,7 @@ export default function EquipmentDashboard() {
               <div className="d-flex justify-content-between">
                 <h3>{!module.is_main_module ? module.name : "Main tool"}</h3>
                 <div>
-                  <ModuleStatusElement module={module} />
+                  <ModuleStatusElement module={module} refetchFn={() => reloadQueriesByKey(["module", equipment.name])} />
                 </div>
               </div>
 
