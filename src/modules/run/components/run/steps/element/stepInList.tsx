@@ -15,7 +15,6 @@ import {
 import { RunPartList } from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartList";
 import { keepPreviousData, useQueries } from "@tanstack/react-query";
 
-
 //runStepParts
 
 export default function StepInList({
@@ -57,7 +56,10 @@ export default function StepInList({
 
   const [runStepPartsQuery] = queries;
 
-  const runStepParts = useMemo(() => (runStepPartsQuery.data?.items ?? []) as RunStepPart[], [runStepPartsQuery.data?.items]);
+  const runStepParts = useMemo(
+    () => (runStepPartsQuery.data?.items ?? []) as RunStepPart[],
+    [runStepPartsQuery.data?.items]
+  );
 
   return (
     <>
@@ -120,9 +122,12 @@ export default function StepInList({
           </Link>{" "}
         </td>
         <td>
-          <Link to={`/${environment}/operator/equipment/${stepModule.equipment.id}`} className="me-2">
-            {stepModule.equipment.name}
-          </Link>
+          {stepModule.equipment && (
+            <Link to={`/${environment}/operator/equipment/${stepModule.equipment.id}`} className="me-2">
+              {stepModule.equipment.name}
+            </Link>
+          )}
+
           <ModuleStatusElement
             module={stepModule}
             refetchFn={() => {
