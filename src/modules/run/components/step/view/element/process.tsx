@@ -9,8 +9,8 @@ const Process = ({ runStep }: { runStep: RunStep }) => {
     <h2>
       {" "}
       {runStep.number} -{runStep.process_module.process.name} on{" "}
-      <Link to={`/${environment}/operator/equipment/${runStep.process_module.module.equipment.id}`}>
-        {runStep.process_module.module.equipment.name} ({runStep.process_module.module.name})
+      <Link to={`/${environment}/operator/equipment/${runStep.process_module.module.equipment?.id}`}>
+        {runStep.process_module.module.equipment?.name} ({runStep.process_module.module.name})
       </Link>
     </h2>
   );

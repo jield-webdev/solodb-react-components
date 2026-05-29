@@ -231,8 +231,8 @@ const StepDashboard = () => {
         <Col className={"col-3"}>
           <div className={"d-flex flex-column"}>
             <h2>
-              <Link to={`/${environment}/operator/equipment/${runStep.process_module.module.equipment.id}`}>
-                {runStep.process_module.module.equipment.name} ({runStep.process_module.module.name})
+              <Link to={`/${environment}/operator/equipment/${runStep.process_module.module.equipment?.id}`}>
+                {runStep.process_module.module.equipment?.name} ({runStep.process_module.module?.name})
               </Link>
             </h2>
 
