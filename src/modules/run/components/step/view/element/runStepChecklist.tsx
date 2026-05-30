@@ -66,7 +66,7 @@ export default function RunStepChecklist({
       setStatusMessage(statusMessages.movingOut);
       setIsProcessing(true);
       try {
-        const response: AxiosResponse<RunStep> = await finishStep(targetRunStep);
+        const response = await finishStep(targetRunStep);
         setStatusMessage(statusMessages.operationFinished);
         if (response.data.next_step_id !== null) {
           navigate(`/${environment}/operator/run/step/${response.data.next_step_id}`);
