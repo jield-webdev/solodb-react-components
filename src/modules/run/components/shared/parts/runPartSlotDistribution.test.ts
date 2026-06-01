@@ -139,4 +139,34 @@ describe("runPartSlotDistribution", () => {
       ["S003-A1"],
     ]);
   });
+
+  it("uses override slot positions before inherited parent slots", () => {
+    const parent = makePart({ id: 1, left: 1, short_label: "S001" });
+    const child = makePart({ id: 11, left: 1, root_id: 1, short_label: "S001-A1", parent: { id: 1 } as RunPart });
+
+    const displaySlotIndexByPartId = buildDisplaySlotIndexByPartId({
+      parts: [parent, child],
+      getOverrideSlotIndex: (part) => (part.id === child.id ? 2 : null),
+      getDirectSlotIndex: (part) => (part.left ?? 1) - 1,
+    });
+
+    expect(displaySlotIndexByPartId.get(parent.id)).toBe(0);
+    expect(displaySlotIndexByPartId.get(child.id)).toBe(2);
+  });
+
+  it("does not loop forever when finite tray slots are full", () => {
+    const displaySlotIndexByPartId = buildDisplaySlotIndexByPartId({
+      parts: [
+        makePart({ id: 1, short_label: "S001" }),
+        makePart({ id: 2, short_label: "S002" }),
+        makePart({ id: 3, short_label: "S003" }),
+      ],
+      slotCount: 2,
+      getDirectSlotIndex: () => null,
+    });
+
+    expect(displaySlotIndexByPartId.get(1)).toBe(0);
+    expect(displaySlotIndexByPartId.get(2)).toBe(1);
+    expect(displaySlotIndexByPartId.has(3)).toBe(false);
+  });
 });

@@ -16,11 +16,13 @@
 - Run tests in watch mode: `yarn test:watch`
 - Generate coverage report: `yarn coverage`
 
-## Expected Validation Before Finalizing Changes
+## Expected Validation Before Finalizing BIG Changes
 
 - Run at least `yarn test` and `npx -y react-doctor@latest . --verbose --diff` before finishing.
 - If behavior changes, add or update tests near the affected domain code.
 - Use the example app (`yarn dev`) to manually verify UI/interaction changes.
+
+- NOTES: if it is a quick change you can skip the checks and just prompt the user to check it for himself
 
 ## Architecture Map
 

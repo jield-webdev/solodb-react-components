@@ -109,10 +109,12 @@ export const buildSplitSlotAssignments = ({
 
 export const buildDisplaySlotIndexByPartId = ({
   parts,
+  getOverrideSlotIndex,
   getDirectSlotIndex,
   slotCount,
 }: {
   parts: RunPart[];
+  getOverrideSlotIndex?: (runPart: RunPart) => number | null;
   getDirectSlotIndex: (runPart: RunPart) => number | null;
   slotCount?: number;
 }) => {
@@ -133,6 +135,18 @@ export const buildDisplaySlotIndexByPartId = ({
     const pendingParts: RunPart[] = [];
 
     levelParts.forEach((runPart) => {
+      const overrideSlotIndex = getOverrideSlotIndex?.(runPart);
+      if (
+        overrideSlotIndex !== undefined &&
+        overrideSlotIndex !== null &&
+        overrideSlotIndex >= 0 &&
+        (slotCount === undefined || overrideSlotIndex < slotCount)
+      ) {
+        slotIndexByPartId.set(runPart.id, overrideSlotIndex);
+        occupiedSlots.add(overrideSlotIndex);
+        return;
+      }
+
       const parentSlotIndex = runPart.parent?.id ? slotIndexByPartId.get(runPart.parent.id) : undefined;
       if (parentSlotIndex !== undefined) {
         slotIndexByPartId.set(runPart.id, parentSlotIndex);
@@ -157,7 +171,7 @@ export const buildDisplaySlotIndexByPartId = ({
 
     pendingParts.forEach((runPart) => {
       let nextSlotIndex = 0;
-      while (occupiedSlots.has(nextSlotIndex) || (slotCount !== undefined && nextSlotIndex >= slotCount)) {
+      while (occupiedSlots.has(nextSlotIndex)) {
         nextSlotIndex += 1;
       }
 

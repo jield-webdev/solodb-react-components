@@ -24,12 +24,14 @@ export const TrayGrid = ({
   tray,
   trayParts,
   trayAllParts,
+  stepParts,
   isSplitLevel,
   context,
 }: {
   tray: RunTray;
   trayParts: RunPart[];
   trayAllParts: RunPart[];
+  stepParts: RunStepPart[];
   isSplitLevel: boolean;
   context: RunPartRenderContext;
 }) => {
@@ -37,6 +39,12 @@ export const TrayGrid = ({
   const trayType = tray.tray_type;
   const label = tray.name ?? tray.label ?? "";
   const trayStepParts = toTrayStepParts(trayParts, stepPartsById);
+  const stepPartByPartId = new Map<number, RunStepPart>();
+  stepParts.forEach((stepPart) => {
+    if (stepPart.step_id === step.id) {
+      stepPartByPartId.set(stepPart.part_id, stepPart);
+    }
+  });
 
   if (!trayType?.rows || !trayType?.columns) {
     return (
@@ -59,6 +67,15 @@ export const TrayGrid = ({
   const displaySlotIndexByPartId = buildDisplaySlotIndexByPartId({
     parts: trayAllParts,
     slotCount: trayCapacity,
+    getOverrideSlotIndex: (runPart) => {
+      const stepPart = stepPartByPartId.get(runPart.id);
+      if (!stepPart || (stepPart.tray_row == null && stepPart.tray_column == null)) return null;
+      return getSlotIndex(
+        trayType,
+        stepPart.tray_row ?? runPart.tray_row,
+        stepPart.tray_column ?? runPart.tray_column
+      );
+    },
     getDirectSlotIndex: (runPart) => getSlotIndex(trayType, runPart.tray_row, runPart.tray_column),
   });
   const slots = isSplitLevel
@@ -71,7 +88,12 @@ export const TrayGrid = ({
 
   if (!isSplitLevel) {
     trayParts.forEach((runPart) => {
-      const slotIndex = getSlotIndex(trayType, runPart.tray_row, runPart.tray_column);
+      const stepPart = stepPartByPartId.get(runPart.id);
+      const slotIndex = getSlotIndex(
+        trayType,
+        stepPart?.tray_row ?? runPart.tray_row,
+        stepPart?.tray_column ?? runPart.tray_column
+      );
       if (slotIndex === null) return;
       if (!slots[slotIndex].length) {
         slots[slotIndex].push(runPart);

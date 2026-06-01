@@ -5,14 +5,28 @@ import { TrayGrid } from "./runPartList/trayGrid";
 import { type RunPartRenderContext } from "./runPartList/partCell";
 import { useMemo } from "react";
 
-const groupPartsByTrayId = (parts: RunPart[], stepParts: RunStepPart[]): Map<number, RunPart[]> =>
-  parts.reduce<Map<number, RunPart[]>>((acc, part) => {
+const getTrayIdPerStepPart = (part: RunPart, stepPart: RunStepPart | null | undefined): number => {
+    if (!stepPart  || !stepPart.tray_id) {
+        return part.tray?.id ?? 0;
+    }
+
+    return stepPart.tray_id;
+};
+
+const groupPartsByTrayId = (parts: RunPart[], stepParts: RunStepPart[]): Map<number, RunPart[]> => {
+  const stepPartsByPartId = new Map(stepParts.map((stepPart) => [stepPart.part_id, stepPart]));
+
+  return parts.reduce<Map<number, RunPart[]>>((acc, part) => {
     if (!part.tray) return acc;
-    const list = acc.get(part.tray.id) ?? [];
+
+    const trayId = getTrayIdPerStepPart(part, stepPartsByPartId.get(part.id));
+
+    const list = acc.get(trayId) ?? [];
     list.push(part);
-    acc.set(part.tray.id, list);
+    acc.set(trayId, list);
     return acc;
   }, new Map());
+};
 
 export const RunPartList = ({
   step,
@@ -80,6 +94,7 @@ export const RunPartList = ({
           tray={tray}
           trayParts={partsByTrayId.get(tray.id) ?? []}
           trayAllParts={allPartsByTrayId.get(tray.id) ?? []}
+          stepParts={stepParts}
           isSplitLevel={isSplitLevel}
           context={context}
         />
