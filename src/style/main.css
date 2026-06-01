@@ -183,6 +183,11 @@
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: grab;
+}
+
+.tray-visual__part:active {
+  cursor: grabbing;
 }
 
 .tray-visual__index {

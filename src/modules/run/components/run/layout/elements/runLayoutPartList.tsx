@@ -1,5 +1,5 @@
-import { type CSSProperties } from "react";
-import { Run, RunPart, RunStep, RunStepPart, TrayType } from "@jield/solodb-typescript-core";
+import { type CSSProperties, type DragEvent } from "react";
+import { Run, RunPart, RunStep, RunStepPart, TrayType, updateRunStepPartTray } from "@jield/solodb-typescript-core";
 import { RunPartList } from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartList";
 
 type RunTray = NonNullable<Run["run_trays"]>[number];
@@ -43,6 +43,40 @@ const groupPartsByTrayId = (parts: RunPart[], stepPartsByPartId: Map<number, Run
   }, new Map());
 };
 
+const handlePartDragStart = (event: DragEvent<HTMLSpanElement>, part: RunPart) => {
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", String(part.id));
+};
+
+const handleSlotDragOver = (event: DragEvent<HTMLDivElement>) => {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+};
+
+const handleSlotDrop = async (
+  event: DragEvent<HTMLDivElement>,
+  tray: RunTray,
+  row: number,
+  column: number,
+  stepPartsByPartId: Map<number, RunStepPart>
+) => {
+  event.preventDefault();
+  const partId = Number(event.dataTransfer.getData("text/plain"));
+  const stepPart = stepPartsByPartId.get(partId);
+  const values = {
+    tray_id: tray.id,
+    tray_row: row,
+    tray_column: column,
+  };
+
+  if (!stepPart) {
+    console.error("Unable to update run step part tray: stepPart not found", values);
+    return;
+  }
+
+  await updateRunStepPartTray(stepPart, tray, row, column);
+};
+
 const RunLayoutTrayVisual = ({
   tray,
   parts,
@@ -61,7 +95,12 @@ const RunLayoutTrayVisual = ({
         <h4 className="h6 mb-2">{trayLabel}</h4>
         <div className="d-flex flex-wrap gap-2">
           {parts.map((part) => (
-            <span key={part.id} className={`tray-visual__part badge bg-primary badge-level-${part.part_level}`}>
+            <span
+              key={part.id}
+              className={`tray-visual__part badge bg-primary badge-level-${part.part_level}`}
+              draggable
+              onDragStart={(event) => handlePartDragStart(event, part)}
+            >
               {part.scanner_label}
             </span>
           ))}
@@ -106,6 +145,8 @@ const RunLayoutTrayVisual = ({
                   data-tray-row={row}
                   data-tray-column={column}
                   data-pocket-number={pocketNumber}
+                  onDragOver={handleSlotDragOver}
+                  onDrop={(event) => handleSlotDrop(event, tray, row, column, stepPartsByPartId)}
                 >
                   {slotParts.length ? (
                     slotParts.map((part) => (
@@ -113,6 +154,8 @@ const RunLayoutTrayVisual = ({
                         key={part.id}
                         className={`tray-visual__part badge bg-primary badge-level-${part.part_level}`}
                         data-part-id={part.id}
+                        draggable
+                        onDragStart={(event) => handlePartDragStart(event, part)}
                       >
                         {part.scanner_label}
                       </span>

@@ -11,7 +11,7 @@ import {
   RunStepPart,
 } from "@jield/solodb-typescript-core";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
-import { RunLayoutPartList } from "./runLayoutPartList";
+import { RunLayoutPartList } from "./elements/runLayoutPartList";
 
 const PAGE_SIZE = 1000;
 
