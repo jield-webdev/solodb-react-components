@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { keepPreviousData, useQueries } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
 import { Placeholder, Table } from "react-bootstrap";
 import {
   listRunParts,
@@ -11,52 +10,35 @@ import {
   RunStepPart,
 } from "@jield/solodb-typescript-core";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
-import { RunLayoutPartList } from "./elements/runLayoutPartList";
-
-const PAGE_SIZE = 1000;
+import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
+import RunLayoutStep from "./elements/runStepInLayout";
 
 export default function RunLayoutElement() {
   const { run } = useContext(RunContext);
-  const { environment } = useParams();
+  const [page, setPage] = useState<number>(1);
+  const [pageSize] = useState<number>(25);
   const [toggledLabels, setToggledLabels] = useState<Map<number, boolean>>(new Map());
 
   const queries = useQueries({
     queries: [
       {
-        queryKey: ["runSteps", JSON.stringify(run), "layout"],
-        queryFn: () => listRunSteps({ run, page: 1, pageSize: PAGE_SIZE }),
+        queryKey: ["runSteps", JSON.stringify(run), page],
+        queryFn: () => listRunSteps({ run, page, pageSize }),
         placeholderData: keepPreviousData,
       },
       {
         queryKey: ["runParts", JSON.stringify(run)],
         queryFn: () => listRunParts({ run }),
       },
-      {
-        queryKey: ["runStepParts", JSON.stringify(run)],
-        queryFn: () => listRunStepParts({ run }),
-      },
     ],
   });
 
-  const [runStepsQuery, runPartsQuery, runStepPartsQuery] = queries;
+  const [runStepsQuery, runPartsQuery] = queries;
   const isLoading = queries.some((query) => query.isLoading);
   const isError = queries.some((query) => query.isError);
 
   const runSteps = useMemo(() => (runStepsQuery.data?.items ?? []) as RunStep[], [runStepsQuery.data?.items]);
   const runParts = useMemo(() => (runPartsQuery.data?.items ?? []) as RunPart[], [runPartsQuery.data?.items]);
-  const runStepParts = useMemo(
-    () => (runStepPartsQuery.data?.items ?? []) as RunStepPart[],
-    [runStepPartsQuery.data?.items]
-  );
-
-  const runStepPartsByStepId = useMemo(() => {
-    return runStepParts.reduce<Map<number, RunStepPart[]>>((acc, stepPart) => {
-      const list = acc.get(stepPart.step_id) ?? [];
-      list.push(stepPart);
-      acc.set(stepPart.step_id, list);
-      return acc;
-    }, new Map());
-  }, [runStepParts]);
 
   useEffect(() => {
     setToggledLabels((prev) => {
@@ -111,7 +93,7 @@ export default function RunLayoutElement() {
       <tr style={{ cursor: "pointer" }} onClick={() => toggleLabel(labelId)}>
         <td colSpan={2} style={{ margin: 0 }} className="bg-secondary">
           <span className="label-toggle">
-            <i className={"fa " + (toggledLabels.get(labelId) ? "fa-caret-down" : "fa-caret-right")} /> {label.label}
+            <i className={"fa " + (Boolean(toggledLabels.get(step.label?.id ?? -1)) ? "fa-caret-down" : "fa-caret-right")} /> {label.label}
           </span>
         </td>
       </tr>
@@ -185,35 +167,26 @@ export default function RunLayoutElement() {
           {runSteps.map((step) => (
             <React.Fragment key={`step-${step.id}`}>
               {step.has_label && renderLabel(step)}
-              {(!step.has_label || toggledLabels.get(step.label?.id ?? -1)) && (
+              {(!step.has_label || Boolean(toggledLabels.get(step.label?.id ?? -1))) && (
                 <>
                   {step.has_step_group && firstInGroupSteps.includes(step) && renderGroupHeader(step)}
-                  <tr>
-                    <td>
-                      <Link to={`/${environment}/operator/run/step/${step.id}`}>
-                        {" "}
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: step.name,
-                          }}
-                        />
-                      </Link>
-                    </td>
-                    <td>
-                      <RunLayoutPartList
-                        step={step}
-                        parts={runParts}
-                        stepParts={runStepPartsByStepId.get(step.id) ?? []}
-                        run={run}
-                      />
-                    </td>
-                  </tr>
+                  <RunLayoutStep
+                    key={`step-${step.id}`}
+                    step={step}
+                    parts={runParts}
+                    run={run}
+                  />
                 </>
               )}
             </React.Fragment>
           ))}
         </tbody>
       </Table>
+      <PaginationLinks
+        data={runStepsQuery.data!}
+        setPage={setPage}
+        isPlaceholderData={runStepsQuery.isPlaceholderData}
+      />
     </div>
   );
 }

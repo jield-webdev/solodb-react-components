@@ -5,7 +5,7 @@ import { TrayGrid } from "./runPartList/trayGrid";
 import { type RunPartRenderContext } from "./runPartList/partCell";
 import { useMemo } from "react";
 
-const getTrayIdPerStepPart = (part: RunPart, stepPart: RunStepPart | null | undefined): number => {
+export const getTrayIdPerStepPart = (part: RunPart, stepPart: RunStepPart | null | undefined): number => {
     if (!stepPart  || !stepPart.tray_id) {
         return part.tray?.id ?? 0;
     }
@@ -13,7 +13,7 @@ const getTrayIdPerStepPart = (part: RunPart, stepPart: RunStepPart | null | unde
     return stepPart.tray_id;
 };
 
-const groupPartsByTrayId = (parts: RunPart[], stepParts: RunStepPart[]): Map<number, RunPart[]> => {
+export const groupPartsByTrayId = (parts: RunPart[], stepParts: RunStepPart[]): Map<number, RunPart[]> => {
   const stepPartsByPartId = new Map(stepParts.map((stepPart) => [stepPart.part_id, stepPart]));
 
   return parts.reduce<Map<number, RunPart[]>>((acc, part) => {
