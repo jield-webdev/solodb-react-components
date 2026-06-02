@@ -30,6 +30,9 @@ const RunHeaderElement = lazy(() =>
 const RunInformationElement = lazy(() =>
   import("@jield/solodb-react-components").then((m) => ({ default: m.RunInformationElement }))
 );
+const RunLayoutElement = lazy(() =>
+  import("@jield/solodb-react-components").then((m) => ({ default: m.RunLayoutElement }))
+);
 const RunStepsElement = lazy(() =>
   import("@jield/solodb-react-components").then((m) => ({ default: m.RunStepsElement }))
 );
@@ -85,6 +88,7 @@ const ROUTES = {
     DETAILS: "/:environment/operator/run/details/:id",
     DETAILS_INFO: "/:environment/operator/run/details/:id/information",
     DETAILS_STEPS: "/:environment/operator/run/details/:id/steps",
+    DETAILS_LAYOUT: "/:environment/operator/run/details/:id/layout",
     STEP: "/:environment/operator/run/step/:id",
   },
   CHEMICAL: {
@@ -157,6 +161,7 @@ export default function PageRoutes() {
         <Route path={ROUTES.RUN.BASE}>
           <Route path={ROUTES.RUN.DETAILS} element={<RunHeaderElement />}>
             <Route path={ROUTES.RUN.DETAILS_INFO} element={<RunInformationElement />} />
+            <Route path={ROUTES.RUN.DETAILS_LAYOUT} element={<RunLayoutElement />} />
             <Route
               path={ROUTES.RUN.DETAILS_STEPS}
               element={
