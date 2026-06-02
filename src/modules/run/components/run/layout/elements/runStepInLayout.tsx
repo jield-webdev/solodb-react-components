@@ -25,6 +25,19 @@ export default function RunStepInLayout({ step, parts, run }: { step: RunStep; p
     [runStepPartsQuery.data?.items]
   );
 
+  const leveledParts = useMemo(
+    () =>
+      parts
+        .filter((p) => p.part_level === step.part_level)
+        .sort((a, b) => {
+          if (a.root_id && b.root_id && a.root_id !== b.root_id) {
+            return a.root_id - b.root_id;
+          }
+          return a.left - b.left;
+        }),
+    [parts]
+  );
+
   return (
     <tr>
       <td>
@@ -45,7 +58,7 @@ export default function RunStepInLayout({ step, parts, run }: { step: RunStep; p
             ))}
           </Placeholder>
         ) : (
-          <RunLayoutPartList step={step} parts={parts} stepParts={stepParts} run={run} />
+          <RunLayoutPartList step={step} parts={leveledParts} stepParts={stepParts} run={run} />
         )}
       </td>
     </tr>
