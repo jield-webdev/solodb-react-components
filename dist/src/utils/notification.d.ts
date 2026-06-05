@@ -8,5 +8,5 @@ export type NotificationProps = {
 export declare function notification(props: NotificationProps): void;
 export declare function NotificationProvider({ children }: {
     children: ReactNode;
-}): import("react/jsx-runtime").JSX.Element;
+}): import("react").JSX.Element;
 export {};

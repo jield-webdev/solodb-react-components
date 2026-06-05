@@ -1,2 +1,3 @@
-declare const InputModal: () => import("react/jsx-runtime").JSX.Element;
+import { default as React } from 'react';
+declare const InputModal: () => React.JSX.Element;
 export default InputModal;

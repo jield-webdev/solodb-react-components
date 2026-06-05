@@ -1,2 +1,3 @@
-declare const PriorityBadge: () => import("react/jsx-runtime").JSX.Element;
+import { default as React } from 'react';
+declare const PriorityBadge: () => React.JSX.Element;
 export default PriorityBadge;

@@ -1,6 +1,7 @@
+import { default as React } from 'react';
 interface RoomSelectElementProps {
     control: any;
     name: string;
 }
-export default function RoomSelectElement({ control, name }: RoomSelectElementProps): import("react/jsx-runtime").JSX.Element;
+export default function RoomSelectElement({ control, name }: RoomSelectElementProps): React.JSX.Element;
 export {};

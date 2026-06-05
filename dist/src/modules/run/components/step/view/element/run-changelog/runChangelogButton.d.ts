@@ -1,4 +1,5 @@
+import { default as React } from 'react';
 declare const RunChangelogButton: ({ size }: {
     size?: "lg" | "sm" | undefined;
-}) => import("react/jsx-runtime").JSX.Element;
+}) => React.JSX.Element;
 export default RunChangelogButton;

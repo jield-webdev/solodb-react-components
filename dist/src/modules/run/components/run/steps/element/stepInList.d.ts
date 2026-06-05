@@ -5,4 +5,4 @@ export default function StepInList({ run, step, parts, monitoredBy, refetchFn, }
     parts: RunPart[];
     monitoredBy: Requirement | undefined;
     refetchFn: (key: any[]) => void;
-}): import("react/jsx-runtime").JSX.Element;
+}): import("react").JSX.Element;

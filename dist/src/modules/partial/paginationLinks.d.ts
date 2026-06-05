@@ -1,3 +1,4 @@
+import { default as React } from 'react';
 import { ApiFormattedResponse } from '@jield/solodb-typescript-core';
 declare const PaginationLinks: ({ data, setPage, setPageSize, pageSize, isPlaceholderData, }: {
     data: ApiFormattedResponse<any> | undefined;
@@ -5,5 +6,5 @@ declare const PaginationLinks: ({ data, setPage, setPageSize, pageSize, isPlaceh
     setPageSize?: (pageSize: (old: number) => number) => void;
     pageSize?: number;
     isPlaceholderData: boolean;
-}) => import("react/jsx-runtime").JSX.Element;
+}) => React.JSX.Element;
 export default PaginationLinks;

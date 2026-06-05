@@ -1,5 +1,6 @@
+import { default as React } from 'react';
 import { Run } from '@jield/solodb-typescript-core';
 declare const BatchCardElement: ({ run }: {
     run: Run;
-}) => import("react/jsx-runtime").JSX.Element;
+}) => React.JSX.Element;
 export default BatchCardElement;

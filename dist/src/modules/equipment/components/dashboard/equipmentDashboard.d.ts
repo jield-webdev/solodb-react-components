@@ -1,1 +1,2 @@
-export default function EquipmentDashboard(): import("react/jsx-runtime").JSX.Element;
+import { JSX } from 'react';
+export default function EquipmentDashboard(): JSX.Element;

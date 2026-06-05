@@ -6,4 +6,4 @@ export interface PartActionsButtonsProps {
     }[];
     onActionSelected: (action: RunStepPartActionEnum) => Promise<void> | void;
 }
-export declare const PartActionsButtons: ({ availableActions, onActionSelected }: PartActionsButtonsProps) => import("react/jsx-runtime").JSX.Element | null;
+export declare const PartActionsButtons: ({ availableActions, onActionSelected }: PartActionsButtonsProps) => import("react").JSX.Element | null;

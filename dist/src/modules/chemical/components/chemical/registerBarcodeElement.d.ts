@@ -1,5 +1,6 @@
+import { default as React } from 'react';
 import { Room, Location } from '@jield/solodb-typescript-core';
-import { AMOUNT_UNITS, scannedCodeIsLocationCode, extractLabelNumber } from '../../utils/chemicalContainerUtils';
+import { AMOUNT_UNITS, scannedCodeIsLocationCode, extractLabelNumber } from '../../../../../modules/chemical/utils/chemicalContainerUtils';
 export { AMOUNT_UNITS, scannedCodeIsLocationCode, extractLabelNumber };
 export default function RegisterBarcodeElement({ room, barcode, resetForm, location, setLocation, }: {
     room: Room;
@@ -7,4 +8,4 @@ export default function RegisterBarcodeElement({ room, barcode, resetForm, locat
     resetForm: () => void;
     location: Location | null;
     setLocation: (location: Location | null) => void;
-}): import("react/jsx-runtime").JSX.Element;
+}): React.JSX.Element;

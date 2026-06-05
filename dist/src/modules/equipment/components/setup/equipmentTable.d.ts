@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { default as React, Dispatch, SetStateAction } from 'react';
 import { Equipment, FilterData } from '@jield/solodb-typescript-core';
 export default function EquipmentTable({ equipmentList, currentFilter, setEquipmentSort, addEquipment, addDisabled, }: {
     equipmentList: Equipment[];
@@ -9,4 +9,4 @@ export default function EquipmentTable({ equipmentList, currentFilter, setEquipm
         order: string;
         direction?: "asc" | "desc";
     }>>;
-}): import("react/jsx-runtime").JSX.Element;
+}): React.JSX.Element;

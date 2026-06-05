@@ -1,1 +1,1 @@
-export default function IrisOperatorDashboard(): import("react/jsx-runtime").JSX.Element;
+export default function IrisOperatorDashboard(): import("react").JSX.Element;

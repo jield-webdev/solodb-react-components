@@ -1,4 +1,4 @@
-import { ModalProperties } from '../../core/interfaces/modalProperties';
+import { ModalProperties } from '../../../../modules/core/interfaces/modalProperties';
 import { RunStep, Run } from '@jield/solodb-typescript-core';
 interface RunStepContext {
     runStep: RunStep;

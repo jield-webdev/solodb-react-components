@@ -1,3 +1,4 @@
+import { default as React } from 'react';
 export default function BarcodeScanElement({ control }: {
     control: any;
-}): import("react/jsx-runtime").JSX.Element;
+}): React.JSX.Element;

@@ -1,1 +1,2 @@
-export default function RunHeader(): import("react/jsx-runtime").JSX.Element;
+import { default as React } from 'react';
+export default function RunHeader(): React.JSX.Element;

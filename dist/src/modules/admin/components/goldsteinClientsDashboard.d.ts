@@ -1,2 +1,3 @@
+import { default as React } from 'react';
 export declare const SERVER_DNS: string;
-export default function GoldsteinClientsDashboard(): import("react/jsx-runtime").JSX.Element;
+export default function GoldsteinClientsDashboard(): React.JSX.Element;

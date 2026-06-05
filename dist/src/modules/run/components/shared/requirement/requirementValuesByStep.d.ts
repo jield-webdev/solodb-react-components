@@ -4,4 +4,4 @@ export default function RequirementValuesByStep({ requirement, measurementResult
     measurementResults?: MeasurementResult[];
     refetchFn?: (keys: any[]) => void;
     editOnly?: boolean;
-}): import("react/jsx-runtime").JSX.Element;
+}): import("react").JSX.Element;

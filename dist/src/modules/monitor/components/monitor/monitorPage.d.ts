@@ -1,1 +1,2 @@
-export default function MonitorPage(): import("react/jsx-runtime").JSX.Element;
+import { default as React } from 'react';
+export default function MonitorPage(): React.JSX.Element;

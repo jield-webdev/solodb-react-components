@@ -6,5 +6,5 @@ type Props = {
         runStepPartAction: RunStepPartActionEnum;
     }) => void;
 };
-declare const RunPartProductionActionsButtons: ({ runStepPart, setRunStepPartAction }: Props) => import("react/jsx-runtime").JSX.Element | null;
+declare const RunPartProductionActionsButtons: ({ runStepPart, setRunStepPartAction }: Props) => import("react").JSX.Element | null;
 export default RunPartProductionActionsButtons;

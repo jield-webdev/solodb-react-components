@@ -6,5 +6,5 @@ interface IrisOperatorEventDetailsProps {
     irisEndpoint: string;
     onEventUpdated: (nextEvent: FileUploadEvent) => void;
 }
-export default function IrisOperatorEventDetails({ event, contentEntries, irisEndpoint, onEventUpdated, }: IrisOperatorEventDetailsProps): import("react/jsx-runtime").JSX.Element;
+export default function IrisOperatorEventDetails({ event, contentEntries, irisEndpoint, onEventUpdated, }: IrisOperatorEventDetailsProps): import("react").JSX.Element;
 export {};

@@ -18,4 +18,4 @@ export interface PartSelectionControlsProps {
  * Renders a button group for selecting/deselecting all parts,
  * and conditionally displays an actions dropdown when parts are selected.
  */
-export declare const PartSelectionControls: ({ onSelectAll, onSelectNone, hasSelectedParts, actionsDropdown, traySelections, onToggleTray, }: PartSelectionControlsProps) => import("react/jsx-runtime").JSX.Element;
+export declare const PartSelectionControls: ({ onSelectAll, onSelectNone, hasSelectedParts, actionsDropdown, traySelections, onToggleTray, }: PartSelectionControlsProps) => import("react").JSX.Element;

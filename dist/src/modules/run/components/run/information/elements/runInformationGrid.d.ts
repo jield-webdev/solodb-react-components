@@ -1,1 +1,2 @@
-export default function RunInformationGrid(): import("react/jsx-runtime").JSX.Element;
+import { default as React } from 'react';
+export default function RunInformationGrid(): React.JSX.Element;

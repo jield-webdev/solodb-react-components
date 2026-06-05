@@ -1,2 +1,3 @@
-declare const StepDashboard: () => import("react/jsx-runtime").JSX.Element;
+import { default as React } from 'react';
+declare const StepDashboard: () => React.JSX.Element;
 export default StepDashboard;

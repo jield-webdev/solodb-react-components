@@ -12,6 +12,6 @@ declare class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBou
     static getDerivedStateFromError(error: Error): ErrorBoundaryState;
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void;
     handleReset: () => void;
-    render(): import("react/jsx-runtime").JSX.Element;
+    render(): React.JSX.Element;
 }
 export default ErrorBoundary;

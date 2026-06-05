@@ -7,4 +7,4 @@ export default function RequirementValuesWithPartTable({ requirement, step, step
     measurementResults?: MeasurementResult[];
     refetchFn?: (keys: any[]) => void;
     editOnly?: boolean;
-}): import("react/jsx-runtime").JSX.Element;
+}): import("react").JSX.Element;

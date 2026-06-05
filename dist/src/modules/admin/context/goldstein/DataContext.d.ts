@@ -13,6 +13,6 @@ interface GoldsteinDataProviderProps {
     children: ReactNode;
     defaultData: Props;
 }
-export declare function GoldsteinDataProvider({ children, defaultData }: GoldsteinDataProviderProps): import("react/jsx-runtime").JSX.Element;
+export declare function GoldsteinDataProvider({ children, defaultData }: GoldsteinDataProviderProps): React.JSX.Element;
 export declare const useGoldsteinClientDataContext: () => GoldsteinDataContextValue;
 export {};

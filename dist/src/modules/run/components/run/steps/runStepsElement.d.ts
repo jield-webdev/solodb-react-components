@@ -1,1 +1,2 @@
-export default function RunStepsElement(): import("react/jsx-runtime").JSX.Element;
+import { default as React } from 'react';
+export default function RunStepsElement(): React.JSX.Element;

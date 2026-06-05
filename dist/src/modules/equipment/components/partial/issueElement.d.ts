@@ -1,3 +1,4 @@
+import { JSX } from 'react';
 import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from '@jield/solodb-typescript-core';
 export default function IssueElement({ issue, equipment, issueAttachments, reloadQueryFn, expanded, }: {
     issue: EquipmentModuleIssue;
@@ -5,4 +6,4 @@ export default function IssueElement({ issue, equipment, issueAttachments, reloa
     issueAttachments: EquipmentModuleIssueAttachment[];
     reloadQueryFn: (key: string[]) => void;
     expanded?: boolean;
-}): import("react/jsx-runtime").JSX.Element;
+}): JSX.Element;

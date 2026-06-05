@@ -7,4 +7,4 @@ export declare const FillValueModal: ({ requirement, result, show, setShow, refe
     refetchFn: (keys: any) => void;
     part?: RunPart;
     stepPart?: RunStepPart;
-}) => import("react/jsx-runtime").JSX.Element;
+}) => import("react").JSX.Element;

@@ -1,3 +1,4 @@
+import { default as React } from 'react';
 import { ServiceEventReportResult } from '@jield/solodb-typescript-core';
 type SaveStatusState = "idle" | "dirty" | "saving" | "saved" | "error";
 type SaveStatus = {
@@ -10,5 +11,5 @@ export default function Criterion({ result, status, onAutoSave, onDirty, }: {
     status?: SaveStatus;
     onAutoSave: (cv: ServiceEventReportResult) => void;
     onDirty: (resultId: number) => void;
-}): import("react/jsx-runtime").JSX.Element;
+}): React.JSX.Element;
 export {};

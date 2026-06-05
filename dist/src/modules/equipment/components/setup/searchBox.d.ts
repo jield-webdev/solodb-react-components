@@ -1,4 +1,5 @@
+import { default as React } from 'react';
 export default function SharchBox({ setSearchQuery, resetFilter }: {
     setSearchQuery: (query: string) => void;
     resetFilter: () => void;
-}): import("react/jsx-runtime").JSX.Element;
+}): React.JSX.Element;

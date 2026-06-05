@@ -11,4 +11,4 @@ export interface PartActionsDropdownProps {
  *
  * Renders a dropdown menu driven by the server-provided `available_actions` array.
  */
-export declare const PartActionsDropdown: ({ availableActions, onActionSelected }: PartActionsDropdownProps) => import("react/jsx-runtime").JSX.Element | null;
+export declare const PartActionsDropdown: ({ availableActions, onActionSelected }: PartActionsDropdownProps) => import("react").JSX.Element | null;

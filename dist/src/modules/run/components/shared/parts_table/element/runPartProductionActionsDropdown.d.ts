@@ -1,3 +1,4 @@
+import { default as React } from 'react';
 import { RunStepPart, RunStepPartActionEnum } from '@jield/solodb-typescript-core';
 type Props = {
     runStepPart: RunStepPart;
@@ -7,5 +8,5 @@ type Props = {
         runStepPartAction: RunStepPartActionEnum;
     }) => void;
 };
-declare const RunPartProductionActionsDropdown: ({ runStepPart, setRunStepPartAction, createRunStepPart, }: Props) => import("react/jsx-runtime").JSX.Element;
+declare const RunPartProductionActionsDropdown: ({ runStepPart, setRunStepPartAction, createRunStepPart, }: Props) => React.JSX.Element;
 export default RunPartProductionActionsDropdown;

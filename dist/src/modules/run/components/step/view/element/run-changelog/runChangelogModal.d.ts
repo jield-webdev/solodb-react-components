@@ -1,5 +1,6 @@
+import { default as React } from 'react';
 declare const RunChangelogModal: ({ show, setModalShow, }: {
     show: boolean;
     setModalShow: (setModalShow: boolean) => void;
-}) => import("react/jsx-runtime").JSX.Element;
+}) => React.JSX.Element;
 export default RunChangelogModal;

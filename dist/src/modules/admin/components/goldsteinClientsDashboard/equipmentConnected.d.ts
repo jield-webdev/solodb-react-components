@@ -1,1 +1,2 @@
-export default function EquipmentConnected(): import("react/jsx-runtime").JSX.Element;
+import { default as React } from 'react';
+export default function EquipmentConnected(): React.JSX.Element;

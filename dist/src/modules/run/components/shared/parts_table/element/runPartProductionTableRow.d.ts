@@ -1,3 +1,4 @@
+import { default as React } from 'react';
 import { RunPart, RunStep, RunStepPart } from '@jield/solodb-typescript-core';
 type Props = {
     runPart: RunPart;
@@ -8,5 +9,5 @@ type Props = {
     runStep: RunStep;
     dropdown: boolean;
 };
-declare const RunStepPartProductionTableRow: ({ runPart, partIsSelected, setPartAsSelected, runStepParts, canInit, runStep, dropdown, }: Props) => import("react/jsx-runtime").JSX.Element | null;
+declare const RunStepPartProductionTableRow: ({ runPart, partIsSelected, setPartAsSelected, runStepParts, canInit, runStep, dropdown, }: Props) => React.JSX.Element | null;
 export default RunStepPartProductionTableRow;

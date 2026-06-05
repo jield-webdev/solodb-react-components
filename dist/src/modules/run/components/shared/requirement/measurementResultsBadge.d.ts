@@ -5,4 +5,4 @@ export declare const MeasurementResultsBadges: ({ requirement, step, measurement
     measurementResults: MeasurementResult[];
     parts: RunPart[];
     stepParts: RunStepPart[];
-}) => import("react/jsx-runtime").JSX.Element;
+}) => import("react").JSX.Element;

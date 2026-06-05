@@ -5,4 +5,4 @@ export declare function FilterBadges({ searchQuery, filter, filterForm, setFilte
     filter: FilterData | null;
     filterForm: FilterFormData;
     setFilterFn: React.Dispatch<React.SetStateAction<FilterData | undefined>>;
-}): import("react/jsx-runtime").JSX.Element;
+}): React.JSX.Element;

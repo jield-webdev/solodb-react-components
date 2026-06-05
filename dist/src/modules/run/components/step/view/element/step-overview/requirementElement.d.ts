@@ -1,3 +1,4 @@
+import { default as React } from 'react';
 import { Requirement, RunPart, RunStepPart } from '@jield/solodb-typescript-core';
 export default function RequirementElement({ requirement, runParts, runStepParts, hideLabel, firstInGroup, }: {
     requirement: Requirement;
@@ -5,4 +6,4 @@ export default function RequirementElement({ requirement, runParts, runStepParts
     runStepParts: RunStepPart[];
     hideLabel?: boolean;
     firstInGroup: boolean;
-}): import("react/jsx-runtime").JSX.Element;
+}): React.JSX.Element;
