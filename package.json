@@ -1,15 +1,15 @@
 {
   "name": "@jield/solodb-react-components",
-  "version": "1.1.8",
+  "version": "1.2.1",
   "type": "module",
   "repository": "jield-webdev/solodb-react-components",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "types": "./dist/src/index.d.ts",
+  "types": "./dist/index.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
       "default": "./dist/index.js"
@@ -27,7 +27,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@jield/solodb-typescript-core": "1.1.9",
+    "@jield/solodb-typescript-core": "1.2.0",
     "@testing-library/dom": "^10.4.1",
     "moment": "^2.30.1",
     "moment-timezone": "^0.6.2",
@@ -35,7 +35,7 @@
     "react-bootstrap": "^2.10.10",
     "react-dropzone": "^15.0.0",
     "react-google-charts": "^5.2.1",
-    "react-hook-form": "^7.75.0",
+    "react-hook-form": "^7.77.0",
     "react-intersection-observer": "^10.0.3",
     "react-markdown": "^10.1.0",
     "react-select": "^5.10.2",
@@ -51,29 +51,29 @@
   },
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",
-    "@tanstack/react-query": "~5.100.9",
-    "@tanstack/react-query-devtools": "~5.100.9",
+    "@tanstack/react-query": "~5.101.0",
+    "@tanstack/react-query-devtools": "~5.101.0",
     "@tanstack/react-table": "^8.21.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
-    "@types/node": "^25.6.2",
-    "@types/react": "^19.2.14",
+    "@types/node": "^25.9.1",
+    "@types/react": "^19.2.16",
     "@types/react-dom": "^19.2.3",
     "@types/react-router-dom": "^5.3.3",
-    "@vitejs/plugin-react": "^6.0.1",
-    "@vitest/coverage-v8": "^4.1.5",
-    "axios": "^1.16.0",
+    "@vitejs/plugin-react": "^6.0.2",
+    "@vitest/coverage-v8": "^4.1.8",
+    "axios": "^1.17.0",
     "jsdom": "^29.1.1",
     "prettier": "^3.8.3",
     "prop-types": "^15.8.1",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
-    "react-router-dom": "^7.15.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.17.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.11",
-    "vite-plugin-dts": "^5.0.0",
-    "vitest": "^4.1.5"
+    "vite": "^8.0.16",
+    "vite-plugin-dts": "^5.0.2",
+    "vitest": "^4.1.8"
   },
-  "packageManager": "yarn@4.14.1"
+  "packageManager": "yarn@4.16.0"
 }
