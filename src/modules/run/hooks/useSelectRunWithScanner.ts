@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Run } from "@jield/solodb-typescript-core";
-import { useScannerContext } from "../../core/contexts/scanner/ScannerContext";
+import { useScannerContext } from "../../core/contexts/scannerContext";
 import { notification } from "@jield/solodb-react-components/index";
 
 export const enum FailStatus {

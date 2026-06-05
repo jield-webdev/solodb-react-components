@@ -94,7 +94,7 @@ export default function RequirementValuesWithPartTable({
   const filteredStepParts = (finalStepParts ?? []).filter(
     (stepPart: RunStepPart) =>
       (finalParts ?? []).find(
-        (part: RunPart) => part.id === stepPart.part.id && part.part_level === step.part_level
+        (part: RunPart) => part.id === stepPart.part_id && part.part_level === step.part_level
       ) !== undefined
   );
 
@@ -198,7 +198,7 @@ export default function RequirementValuesWithPartTable({
                     <tr key={`${stepPart.id}:${target.logging_parameter.id}`} className={rowClass}>
                       {idx === 0 && (
                         <td rowSpan={rowSpan}>
-                          {stepPart.part.short_label}{" "}
+                          {finalParts.find((p) => p.id === stepPart.part_id)?.short_label ?? stepPart.part_id}{" "}
                           <small className="text-muted">({stepPart.id})</small>
                         </td>
                       )}
@@ -237,7 +237,7 @@ export default function RequirementValuesWithPartTable({
                   requirement={requirement}
                   {...(existingResult
                     ? { result: existingResult } 
-                    : { part: stepPart.part, stepPart })} 
+                    : { part: finalParts.find((p) => p.id === stepPart.part_id), stepPart })}
                   show={openModalPartId === String(stepPart.id)}
                   setShow={(show) => {
                     if (!show) setOpenModalPartId(null);

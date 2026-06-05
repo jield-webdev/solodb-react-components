@@ -31,7 +31,7 @@ export const MeasurementResultsBadges = ({
   }, {});
 
   const getBadgeStatusClass = (runPart: RunPart): string => {
-    const stepPart = stepParts.find((sp) => sp.part.id === runPart.id);
+    const stepPart = stepParts.find((sp) => sp.part_id === runPart.id);
     if (!stepPart) {
       return "badge-inactive";
     }

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { keepPreviousData, useQueries, useQueryClient } from "@tanstack/react-query";
-import { Table } from "react-bootstrap";
+import { keepPreviousData, useInfiniteQuery, useQueries, useQueryClient } from "@tanstack/react-query";
+import { Table, Placeholder } from "react-bootstrap";
 
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
@@ -10,11 +10,9 @@ import RequirementStepInList from "@jield/solodb-react-components/modules/run/co
 import {
   listRunSteps,
   listRunParts,
-  listRunStepParts,
   listRequirements,
   RunStep,
   RunPart,
-  RunStepPart,
   Requirement,
 } from "@jield/solodb-typescript-core";
 
@@ -40,10 +38,6 @@ export default function RunStepsElement() {
         queryFn: () => listRunParts({ run }),
       },
       {
-        queryKey: ["runStepParts", JSON.stringify(run)],
-        queryFn: () => listRunStepParts({ run }),
-      },
-      {
         queryKey: ["requirements", JSON.stringify(run)],
         queryFn: () => listRequirements({ run: run }),
       },
@@ -58,7 +52,7 @@ export default function RunStepsElement() {
     queryClient.refetchQueries({ queryKey: finalKeys });
   };
 
-  const [runStepsQuery, runPartQuery, runStepPartsQuery, requirementsQuery] = queries;
+  const [runStepsQuery, runPartQuery, requirementsQuery] = queries;
 
   const isLoading = queries.some((q) => q.isLoading);
   const isError = queries.some((q) => q.isError);
@@ -73,10 +67,6 @@ export default function RunStepsElement() {
 
   const runSteps = useMemo(() => (runStepsQuery.data?.items ?? []) as RunStep[], [runStepsQuery.data?.items]);
   const runParts = useMemo(() => (runPartQuery.data?.items ?? []) as RunPart[], [runPartQuery.data?.items]);
-  const runStepParts = useMemo(
-    () => (runStepPartsQuery.data?.items ?? []) as RunStepPart[],
-    [runStepPartsQuery.data?.items]
-  );
   const requirements = useMemo(
     () => (requirementsQuery.data?.items ?? []) as Requirement[],
     [requirementsQuery.data?.items]
@@ -95,7 +85,71 @@ export default function RunStepsElement() {
     });
   }, [runSteps]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div>
+        <h2>Run steps</h2>
+        <div className="d-flex justify-content-between align-items-center">
+          <div className="form-check form-switch">
+            <Placeholder animation="glow" as="span">
+              <Placeholder style={{ width: "2rem", height: "1rem", borderRadius: "0.5rem" }} />
+            </Placeholder>
+            <Placeholder animation="glow" as="span" className="ms-2">
+              <Placeholder style={{ width: "15rem" }} />
+            </Placeholder>
+          </div>
+        </div>
+        <Table borderless hover striped size="sm">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Parts</th>
+              <th></th>
+              <th>Process</th>
+              <th>Equipment</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[1, 2].map((group) => (
+              <React.Fragment key={group}>
+                <tr style={{ pointerEvents: "none" }}>
+                  <td colSpan={5} className="bg-info">
+                    <Placeholder animation="glow" as="span">
+                      <Placeholder style={{ width: "5rem" }} />
+                    </Placeholder>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Placeholder animation="glow" as="span">
+                      <Placeholder style={{ width: "0.75rem" }} />
+                    </Placeholder>
+                  </td>
+                  <td colSpan={2}>
+                    <Placeholder animation="glow" as="div" className="d-flex flex-wrap gap-1">
+                      {Array.from({ length: 5 }).map((_, j) => (
+                        <Placeholder key={j} style={{ width: "4.5rem", height: "1.5rem", borderRadius: "3px" }} />
+                      ))}
+                    </Placeholder>
+                  </td>
+                  <td>
+                    <Placeholder animation="glow" as="span">
+                      <Placeholder style={{ width: "10rem" }} />
+                    </Placeholder>
+                  </td>
+                  <td>
+                    <Placeholder animation="glow" as="span">
+                      <Placeholder style={{ width: "12rem" }} />
+                    </Placeholder>
+                  </td>
+                </tr>
+              </React.Fragment>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+    );
+  }
   if (isError) return <div className="text-danger">Error loading run steps.</div>;
 
   const seenGroups = new Set<string>();
@@ -178,7 +232,7 @@ export default function RunStepsElement() {
           </tr>
         </thead>
         <tbody>
-          {runSteps.map((step, i) => {
+          {runSteps.map((step) => {
             const key = `step-${step.id}`;
             return (
               <React.Fragment key={key}>
@@ -194,9 +248,6 @@ export default function RunStepsElement() {
                             requirement={requirement}
                             step={step}
                             parts={runParts}
-                            stepParts={runStepParts.filter(
-                              (part) => part.step.id === (requirement.requirement_for_step?.id ?? requirement.step.id)
-                            )}
                             refetchFn={reloadQueriesByKey}
                           />
                         );
@@ -206,7 +257,6 @@ export default function RunStepsElement() {
                         run={run}
                         step={step}
                         parts={runParts}
-                        stepParts={runStepParts.filter((part) => part.step.id === step.id)}
                         monitoredBy={monitoredSteps[step.id]}
                         refetchFn={reloadQueriesByKey}
                       />

@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  RunPart,
+  RunStep,
+  RunStepPart,
+  RunStepPartActionEnum,
+  RunStepPartState,
+  RunStepPartStateEnum,
+  performRunStepPartAction,
+} from "@jield/solodb-typescript-core";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import RunPartProductionActionsDropdown from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsDropdown";
-import {
-  performRunStepPartAction,
-  RunStepPartActionEnum,
-  RunPart,
-  RunStepPart,
-  RunStep,
-} from "@jield/solodb-typescript-core";
-import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import RunPartProductionActionsButtons from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsButtons";
+import {
+  upsertRunStepPartCache,
+  updateRunStepPartCacheByRunStep,
+} from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
+import isRunStepReadyForProcessing from "@jield/solodb-react-components/modules/run/utils/isRunStepReadyForProcessing";
 
 type Props = {
   runPart: RunPart;
@@ -20,43 +26,47 @@ type Props = {
   runStepParts: RunStepPart[];
   canInit: boolean;
   runStep: RunStep;
-  refetchFn?: () => void;
   dropdown: boolean;
-  onRunStepPartUpdated?: (runStepPart: RunStepPart) => void;
 };
 
-const RunStepPartProductionTableRow = (props: Props) => {
-  const queryClient = useQueryClient();
-  const refetchFn = props.refetchFn ?? (() => {});
+/** Returns true when the click target is an interactive element that should swallow the event. */
+const isInteractiveElement = (target: HTMLElement): boolean =>
+  !!target.closest("button, a, input, textarea, select, option, label");
+
+const RunStepPartProductionTableRow = ({
+  runPart,
+  partIsSelected,
+  setPartAsSelected,
+  runStepParts,
+  canInit,
+  runStep,
+  dropdown,
+}: Props) => {
   const [runStepPart, setRunStepPart] = useState<RunStepPart | undefined>();
 
+  const queryClient = useQueryClient();
+
+  // Sync runStepPart from a parent list
   useEffect(() => {
-    const match = props.runStepParts.find((sp) => sp.part.id === props.runPart.id);
+    const match = runStepParts.find((sp) => sp.part_id === runPart.id);
     setRunStepPart(match);
-  }, [props.runStepParts, props.runPart.id]);
+  }, [runStepParts, runPart.id]);
 
   const handleRowClick = (event: React.MouseEvent<HTMLTableRowElement>) => {
-    if (!props.setPartAsSelected) {
-      return;
-    }
+    if (!setPartAsSelected) return;
 
     const target = event.target as HTMLElement;
-    if (target.closest("button, a, input, textarea, select, option, label")) {
-      return;
-    }
+    if (isInteractiveElement(target)) return;
 
-    const partId = runStepPart ? runStepPart.part.id : props.runPart.id;
+    const partId = runStepPart ? runStepPart.part_id : runPart.id;
     if (partId !== undefined) {
-      props.setPartAsSelected(partId);
+      setPartAsSelected(partId);
     }
   };
 
   const createRunStepPart = () => {
-    if (props.canInit) {
-      return;
-    }
+    if (canInit) return;
 
-    const { runPart, runStep, onRunStepPartUpdated } = props as Props;
     axios
       .post("/create/run/step/part", {
         run_part_id: runPart.id,
@@ -65,125 +75,96 @@ const RunStepPartProductionTableRow = (props: Props) => {
       .then((response) => {
         const nextStepPart = { ...response.data } as RunStepPart;
         setRunStepPart(nextStepPart);
-        if (onRunStepPartUpdated) {
-          onRunStepPartUpdated(nextStepPart);
-        }
-
-        //Invalidate the query so we can fetch the new data
-        refetchFn();
-        queryClient.invalidateQueries({
-          queryKey: ["runSteps", "runStepParts"],
-        });
+        upsertRunStepPartCache(queryClient, runStep, nextStepPart);
       });
   };
 
-  const setRunStepPartAction = async ({
+  const doRunStepPartAction = async ({
     runStepPart: targetStepPart,
     runStepPartAction,
   }: {
     runStepPart: RunStepPart;
     runStepPartAction: RunStepPartActionEnum;
   }) => {
-    const latestAction = (await performRunStepPartAction(
-      targetStepPart,
-      runStepPartAction
-    )) as RunStepPart["latest_action"];
+    const latestAction: RunStepPartState = await performRunStepPartAction({
+      runStepPart: targetStepPart,
+      // NOTE: the core library currently types this param as `RunStepPartStateEnum`
+      // even though `available_actions` entries are `RunStepPartActionEnum`.
+      // The numeric value is sent as-is to the backend, so this cast is safe until
+      // the core library's typing is corrected.
+      runStepPartAction: runStepPartAction as unknown as RunStepPartStateEnum,
+    });
 
     setRunStepPart((current) => {
-      if (!current) {
-        return current;
-      }
-      const updatedStepPart = {
+      if (!current) return current;
+
+      const { status, processed, failed, started, available_actions } = latestAction.updated_run_step_part_state;
+
+      return {
         ...current,
-        latest_action: latestAction,
-        actions: current.actions + 1,
+        status,
+        processed,
+        failed,
+        started,
+        available_actions,
       };
-      updateRunStepPartCache(queryClient, {
-        runStepPart: updatedStepPart,
-        action: runStepPartAction,
-        latestAction,
-      });
-      const { onRunStepPartUpdated } = props as Props;
-      if (onRunStepPartUpdated) {
-        onRunStepPartUpdated(updatedStepPart);
-      }
-      return updatedStepPart;
     });
 
-    refetchFn();
-    queryClient.invalidateQueries({
-      queryKey: ["runSteps"],
+    updateRunStepPartCacheByRunStep(queryClient, runStep, {
+      runStepPart: targetStepPart,
+      latestAction,
     });
   };
 
-  const onRunStepPartUpdated = (nextStepPart: RunStepPart) => {
-    setRunStepPart(nextStepPart);
-    const { onRunStepPartUpdated: onUpdated } = props as Props;
-    if (onUpdated) {
-      onUpdated(nextStepPart);
-    }
-  };
-
-  if (!runStepPart) {
-    return null;
-  }
+  if (!runStepPart) return null;
 
   return (
-    <tr onClick={handleRowClick} style={props.setPartAsSelected ? { cursor: "pointer" } : undefined}>
+    <tr onClick={handleRowClick} style={setPartAsSelected ? { cursor: "pointer" } : undefined}>
+      {/* Selection checkbox */}
       <td>
-        {props.setPartAsSelected && (
+        {setPartAsSelected && isRunStepReadyForProcessing(runStep) && (
           <input
             type="checkbox"
-            id={`part-select-${runStepPart.part.id}`}
+            id={`part-select-${runStepPart.part_id}`}
             name="tomato"
-            className={"form-check-input"}
-            checked={props.partIsSelected}
-            onChange={() => {
-              props.setPartAsSelected?.(runStepPart.part.id);
-            }}
+            className="form-check-input"
+            checked={partIsSelected}
+            onChange={() => setPartAsSelected?.(runStepPart.part_id)}
           />
         )}
       </td>
-      <td>{props.runPart.scanner_label}</td>
+
+      {/* Scanner label */}
+      <td>{runPart.scanner_label}</td>
+
+      {/* Status badge */}
       <td>
-        <div className={"d-flex align-items-start gap-1"}>
+        <div className="d-flex align-items-start gap-1">
           <span className={`badge ${runStepPart.status.class ?? ""}`.trim()}>{runStepPart.status.key}</span>
-          <small className={"text-muted"}>{runStepPart.status.text}</small>
+          <small className="text-muted">{runStepPart.status.text}</small>
         </div>
       </td>
+
+      {/* Action buttons / dropdown */}
+
+      {isRunStepReadyForProcessing(runStep) && (
+        <td>
+          {dropdown ? (
+            <RunPartProductionActionsDropdown
+              runStepPart={runStepPart}
+              setRunStepPartAction={doRunStepPartAction}
+              createRunStepPart={createRunStepPart}
+            />
+          ) : (
+            <RunPartProductionActionsButtons runStepPart={runStepPart} setRunStepPartAction={doRunStepPartAction} />
+          )}
+        </td>
+      )}
+
+      {/* Comment */}
       <td>
-        {props.dropdown && (
-          <RunPartProductionActionsDropdown
-            runStepPart={runStepPart}
-            setRunStepPartAction={setRunStepPartAction}
-            createRunStepPart={createRunStepPart}
-          />
-        )}
-        {!props.dropdown && (
-          <RunPartProductionActionsButtons runStepPart={runStepPart} setRunStepPartAction={setRunStepPartAction} />
-        )}
+        <RunStepPartComment runStepPart={runStepPart} setRunStepPart={setRunStepPart} />
       </td>
-      <td>
-        <RunStepPartComment runStepPart={runStepPart} setRunStepPart={onRunStepPartUpdated} />
-      </td>
-      {/*<td>*/}
-      {/*  <small className={"text-muted font-monospace"}>*/}
-      {/*    part id: {runStepPart.part.id}*/}
-      {/*    <br />*/}
-      {/*    run step part id: {runStepPart.id}*/}
-      {/*    <br />*/}
-      {/*    level: {props.runStep.part_level}*/}
-      {/*    <br />*/}
-      {/*    label: {runStepPart.part.label}*/}
-      {/*    <br />*/}
-      {/*    parsed_label: {runStepPart.part.parsed_label}*/}
-      {/*    <br />*/}
-      {/*    short_label: {runStepPart.part.short_label}*/}
-      {/*    <br />*/}
-      {/*    tray: {runStepPart.part.tray?.id} ({runStepPart.part.tray?.label})<br />*/}
-      {/*    tray_column: {runStepPart.part.tray_column} | tray_row: {runStepPart.part.tray_row}*/}
-      {/*  </small>*/}
-      {/*</td>*/}
     </tr>
   );
 };

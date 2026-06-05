@@ -64,7 +64,7 @@ function GoldsteinEquipmentDashboardContent() {
     userID: 0,
   });
   const [timeLeft, setTimeLeft] = useState<number>(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const setServerError = () => {
     setRenderingState({
@@ -93,7 +93,9 @@ function GoldsteinEquipmentDashboardContent() {
             payload: "",
           };
           sendWsMessage(wsRef.current, pkg);
-          clearInterval(timeoutRef.current as NodeJS.Timeout);
+          if (timeoutRef.current) {
+            clearInterval(timeoutRef.current);
+          }
           return 0;
         }
         return prev - 1;
@@ -136,8 +138,7 @@ function GoldsteinEquipmentDashboardContent() {
     }
 
     if (clientStatus.status === Status.USER_AUTHENTICATED) {
-      const userName = await getUsername(clientStatus.message.userID, goldsteinData.goldsteinFQDN);
-      baseStatus.userName = userName;
+      baseStatus.userName = await getUsername(clientStatus.message.userID, goldsteinData.goldsteinFQDN);;
       if (clientStatus.message.usable) {
         baseStatus.status = RenderingEnum.EQUIPMENT_USABLE;
         const elapsed = (new Date().getTime() - new Date(clientStatus.timestamp).getTime()) / 1000;

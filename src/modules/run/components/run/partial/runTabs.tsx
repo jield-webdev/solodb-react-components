@@ -15,12 +15,15 @@ export default function RunTabs(props: { className?: string }) {
       title: "Information",
       link: `/${environment}/operator/run/details/${run.id}/information`,
     },
+    {
+      title: "Steps",
+      link: `/${environment}/operator/run/details/${run.id}/steps`,
+    },
+    {
+      title: "Layout",
+      link: `/${environment}/operator/run/details/${run.id}/layout`,
+    },
   ];
-
-  links.push({
-    title: "Steps",
-    link: `/${environment}/operator/run/details/${run.id}/steps`,
-  });
 
   //Now we can render the tabs
   return (

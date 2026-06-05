@@ -24,14 +24,14 @@ export { default as MonitorProvider } from "@jield/solodb-react-components/modul
 // Run Components
 export { default as RunHeaderElement } from "@jield/solodb-react-components/modules/run/components/run/runHeaderElement";
 export { default as RunStepsElement } from "@jield/solodb-react-components/modules/run/components/run/steps/runStepsElement";
-export { default as RunInformationElement } from "@jield/solodb-react-components/modules/run/components/run/steps/runInformationElement";
+export { default as RunInformationElement } from "@jield/solodb-react-components/modules/run/components/run/information/runInformationElement";
+export { default as RunLayoutElement } from "@jield/solodb-react-components/modules/run/components/run/layout/runLayoutElement";
 export { default as RunStepHeaderElement } from "@jield/solodb-react-components/modules/run/components/step/runStepHeaderElement";
 export { default as RunStepExecuteElement } from "@jield/solodb-react-components/modules/run/components/step/view/runStepExecuteElement";
 export { default as StepDetails } from "@jield/solodb-react-components/modules/run/components/run/steps/element/stepDetails";
 export { default as RunStepChecklist } from "@jield/solodb-react-components/modules/run/components/step/view/element/runStepChecklist";
 export { default as RunStepExecuteMinimal } from "@jield/solodb-react-components/modules/run/components/step/view/runStepExecuteMinimal";
 export { default as BatchCardElement } from "@jield/solodb-react-components/modules/run/components/step/view/element/batchCardElement";
-export { default as SelectRunWithQrScanner } from "@jield/solodb-react-components/modules/run/components/shared/qr-scanner/selectRunWithQrScanner";
 
 // Run Providers
 export { default as RunProvider } from "@jield/solodb-react-components/modules/run/providers/runProvider";
@@ -64,8 +64,11 @@ export { MonitorContext } from "@jield/solodb-react-components/modules/monitor/c
 export { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 export { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 export { EmphasizedParametersContext } from "@jield/solodb-react-components/modules/run/contexts/emphasizedParametersContext";
-export { ScannerContext, useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-export { ScannerProvider } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerProvider";
+export {
+  ScannerContext,
+  useScannerContext,
+} from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
+export { ScannerProvider } from "@jield/solodb-react-components/modules/core/providers/scannerProvider";
 
 // Hooks
 export { useAuth } from "@jield/solodb-react-components/modules/core/hooks/useAuth";
@@ -77,4 +80,4 @@ export { initSolodbComponents } from "@jield/solodb-react-components/modules/cor
 // Utils
 export { notification, NotificationProvider } from "@jield/solodb-react-components/utils/notification";
 
-import "./style/main.css"
+import "./style/main.css";

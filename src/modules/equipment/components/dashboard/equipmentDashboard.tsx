@@ -11,7 +11,16 @@ import EcnModalForm from "@jield/solodb-react-components/modules/equipment/compo
 import IssueModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/issueModalForm";
 import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
 import ListEquipmentReport from "@jield/solodb-react-components/modules/service/components/equipmentReports/ListEquipmentReport";
-import { listEcn, listEcnAttachments, listIssueAttachments, listIssues, listModules, listMonitors, listRuns, Run } from "@jield/solodb-typescript-core";
+import {
+  listEcn,
+  listEcnAttachments,
+  listIssueAttachments,
+  listIssues,
+  listModules,
+  listMonitors,
+  listRuns,
+  Run,
+} from "@jield/solodb-typescript-core";
 
 export default function EquipmentDashboard() {
   const { environment } = useParams();
@@ -208,9 +217,9 @@ export default function EquipmentDashboard() {
           {modulesQuery.data?.items.map((module, i) => (
             <React.Fragment key={i}>
               <div className="d-flex justify-content-between">
-                <h3>{!module.type.is_main_tool ? module.name : "Main tool"}</h3>
+                <h3>{module.id !== equipment.main_tool_module_id ? module.name : "Main tool"}</h3>
                 <div>
-                  <ModuleStatusElement module={module} />
+                  <ModuleStatusElement module={module} refetchFn={() => reloadQueriesByKey(["module", equipment.name])} />
                 </div>
               </div>
 
@@ -227,7 +236,11 @@ export default function EquipmentDashboard() {
                         New ECN
                       </Button>
                     </div>
-                    <div>{module.type.is_main_tool && <LogAssistElement size="sm" moduleId={module.id} />}</div>
+                    <div>
+                      {module.id === equipment.main_tool_module_id && (
+                        <LogAssistElement size="sm" moduleId={module.id} />
+                      )}
+                    </div>
                   </div>
                 </div>
 

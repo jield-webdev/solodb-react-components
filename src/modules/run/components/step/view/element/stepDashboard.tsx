@@ -31,8 +31,7 @@ import {
   RunTypeEnum,
   listEcn,
 } from "@jield/solodb-typescript-core";
-import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-import { randomUUID } from "node:crypto";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
 
 const StepDashboard = () => {
   const { environment } = useParams();
@@ -59,10 +58,6 @@ const StepDashboard = () => {
           getEquipmentModule({
             id: runStep.process_module.module.id,
           }),
-      },
-      {
-        queryKey: ["requirement", runStep.id],
-        queryFn: () => listRequirements({ run: run, step: runStep }),
       },
       {
         queryKey: ["requirement", runStep.id],
@@ -236,8 +231,8 @@ const StepDashboard = () => {
         <Col className={"col-3"}>
           <div className={"d-flex flex-column"}>
             <h2>
-              <Link to={`/${environment}/operator/equipment/${runStep.process_module.module.equipment.id}`}>
-                {runStep.process_module.module.equipment.name} ({runStep.process_module.module.name})
+              <Link to={`/${environment}/operator/equipment/${runStep.process_module.module.equipment?.id}`}>
+                {runStep.process_module.module.equipment?.name} ({runStep.process_module.module?.name})
               </Link>
             </h2>
 

@@ -1,7 +1,7 @@
-import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
-import { notification } from "@jield/solodb-react-components/utils/notification";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
 import { RunPart } from "@jield/solodb-typescript-core";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import parseScannerForRun, { ScannedKeysType } from "../../../../core/utils/parseScannerType";
 
 export interface UsePartSelectionOptions {
   parts: RunPart[];
@@ -43,6 +43,8 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
   // Update the ref whenever parts or setPartAsSelected changes
   const onScanReadsKey = useCallback(
     (keys: string) => {
+      if (parseScannerForRun(keys) != ScannedKeysType.WILD_CARD) return;
+
       const normalizedRead = keys.replace(/_/g, "-").toUpperCase();
 
       // TO prevent empty values
@@ -62,22 +64,10 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
         return;
       }
 
-      const foundPart = parts.find((p) => normalizedRead.includes(p.scanner_label));
+      const foundPart = parts.find((p) => normalizedRead.includes(p.scanner_label.toUpperCase()));
 
-      if (!foundPart) {
-        notification({
-          notificationHeader: "Part scanner",
-          notificationBody: "Part not found",
-          notificationType: "danger",
-        });
-        return;
-      }
-
-      notification({
-        notificationHeader: "Part scanner",
-        notificationBody: `Found part: ${foundPart.scanner_label}`,
-        notificationType: "success",
-      });
+      if (!foundPart) return;
+      
 
       setPartAsSelected(foundPart.id);
     },
@@ -86,12 +76,12 @@ export function usePartSelection({ parts }: UsePartSelectionOptions): UsePartSel
 
   // So when it mounts it tries to pick the lastlyReadedKeys
   useEffect(() => {
-    removeCallbackFn(callbackId);
+    removeCallbackFn(ScannedKeysType.WILD_CARD, callbackId);
     onScanReadsKey(lastlyReadedKeys);
-    addCallbackFn(callbackId, onScanReadsKey);
+    addCallbackFn(ScannedKeysType.WILD_CARD, callbackId, onScanReadsKey);
 
     return () => {
-      removeCallbackFn(callbackId);
+      removeCallbackFn(ScannedKeysType.WILD_CARD, callbackId);
     };
   }, [parts]);
 

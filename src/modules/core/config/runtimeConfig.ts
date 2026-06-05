@@ -40,6 +40,10 @@ export function getSolodbServerApiUrl() {
   return cfg.serverUri + "api";
 }
 
+export function getSolodbServerCleanUrl() {
+  return cfg.serverUri;
+}
+
 export function getIrisServerUrl() {
   return cfg.irisServerUri;
 }

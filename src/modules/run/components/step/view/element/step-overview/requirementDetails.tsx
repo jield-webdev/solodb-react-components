@@ -17,7 +17,9 @@ export default function RequirementDetails({
   parts: RunPart[];
   measurementResults: MeasurementResult[];
 }) {
-  const filteredStepParts = stepParts.filter((part) => part.step.id === (requirement.requirement_for_step?.id ?? requirement.step.id));
+  const filteredStepParts = stepParts.filter(
+    (part) => part.step_id === (requirement.requirement_for_step?.id ?? requirement.step.id)
+  );
   const { environment } = useParams();
   return (
     <>
@@ -36,7 +38,9 @@ export default function RequirementDetails({
           </div>
           <div style={{ flexGrow: 1, flex: "1 1 360px" }}>
             <h4>Monitored Step</h4>
-            <Link to={`/${environment}/operator/run/step/${requirement.requirement_for_step?.id ?? requirement.step.id}`}>
+            <Link
+              to={`/${environment}/operator/run/step/${requirement.requirement_for_step?.id ?? requirement.step.id}`}
+            >
               <span>
                 <i className="fa fa-search"></i> {requirement.requirement_for_step?.name ?? requirement.step.name}
               </span>

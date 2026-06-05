@@ -1,43 +1,34 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { Table } from "react-bootstrap";
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import React, { useMemo, useState } from "react";
+import { Placeholder, Table } from "react-bootstrap";
+import { useQueries } from "@tanstack/react-query";
 import RunPartProductionTableRow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionTableRow";
 import {
-  finishStepWhenAllPartsAreFinished,
   Run,
   RunStep,
-  RunStepPart,
   RunPart,
   listRunParts,
   listRunStepParts,
-  RunStepPartActionEnum,
+  RunStepPartStateEnum,
 } from "@jield/solodb-typescript-core";
+import type { RunStepPart } from "@jield/solodb-typescript-core";
 import { usePartSelection } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartSelection";
-import { notification } from "@jield/solodb-react-components/utils/notification";
-import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
-import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scanner/ScannerContext";
+import useQrPartNotifications from "../../../hooks/run/parts/useQrPartNotifications";
 
 type Props = {
   run: Run;
   runStep: RunStep;
-  runStepParts?: RunStepPart[];
-  runParts?: RunPart[];
-  refetchFn?: () => void;
 };
 
-const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () => {} }: Props) => {
-  const queryClient = useQueryClient();
+const RunPartsQrFlow = ({ run, runStep }: Props) => {
   const queries = useQueries({
     queries: [
       {
         queryKey: ["runParts", run.id, runStep.part_level],
         queryFn: () => listRunParts({ run: run, level: runStep.part_level }),
-        enabled: !runParts, // don't fetch if runParts prop provided
       },
       {
         queryKey: ["runStepParts", runStep.id],
         queryFn: () => listRunStepParts({ step: runStep }),
-        enabled: !runStepParts, // don't fetch if runStepParts prop provided
       },
     ],
   });
@@ -47,25 +38,19 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
   const isLoading = queries.some((q) => q.isLoading);
   const isError = queries.some((q) => q.isError);
 
-  const runPartsData = useMemo<RunPart[]>(
-    () => runParts ?? (runPartQuery.data?.items as RunPart[] | undefined) ?? [],
-    [runParts, runPartQuery.data]
+  const runParts = useMemo<RunPart[]>(
+    () => (runPartQuery.data?.items as RunPart[] | undefined) ?? [],
+    [runPartQuery.data]
   );
 
-  const runStepPartsData = useMemo<RunStepPart[]>(
-    () => runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
-    [runStepParts, runStepPartsQuery.data]
+  const runStepParts = useMemo<RunStepPart[]>(
+    () => (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [],
+    [runStepPartsQuery.data]
   );
-
-  useEffect(() => {
-    const partsToVerify = runStepParts ?? (runStepPartsQuery.data?.items as RunStepPart[] | undefined) ?? [];
-    // verify for the need to finish the step
-    finishStepWhenAllPartsAreFinished(runStep, partsToVerify);
-  }, [runStepParts, runStepPartsQuery.data]);
 
   const leveledParts = useMemo(
-    () => runPartsData.filter((part) => part.part_level === runStep.part_level),
-    [runPartsData, runStep.part_level]
+    () => runParts.filter((part) => part.part_level === runStep.part_level),
+    [runParts, runStep.part_level]
   );
 
   const [showCompletedParts, setShowCompletedParts] = useState<boolean>(false);
@@ -75,61 +60,17 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
     parts: leveledParts,
   });
 
+  useQrPartNotifications({ runStepParts: runStepParts, runParts: leveledParts });
+
   const partsToRender = useMemo(
     () =>
       leveledParts.filter(
-        (part) => selectedParts.get(part.id) && (showCompletedParts || !isRunPartFinish(runStepPartsData, part))
+        (part) => selectedParts.get(part.id) && (showCompletedParts || !isRunPartFinish(runStepParts, part))
       ),
-    [leveledParts, selectedParts, runStepPartsData, showCompletedParts]
+    [leveledParts, runStepParts, selectedParts, showCompletedParts]
   );
 
-  const reloadData = () => {
-    // Reload the data
-    queryClient.invalidateQueries({ queryKey: ["runParts", run.id, runStep.part_level] });
-    queryClient.invalidateQueries({ queryKey: ["runStepParts", runStep.id] });
-    refetchFn();
-  };
 
-  // Handle notifying when a part is completed and therefore is not shown
-  const { lastlyReadedKeys, addCallbackFn, removeCallbackFn } = useScannerContext();
-  const callbackId = useId();
-
-  const onReadKeys = useCallback(
-    (keys: string) => {
-      const normalizedRead = keys.replace(/_/g, "-").toUpperCase();
-
-      // TO prevent empty values
-      if (!normalizedRead) return;
-
-      const foundPart = runPartsData.find((p) => normalizedRead.includes(p.short_label));
-
-      if (!foundPart) return;
-
-      if (!showCompletedParts && isRunPartFinish(runStepPartsData, foundPart)) {
-        notification({
-          notificationHeader: "Run parts table",
-          notificationBody: `Part ${foundPart.parsed_label ?? foundPart.short_label} is already completed`,
-          notificationType: "danger",
-        });
-      }
-    },
-    [runPartsData, runStepPartsData]
-  );
-
-  // update the callback
-  useEffect(() => {
-    removeCallbackFn(callbackId);
-    addCallbackFn(callbackId, onReadKeys);
-    onReadKeys(lastlyReadedKeys);
-
-    return () => {
-      removeCallbackFn(callbackId);
-    };
-  }, [runPartsData, runStepPartsData]);
-
-  if (isLoading) {
-    return <LoadingComponent message={"Loading run parts"} />;
-  }
   if (isError) {
     return <div className="text-danger">Error loading run parts.</div>;
   }
@@ -143,17 +84,40 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
             <th>Status</th>
             <th>Actions</th>
             <th>Comment</th>
-            <th>Debug</th>
           </tr>
         </thead>
         <tbody>
-          {partsToRender.map((runPart: RunPart, i: React.Key) => (
+          {isLoading &&
+            Array.from({ length: 1 }).map((_, i) => (
+              <tr key={`placeholder-${i}`}>
+                <td colSpan={2}>
+                  <Placeholder as="div" animation="glow">
+                    <Placeholder xs={6} />
+                  </Placeholder>
+                </td>
+                <td>
+                  <Placeholder as="div" animation="glow">
+                    <Placeholder xs={5} />
+                  </Placeholder>
+                </td>
+                <td>
+                  <Placeholder as="div" animation="glow">
+                    <Placeholder xs={4} />
+                  </Placeholder>
+                </td>
+                <td>
+                  <Placeholder as="div" animation="glow">
+                    <Placeholder xs={7} />
+                  </Placeholder>
+                </td>
+              </tr>
+            ))}
+          {!isLoading && partsToRender.map((runPart: RunPart, i: React.Key) => (
             <RunPartProductionTableRow
               runStep={runStep}
               runPart={runPart}
-              runStepParts={runStepPartsData}
+              runStepParts={runStepParts}
               canInit={false}
-              refetchFn={reloadData}
               key={`${runPart.parsed_label}${i}`}
               partIsSelected={selectedParts.get(runPart.id) ?? false}
               dropdown={false}
@@ -162,7 +126,7 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
         </tbody>
       </Table>
       <DisplayStepPartsInfo
-        runStepParts={runStepPartsData}
+        runStepParts={runStepParts}
         selectedPartsLength={partsToRender.length}
         totalParts={leveledParts.length}
         onSelectAll={selectAllParts}
@@ -174,12 +138,12 @@ const RunPartsQrFlow = ({ run, runStep, runStepParts, runParts, refetchFn = () =
   );
 };
 
-const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart): boolean => {
-  const stepPart = runStepParts.find((p) => p.part.id == part.id);
+export const isRunPartFinish = (runStepParts: RunStepPart[], part: RunPart) => {
+  const stepPart = runStepParts.find((p) => p.part_id == part.id);
 
   if (stepPart === null || stepPart === undefined) return false;
 
-  return stepPart.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING;
+  return stepPart.processed;
 };
 
 const DisplayStepPartsInfo = ({
@@ -197,9 +161,7 @@ const DisplayStepPartsInfo = ({
 }) => {
   const finishedParts = useMemo(() => {
     let counter = 0;
-    runStepParts.forEach((part) =>
-      part.latest_action?.type.id === RunStepPartActionEnum.FINISH_PROCESSING ? counter++ : null
-    );
+    runStepParts.forEach((part) => (part.processed ? counter++ : null));
     return counter;
   }, [runStepParts]);
 

@@ -16,12 +16,6 @@
 - Run tests in watch mode: `yarn test:watch`
 - Generate coverage report: `yarn coverage`
 
-## Expected Validation Before Finalizing Changes
-
-- Run at least `yarn test` and `npx -y react-doctor@latest . --verbose --diff` before finishing.
-- If behavior changes, add or update tests near the affected domain code.
-- Use the example app (`yarn dev`) to manually verify UI/interaction changes.
-
 ## Architecture Map
 
 - `src/index.ts`: package entrypoint; controls all public exports.

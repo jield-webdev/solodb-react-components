@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useId, useState } from "react";
 import { Alert, Button, Col, Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
 import axios from "axios";
@@ -13,8 +13,10 @@ import {
   AMOUNT_UNITS,
   extractLabelNumber,
   scannedCodeIsLocationCode,
-} from "@jield/solodb-react-components/modules/chemical/components/chemical/registerBarcodeElement";
+} from "@jield/solodb-react-components/modules/chemical/utils/chemicalContainerUtils";
 import { ChemicalContainer, getLocation, Room, Location } from "@jield/solodb-typescript-core";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
+import { ScannedKeysType } from "@jield/solodb-react-components/modules/core/utils/parseScannerType";
 
 type Inputs = {
   location: number;
@@ -43,6 +45,7 @@ export default function RegisterContainerElement({
 }) {
   const { user } = useContext(AuthContext);
   const { environment } = useParams();
+  const { addCallbackFn, removeCallbackFn } = useScannerContext();
 
   //Keep a state for the location, because we need to change the behavior of the form in case a location has been scanned
   // const [scannedLocation, setScannedLocation] = useState<Location | null>(location);
@@ -80,49 +83,37 @@ export default function RegisterContainerElement({
     });
   }, [locationId]);
 
-  useEffect(() => {
-    let scannedCode = ""; // To accumulate scanner input
+  const resetScannedLocation = useCallback(() => {
+    setLocation(null);
+    setValue("location", 0);
+  }, [setLocation, setValue]);
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Ignore inputs coming from physical keyboard if barcode scanner is exclusively expected
-      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
-        return; // Ignore if the user is typing into a form field or textarea
-      }
+  const scanCallbackId = useId();
 
-      // Ignore modifier keys like Shift, Ctrl, Alt, etc., as well as irrelevant keys
-      if (event.key.length > 1 && event.key !== "Enter") {
+  const onScanKeys = useCallback(
+    async (keys: string) => {
+      if (scannedCodeIsLocationCode(keys)) {
+        const parsedLocationId = extractLabelNumber(keys);
+        if (parsedLocationId !== null) {
+          const loadedLocation = await getLocation({ id: parsedLocationId });
+          setLocation(loadedLocation);
+          setValue("location", parsedLocationId);
+        }
         return;
       }
 
-      // Append valid characters to the accumulated "scannedCode"
-      if (event.key === "Enter") {
-        // Check if the code matches the pattern for scanning
-        if (scannedCodeIsLocationCode(scannedCode)) {
-          const locationId = extractLabelNumber(scannedCode);
-          if (null !== locationId) {
-            //We have a location, call the API to find all information about it
-            getLocation({ id: locationId }).then((location) => {
-              setLocation(location);
-            });
-
-            setValue("location", locationId); // Update the "location" field with the parsed ID
-          }
-        }
-
-        if (scannedCode.startsWith("reset-scan-location")) {
-          resetScannedLocation();
-        }
-        scannedCode = ""; // Reset after processing
-      } else {
-        scannedCode += event.key; // Accumulate characters
+      if (keys.startsWith("reset-scan-location")) {
+        resetScannedLocation();
       }
-    };
+    },
+    [setLocation, setValue, resetScannedLocation]
+  );
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [setValue]);
+  useEffect(() => {
+    removeCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId);
+    addCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId, onScanKeys);
+    return () => removeCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId);
+  }, [onScanKeys]);
 
   const onSubmit = async (values: Inputs) => {
     //Append the user to the submission values, make sure the object accepts the new property
@@ -132,11 +123,6 @@ export default function RegisterContainerElement({
 
     //Store the created container in the state
     setCreatedContainer(response.data);
-  };
-
-  const resetScannedLocation = () => {
-    setLocation(null);
-    setValue("location", 0);
   };
 
   return (

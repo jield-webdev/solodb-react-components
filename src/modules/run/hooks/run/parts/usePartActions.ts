@@ -1,99 +1,183 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useId } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   performRunStepPartAction,
+  performRunStepPartActions,
   RunStepPartActionEnum,
+  RunStepPartStateEnum,
   RunStepPart,
   RunStep,
-  getAvailableRunStepPartActions,
+  RunPart,
+  actionLabelToEnum,
+  actionEnumToName,
 } from "@jield/solodb-typescript-core";
-import { updateRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
+import {
+  updateRunStepPartCache,
+  updateRunStepPartCacheByRunStep,
+} from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
+import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
+import { PERFORM_RUN_ACTION_TRIGER, ScannedKeysType } from "../../../../core/utils/parseScannerType";
+import { notification } from "@jield/solodb-react-components/utils/notification";
 
-export interface UsePartActionsOptions<T> {
+export interface UsePartActionsOptions {
   runStep: RunStep;
-  parts: T[];
+  parts: RunStepPart[] | RunPart[];
   selectedParts: Map<number, boolean>;
-  getPartId: (part: T) => number;
-  getRunStepPart: (part: T) => RunStepPart | undefined;
-  refetchFn?: () => void;
+  getRunPart?: (part: RunStepPart) => number;
+  getRunStepPart?: (part: RunPart) => RunStepPart | undefined;
+  actionsFromScanner?: boolean;
 }
 
 export interface UsePartActionsResult {
-  performActionToSelectedParts: (action: RunStepPartActionEnum) => void;
-  getAvailableActionsForSelection: () => Set<RunStepPartActionEnum>;
+  performActionToSelectedParts: (action: RunStepPartActionEnum) => Promise<void>;
+  getAvailableActionsForSelection: () => { id: RunStepPartActionEnum; name: string }[];
 }
 
+const isRunStepPart = (part: RunStepPart | RunPart): part is RunStepPart => {
+  return "step_id" in part && "part_id" in part;
+};
+
 /**
- * Hook for managing bulk actions on selected parts
+ * Hook for managing bulk actions on selected parts.
  *
- * @param options Configuration object with parts, selection state, and action mappings
- * @returns Functions for performing and querying available actions
+ * With the new backend architecture, the frontend no longer computes which actions
+ * are allowed — it reads `runStepPart.available_actions` (server-provided) directly
+ * and forwards the chosen action id to `performRunStepPartAction`.
  */
-export function usePartActions<T>({
+export function usePartActions({
   runStep,
   parts,
   selectedParts,
-  getPartId,
+  getRunPart,
   getRunStepPart,
-  refetchFn,
-}: UsePartActionsOptions<T>): UsePartActionsResult {
+  actionsFromScanner = true,
+}: UsePartActionsOptions): UsePartActionsResult {
   const queryClient = useQueryClient();
 
-  const performActionToSelectedParts = useCallback(
-    (action: RunStepPartActionEnum) => {
-      const selectedItems = parts.filter((part) => selectedParts.get(getPartId(part)));
+  const { addCallbackFn, removeCallbackFn } = useScannerContext();
+  const callbackId = useId();
 
-      if (selectedItems.length === 0) {
+  // Resolves the currently-selected items (from either a RunStepPart[] or RunPart[])
+  // into their corresponding RunStepParts. Items without a matching RunStepPart are dropped.
+  const getSelectedRunStepParts = useCallback((): RunStepPart[] => {
+    if (parts.length === 0) return [];
+
+    if (isRunStepPart(parts[0])) {
+      return (parts as RunStepPart[]).filter((part) => {
+        const partId = getRunPart ? getRunPart(part) : part.part_id;
+        return selectedParts.get(partId);
+      });
+    }
+
+    return (parts as RunPart[])
+      .filter((part) => selectedParts.get(part.id))
+      .map((part) => (getRunStepPart ? getRunStepPart(part) : undefined))
+      .filter((stepPart): stepPart is RunStepPart => stepPart !== undefined);
+  }, [parts, selectedParts, getRunPart, getRunStepPart]);
+
+  const performActionToSelectedParts = useCallback(
+    async (action: RunStepPartActionEnum) => {
+      const selectedStepParts = getSelectedRunStepParts();
+      if (selectedStepParts.length === 0) return;
+
+      const actionableStepParts = selectedStepParts.filter((runStepPart) =>
+        runStepPart.available_actions.some(({ id }) => id === action)
+      );
+
+      if (actionableStepParts.length === 0) return;
+
+      if (actionableStepParts.length === 1) {
+        const runStepPart = actionableStepParts[0];
+        const latestAction = await performRunStepPartAction({
+          runStepPart,
+          // NOTE: the core library currently types this param as `RunStepPartStateEnum`
+          // even though `available_actions` entries are `RunStepPartActionEnum`.
+          // The numeric value is sent as-is to the backend, so this cast is safe until
+          // the core library's typing is corrected.
+          runStepPartAction: action as unknown as RunStepPartStateEnum,
+        });
+        updateRunStepPartCache(queryClient, { runStepPart, latestAction });
         return;
       }
 
-      const promises = selectedItems
-        .map((item) => getRunStepPart(item))
-        .filter((runStepPart): runStepPart is RunStepPart => runStepPart !== undefined)
-        .filter((runStepPart) => getAvailableRunStepPartActions(runStepPart).some((a) => a === action))
-        .map((runStepPart) =>
-          performRunStepPartAction(runStepPart, action).then((latestAction) => {
-            updateRunStepPartCache(queryClient, {
-              runStepPart,
-              action,
-              latestAction: latestAction as RunStepPart["latest_action"],
-            });
-          })
-        );
-
-      Promise.all(promises).then(() => {
-        queryClient.refetchQueries({ queryKey: ["stepParts", runStep.id] });
-        queryClient.refetchQueries({ queryKey: ["runStepParts", runStep.id] });
-        if (refetchFn) {
-          refetchFn();
-        }
+      const latestActions = await performRunStepPartActions({
+        runStepPartActions: actionableStepParts.map((runStepPart) => ({
+          runStepPart,
+          // NOTE: the core library currently types this param as `RunStepPartStateEnum`
+          // even though `available_actions` entries are `RunStepPartActionEnum`.
+          // The numeric value is sent as-is to the backend, so this cast is safe until
+          // the core library's typing is corrected.
+          runStepPartAction: action as unknown as RunStepPartStateEnum,
+        })),
       });
+      updateRunStepPartCacheByRunStep(queryClient, runStep, { latestActions });
     },
-    [parts, selectedParts, getPartId, getRunStepPart, queryClient, runStep.id, refetchFn]
+    [getSelectedRunStepParts, queryClient, runStep]
   );
 
-  const getAvailableActionsForSelection = useCallback((): Set<RunStepPartActionEnum> => {
-    const selectedItems = parts.filter((part) => selectedParts.get(getPartId(part)));
+  const onScanner = useCallback(
+    (keys: string) => {
+      if (!keys) return;
+      if (!validScannerInput(keys)) return;
 
-    if (selectedItems.length === 0) {
-      return new Set();
+      const parsedScanner = keys.split("/");
+      const action = actionLabelToEnum(parsedScanner[1]);
+
+      if (!action) {
+        notification({
+          notificationHeader: "Part scanner",
+          notificationBody: "Non valid action found in the scanned text",
+          notificationType: "danger",
+        });
+        return;
+      }
+
+      notification({
+        notificationHeader: "Part scanner",
+        notificationBody: `Performing action ${actionEnumToName(action)} on selected parts`,
+        notificationType: "success",
+      });
+
+      void performActionToSelectedParts(action);
+    },
+    [performActionToSelectedParts]
+  );
+
+  useEffect(() => {
+    if (!actionsFromScanner) return;
+
+    removeCallbackFn(ScannedKeysType.PERFORM_RUN_ACTION, callbackId);
+    addCallbackFn(ScannedKeysType.PERFORM_RUN_ACTION, callbackId, onScanner);
+
+    return () => {
+      removeCallbackFn(ScannedKeysType.PERFORM_RUN_ACTION, callbackId);
+    };
+  }, [actionsFromScanner, onScanner, addCallbackFn, removeCallbackFn, callbackId]);
+
+  const getAvailableActionsForSelection = useCallback((): { id: RunStepPartActionEnum; name: string }[] => {
+    // Union of all selected parts' available_actions, deduplicated by id.
+    // Names are taken from the first part that exposes each action — the server
+    // returns consistent names, so all occurrences will be the same string.
+    const seen = new Map<RunStepPartActionEnum, string>();
+
+    for (const runStepPart of getSelectedRunStepParts()) {
+      for (const { id, name } of runStepPart.available_actions) {
+        if (!seen.has(id)) {
+          seen.set(id, name);
+        }
+      }
     }
 
-    const actionSet = new Set<RunStepPartActionEnum>();
-
-    selectedItems.forEach((item) => {
-      const runStepPart = getRunStepPart(item);
-      if (runStepPart) {
-        const actionsForPart = getAvailableRunStepPartActions(runStepPart);
-        actionsForPart.forEach((action) => actionSet.add(action));
-      }
-    });
-
-    return actionSet;
-  }, [parts, selectedParts, getPartId, getRunStepPart]);
+    return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
+  }, [getSelectedRunStepParts]);
 
   return {
     performActionToSelectedParts,
     getAvailableActionsForSelection,
   };
+}
+
+function validScannerInput(input: string) {
+  const pattern = new RegExp(`^${PERFORM_RUN_ACTION_TRIGER}/.+`);
+  return pattern.test(input);
 }

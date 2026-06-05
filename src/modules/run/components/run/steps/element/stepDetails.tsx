@@ -1,23 +1,19 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import { RunStepParametersTable } from "@jield/solodb-react-components/modules/run/components/shared/parameters/runStepParametersTable";
 import { EmphasizedParametersContext } from "@jield/solodb-react-components/modules/run/contexts/emphasizedParametersContext";
 import UploadFilesToStep from "@jield/solodb-react-components/modules/run/components/shared/files/uploadFilesToStep";
 import RunPartsRegularFlow from "@jield/solodb-react-components/modules/run/components/shared/parts_table/runPartsRegularFlow";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
-import { RunStep, RunStepPart, RunPart, RunTypeEnum, Run } from "@jield/solodb-typescript-core";
+import { RunStep, Run } from "@jield/solodb-typescript-core";
 
 export default function StepDetails({
   run,
   step,
-  stepParts,
-  parts,
   refetchFn = () => null,
 }: {
   run?: Run;
   step: RunStep;
-  stepParts: RunStepPart[];
-  parts: RunPart[];
   refetchFn?: (keys: any[]) => void;
 }) {
   const { run: contextRun } = useContext(RunContext);
@@ -37,10 +33,6 @@ export default function StepDetails({
             <RunPartsRegularFlow
               run={resolvedRun}
               runStep={step}
-              runStepParts={stepParts}
-              refetchFn={() => {
-                refetchFn(["runStepParts"]);
-              }}
             />
             {step.has_remark && (
               <>

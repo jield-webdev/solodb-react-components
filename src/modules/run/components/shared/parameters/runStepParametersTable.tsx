@@ -1,4 +1,4 @@
-import { Alert, Table } from "react-bootstrap";
+import { Alert, Placeholder, Table } from "react-bootstrap";
 import { RunStepParameterEditButton } from "@jield/solodb-react-components/modules/run/components/shared/parameters/runStepParameterEditButton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
@@ -34,7 +34,44 @@ export const RunStepParametersTable = ({
   const displayedParameters = showOnlyEmphasizedParameters ? parameters.filter((param) => param.emphasize) : parameters;
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Table>
+        <thead>
+          <tr>
+            <th>Pos</th>
+            <th>Parameter</th>
+            <th>Value</th>
+            <th>Unit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: 2 }).map((_, i) => (
+            <tr key={i}>
+              <td>
+                <Placeholder as="div" animation="glow">
+                  <Placeholder xs={3} />
+                </Placeholder>
+              </td>
+              <td>
+                <Placeholder as="div" animation="glow">
+                  <Placeholder xs={7} />
+                </Placeholder>
+              </td>
+              <td>
+                <Placeholder as="div" animation="glow">
+                  <Placeholder xs={5} />
+                </Placeholder>
+              </td>
+              <td>
+                <Placeholder as="div" animation="glow">
+                  <Placeholder xs={4} />
+                </Placeholder>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    );
   }
 
   if (parameters.length === 0) {

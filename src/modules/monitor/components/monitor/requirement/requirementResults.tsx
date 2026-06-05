@@ -4,7 +4,7 @@ import { Alert, Badge, Col, Row, Table } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
-import { GetServerUri } from "@jield/solodb-react-components/modules/core/functions/getServerUri";
+import { GetServerUri } from "@jield/solodb-react-components/modules/core/utils/getServerUri";
 import RequirementChart from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/requirementChart";
 import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
 import AddResultModal from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/addResultModal";

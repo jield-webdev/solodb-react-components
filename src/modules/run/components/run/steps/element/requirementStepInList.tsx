@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
-import { Badge } from "react-bootstrap";
+import { Badge, Placeholder } from "react-bootstrap";
 import RequirementDetails from "@jield/solodb-react-components/modules/run/components/run/steps/element/requirementDetails";
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQueries, useQueryClient } from "@tanstack/react-query";
 import { MeasurementResultsBadges } from "@jield/solodb-react-components/modules/run/components/shared/requirement/measurementResultsBadge";
-import { Requirement, RunStep, RunPart, RunStepPart, EquipmentModule, MeasurementResult, listMeasurementResults } from "@jield/solodb-typescript-core";
+import { Requirement, RunStep, RunPart, RunStepPart, EquipmentModule, MeasurementResult, listMeasurementResults,
+  listRunStepParts
+} from "@jield/solodb-typescript-core";
 
 export default function RequirementStepInList({
   requirement,
   step,
   parts,
-  stepParts,
   refetchFn,
 }: {
   requirement: Requirement;
   step: RunStep;
   parts: RunPart[];
-  stepParts: RunStepPart[];
   refetchFn: (key: any[]) => void;
 }) {
   const { environment } = useParams();
@@ -42,6 +42,11 @@ export default function RequirementStepInList({
         queryKey: ["requirement", "measurementResults", JSON.stringify(requirement.measurement.id)],
         queryFn: () => listMeasurementResults({ measurement: requirement.measurement }),
       },
+      {
+        queryKey: ["runStepParts", (requirement.requirement_for_step?.id ?? requirement.step.id)],
+        queryFn: () => listRunStepParts({ step: requirement.requirement_for_step ?? requirement.step }),
+        placeholderData: keepPreviousData,
+      },
     ],
   });
 
@@ -53,8 +58,19 @@ export default function RequirementStepInList({
     refetchFn(keys);
   };
 
-  const [measurementResultsQuery] = queries;
+  const [measurementResultsQuery, runStepPartsQuery] = queries;
   const isLoading = queries.some((q) => q.isLoading);
+
+  const runStepParts = useMemo(
+    () => (runStepPartsQuery.data?.items ?? []) as RunStepPart[],
+    [runStepPartsQuery.data?.items]
+  );
+
+  const measurementResults = useMemo(
+    () => (measurementResultsQuery.data?.items ?? []) as MeasurementResult[],
+    [measurementResultsQuery.data?.items]
+  );
+
 
   const getRowStatus = (measurementResults: MeasurementResult[]): string => {
     if (measurementResults.length == 0) {
@@ -99,7 +115,7 @@ export default function RequirementStepInList({
 
   return (
     <>
-      <tr className={getRowStatus(measurementResultsQuery.data?.items ?? [])}>
+      <tr className={getRowStatus(measurementResults)}>
         <td>
           <i
             className={"fa ms-2 " + (isExpanded ? "fa-chevron-down" : "fa-chevron-right")}
@@ -109,13 +125,21 @@ export default function RequirementStepInList({
         </td>
         {/* parts */}
         <td>
-          <MeasurementResultsBadges
-            requirement={requirement}
-            step={step}
-            measurementResults={measurementResultsQuery.data?.items ?? []}
-            parts={parts}
-            stepParts={stepParts}
-          />
+          {isLoading ? (
+            <Placeholder animation="glow" as="div" className="d-flex flex-wrap gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Placeholder key={i} style={{ width: "4.5rem", height: "1.5rem", borderRadius: "3px" }} />
+              ))}
+            </Placeholder>
+          ) : (
+            <MeasurementResultsBadges
+              requirement={requirement}
+              step={step}
+              measurementResults={measurementResults}
+              parts={parts}
+              stepParts={runStepParts}
+            />
+          )}
         </td>
 
         {/* misc status elements */}
@@ -167,9 +191,9 @@ export default function RequirementStepInList({
               <RequirementDetails
                 requirement={requirement}
                 step={step}
-                stepParts={stepParts}
+                stepParts={runStepParts}
                 parts={parts}
-                measurementResults={measurementResultsQuery.data?.items ?? []}
+                measurementResults={measurementResults}
                 refetchFn={reloadQueriesByKey}
               />
             )}

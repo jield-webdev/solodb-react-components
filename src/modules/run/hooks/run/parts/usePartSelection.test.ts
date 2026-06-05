@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { act, render, renderHook, waitFor } from "@testing-library/react";
-import { createElement, useEffect } from "react";
+import { createElement, useEffect, type ReactNode } from "react";
 import { RunPart } from "@jield/solodb-typescript-core";
-import { ScannerContext } from "../../../../core/contexts/scanner/ScannerContext";
+import { ScannerContext } from "../../../../core/contexts/scannerContext";
 import { usePartSelection, UsePartSelectionResult } from "./usePartSelection";
 
 describe("usePartSelection", () => {
@@ -11,12 +11,22 @@ describe("usePartSelection", () => {
     { id: 2, short_label: "PART-2" },
     { id: 3, short_label: "PART-3" },
   ] as RunPart[];
+  const scannerContextValue = {
+    lastlyReadedKeys: "",
+    addCallbackFn: vi.fn(),
+    removeCallbackFn: vi.fn(),
+    addReadingCallbackFn: vi.fn(),
+    removeReadingCallbackFn: vi.fn(),
+  };
+  const wrapper = ({ children }: { children: ReactNode }) =>
+    createElement(ScannerContext.Provider, { value: scannerContextValue }, children);
 
   it("initializes with no parts selected", () => {
     const { result } = renderHook(() =>
       usePartSelection({
         parts: mockParts,
-      })
+      }),
+      { wrapper }
     );
 
     expect(result.current.hasSelectedParts).toBe(false);
@@ -29,7 +39,8 @@ describe("usePartSelection", () => {
     const { result } = renderHook(() =>
       usePartSelection({
         parts: mockParts,
-      })
+      }),
+      { wrapper }
     );
 
     act(() => {
@@ -52,7 +63,8 @@ describe("usePartSelection", () => {
     const { result } = renderHook(() =>
       usePartSelection({
         parts: mockParts,
-      })
+      }),
+      { wrapper }
     );
 
     act(() => {
@@ -69,7 +81,8 @@ describe("usePartSelection", () => {
     const { result } = renderHook(() =>
       usePartSelection({
         parts: mockParts,
-      })
+      }),
+      { wrapper }
     );
 
     // First select all
@@ -96,6 +109,7 @@ describe("usePartSelection", () => {
         }),
       {
         initialProps: { parts: mockParts },
+        wrapper,
       }
     );
 
@@ -117,7 +131,7 @@ describe("usePartSelection", () => {
   });
 
   it("deduplicates buffered scanned keys before applying selection", async () => {
-    const bufferedPart = { id: 1, short_label: "ABC-123" } as RunPart;
+    const bufferedPart = { id: 1, short_label: "ABC-123", scanner_label: "ABC-123" } as RunPart;
     let latestResult: UsePartSelectionResult | null = null;
 
     const Inner = ({ parts, onChange }: { parts: RunPart[]; onChange: (result: UsePartSelectionResult) => void }) => {
