@@ -501,7 +501,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@jield/solodb-react-components@workspace:."
   dependencies:
-    "@jield/solodb-typescript-core": "npm:1.1.9"
+    "@jield/solodb-typescript-core": "link:../solodb-typescript-core/"
     "@originjs/vite-plugin-commonjs": "npm:^1.0.3"
     "@tanstack/react-query": "npm:~5.100.9"
     "@tanstack/react-query-devtools": "npm:~5.100.9"
@@ -548,14 +548,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@jield/solodb-typescript-core@npm:1.1.9":
-  version: 1.1.9
-  resolution: "@jield/solodb-typescript-core@npm:1.1.9"
-  peerDependencies:
-    axios: ^1.13.2
-  checksum: 10c0/5972f62982faa18d71d20dcaf1729a6fea5205bbab678e8b5cccf634e4dc78e13aee85412ed47f8ae6806fe4aae0c0cac8a4c715998a9b5c2d307b6c37354846
+"@jield/solodb-typescript-core@link:../solodb-typescript-core/::locator=%40jield%2Fsolodb-react-components%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@jield/solodb-typescript-core@link:../solodb-typescript-core/::locator=%40jield%2Fsolodb-react-components%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@jridgewell/gen-mapping@npm:^0.3.12, @jridgewell/gen-mapping@npm:^0.3.5":
   version: 0.3.13

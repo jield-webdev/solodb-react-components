@@ -11,8 +11,9 @@ export declare const buildSplitSlotAssignments: ({ parts, slotCount, getSlotInde
     slotCount: number;
     getSlotIndex: (runPart: RunPart) => number | null;
 }) => RunPart[][];
-export declare const buildDisplaySlotIndexByPartId: ({ parts, getDirectSlotIndex, slotCount, }: {
+export declare const buildDisplaySlotIndexByPartId: ({ parts, getOverrideSlotIndex, getDirectSlotIndex, slotCount, }: {
     parts: RunPart[];
+    getOverrideSlotIndex?: (runPart: RunPart) => number | null;
     getDirectSlotIndex: (runPart: RunPart) => number | null;
     slotCount?: number;
 }) => Map<number, number>;

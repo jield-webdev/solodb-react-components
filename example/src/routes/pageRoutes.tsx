@@ -36,6 +36,9 @@ const RunLayoutElement = lazy(() =>
 const RunStepsElement = lazy(() =>
   import("@jield/solodb-react-components").then((m) => ({ default: m.RunStepsElement }))
 );
+const NewRunWizard = lazy(() =>
+  import("@jield/solodb-react-components").then((m) => ({ default: m.NewRunWizard }))
+);
 const EmphasizedParametersProvider = lazy(() =>
   import("@jield/solodb-react-components").then((m) => ({ default: m.EmphasizedParametersProvider }))
 );
@@ -83,6 +86,7 @@ const ROUTES = {
     BASE: "/:environment/operator/monitor",
     DETAIL: "/:environment/operator/monitor/:id",
   },
+  NEW_RUN_WIZARD: "/:environment/run/new/wizard.html",
   RUN: {
     BASE: "/:environment/operator/run",
     DETAILS: "/:environment/operator/run/details/:id",
@@ -155,6 +159,10 @@ export default function PageRoutes() {
               </StatusMailProvider>
             }
           />
+        </Route>
+
+        {/* RunWizard Route */}
+        <Route path={ROUTES.NEW_RUN_WIZARD} element={<NewRunWizard />}>
         </Route>
 
         {/* Run routes */}
