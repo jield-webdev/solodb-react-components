@@ -98,7 +98,6 @@ const StepDashboard = () => {
   }
 
   if (isLoading) {
-      console.log(queries);
     return <div>Loading...</div>;
   }
 
