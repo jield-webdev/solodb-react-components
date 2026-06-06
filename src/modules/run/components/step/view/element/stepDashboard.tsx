@@ -43,10 +43,10 @@ const StepDashboard = () => {
     queries: [
       {
         queryKey: ["monitors", runStep.process_module.module.equipment],
-        queryFn: () =>
+        queryFn: () => runStep.process_module.module.equipment ? 
           listMonitors({
             equipment: runStep.process_module.module.equipment,
-          }),
+          }) : [],
       },
       {
         queryKey: ["ecn", runStep.process_module.module],
@@ -98,6 +98,7 @@ const StepDashboard = () => {
   }
 
   if (isLoading) {
+      console.log(queries);
     return <div>Loading...</div>;
   }
 
