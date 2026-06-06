@@ -22,21 +22,9 @@ export { default as MonitorHeaderElement } from "./modules/monitor/components/mo
 export { default as MonitorProvider } from "./modules/monitor/providers/monitorProvider";
 
 // Run Components
-<<<<<<< HEAD
-export { default as RunHeaderElement } from "@jield/solodb-react-components/modules/run/components/run/runHeaderElement";
-export { default as RunStepsElement } from "@jield/solodb-react-components/modules/run/components/run/steps/runStepsElement";
-export { default as NewRunWizard } from "@jield/solodb-react-components/modules/run/components/wizard/wizard";
-export { default as RunInformationElement } from "@jield/solodb-react-components/modules/run/components/run/information/runInformationElement";
-export { default as RunLayoutElement } from "@jield/solodb-react-components/modules/run/components/run/layout/runLayoutElement";
-export { default as RunStepHeaderElement } from "@jield/solodb-react-components/modules/run/components/step/runStepHeaderElement";
-export { default as RunStepExecuteElement } from "@jield/solodb-react-components/modules/run/components/step/view/runStepExecuteElement";
-export { default as StepDetails } from "@jield/solodb-react-components/modules/run/components/run/steps/element/stepDetails";
-export { default as RunStepChecklist } from "@jield/solodb-react-components/modules/run/components/step/view/element/runStepChecklist";
-export { default as RunStepExecuteMinimal } from "@jield/solodb-react-components/modules/run/components/step/view/runStepExecuteMinimal";
-export { default as BatchCardElement } from "@jield/solodb-react-components/modules/run/components/step/view/element/batchCardElement";
-=======
 export { default as RunHeaderElement } from "./modules/run/components/run/runHeaderElement";
 export { default as RunStepsElement } from "./modules/run/components/run/steps/runStepsElement";
+export { default as NewRunWizard } from "./modules/run/components/wizard/wizard";
 export { default as RunInformationElement } from "./modules/run/components/run/information/runInformationElement";
 export { default as RunLayoutElement } from "./modules/run/components/run/layout/runLayoutElement";
 export { default as RunStepHeaderElement } from "./modules/run/components/step/runStepHeaderElement";
@@ -45,7 +33,6 @@ export { default as StepDetails } from "./modules/run/components/run/steps/eleme
 export { default as RunStepChecklist } from "./modules/run/components/step/view/element/runStepChecklist";
 export { default as RunStepExecuteMinimal } from "./modules/run/components/step/view/runStepExecuteMinimal";
 export { default as BatchCardElement } from "./modules/run/components/step/view/element/batchCardElement";
->>>>>>> b14f055c323c6a988999f5f07c1e5ba9a360fe44
 
 // Run Providers
 export { default as RunProvider } from "./modules/run/providers/runProvider";
