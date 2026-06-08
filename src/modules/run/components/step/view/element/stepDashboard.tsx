@@ -30,8 +30,18 @@ import {
   listRequirements,
   RunTypeEnum,
   listEcn,
+  type ApiFormattedResponse,
+  type Monitor,
 } from "@jield/solodb-typescript-core";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
+
+const emptyMonitorResponse: ApiFormattedResponse<Monitor> = {
+  items: [],
+  amountOfPages: 0,
+  currentPage: 0,
+  totalItems: 0,
+  hasMore: false,
+};
 
 const StepDashboard = () => {
   const { environment } = useParams();
@@ -43,10 +53,12 @@ const StepDashboard = () => {
     queries: [
       {
         queryKey: ["monitors", runStep.process_module.module.equipment],
-        queryFn: () => runStep.process_module.module.equipment ? 
-          listMonitors({
-            equipment: runStep.process_module.module.equipment,
-          }) : [],
+        queryFn: () =>
+          runStep.process_module.module.equipment
+            ? listMonitors({
+                equipment: runStep.process_module.module.equipment,
+              })
+            : emptyMonitorResponse,
       },
       {
         queryKey: ["ecn", runStep.process_module.module],
