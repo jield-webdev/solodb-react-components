@@ -1,7 +1,7 @@
 import { createRunParent, type Run, type RunParent, type Substrate } from "@jield/solodb-typescript-core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Button, Nav } from "react-bootstrap";
+import { Alert, Button, Nav } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import RunSelect from "./elements/runSelect";
 import SubstrateSelect from "./elements/substrateSelect";
@@ -15,26 +15,37 @@ export default function NewRunWizard() {
   const [selectedSubstrate, setSelectedSubstrate] = useState<Substrate | null>(null);
   const [selectedRuns, setSelectedRuns] = useState<Run[]>([]);
   const [selectedPartIdsByRunId, setSelectedPartIdsByRunId] = useState<Record<number, number[]>>({});
+  const [amountPerPartByRunId, setAmountPerPartByRunId] = useState<Record<number, Record<number, number>>>({});
   const [descriptionsByRunId, setDescriptionsByRunId] = useState<Record<number, string>>({});
 
   const createRunMutation = useMutation({
     mutationFn: async ({
       parentRuns,
       partIdsByRunId,
+      amountPerPartByRunId,
       descriptionsByRunId,
     }: {
       parentRuns: Run[];
       partIdsByRunId: Record<number, number[]>;
+      amountPerPartByRunId: Record<number, Record<number, number>>;
       descriptionsByRunId: Record<number, string>;
     }): Promise<RunParent[]> => {
       let createdRunId: number | null = null;
       const runParents: RunParent[] = [];
 
       for (const parentRun of parentRuns) {
+        const partIds = partIdsByRunId[parentRun.id] ?? [];
+        const amountByPartId = amountPerPartByRunId[parentRun.id] ?? {};
+        const amountPerPart =
+          partIds.length > 0
+            ? Object.fromEntries(partIds.map((partId) => [partId, amountByPartId[partId] ?? 1]))
+            : null;
+
         const runParent = await createRunParent({
           run_id: createdRunId,
           parent_run_id: parentRun.id,
-          part_ids: partIdsByRunId[parentRun.id] ?? [],
+          part_ids: partIds,
+          amount_per_part: amountPerPart,
           description: descriptionsByRunId[parentRun.id] || null,
         });
 
@@ -79,6 +90,8 @@ export default function NewRunWizard() {
             setSelectedRuns={setSelectedRuns}
             selectedPartIdsByRunId={selectedPartIdsByRunId}
             setSelectedPartIdsByRunId={setSelectedPartIdsByRunId}
+            amountPerPartByRunId={amountPerPartByRunId}
+            setAmountPerPartByRunId={setAmountPerPartByRunId}
             descriptionsByRunId={descriptionsByRunId}
             setDescriptionsByRunId={setDescriptionsByRunId}
           />
@@ -97,6 +110,7 @@ export default function NewRunWizard() {
                 createRunMutation.mutate({
                   parentRuns: selectedRuns,
                   partIdsByRunId: selectedPartIdsByRunId,
+                  amountPerPartByRunId,
                   descriptionsByRunId,
                 });
               }
@@ -105,6 +119,15 @@ export default function NewRunWizard() {
             {createRunMutation.isPending ? "Creating..." : "Create Run"}
           </Button>
         </div>
+
+        {createRunMutation.isSuccess && createRunMutation.data.length > 0 && (
+          <Alert variant="success" className="mt-3">
+            Run Created:{" "}
+            <Alert.Link href={`${environment}/run/${createRunMutation.data[0].run_id}/information.html`}>
+              #{createRunMutation.data[0].run_id}
+            </Alert.Link>
+          </Alert>
+        )}
       </div>
     </div>
   );

@@ -15,6 +15,8 @@ type RunSelectProps = {
   setSelectedRuns: (selectedRuns: Run[]) => void;
   selectedPartIdsByRunId: Record<number, number[]>;
   setSelectedPartIdsByRunId: (selectedPartIdsByRunId: Record<number, number[]>) => void;
+  amountPerPartByRunId: Record<number, Record<number, number>>;
+  setAmountPerPartByRunId: (amountPerPartByRunId: Record<number, Record<number, number>>) => void;
   descriptionsByRunId: Record<number, string>;
   setDescriptionsByRunId: (descriptionsByRunId: Record<number, string>) => void;
 };
@@ -54,16 +56,23 @@ const isRunOption = (option: unknown): option is RunOption => {
   );
 };
 
+const getPartLabel = (part: RunPart): string => {
+  return part.parsed_label || part.scanner_label || part.label || part.short_label;
+};
+
 export default function RunSelect({
   selectedRuns,
   setSelectedRuns,
   selectedPartIdsByRunId,
   setSelectedPartIdsByRunId,
+  amountPerPartByRunId,
+  setAmountPerPartByRunId,
   descriptionsByRunId,
   setDescriptionsByRunId,
 }: RunSelectProps) {
   const { environment } = useParams();
   const [activeRunId, setActiveRunId] = useState<number | null>(null);
+  const [experimentalEdit, setExperimentalEdit] = useState(false);
 
   const { data: runsData, isFetching: isRunsFetching } = useQuery({
     queryKey: [environment],
@@ -113,6 +122,25 @@ export default function RunSelect({
     setSelectedPartIdsByRunId(next);
   };
 
+  const getPartAmount = (runId: number, partId: number): number => amountPerPartByRunId[runId]?.[partId] ?? 1;
+
+  const setRunPartAmount = (runId: number, partId: number, amount: number) => {
+    const sanitizedAmount = Number.isFinite(amount) ? Math.max(1, amount) : 1;
+    setAmountPerPartByRunId({
+      ...amountPerPartByRunId,
+      [runId]: {
+        ...(amountPerPartByRunId[runId] ?? {}),
+        [partId]: sanitizedAmount,
+      },
+    });
+  };
+
+  const clearRunPartAmounts = (runId: number) => {
+    const next = { ...amountPerPartByRunId };
+    delete next[runId];
+    setAmountPerPartByRunId(next);
+  };
+
   const setRunDescription = (runId: number, description: string) => {
     const next = { ...descriptionsByRunId };
     if (description) {
@@ -137,6 +165,7 @@ export default function RunSelect({
     const nextSelectedRuns = selectedRuns.filter((run) => run.id !== runId);
     setSelectedRuns(nextSelectedRuns);
     setRunPartIds(runId, []);
+    clearRunPartAmounts(runId);
     setRunDescription(runId, "");
 
     if (activeRunId === runId) {
@@ -276,6 +305,18 @@ export default function RunSelect({
                   <div className="d-flex align-items-center justify-content-between mb-3">
                     <div>
                       <h3 className="mb-1">Select parts</h3>
+                      <Button
+                        variant={experimentalEdit ? "outline-primary" : "primary"}
+                        size="sm"
+                        onClick={() => setExperimentalEdit((isEditing) => !isEditing)}
+                        aria-pressed={experimentalEdit}
+                      >
+                        {experimentalEdit ? "Done editing split" : "Edit experimental split"}
+                      </Button>
+                      {experimentalEdit && (
+                        <p className="text-secondary small mb-0 mt-1">Amounts must be 1 or higher.</p>
+                      )}
+
                       <p className="text-secondary mb-0">
                         {run.label} — {run.name}
                       </p>
@@ -319,26 +360,81 @@ export default function RunSelect({
                           </Button>
                         </legend>
 
-                        <div className="d-flex flex-wrap gap-2">
-                          {group.parts.map((part) => {
-                            const selected = isPartSelected(run.id, part.id);
-                            return (
-                              <Badge
-                                key={part.id}
-                                as="button"
-                                type="button"
-                                bg={selected ? "primary" : "secondary"}
-                                onClick={() => togglePart(run.id, part.id)}
-                                aria-pressed={selected}
-                                title={part.label}
-                                className={`border-0 fs-6 fw-normal px-3 py-2${selected ? " step-part-selected" : ""}`}
-                                style={{ cursor: "pointer" }}
-                              >
-                                {part.parsed_label || part.scanner_label || part.label || part.short_label}
-                              </Badge>
-                            );
-                          })}
-                        </div>
+                        {experimentalEdit ? (
+                          <div className="list-group">
+                            {group.parts.map((part) => {
+                              const selected = isPartSelected(run.id, part.id);
+                              const partLabel = getPartLabel(part);
+                              const amountInputId = `part-amount-${run.id}-${part.id}`;
+                              const selectedInputId = `part-selected-${run.id}-${part.id}`;
+
+                              return (
+                                <div
+                                  key={part.id}
+                                  className={`list-group-item d-flex align-items-center gap-3 flex-wrap${
+                                    selected ? " border-primary" : ""
+                                  }`}
+                                >
+                                  <div className="d-flex align-items-center gap-2">
+                                    <Form.Label htmlFor={amountInputId} className="small text-secondary mb-0">
+                                      Split
+                                    </Form.Label>
+                                    <Form.Control
+                                      id={amountInputId}
+                                      type="number"
+                                      size="sm"
+                                      min={1}
+                                      step="any"
+                                      inputMode="decimal"
+                                      value={getPartAmount(run.id, part.id)}
+                                      onChange={(event) =>
+                                        setRunPartAmount(run.id, part.id, Number(event.target.value))
+                                      }
+                                      aria-label={`Experimental split amount for ${partLabel}`}
+                                      style={{ maxWidth: "7rem" }}
+                                    />
+                                  </div>
+                                  <label
+                                    htmlFor={selectedInputId}
+                                    className="flex-grow-1 mb-0"
+                                    style={{ cursor: "pointer" }}
+                                  >
+                                    {partLabel}
+                                  </label>
+                                  <Form.Check
+                                    id={selectedInputId}
+                                    type="checkbox"
+                                    checked={selected}
+                                    onChange={() => togglePart(run.id, part.id)}
+                                    aria-label={`Select ${partLabel}`}
+                                    className="ms-sm-auto"
+                                  />
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="d-flex flex-wrap gap-2">
+                            {group.parts.map((part) => {
+                              const selected = isPartSelected(run.id, part.id);
+                              return (
+                                <Badge
+                                  key={part.id}
+                                  as="button"
+                                  type="button"
+                                  bg={selected ? "primary" : "secondary"}
+                                  onClick={() => togglePart(run.id, part.id)}
+                                  aria-pressed={selected}
+                                  title={part.label}
+                                  className={`border-0 fs-6 fw-normal px-3 py-2${selected ? " step-part-selected" : ""}`}
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  {getPartLabel(part)}
+                                </Badge>
+                              );
+                            })}
+                          </div>
+                        )}
                       </fieldset>
                     ))}
                 </div>
