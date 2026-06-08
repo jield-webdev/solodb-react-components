@@ -1,56 +1,104 @@
-import { listRuns, Run } from "@jield/solodb-typescript-core";
-import { useQueries } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { createRunParent, type Run, type Substrate } from "@jield/solodb-typescript-core";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { Button, Nav } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import AsyncSelect from "react-select/async";
-import { customStyles } from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
+import RunSelect from "./elements/runSelect";
+import SubstrateSelect from "./elements/substrateSelect";
 
-type RunOption = { value: number; label: string };
+type WizardPage = "parts" | "substrate";
+
+type ParentRunState = {
+  selectedRun: Run | null;
+  selectedPartIds: number[];
+  description: string;
+};
 
 export default function NewRunWizard() {
   const { environment } = useParams();
-  const [selectedRun, setSelectedRun] = useState<Run | null>(null);
-
-  const [runsQuery] = useQueries({
-    queries: [
-      {
-        queryKey: [environment],
-        queryFn: () => listRuns({ environment: environment }),
-      },
-    ],
+  const queryClient = useQueryClient();
+  const [activePage, setActivePage] = useState<WizardPage>("parts");
+  const [selectedSubstrate, setSelectedSubstrate] = useState<Substrate | null>(null);
+  const [parentRunState, setParentRunState] = useState<ParentRunState>({
+    selectedRun: null,
+    selectedPartIds: [],
+    description: "",
   });
 
-  const runs: Run[] | null = useMemo(() => runsQuery.data?.items ?? null, [runsQuery]);
-
-  // listRuns has no server-side query param, so filter the already-loaded runs client-side.
-  const loadOptions = (inputValue: string, callback: (options: RunOption[]) => void) => {
-    const query = inputValue.toLowerCase();
-    const options = (runs ?? [])
-      .filter((r) => !query || r.label.toLowerCase().includes(query) || r.name.toLowerCase().includes(query))
-      .map((r) => ({ value: r.id, label: `${r.label} — ${r.name}` }));
-    callback(options);
-  };
-
-  const currentOption: RunOption | null = selectedRun
-    ? { value: selectedRun.id, label: `${selectedRun.label} — ${selectedRun.name}` }
-    : null;
+  const createRunMutation = useMutation({
+    mutationFn: ({
+      parentRunId,
+      partIds,
+      description,
+    }: {
+      parentRunId: number;
+      partIds: number[];
+      description: string;
+    }) => {
+      return createRunParent({
+        run_id: null,
+        parent_run_id: parentRunId,
+        part_ids: partIds,
+        description: description || null,
+      });
+    },
+    onSuccess: (_runParent, variables) => {
+      queryClient.invalidateQueries({ queryKey: [environment] });
+      queryClient.invalidateQueries({ queryKey: [variables.parentRunId] });
+    },
+  });
 
   return (
     <div>
-      <div>
-        <h3>Select parent run</h3>
-        <AsyncSelect
-          isSearchable={true}
-          isClearable={true}
-          defaultOptions
-          placeholder={"— Select a run, or start typing"}
-          loadOptions={loadOptions}
-          value={currentOption}
-          styles={customStyles}
-          onChange={(option: any) => {
-            setSelectedRun(runs?.find((r) => r.id === option?.value) ?? null);
-          }}
+      <Nav
+        variant="tabs"
+        activeKey={activePage}
+        onSelect={(eventKey) => {
+          if (eventKey === "parts" || eventKey === "substrate") {
+            setActivePage(eventKey);
+          }
+        }}
+        className="mb-4"
+      >
+        <Nav.Item>
+          <Nav.Link eventKey="parts">Parent run and parts</Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey="substrate">Select Substrate</Nav.Link>
+        </Nav.Item>
+      </Nav>
+
+      {activePage === "parts" && (
+        <RunSelect
+          selectedRun={parentRunState.selectedRun}
+          setSelectedRun={(selectedRun) => setParentRunState((current) => ({ ...current, selectedRun }))}
+          selectedPartIds={parentRunState.selectedPartIds}
+          setSelectedPartIds={(selectedPartIds) => setParentRunState((current) => ({ ...current, selectedPartIds }))}
+          description={parentRunState.description}
+          setDescription={(description) => setParentRunState((current) => ({ ...current, description }))}
         />
+      )}
+
+      {activePage === "substrate" && (
+        <SubstrateSelect selectedSubstrate={selectedSubstrate} setSelectedSubstrate={setSelectedSubstrate} />
+      )}
+
+      <div className="d-flex justify-content-end mt-4">
+        <Button
+          variant="primary"
+          disabled={!parentRunState.selectedRun || createRunMutation.isPending}
+          onClick={() => {
+            if (parentRunState.selectedRun) {
+              createRunMutation.mutate({
+                parentRunId: parentRunState.selectedRun.id,
+                partIds: parentRunState.selectedPartIds,
+                description: parentRunState.description,
+              });
+            }
+          }}
+        >
+          {createRunMutation.isPending ? "Creating..." : "Create Run"}
+        </Button>
       </div>
     </div>
   );
