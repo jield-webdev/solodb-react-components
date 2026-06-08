@@ -1,4 +1,4 @@
-import { createRunParent, type Run, type Substrate } from "@jield/solodb-typescript-core";
+import { createRunParent, type Run, type RunParent, type Substrate } from "@jield/solodb-typescript-core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button, Nav } from "react-bootstrap";
@@ -8,43 +8,47 @@ import SubstrateSelect from "./elements/substrateSelect";
 
 type WizardPage = "parts" | "substrate";
 
-type ParentRunState = {
-  selectedRun: Run | null;
-  selectedPartIds: number[];
-  description: string;
-};
-
 export default function NewRunWizard() {
   const { environment } = useParams();
   const queryClient = useQueryClient();
   const [activePage, setActivePage] = useState<WizardPage>("parts");
   const [selectedSubstrate, setSelectedSubstrate] = useState<Substrate | null>(null);
-  const [parentRunState, setParentRunState] = useState<ParentRunState>({
-    selectedRun: null,
-    selectedPartIds: [],
-    description: "",
-  });
+  const [selectedRuns, setSelectedRuns] = useState<Run[]>([]);
+  const [selectedPartIdsByRunId, setSelectedPartIdsByRunId] = useState<Record<number, number[]>>({});
+  const [descriptionsByRunId, setDescriptionsByRunId] = useState<Record<number, string>>({});
 
   const createRunMutation = useMutation({
-    mutationFn: ({
-      parentRunId,
-      partIds,
-      description,
+    mutationFn: async ({
+      parentRuns,
+      partIdsByRunId,
+      descriptionsByRunId,
     }: {
-      parentRunId: number;
-      partIds: number[];
-      description: string;
-    }) => {
-      return createRunParent({
-        run_id: null,
-        parent_run_id: parentRunId,
-        part_ids: partIds,
-        description: description || null,
-      });
+      parentRuns: Run[];
+      partIdsByRunId: Record<number, number[]>;
+      descriptionsByRunId: Record<number, string>;
+    }): Promise<RunParent[]> => {
+      let createdRunId: number | null = null;
+      const runParents: RunParent[] = [];
+
+      for (const parentRun of parentRuns) {
+        const runParent = await createRunParent({
+          run_id: createdRunId,
+          parent_run_id: parentRun.id,
+          part_ids: partIdsByRunId[parentRun.id] ?? [],
+          description: descriptionsByRunId[parentRun.id] || null,
+        });
+
+        createdRunId = runParent.run_id;
+        runParents.push(runParent);
+      }
+
+      return runParents;
     },
     onSuccess: (_runParent, variables) => {
       queryClient.invalidateQueries({ queryKey: [environment] });
-      queryClient.invalidateQueries({ queryKey: [variables.parentRunId] });
+      variables.parentRuns.forEach((parentRun) => {
+        queryClient.invalidateQueries({ queryKey: [parentRun.id] });
+      });
     },
   });
 
@@ -68,37 +72,39 @@ export default function NewRunWizard() {
         </Nav.Item>
       </Nav>
 
-      {activePage === "parts" && (
-        <RunSelect
-          selectedRun={parentRunState.selectedRun}
-          setSelectedRun={(selectedRun) => setParentRunState((current) => ({ ...current, selectedRun }))}
-          selectedPartIds={parentRunState.selectedPartIds}
-          setSelectedPartIds={(selectedPartIds) => setParentRunState((current) => ({ ...current, selectedPartIds }))}
-          description={parentRunState.description}
-          setDescription={(description) => setParentRunState((current) => ({ ...current, description }))}
-        />
-      )}
+      <div className="m-3">
+        {activePage === "parts" && (
+          <RunSelect
+            selectedRuns={selectedRuns}
+            setSelectedRuns={setSelectedRuns}
+            selectedPartIdsByRunId={selectedPartIdsByRunId}
+            setSelectedPartIdsByRunId={setSelectedPartIdsByRunId}
+            descriptionsByRunId={descriptionsByRunId}
+            setDescriptionsByRunId={setDescriptionsByRunId}
+          />
+        )}
 
-      {activePage === "substrate" && (
-        <SubstrateSelect selectedSubstrate={selectedSubstrate} setSelectedSubstrate={setSelectedSubstrate} />
-      )}
+        {activePage === "substrate" && (
+          <SubstrateSelect selectedSubstrate={selectedSubstrate} setSelectedSubstrate={setSelectedSubstrate} />
+        )}
 
-      <div className="d-flex justify-content-end mt-4">
-        <Button
-          variant="primary"
-          disabled={!parentRunState.selectedRun || createRunMutation.isPending}
-          onClick={() => {
-            if (parentRunState.selectedRun) {
-              createRunMutation.mutate({
-                parentRunId: parentRunState.selectedRun.id,
-                partIds: parentRunState.selectedPartIds,
-                description: parentRunState.description,
-              });
-            }
-          }}
-        >
-          {createRunMutation.isPending ? "Creating..." : "Create Run"}
-        </Button>
+        <div className="d-flex justify-content-end mt-4">
+          <Button
+            variant="primary"
+            disabled={selectedRuns.length === 0 || createRunMutation.isPending}
+            onClick={() => {
+              if (selectedRuns.length > 0) {
+                createRunMutation.mutate({
+                  parentRuns: selectedRuns,
+                  partIdsByRunId: selectedPartIdsByRunId,
+                  descriptionsByRunId,
+                });
+              }
+            }}
+          >
+            {createRunMutation.isPending ? "Creating..." : "Create Run"}
+          </Button>
+        </div>
       </div>
     </div>
   );
