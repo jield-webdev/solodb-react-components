@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import { Alert, Button } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
-import RunSelect from "../../wizard/elements/runSelect";
+import RunSelect from "../../wizard/runSelect";
 
 export default function EditRunParents() {
   const { environment } = useParams();

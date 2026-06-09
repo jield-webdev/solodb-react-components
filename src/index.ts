@@ -24,7 +24,7 @@ export { default as MonitorProvider } from "./modules/monitor/providers/monitorP
 // Run Components
 export { default as RunHeaderElement } from "./modules/run/components/run/runHeaderElement";
 export { default as RunStepsElement } from "./modules/run/components/run/steps/runStepsElement";
-export { default as NewRunWizard } from "./modules/run/components/wizard/wizard";
+export { default as NewRunWizard } from "./modules/run/components/wizard/wizardElement";
 export { default as RunInformationElement } from "./modules/run/components/run/information/runInformationElement";
 export { default as RunLayoutElement } from "./modules/run/components/run/layout/runLayoutElement";
 export { default as RunStepHeaderElement } from "./modules/run/components/step/runStepHeaderElement";

@@ -317,16 +317,18 @@ export default function RunSelect({
         {selectedRuns.length > 0 && (
           <div className="d-flex flex-column gap-2">
             {selectedRuns.map((run) => (
-              <div key={run.id} className="d-flex align-items-center justify-content-between gap-3 border rounded p-2">
+              <div key={run.id} className="d-flex flex-column gap-2 bg-body-secondary rounded p-2">
                 <div>
                   <div className="fw-semibold">
                     {run.label} — {run.name}
                   </div>
                   <div className="text-secondary small">Included in creation</div>
                 </div>
-                <Button variant="outline-danger" size="sm" onClick={() => deselectRun(run.id)}>
-                  Deselect
-                </Button>
+                <div className="d-flex align-items-center gap-2">
+                  <Button variant="outline-danger" size="sm" onClick={() => deselectRun(run.id)}>
+                    Deselect
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
