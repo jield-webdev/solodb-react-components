@@ -72,6 +72,7 @@ export default function EditRunParents() {
           setAmountPerPartByRunId={setAmountPerPartByRunId}
           descriptionsByRunId={descriptionsByRunId}
           setDescriptionsByRunId={setDescriptionsByRunId}
+          run={run}
         />
 
         <div className="d-flex justify-content-end mt-4">

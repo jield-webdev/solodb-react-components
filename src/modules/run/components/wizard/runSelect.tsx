@@ -19,13 +19,11 @@ type RunSelectProps = {
   setAmountPerPartByRunId: Dispatch<SetStateAction<Record<number, Record<number, number>>>>;
   descriptionsByRunId: Record<number, string>;
   setDescriptionsByRunId: Dispatch<SetStateAction<Record<number, string>>>;
+  run?: Run;
 };
 
 const emptySelectedPartIds = new Set<number>();
-const emptyRuns: Run[] = [];
 
-// Parts are ordered the same way the run part list orders them: by root first,
-// then by their position (`left`) so siblings stay together within a level.
 const sortParts = (a: RunPart, b: RunPart): number => {
   if (a.root_id && b.root_id && a.root_id !== b.root_id) {
     return a.root_id - b.root_id;
@@ -72,6 +70,7 @@ export default function RunSelect({
   setAmountPerPartByRunId,
   descriptionsByRunId,
   setDescriptionsByRunId,
+  run,
 }: RunSelectProps) {
   const { environment } = useParams();
   const [activeRunId, setActiveRunId] = useState<number | null>(null);
@@ -79,7 +78,7 @@ export default function RunSelect({
 
   const { data: runsData, isFetching: isRunsFetching } = useQuery({
     queryKey: [environment],
-    queryFn: () => listRuns({ environment: environment }),
+    queryFn: () => listRuns({ environment: environment, availableAsParentForRun: run }),
   });
 
   const partQueryOptions = useMemo(
@@ -98,7 +97,7 @@ export default function RunSelect({
     queries: partQueryOptions,
   });
 
-  const runs: Run[] = runsData?.items ?? emptyRuns;
+  const runs: Run[] = runsData?.items ?? [];
   const selectedRunIds = useMemo(() => new Set(selectedRuns.map((run) => run.id)), [selectedRuns]);
   const visibleRunId =
     activeRunId !== null && selectedRunIds.has(activeRunId) ? activeRunId : (selectedRuns[0]?.id ?? null);
