@@ -7,25 +7,13 @@ import {
   TeamPurpose,
 } from "@jield/solodb-typescript-core";
 import { useQuery } from "@tanstack/react-query";
-import { type FormEvent, type ReactNode, useState } from "react";
-import { Alert, Badge, Button, Col, Form, Row } from "react-bootstrap";
+import { type FormEvent, useState } from "react";
+import { Alert, Button, Form } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import { type SelectedSubstrate } from "./substrateSelect";
-
-// A labelled section: the title sits on the left, the controls are padded to the
-// right, and a divider separates it from the previous section.
-function FormSection({ title, isFirst = false, children }: { title: string; isFirst?: boolean; children: ReactNode }) {
-  return (
-    <Row className={`g-3 py-4${isFirst ? "" : " border-top"}`}>
-      <Col xs={12} md={3}>
-        <h3 className="fs-5 mb-0">{title}</h3>
-      </Col>
-      <Col xs={12} md={9}>
-        <div className="d-flex flex-column gap-3">{children}</div>
-      </Col>
-    </Row>
-  );
-}
+import { type SelectedSubstrate } from "../substrateSelect";
+import FormSection from "./formSection";
+import OrganisationSelect from "./organisationSelect";
+import SelectionOverview from "./selectionOverview";
 
 export type CreateRunFormValues = {
   name: string;
@@ -44,18 +32,9 @@ type CreateRunFormProps = {
   errorMessage?: string;
   selectedRuns: Run[];
   selectedSubstrates: SelectedSubstrate[];
-  selectedPartIdsByRunId: Record<number, number[]>;
+  partIdsByRunId: Record<number, number[]>;
   onBack: () => void;
   onSubmit: (values: CreateRunFormValues) => void;
-};
-
-const parseSelectedId = (value: string): number | null => {
-  if (value === "") {
-    return null;
-  }
-
-  const id = Number(value);
-  return Number.isFinite(id) ? id : null;
 };
 
 export default function CreateRunForm({
@@ -63,7 +42,7 @@ export default function CreateRunForm({
   errorMessage,
   selectedRuns,
   selectedSubstrates,
-  selectedPartIdsByRunId,
+  partIdsByRunId,
   onBack,
   onSubmit,
 }: CreateRunFormProps) {
@@ -108,9 +87,6 @@ export default function CreateRunForm({
   const isMotivationMissing = trimmedMotivation === "";
   const showNameError = hasAttemptedSubmit && isNameMissing;
   const showMotivationError = hasAttemptedSubmit && isMotivationMissing;
-  const showGroupError = hasAttemptedSubmit && !hasValidGroup;
-  const showTeamError = hasAttemptedSubmit && !hasValidTeam;
-  const showProjectError = hasAttemptedSubmit && !hasValidProject;
   const hasOrganisationValues = hasValidGroup && hasValidTeam && hasValidProject;
   const canSubmit =
     !isNameMissing &&
@@ -119,7 +95,6 @@ export default function CreateRunForm({
     !isOrganisationLoading &&
     !hasOrganisationError &&
     !isSubmitting;
-  const organisationErrorMessage = hasOrganisationError ? "Could not load organisation values." : null;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -212,85 +187,45 @@ export default function CreateRunForm({
       </FormSection>
 
       <FormSection title="Organisation">
-        {hasAttemptedSubmit && organisationErrorMessage && <Alert variant="warning">{organisationErrorMessage}</Alert>}
+        {hasAttemptedSubmit && hasOrganisationError && (
+          <Alert variant="warning">Could not load organisation values.</Alert>
+        )}
 
-        <Form.Group controlId="create-run-group">
-          <Form.Label>
-            Group <span className="text-danger">*</span>
-          </Form.Label>
-          <Form.Select
-            value={groupId ?? ""}
-            onChange={(event) => setGroupId(parseSelectedId(event.target.value))}
-            required
-            disabled={isSubmitting}
-            isInvalid={showGroupError}
-          >
-            <option value="">{groupsQuery.isLoading ? "Loading groups..." : "Select a group"}</option>
-            {groups.map((group) => (
-              <option key={group.id} value={group.id}>
-                {group.label}
-              </option>
-            ))}
-          </Form.Select>
-          {showGroupError && (
-            <Form.Control.Feedback type="invalid">
-              {groupsQuery.isLoading ? "Groups are still loading." : "Select a group."}
-            </Form.Control.Feedback>
-          )}
-          <Form.Text muted>Select the group to which this run belongs</Form.Text>
-        </Form.Group>
+        <OrganisationSelect
+          controlId="create-run-group"
+          label="Group"
+          options={groups}
+          isLoading={groupsQuery.isLoading}
+          value={groupId}
+          onChange={setGroupId}
+          showError={hasAttemptedSubmit && !hasValidGroup}
+          disabled={isSubmitting}
+          helpText="Select the group to which this run belongs"
+        />
 
-        <Form.Group controlId="create-run-team">
-          <Form.Label>
-            Team <span className="text-danger">*</span>
-          </Form.Label>
-          <Form.Select
-            value={teamId ?? ""}
-            onChange={(event) => setTeamId(parseSelectedId(event.target.value))}
-            required
-            disabled={isSubmitting}
-            isInvalid={showTeamError}
-          >
-            <option value="">{teamsQuery.isLoading ? "Loading teams..." : "Select a team"}</option>
-            {teams.map((team) => (
-              <option key={team.id} value={team.id}>
-                {team.label}
-              </option>
-            ))}
-          </Form.Select>
-          {showTeamError && (
-            <Form.Control.Feedback type="invalid">
-              {teamsQuery.isLoading ? "Teams are still loading." : "Select a team."}
-            </Form.Control.Feedback>
-          )}
-          <Form.Text muted>Select the team to which this run belongs</Form.Text>
-        </Form.Group>
+        <OrganisationSelect
+          controlId="create-run-team"
+          label="Team"
+          options={teams}
+          isLoading={teamsQuery.isLoading}
+          value={teamId}
+          onChange={setTeamId}
+          showError={hasAttemptedSubmit && !hasValidTeam}
+          disabled={isSubmitting}
+          helpText="Select the team to which this run belongs"
+        />
 
-        <Form.Group controlId="create-run-project">
-          <Form.Label>
-            Project <span className="text-danger">*</span>
-          </Form.Label>
-          <Form.Select
-            value={projectId ?? ""}
-            onChange={(event) => setProjectId(parseSelectedId(event.target.value))}
-            required
-            disabled={isSubmitting}
-            isInvalid={showProjectError}
-          >
-            <option value="">{projectsQuery.isLoading ? "Loading projects..." : "Select a project"}</option>
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.label}
-              </option>
-            ))}
-          </Form.Select>
-          {showProjectError && (
-            <Form.Control.Feedback type="invalid">
-              {projectsQuery.isLoading ? "Projects are still loading." : "Select a project."}
-            </Form.Control.Feedback>
-          )}
-          <Form.Text muted>Select the project to which this run belongs</Form.Text>
-        </Form.Group>
+        <OrganisationSelect
+          controlId="create-run-project"
+          label="Project"
+          options={projects}
+          isLoading={projectsQuery.isLoading}
+          value={projectId}
+          onChange={setProjectId}
+          showError={hasAttemptedSubmit && !hasValidProject}
+          disabled={isSubmitting}
+          helpText="Select the project to which this run belongs"
+        />
       </FormSection>
 
       <FormSection title="Parts">
@@ -326,62 +261,11 @@ export default function CreateRunForm({
       </FormSection>
 
       <FormSection title="Overview">
-        <div>
-          <div className="text-secondary small text-uppercase fw-semibold mb-2">
-            Parent runs &amp; parts <span className="text-body-tertiary">(selected previously)</span>
-          </div>
-          {selectedRuns.length === 0 ? (
-            <p className="text-secondary fst-italic mb-0">No parent runs selected.</p>
-          ) : (
-            <div className="d-flex flex-column gap-2">
-              {selectedRuns.map((run) => {
-                const selectedPartCount = selectedPartIdsByRunId[run.id]?.length ?? 0;
-                return (
-                  <div
-                    key={run.id}
-                    className="d-flex align-items-center justify-content-between gap-3 bg-body-secondary border-0 rounded p-2"
-                  >
-                    <div className="fw-semibold">
-                      {run.label} — {run.name}
-                    </div>
-                    {selectedPartCount > 0 ? (
-                      <Badge bg="secondary" pill className="fw-normal">
-                        {selectedPartCount} {selectedPartCount === 1 ? "part" : "parts"}
-                      </Badge>
-                    ) : (
-                      <span className="text-secondary fst-italic small">No parts selected</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div>
-          <div className="text-secondary small text-uppercase fw-semibold mb-2">
-            Substrates <span className="text-body-tertiary">(selected previously)</span>
-          </div>
-          {selectedSubstrates.length === 0 ? (
-            <p className="text-secondary fst-italic mb-0">No substrates selected.</p>
-          ) : (
-            <div className="d-flex flex-column gap-2">
-              {selectedSubstrates.map(({ substrate, amount }) => (
-                <div
-                  key={substrate.id}
-                  className="d-flex align-items-center justify-content-between gap-3 bg-body-secondary rounded p-2"
-                >
-                  <div className="fw-semibold">
-                    {substrate.label} — {substrate.short_label}
-                  </div>
-                  <Badge bg="secondary" pill className="fw-normal">
-                    Amount: {amount}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <SelectionOverview
+          selectedRuns={selectedRuns}
+          selectedSubstrates={selectedSubstrates}
+          partIdsByRunId={partIdsByRunId}
+        />
       </FormSection>
 
       <div className="d-flex justify-content-end mt-4 gap-3">

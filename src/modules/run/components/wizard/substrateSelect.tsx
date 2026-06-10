@@ -1,6 +1,7 @@
 import { listSubstrate, type Substrate } from "@jield/solodb-typescript-core";
 import { type Dispatch, type SetStateAction } from "react";
 import { Button, Form } from "react-bootstrap";
+import { type StylesConfig } from "react-select";
 import AsyncSelect from "react-select/async";
 import { customStyles } from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
 
@@ -13,30 +14,21 @@ type SubstrateSelectProps = {
   setSelectedSubstrates: Dispatch<SetStateAction<SelectedSubstrate[]>>;
 };
 
-const isSubstrateOption = (option: unknown): option is SubstrateOption => {
-  return (
-    typeof option === "object" &&
-    option !== null &&
-    "value" in option &&
-    typeof (option as { value?: unknown }).value === "number" &&
-    "substrate" in option &&
-    typeof (option as { substrate?: unknown }).substrate === "object" &&
-    (option as { substrate?: unknown }).substrate !== null
-  );
-};
-
 const substrateToOption = (substrate: Substrate): SubstrateOption => ({
   value: substrate.id,
   label: `${substrate.label} — ${substrate.short_label}`,
   substrate,
 });
 
-export default function SubstrateSelect({ selectedSubstrates, setSelectedSubstrates }: SubstrateSelectProps) {
-  const loadOptions = async (inputValue: string): Promise<SubstrateOption[]> => {
-    const response = await listSubstrate({ query: inputValue || undefined });
-    return response.items.map(substrateToOption);
-  };
+const loadOptions = async (inputValue: string): Promise<SubstrateOption[]> => {
+  const response = await listSubstrate({ query: inputValue || undefined });
+  return response.items.map(substrateToOption);
+};
 
+// customStyles is option-type agnostic, so narrowing it to SubstrateOption is safe.
+const substrateSelectStyles = customStyles as StylesConfig<SubstrateOption, false>;
+
+export default function SubstrateSelect({ selectedSubstrates, setSelectedSubstrates }: SubstrateSelectProps) {
   const addSubstrate = (substrate: Substrate) => {
     setSelectedSubstrates((current) => {
       if (current.some((entry) => entry.substrate.id === substrate.id)) {
@@ -47,8 +39,9 @@ export default function SubstrateSelect({ selectedSubstrates, setSelectedSubstra
   };
 
   const updateAmount = (substrateId: number, amount: number) => {
+    const sanitizedAmount = Number.isFinite(amount) ? Math.max(0, amount) : 0;
     setSelectedSubstrates((current) =>
-      current.map((entry) => (entry.substrate.id === substrateId ? { ...entry, amount } : entry)),
+      current.map((entry) => (entry.substrate.id === substrateId ? { ...entry, amount: sanitizedAmount } : entry))
     );
   };
 
@@ -59,16 +52,16 @@ export default function SubstrateSelect({ selectedSubstrates, setSelectedSubstra
   return (
     <div className="mb-4">
       <h3>Select substrate</h3>
-      <AsyncSelect
+      <AsyncSelect<SubstrateOption>
         isSearchable={true}
         isClearable={true}
         defaultOptions
         placeholder={"— Select a substrate, or start typing"}
         loadOptions={loadOptions}
         value={null}
-        styles={customStyles}
+        styles={substrateSelectStyles}
         onChange={(option) => {
-          if (isSubstrateOption(option)) {
+          if (option) {
             addSubstrate(option.substrate);
           }
         }}
@@ -88,7 +81,7 @@ export default function SubstrateSelect({ selectedSubstrates, setSelectedSubstra
                   onClick={() => removeSubstrate(substrate.id)}
                   aria-label={`Deselect ${substrate.label}`}
                 >
-                    Deselect 
+                  Deselect
                 </Button>
                 <Form.Control
                   type="number"
@@ -96,10 +89,7 @@ export default function SubstrateSelect({ selectedSubstrates, setSelectedSubstra
                   step={1}
                   value={amount}
                   className="flex-grow-1"
-                  onChange={(event) => {
-                    const nextAmount = Number(event.target.value);
-                    updateAmount(substrate.id, Number.isFinite(nextAmount) ? Math.max(0, nextAmount) : 0);
-                  }}
+                  onChange={(event) => updateAmount(substrate.id, Number(event.target.value))}
                   aria-label={`Amount for ${substrate.label}`}
                 />
               </div>

@@ -3,36 +3,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Alert, Button, Nav } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import CreateRunForm, { type CreateRunFormValues } from "./crateRun";
-import RunSelect from "./runSelect";
+import { type ParentRunSelectionState, useParentRunSelection } from "../../hooks/useParentRunSelection";
+import { buildRunParentPayloads } from "../../utils/buildRunParentPayloads";
+import ParentRunSelect from "../shared/parentRuns/parentRunSelect";
+import CreateRunForm, { type CreateRunFormValues } from "./createRunForm/createRunForm";
+import { getCreateRunErrorMessage } from "./getCreateRunErrorMessage";
 import SubstrateSelect, { type SelectedSubstrate } from "./substrateSelect";
 
 type WizardPage = "parts" | "substrate" | "details";
 
-const getErrorMessage = (error: unknown): string => {
-  if (error instanceof Error && error.message !== "") {
-    return error.message;
-  }
-
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "response" in error &&
-    typeof (error as { response?: unknown }).response === "object" &&
-    (error as { response?: unknown }).response !== null
-  ) {
-    const response = (error as { response: { data?: { message?: unknown; detail?: unknown } } }).response;
-
-    if (typeof response.data?.message === "string") {
-      return response.data.message;
-    }
-
-    if (typeof response.data?.detail === "string") {
-      return response.data.detail;
-    }
-  }
-
-  return "Could not create the run.";
+type CreateRunVariables = {
+  runValues: CreateRunFormValues;
+  parentRuns: ParentRunSelectionState;
+  substrates: SelectedSubstrate[];
 };
 
 export default function NewRunWizard() {
@@ -40,27 +23,10 @@ export default function NewRunWizard() {
   const queryClient = useQueryClient();
   const [activePage, setActivePage] = useState<WizardPage>("parts");
   const [selectedSubstrates, setSelectedSubstrates] = useState<SelectedSubstrate[]>([]);
-  const [selectedRuns, setSelectedRuns] = useState<Run[]>([]);
-  const [selectedPartIdsByRunId, setSelectedPartIdsByRunId] = useState<Record<number, number[]>>({});
-  const [amountPerPartByRunId, setAmountPerPartByRunId] = useState<Record<number, Record<number, number>>>({});
-  const [descriptionsByRunId, setDescriptionsByRunId] = useState<Record<number, string>>({});
+  const parentRunSelection = useParentRunSelection();
 
   const createRunMutation = useMutation({
-    mutationFn: async ({
-      runValues,
-      parentRuns,
-      partIdsByRunId,
-      amountPerPartByRunId,
-      descriptionsByRunId,
-      substrates,
-    }: {
-      runValues: CreateRunFormValues;
-      parentRuns: Run[];
-      partIdsByRunId: Record<number, number[]>;
-      amountPerPartByRunId: Record<number, Record<number, number>>;
-      descriptionsByRunId: Record<number, string>;
-      substrates: SelectedSubstrate[];
-    }): Promise<Run> => {
+    mutationFn: async ({ runValues, parentRuns, substrates }: CreateRunVariables): Promise<Run> => {
       const createdRun = await createRun({
         name: runValues.name,
         motivation: runValues.motivation,
@@ -73,22 +39,9 @@ export default function NewRunWizard() {
         run_type: runValues.runType,
       });
 
-      const parentPromises = parentRuns.map((parentRun) => {
-        const partIds = partIdsByRunId[parentRun.id] ?? [];
-        const amountByPartId = amountPerPartByRunId[parentRun.id] ?? {};
-        const amountPerPart =
-          partIds.length > 0
-            ? Object.fromEntries(partIds.map((partId) => [partId, amountByPartId[partId] ?? 1]))
-            : null;
-
-        return createRunParent({
-          run_id: createdRun.id,
-          parent_run_id: parentRun.id,
-          part_ids: partIds,
-          amount_per_part: amountPerPart,
-          description: descriptionsByRunId[parentRun.id] || null,
-        });
-      });
+      const parentPromises = buildRunParentPayloads(createdRun.id, parentRuns).map((payload) =>
+        createRunParent(payload)
+      );
 
       const substratePromises = substrates.map(({ substrate, amount }) =>
         createRunSubstrate({
@@ -98,14 +51,14 @@ export default function NewRunWizard() {
         })
       );
 
-      await Promise.all([Promise.all(parentPromises), Promise.all(substratePromises)]);
+      await Promise.all([...parentPromises, ...substratePromises]);
 
       return createdRun;
     },
     onSuccess: (run, variables) => {
       queryClient.invalidateQueries({ queryKey: [environment] });
       queryClient.invalidateQueries({ queryKey: [run.id] });
-      variables.parentRuns.forEach((parentRun) => {
+      variables.parentRuns.selectedRuns.forEach((parentRun) => {
         queryClient.invalidateQueries({ queryKey: [parentRun.id] });
       });
     },
@@ -134,18 +87,7 @@ export default function NewRunWizard() {
       )}
 
       <div className="m-3">
-        {activePage === "parts" && (
-          <RunSelect
-            selectedRuns={selectedRuns}
-            setSelectedRuns={setSelectedRuns}
-            selectedPartIdsByRunId={selectedPartIdsByRunId}
-            setSelectedPartIdsByRunId={setSelectedPartIdsByRunId}
-            amountPerPartByRunId={amountPerPartByRunId}
-            setAmountPerPartByRunId={setAmountPerPartByRunId}
-            descriptionsByRunId={descriptionsByRunId}
-            setDescriptionsByRunId={setDescriptionsByRunId}
-          />
-        )}
+        {activePage === "parts" && <ParentRunSelect selection={parentRunSelection} />}
 
         {activePage === "substrate" && (
           <SubstrateSelect selectedSubstrates={selectedSubstrates} setSelectedSubstrates={setSelectedSubstrates} />
@@ -154,18 +96,15 @@ export default function NewRunWizard() {
         {activePage === "details" && (
           <CreateRunForm
             isSubmitting={createRunMutation.isPending}
-            errorMessage={createRunMutation.isError ? getErrorMessage(createRunMutation.error) : undefined}
-            selectedRuns={selectedRuns}
+            errorMessage={createRunMutation.isError ? getCreateRunErrorMessage(createRunMutation.error) : undefined}
+            selectedRuns={parentRunSelection.selectedRuns}
             selectedSubstrates={selectedSubstrates}
-            selectedPartIdsByRunId={selectedPartIdsByRunId}
+            partIdsByRunId={parentRunSelection.partIdsByRunId}
             onBack={() => setActivePage("parts")}
             onSubmit={(runValues) => {
               createRunMutation.mutate({
                 runValues,
-                parentRuns: selectedRuns,
-                partIdsByRunId: selectedPartIdsByRunId,
-                amountPerPartByRunId,
-                descriptionsByRunId,
+                parentRuns: parentRunSelection,
                 substrates: selectedSubstrates,
               });
             }}
