@@ -1,8 +1,8 @@
 import { createRun, createRunParent, createRunSubstrate, type Run } from "@jield/solodb-typescript-core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Alert, Button, Nav } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { Button, Nav } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
 import { type ParentRunSelectionState, useParentRunSelection } from "../../hooks/useParentRunSelection";
 import { buildRunParentPayloads } from "../../utils/buildRunParentPayloads";
 import ParentRunSelect from "../shared/parentRuns/parentRunSelect";
@@ -20,6 +20,7 @@ type CreateRunVariables = {
 
 export default function NewRunWizard() {
   const { environment } = useParams();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activePage, setActivePage] = useState<WizardPage>("parts");
   const [selectedSubstrates, setSelectedSubstrates] = useState<SelectedSubstrate[]>([]);
@@ -61,6 +62,7 @@ export default function NewRunWizard() {
       variables.parentRuns.selectedRuns.forEach((parentRun) => {
         queryClient.invalidateQueries({ queryKey: [parentRun.id] });
       });
+      navigate(`/${environment}/run/${run.id}/information.html`);
     },
   });
 
@@ -123,15 +125,6 @@ export default function NewRunWizard() {
               Continue
             </Button>
           </div>
-        )}
-
-        {createRunMutation.isSuccess && (
-          <Alert variant="success" className="mt-3">
-            Run Created:{" "}
-            <Alert.Link href={`${environment}/run/${createRunMutation.data.id}/information.html`}>
-              #{createRunMutation.data.id}
-            </Alert.Link>
-          </Alert>
         )}
       </div>
     </div>

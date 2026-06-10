@@ -1,6 +1,6 @@
 import { listRunParts, listRuns, type Run } from "@jield/solodb-typescript-core";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Nav } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { type StylesConfig } from "react-select";
@@ -20,6 +20,12 @@ type ParentRunSelectProps = {
 };
 
 const selectPartGroups = (data: Awaited<ReturnType<typeof listRunParts>>) => groupPartsByLevel(data.items ?? []);
+
+const toOption = (candidate: Run): RunOption => ({
+  value: candidate.id,
+  label: `${candidate.label} — ${candidate.name}`,
+  run: candidate,
+});
 
 // customStyles is option-type agnostic, so narrowing it to RunOption is safe.
 const runSelectStyles = customStyles as StylesConfig<RunOption, false>;
@@ -44,7 +50,9 @@ export default function ParentRunSelect({ selection, run }: ParentRunSelectProps
     })),
   });
 
-  const runs: Run[] = runsData?.items ?? [];
+  const runs: Run[] = useMemo(() => runsData?.items ?? [], [runsData]);
+
+  const defaultRunOptions = useMemo(() => runs.map(toOption), [runs]);
 
   const visibleRunIndex =
     activeRunId === null
@@ -63,7 +71,7 @@ export default function ParentRunSelect({ selection, run }: ParentRunSelectProps
         (candidate) =>
           !query || candidate.label.toLowerCase().includes(query) || candidate.name.toLowerCase().includes(query)
       )
-      .map((candidate) => ({ value: candidate.id, label: `${candidate.label} — ${candidate.name}`, run: candidate }));
+      .map(toOption);
   };
 
   const selectRun = (selected: Run) => {
@@ -78,7 +86,7 @@ export default function ParentRunSelect({ selection, run }: ParentRunSelectProps
         <AsyncSelect<RunOption>
           isSearchable={true}
           isClearable={true}
-          defaultOptions
+          defaultOptions={defaultRunOptions}
           placeholder={"— Select a run, or start typing"}
           loadOptions={loadOptions}
           isLoading={isRunsFetching}

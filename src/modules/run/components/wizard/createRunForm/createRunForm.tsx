@@ -119,12 +119,6 @@ export default function CreateRunForm({
 
   return (
     <Form noValidate onSubmit={handleSubmit}>
-      {errorMessage && (
-        <Alert variant="danger" className="mb-4">
-          {errorMessage}
-        </Alert>
-      )}
-
       <FormSection title="Details" isFirst>
         <Form.Group controlId="create-run-name">
           <Form.Label>
@@ -267,6 +261,12 @@ export default function CreateRunForm({
           partIdsByRunId={partIdsByRunId}
         />
       </FormSection>
+
+      {errorMessage && (
+        <Alert variant="danger" className="mb-4">
+          {errorMessage}
+        </Alert>
+      )}
 
       <div className="d-flex justify-content-end mt-4 gap-3">
         <Button variant="outline-secondary" type="button" onClick={onBack} disabled={isSubmitting}>
