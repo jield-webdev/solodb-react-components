@@ -2,6 +2,7 @@ import { useMemo, type CSSProperties, type DragEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Run, RunPart, RunStep, RunStepPart, TrayType, updateRunStepPartTray } from "@jield/solodb-typescript-core";
 import { upsertRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
+import { notification } from "@jield/solodb-react-components/utils/notification";
 
 type RunTray = NonNullable<Run["run_trays"]>[number];
 
@@ -59,9 +60,18 @@ export default function RunLayoutTrayVisual({
     try {
       const response = await updateRunStepPartTray(stepPart, tray, row, column);
       upsertRunStepPartCache(queryClient, step, response.data);
+      notification({
+        notificationHeader: "Tray part change",
+        notificationBody: "Part moved successfully",
+        notificationType: "success",
+      });
     } catch (error) {
       upsertRunStepPartCache(queryClient, step, stepPart);
-      console.error("Unable to update run step part tray.", error);
+      notification({
+        notificationHeader: "Tray part change",
+        notificationBody: "Unable to move part in the tray",
+        notificationType: "danger",
+      });
     }
   };
 

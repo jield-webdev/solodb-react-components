@@ -75,7 +75,7 @@ export const RunPartList = ({
 
   const context: RunPartRenderContext = { step, stepPartsById, allowCreate, selectedPartIds };
 
-  if (trays.length === 0) {
+  if (trays.length === 0 || leveledParts[0]?.part_level > 0) {
     return (
       <FlatGrid
         leveledParts={leveledParts}

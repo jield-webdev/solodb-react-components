@@ -1,3 +1,4 @@
+import { RunProvider } from "@jield/solodb-react-components";
 import React, { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 
@@ -36,9 +37,10 @@ const RunLayoutElement = lazy(() =>
 const RunStepsElement = lazy(() =>
   import("@jield/solodb-react-components").then((m) => ({ default: m.RunStepsElement }))
 );
-const NewRunWizard = lazy(() =>
-  import("@jield/solodb-react-components").then((m) => ({ default: m.NewRunWizard }))
+const EditRunParents = lazy(() =>
+  import("@jield/solodb-react-components").then((m) => ({ default: m.EditRunParents }))
 );
+const NewRunWizard = lazy(() => import("@jield/solodb-react-components").then((m) => ({ default: m.NewRunWizard })));
 const EmphasizedParametersProvider = lazy(() =>
   import("@jield/solodb-react-components").then((m) => ({ default: m.EmphasizedParametersProvider }))
 );
@@ -86,9 +88,10 @@ const ROUTES = {
     BASE: "/:environment/operator/monitor",
     DETAIL: "/:environment/operator/monitor/:id",
   },
-  NEW_RUN_WIZARD: "/:environment/run/new/wizard.html",
   RUN: {
     BASE: "/:environment/operator/run",
+    NEW_RUN_WIZARD: "/:environment/run/new/wizard.html",
+    EDIT_PARENTS: "/:environment/run/relationship/overview/:id.html",
     DETAILS: "/:environment/operator/run/details/:id",
     DETAILS_INFO: "/:environment/operator/run/details/:id/information",
     DETAILS_STEPS: "/:environment/operator/run/details/:id/steps",
@@ -162,8 +165,17 @@ export default function PageRoutes() {
         </Route>
 
         {/* RunWizard Route */}
-        <Route path={ROUTES.NEW_RUN_WIZARD} element={<NewRunWizard />}>
-        </Route>
+        <Route path={ROUTES.RUN.NEW_RUN_WIZARD} element={<NewRunWizard />}></Route>
+
+        {/* Edit run parent route */}
+        <Route
+          path={ROUTES.RUN.EDIT_PARENTS}
+          element={
+            <RunProvider>
+              <EditRunParents />
+            </RunProvider>
+          }
+        ></Route>
 
         {/* Run routes */}
         <Route path={ROUTES.RUN.BASE}>
