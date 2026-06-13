@@ -48,6 +48,24 @@ export default function RunLayoutTrayVisual({
       return;
     }
 
+    const existingStepPartInSlot = stepParts.find(
+      (candidate) =>
+        candidate.id !== stepPart.id &&
+        candidate.step_id === step.id &&
+        candidate.tray_id === tray.id &&
+        candidate.tray_row === row &&
+        candidate.tray_column === column
+    );
+
+    if (existingStepPartInSlot) {
+      notification({
+        notificationHeader: "Tray part change",
+        notificationBody: "Two PartTrays can not be in the same tray position",
+        notificationType: "danger",
+      });
+      return;
+    }
+
     const expectedStepPart: RunStepPart = {
       ...stepPart,
       tray_id: tray.id,
@@ -69,7 +87,7 @@ export default function RunLayoutTrayVisual({
       upsertRunStepPartCache(queryClient, step, stepPart);
       notification({
         notificationHeader: "Tray part change",
-        notificationBody: "Unable to move part in the tray",
+        notificationBody: "Error",
         notificationType: "danger",
       });
     }
@@ -124,6 +142,7 @@ export default function RunLayoutTrayVisual({
             const pocketNumber = slotIndex + 1;
             const { row, column } = getSlotPosition(trayType, slotIndex);
             const part = stepPart ? partsById.get(stepPart.part_id) : null;
+            const partBadgeColor = stepPart?.tray_id ? "bg-primary" : "bg-grey";
 
             return (
               <div key={`${tray.id}-${pocketNumber}`} className="tray-visual__pocket">
@@ -139,7 +158,7 @@ export default function RunLayoutTrayVisual({
                   {part && stepPart ? (
                     <span
                       key={stepPart.id}
-                      className={`tray-visual__part badge bg-primary badge-level-${part.part_level}`}
+                      className={`tray-visual__part badge ${partBadgeColor} badge-level-${part.part_level}`}
                       data-part-id={part.id}
                       data-step-part-id={stepPart.id}
                       draggable
