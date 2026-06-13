@@ -88,7 +88,7 @@ export default function RunLayoutTrayVisual({
     "--tray-rows": trayType.rows,
     "--tray-columns": trayType.columns,
   } as CSSProperties;
-  const slots = Array.from({ length: trayCapacity }, () => [] as RunStepPart[]);
+  const slots: (RunStepPart | null)[] = Array.from({ length: trayCapacity }, () => null);
 
   stepParts.forEach((stepPart) => {
     const part = partsById.get(stepPart.part_id);
@@ -101,17 +101,20 @@ export default function RunLayoutTrayVisual({
     );
 
     if (slotIndex === null) return;
-    slots[slotIndex].push(stepPart);
+    slots[slotIndex] = stepPart;
   });
+
+  console.log(slots);
 
   return (
     <section className="tray-visual my-2" style={trayStyle} aria-label={tray.name}>
       <h4 className="h6 mb-2">{trayLabel}</h4>
       <div className="tray-visual__frame">
         <div className="tray-visual__grid" data-orientation={trayType.orientation === "ttb" ? "ttb" : "ltr"}>
-          {slots.map((slotParts, slotIndex) => {
+          {slots.map((stepPart, slotIndex) => {
             const pocketNumber = slotIndex + 1;
             const { row, column } = getSlotPosition(trayType, slotIndex);
+            const part = stepPart ? partsById.get(stepPart.part_id) : null;
 
             return (
               <div key={`${tray.id}-${pocketNumber}`} className="tray-visual__pocket">
@@ -124,24 +127,17 @@ export default function RunLayoutTrayVisual({
                   onDragOver={handleSlotDragOver}
                   onDrop={(event) => handleSlotDrop(event, tray, row, column)}
                 >
-                  {slotParts.length ? (
-                    slotParts.map((stepPart) => {
-                      const part = partsById.get(stepPart.part_id);
-                      if (!part) return null;
-
-                      return (
-                        <span
-                          key={stepPart.id}
-                          className={`tray-visual__part badge bg-primary badge-level-${part.part_level}`}
-                          data-part-id={part.id}
-                          data-step-part-id={stepPart.id}
-                          draggable
-                          onDragStart={(event) => handlePartDragStart(event, stepPart)}
-                        >
-                          {part.scanner_label}
-                        </span>
-                      );
-                    })
+                  {part && stepPart ? (
+                    <span
+                      key={stepPart.id}
+                      className={`tray-visual__part badge bg-primary badge-level-${part.part_level}`}
+                      data-part-id={part.id}
+                      data-step-part-id={stepPart.id}
+                      draggable
+                      onDragStart={(event) => handlePartDragStart(event, stepPart)}
+                    >
+                      {part.scanner_label}
+                    </span>
                   ) : (
                     <span className="tray-visual__index">{pocketNumber}</span>
                   )}
