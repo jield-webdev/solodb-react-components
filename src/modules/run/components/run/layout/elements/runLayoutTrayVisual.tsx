@@ -101,10 +101,19 @@ export default function RunLayoutTrayVisual({
     );
 
     if (slotIndex === null) return;
-    slots[slotIndex] = stepPart;
-  });
 
-  console.log(slots);
+    if (stepPart.tray_id === null && slots[slotIndex]?.tray_id !== null) return;
+
+    if (stepPart.tray_id !== null) {
+        slots[slotIndex] = stepPart;
+        return;
+    }
+
+    if (stepPart.tray_id === null && slots[slotIndex]?.tray_id === null) {
+        slots[slotIndex] = stepPart;
+        return;
+    }
+  });
 
   return (
     <section className="tray-visual my-2" style={trayStyle} aria-label={tray.name}>
