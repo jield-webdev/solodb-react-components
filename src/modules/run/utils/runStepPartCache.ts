@@ -20,6 +20,10 @@ type UpdateRunStepPartCacheByRunStepOptions =
       latestActions: RunStepPartState[] | ApiFormattedResponse<RunStepPartState>;
     };
 
+type UpsertRunStepPartCacheOptions = {
+  updateSubsequent?: boolean;
+};
+
 // --- Item transformers ---
 
 const applyActionToRunStepPart = (runStepPart: RunStepPart, latestAction: RunStepPartState): RunStepPart => {
@@ -49,6 +53,23 @@ const mapOverItems = <T>(data: any, transform: (items: T[]) => T[]): any => {
   }
 
   return data;
+};
+
+const getItemsFromData = <T>(data: any): T[] => {
+  if (!data) return [];
+
+  if (Array.isArray(data.pages)) {
+    return data.pages.flatMap((page: any) => {
+      if (!Array.isArray(page?.items)) return [];
+      return page.items as T[];
+    });
+  }
+
+  if (Array.isArray(data.items)) {
+    return data.items as T[];
+  }
+
+  return [];
 };
 
 // --- Cache data transformers ---
@@ -91,8 +112,47 @@ const applyBatchActions = (
   );
 };
 
-const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart): any => {
+const shouldUpdateSubsequentTray = (
+  item: RunStepPart,
+  runStep: RunStep,
+  runStepPart: RunStepPart,
+  runStepsById: Map<number, RunStep>
+): boolean => {
+  if (item.id === runStepPart.id || item.part_id !== runStepPart.part_id) return false;
+
+  const targetStep = runStepsById.get(item.step_id);
+  if (!targetStep) return false;
+
+  return (
+    targetStep.run_id === runStep.run_id &&
+    targetStep.part_level === 0 &&
+    targetStep.sequence > runStep.sequence
+  );
+};
+
+const upsertRunStepPartInData = (
+  data: any,
+  runStep: RunStep,
+  runStepPart: RunStepPart,
+  options: UpsertRunStepPartCacheOptions = {},
+  runStepsById: Map<number, RunStep> = new Map()
+): any => {
   if (!data) return data;
+
+  const updateItem = (item: RunStepPart): RunStepPart => {
+    if (item.id === runStepPart.id) return runStepPart;
+
+    if (options.updateSubsequent && shouldUpdateSubsequentTray(item, runStep, runStepPart, runStepsById)) {
+      return {
+        ...item,
+        tray_id: runStepPart.tray_id,
+        tray_row: runStepPart.tray_row,
+        tray_column: runStepPart.tray_column,
+      };
+    }
+
+    return item;
+  };
 
   if (Array.isArray(data.pages)) {
     const pages = data.pages as any[];
@@ -101,9 +161,7 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart): any => {
     );
 
     if (existsInAnyPage) {
-      return mapOverItems<RunStepPart>(data, (items) =>
-        items.map((item) => (item.id === runStepPart.id ? runStepPart : item))
-      );
+      return mapOverItems<RunStepPart>(data, (items) => items.map(updateItem));
     }
 
     // Append to last page if not found in any page
@@ -112,8 +170,9 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart): any => {
       return {
         ...data,
         pages: pages.map((page: any, i: number) => {
-          if (i !== lastIndex || !page || !Array.isArray(page.items)) return page;
-          return { ...page, items: [...page.items, runStepPart] };
+          if (!page || !Array.isArray(page.items)) return page;
+          const items = page.items.map(updateItem);
+          return { ...page, items: i === lastIndex ? [...items, runStepPart] : items };
         }),
       };
     }
@@ -126,11 +185,23 @@ const upsertRunStepPartInData = (data: any, runStepPart: RunStepPart): any => {
     const exists = items.some((item) => item.id === runStepPart.id);
     return {
       ...data,
-      items: exists ? items.map((item) => (item.id === runStepPart.id ? runStepPart : item)) : [...items, runStepPart],
+      items: exists ? items.map(updateItem) : [...items.map(updateItem), runStepPart],
     };
   }
 
   return data;
+};
+
+const getCachedRunStepsById = (queryClient: QueryClient): Map<number, RunStep> => {
+  const runStepsById = new Map<number, RunStep>();
+
+  queryClient.getQueriesData({ queryKey: ["runSteps"] }).forEach(([, data]) => {
+    getItemsFromData<RunStep>(data).forEach((step) => {
+      runStepsById.set(step.id, step);
+    });
+  });
+
+  return runStepsById;
 };
 
 // --- Cache operations ---
@@ -224,6 +295,15 @@ export const updateRunStepPartCacheByRunStep = (
   updateRunStepPartCacheInternal(queryClient, options);
 };
 
-export const upsertRunStepPartCache = (queryClient: QueryClient, runStep: RunStep, runStepPart: RunStepPart): void => {
-  queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) => upsertRunStepPartInData(data, runStepPart));
+export const upsertRunStepPartCache = (
+  queryClient: QueryClient,
+  runStep: RunStep,
+  runStepPart: RunStepPart,
+  options: UpsertRunStepPartCacheOptions = {}
+): void => {
+  const runStepsById = options.updateSubsequent ? getCachedRunStepsById(queryClient) : new Map<number, RunStep>();
+
+  queryClient.setQueriesData({ queryKey: ["runStepParts"] }, (data) =>
+    upsertRunStepPartInData(data, runStep, runStepPart, options, runStepsById)
+  );
 };

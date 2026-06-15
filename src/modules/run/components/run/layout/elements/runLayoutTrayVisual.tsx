@@ -76,8 +76,8 @@ export default function RunLayoutTrayVisual({
     upsertRunStepPartCache(queryClient, step, expectedStepPart);
 
     try {
-      const response = await updateRunStepPartTray(stepPart, tray, row, column);
-      upsertRunStepPartCache(queryClient, step, response.data);
+      const response = await updateRunStepPartTray(stepPart, tray, row, column, true);
+      upsertRunStepPartCache(queryClient, step, response.data, { updateSubsequent: true });
       notification({
         notificationHeader: "Tray part change",
         notificationBody: "Part moved successfully",
