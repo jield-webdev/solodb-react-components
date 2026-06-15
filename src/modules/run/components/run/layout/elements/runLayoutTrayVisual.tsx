@@ -87,7 +87,7 @@ export default function RunLayoutTrayVisual({
       upsertRunStepPartCache(queryClient, step, stepPart);
       notification({
         notificationHeader: "Tray part change",
-        notificationBody: "Error",
+        notificationBody: getTrayUpdateErrorMessage(error),
         notificationType: "danger",
       });
     }
@@ -200,4 +200,24 @@ const getSlotPosition = (trayType: TrayType, slotIndex: number) => {
     row: Math.floor(slotIndex / trayType.columns) + 1,
     column: (slotIndex % trayType.columns) + 1,
   };
+};
+
+const getTrayUpdateErrorMessage = (error: unknown): string => {
+  if (typeof error === "object" && error !== null && "response" in error) {
+    const response = (error as { response?: { data?: { detail?: unknown; message?: unknown } } }).response;
+
+    if (typeof response?.data?.detail === "string" && response.data.detail !== "") {
+      return response.data.detail;
+    }
+
+    if (typeof response?.data?.message === "string" && response.data.message !== "") {
+      return response.data.message;
+    }
+  }
+
+  if (error instanceof Error && error.message !== "") {
+    return error.message;
+  }
+
+  return "Could not move part.";
 };
