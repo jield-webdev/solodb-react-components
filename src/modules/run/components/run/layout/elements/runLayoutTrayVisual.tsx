@@ -1,5 +1,6 @@
 import { useMemo, type CSSProperties, type DragEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Run, RunPart, RunStep, RunStepPart, TrayType, updateRunStepPartTray } from "@jield/solodb-typescript-core";
 import { upsertRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import { notification } from "@jield/solodb-react-components/utils/notification";
@@ -54,7 +55,8 @@ export default function RunLayoutTrayVisual({
         candidate.step_id === step.id &&
         candidate.tray_id === tray.id &&
         candidate.tray_row === row &&
-        candidate.tray_column === column
+        candidate.tray_column === column &&
+        !(candidate.has_failed_in_previouse_state || candidate.failed)
     );
 
     if (existingStepPartInSlot) {
@@ -120,17 +122,16 @@ export default function RunLayoutTrayVisual({
 
     if (slotIndex === null) return;
 
-    if (stepPart.tray_id === null && slots[slotIndex]?.tray_id !== null) return;
+    if (stepPart.has_failed_in_previouse_state) return;
 
-    if (stepPart.tray_id !== null) {
-        slots[slotIndex] = stepPart;
-        return;
-    }
+    const slotPriority = getStepPartSlotPriority(stepPart);
 
-    if (stepPart.tray_id === null && slots[slotIndex]?.tray_id === null) {
-        slots[slotIndex] = stepPart;
-        return;
-    }
+    const currentStepPart = slots[slotIndex];
+    const currentSlotPriority = currentStepPart ? getStepPartSlotPriority(currentStepPart) : null;
+
+    if (currentSlotPriority !== null && currentSlotPriority < slotPriority) return;
+
+    slots[slotIndex] = stepPart;
   });
 
   return (
@@ -142,7 +143,8 @@ export default function RunLayoutTrayVisual({
             const pocketNumber = slotIndex + 1;
             const { row, column } = getSlotPosition(trayType, slotIndex);
             const part = stepPart ? partsById.get(stepPart.part_id) : null;
-            const partBadgeColor = stepPart?.tray_id ? "bg-primary" : "bg-grey";
+            const partBadgeColor = getPartBadgeColor(stepPart);
+            const partBadgeTooltip = getPartBadgeTooltip(stepPart);
 
             return (
               <div key={`${tray.id}-${pocketNumber}`} className="tray-visual__pocket">
@@ -156,16 +158,21 @@ export default function RunLayoutTrayVisual({
                   onDrop={(event) => handleSlotDrop(event, tray, row, column)}
                 >
                   {part && stepPart ? (
-                    <span
+                    <OverlayTrigger
                       key={stepPart.id}
-                      className={`tray-visual__part badge ${partBadgeColor} badge-level-${part.part_level}`}
-                      data-part-id={part.id}
-                      data-step-part-id={stepPart.id}
-                      draggable
-                      onDragStart={(event) => handlePartDragStart(event, stepPart)}
+                      placement="top"
+                      overlay={<Tooltip id={`tooltip-tray-slot-part-${stepPart.id}`}>{partBadgeTooltip}</Tooltip>}
                     >
-                      {part.scanner_label}
-                    </span>
+                      <span
+                        className={`tray-visual__part badge ${partBadgeColor} badge-level-${part.part_level}`}
+                        data-part-id={part.id}
+                        data-step-part-id={stepPart.id}
+                        draggable
+                        onDragStart={(event) => handlePartDragStart(event, stepPart)}
+                      >
+                        {part.scanner_label}
+                      </span>
+                    </OverlayTrigger>
                   ) : (
                     <span className="tray-visual__index">{pocketNumber}</span>
                   )}
@@ -220,4 +227,32 @@ const getTrayUpdateErrorMessage = (error: unknown): string => {
   }
 
   return "Could not move part.";
+};
+
+const getStepPartSlotPriority = (stepPart: RunStepPart): number => {
+  if (stepPart.tray_id != null && !stepPart.failed) {
+      return 1;
+  }
+
+  if (stepPart.tray_id != null) {
+      return 2;
+  }
+
+  return 3;
+};
+
+const getPartBadgeColor = (stepPart: RunStepPart | null): string => {
+  if (stepPart?.failed) return "bg-danger";
+
+  return stepPart?.tray_id ? "bg-primary" : "bg-grey";
+};
+
+const getPartBadgeTooltip = (stepPart: RunStepPart | null): string => {
+  if (stepPart?.failed) return "Part failed";
+
+  if (stepPart == null) {
+    return "In default postion";
+  }
+
+  return stepPart.tray_id != undefined ? "Not in default postion" : "In default position";
 };

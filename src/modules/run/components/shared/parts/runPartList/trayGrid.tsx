@@ -20,6 +20,18 @@ const toTrayStepParts = (trayParts: RunPart[], stepPartsById: Map<number, RunSte
     .map((part) => stepPartsById.get(part.id))
     .filter((sp): sp is RunStepPart => sp !== undefined);
 
+const getStepPartSlotPriority = (stepPart: RunStepPart | undefined): number => {
+  if (stepPart?.tray_id != null && !stepPart?.failed) {
+      return 1;
+  }
+
+  if (stepPart?.tray_id != null) {
+      return 2;
+  }
+
+  return 3;
+};
+
 export const TrayGrid = ({
   tray,
   trayParts,
@@ -95,9 +107,16 @@ export const TrayGrid = ({
         stepPart?.tray_column ?? runPart.tray_column
       );
       if (slotIndex === null) return;
-      if (!slots[slotIndex].length) {
-        slots[slotIndex].push(runPart);
-      }
+
+      const slotPriority = getStepPartSlotPriority(stepPart);
+      const currentRunPart = slots[slotIndex][0];
+      const currentSlotPriority = currentRunPart
+        ? getStepPartSlotPriority(stepPartByPartId.get(currentRunPart.id))
+        : null;
+
+      if (currentSlotPriority !== null && currentSlotPriority < slotPriority) return;
+
+      slots[slotIndex] = [runPart];
     });
   }
 
