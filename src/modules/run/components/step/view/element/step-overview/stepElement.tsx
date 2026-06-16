@@ -51,10 +51,19 @@ const StepElement = ({
         <div className="d-flex align-items-center gap-2 flex-shrink-0">
           {runStep.id !== contextRunStep.id && (
             <i
+              role="button"
+              tabIndex={0}
+              aria-label={showStepDetail ? "Collapse details" : "Expand details"}
               className={"fa " + (showStepDetail ? "fa-chevron-down" : "fa-chevron-right")}
               style={{ cursor: "pointer" }}
               onClick={() => {
                 setShowStepDetail(!showStepDetail);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setShowStepDetail(!showStepDetail);
+                }
               }}
             />
           )}

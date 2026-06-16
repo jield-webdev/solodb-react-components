@@ -18,6 +18,9 @@ const HoldCodeBadge = () => {
     <>
       {runHoldCode && (
         <span
+          role="button"
+          tabIndex={0}
+          aria-label="Edit hold code"
           className={"badge handle"}
           style={{
             backgroundColor: runHoldCode.hold_code.back_color,
@@ -26,6 +29,12 @@ const HoldCodeBadge = () => {
             cursor: "pointer",
           }}
           onClick={() => OpenHoldCode()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              OpenHoldCode();
+            }
+          }}
         >
           {runHoldCode.hold_code.code}
         </span>

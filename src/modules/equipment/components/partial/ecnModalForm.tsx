@@ -259,7 +259,7 @@ const EcnModalForm: React.FC<EcnModalFormProps> = ({ equipment, showModal, onClo
             {files.length > 0 && (
               <ul>
                 {files.map((file, index) => (
-                  <li key={index}>
+                  <li key={`${file.name}-${file.lastModified}`}>
                     {file.name}{" "}
                     <Button variant="secondary" onClick={() => removeToUploadFiles(index)}>
                       cancel
@@ -275,7 +275,7 @@ const EcnModalForm: React.FC<EcnModalFormProps> = ({ equipment, showModal, onClo
               <Form.Label>Uploaded files</Form.Label>
               <ul>
                 {attachmentsUpdated.map((attachment, index) => (
-                  <li key={index}>
+                  <li key={attachment.id}>
                     {attachment.filename}{" "}
                     <Button variant="secondary" onClick={() => removeAlreadyUploadedFiles(index)}>
                       delete

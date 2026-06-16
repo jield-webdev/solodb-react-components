@@ -113,7 +113,7 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
           </thead>
           <tbody>
             {filesData.map((file: File, i) => (
-              <tr key={i}>
+              <tr key={file.url}>
                 <td>
                   <small className="text-muted">{i + 1}</small>
                 </td>
@@ -123,9 +123,18 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
                 </td>
                 <td>
                   <i
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Delete file"
                     className="fa fa-trash-o remove-file handle"
                     style={{ cursor: "pointer" }}
                     onClick={() => onClickDeleteFile(file)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onClickDeleteFile(file);
+                      }
+                    }}
                   />{" "}
                   {formatFileSize(file.size)}
                 </td>
@@ -150,8 +159,8 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
       {/* List of selected files before upload */}
       {selectedFiles.length > 0 && (
         <ListGroup className="mt-3">
-          {selectedFiles.map((file, idx) => (
-            <ListGroup.Item key={idx}>{file.name}</ListGroup.Item>
+          {selectedFiles.map((file) => (
+            <ListGroup.Item key={file.name}>{file.name}</ListGroup.Item>
           ))}
         </ListGroup>
       )}

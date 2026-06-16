@@ -79,10 +79,18 @@ export function FilterBadges({
           {cleanedFilter.filter.general.map((entry) => (
             <span
               key={entry}
+              role="button"
+              tabIndex={0}
               className="m-1 badge bg-pill bg-info"
               style={{ cursor: "pointer" }}
               onClick={() => {
                 handleClearGeneralFilter(entry);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleClearGeneralFilter(entry);
+                }
               }}
             >
               {entry} <i className="fa fa-times"></i>
@@ -91,10 +99,18 @@ export function FilterBadges({
           {Object.entries(cleanedFilter.facet).map(([name, facet]) => (
             <span
               key={name}
+              role="button"
+              tabIndex={0}
               className="m-1 badge bg-pill bg-info"
               style={{ cursor: "pointer" }}
               onClick={() => {
                 handleClearFacet(name);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  handleClearFacet(name);
+                }
               }}
             >
               {Object.values(filterForm.facet.fieldsets).find((fieldset) => fieldset.name == name)?.label ?? name}:{" "}

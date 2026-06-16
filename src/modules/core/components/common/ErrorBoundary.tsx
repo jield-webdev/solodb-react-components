@@ -45,7 +45,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                             {this.state.error.message}
                         </pre>
                     )}
-                    <button onClick={this.handleReset}>Try again</button>
+                    <button type="button" onClick={this.handleReset}>Try again</button>
                 </div>
             );
         }

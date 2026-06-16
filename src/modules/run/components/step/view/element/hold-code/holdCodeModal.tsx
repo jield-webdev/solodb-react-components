@@ -125,11 +125,12 @@ const HoldCodeModal = ({
           )}
 
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label className={"col-sm-3 col-form-label text-end"}>Message</label>
+            <label htmlFor={"holdCodeDescription"} className={"col-sm-3 col-form-label text-end"}>Message</label>
             <div className={"col-sm-9"}>
               <Form.Control
                 as="textarea"
                 rows={3}
+                id={"holdCodeDescription"}
                 {...register("description", {
                   required: "A message is required",
                 })}

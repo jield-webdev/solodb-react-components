@@ -29,6 +29,8 @@ export const RunStepParameterEditButton = ({ parameter, value, refetchFn }: {par
   return (
     <>
       <span
+        role="button"
+        tabIndex={0}
         style={{
           cursor: "pointer",
           borderBottom: "1px dashed #999",
@@ -38,17 +40,26 @@ export const RunStepParameterEditButton = ({ parameter, value, refetchFn }: {par
         onClick={() => {
           setShowEdit(!showEdit);
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setShowEdit(!showEdit);
+          }
+        }}
       >
         {value.value !== "" && value.value !== null ? value.value : "edit"}
       </span>
       <div style={{ display: showEdit ? "" : "none" }} className="btn-group">
         <input
           type="text"
+          aria-label="Parameter value"
           value={inputValue ?? ""}
           className="form-control"
           onChange={(e) => setInputValue(e.target.value)}
         />
         <button
+          type="button"
+          aria-label="Save"
           onClick={() => {
             editValue(inputValue);
           }}
@@ -57,6 +68,8 @@ export const RunStepParameterEditButton = ({ parameter, value, refetchFn }: {par
           <i className="fa fa-check"></i>
         </button>
         <button
+          type="button"
+          aria-label="Cancel"
           onClick={() => {
             setShowEdit(false);
           }}

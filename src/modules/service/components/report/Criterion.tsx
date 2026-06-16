@@ -93,6 +93,7 @@ export default function Criterion({
               return (
                 <input
                   id={`result-${result.id}`}
+                  aria-label={criterionVersion.criterion.criterion}
                   type="number"
                   step={criterionVersion.criterion.input_type === "float" ? "0.01" : "1"}
                   className={`form-control ${validationClassName}`}
@@ -112,6 +113,7 @@ export default function Criterion({
               return (
                 <input
                   id={`result-${result.id}`}
+                  aria-label={criterionVersion.criterion.criterion}
                   type="date"
                   className={`form-control ${validationClassName}`}
                   value={stringValue(field.value)}
@@ -130,6 +132,7 @@ export default function Criterion({
               return (
                 <textarea
                   id={`result-${result.id}`}
+                  aria-label={criterionVersion.criterion.criterion}
                   className={`form-control ${validationClassName}`}
                   rows={3}
                   value={stringValue(field.value)}
@@ -148,6 +151,7 @@ export default function Criterion({
               return (
                 <input
                   id={`result-${result.id}`}
+                  aria-label={criterionVersion.criterion.criterion}
                   type="text"
                   className={`form-control ${validationClassName}`}
                   value={stringValue(field.value)}
@@ -192,6 +196,7 @@ export default function Criterion({
                       <input
                         type="radio"
                         id={`result-${result.id}_${key}`}
+                        aria-label={String(label)}
                         name={`result-${result.id}`}
                         value={key}
                         checked={current === key}
@@ -227,6 +232,7 @@ export default function Criterion({
                       <input
                         type="checkbox"
                         id={`result-${result.id}_${key}`}
+                        aria-label={String(label)}
                         name={`result-${result.id}`}
                         value={key}
                         checked={selected.includes(key)}
@@ -248,6 +254,7 @@ export default function Criterion({
                   <input
                     type="checkbox"
                     id={`result-${result.id}`}
+                    aria-label={criterionVersion.criterion.criterion}
                     checked={!!field.value}
                     onChange={(e) => {
                       field.onChange(e.target.checked);
@@ -262,7 +269,7 @@ export default function Criterion({
             case "action":
               return (
                 <div className={`d-flex align-items-center ${groupValidationClassName}`}>
-                  <label className="me-2">Done </label>
+                  <span className="me-2">Done </span>
                   <div
                     role="group"
                     aria-label={`${result.id}-action`}

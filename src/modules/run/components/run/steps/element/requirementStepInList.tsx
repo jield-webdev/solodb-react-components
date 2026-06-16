@@ -118,9 +118,18 @@ export default function RequirementStepInList({
       <tr className={getRowStatus(measurementResults)}>
         <td>
           <i
+            role="button"
+            tabIndex={0}
+            aria-label={isExpanded ? "Collapse details" : "Expand details"}
             className={"fa ms-2 " + (isExpanded ? "fa-chevron-down" : "fa-chevron-right")}
             style={{ cursor: "pointer" }}
             onClick={toggleExpand}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggleExpand();
+              }
+            }}
           />
         </td>
         {/* parts */}

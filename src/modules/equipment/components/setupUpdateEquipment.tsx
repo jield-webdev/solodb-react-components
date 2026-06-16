@@ -236,9 +236,9 @@ export default function SetupUpdateEquipment() {
         Error loading:{" "}
         {[setupQuery, filterFormQuery]
           .filter((q) => q.isError)
-          .map((q, idx) => {
+          .map((q) => {
             const message = q.error instanceof Error ? q.error.message : "Unknown error";
-            return <span key={idx}>Query error {message}</span>;
+            return <span key={message}>Query error {message}</span>;
           })}
       </div>
     );

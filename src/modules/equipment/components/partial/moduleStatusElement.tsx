@@ -111,6 +111,9 @@ export default function ModuleStatusElement({
           }
         >
           <div
+            role="button"
+            tabIndex={0}
+            aria-label="Edit module status"
             className="badge"
             style={{
               color: moduleStatus.status.front_color,
@@ -118,6 +121,12 @@ export default function ModuleStatusElement({
               cursor: "pointer",
             }}
             onClick={handleOpenModal}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleOpenModal();
+              }
+            }}
           >
             {moduleStatus.status?.status}
           </div>

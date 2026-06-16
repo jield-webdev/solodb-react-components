@@ -120,6 +120,7 @@ export default function EquipmentTable({
               )}{" "}
               {!equipment.is_in_fixed_setup && (
                 <button
+                  type="button"
                   onClick={() => addEquipment(equipment)}
                   className="btn btn-outline-success btn-sm"
                   disabled={addDisabled}
@@ -157,7 +158,10 @@ export default function EquipmentTable({
               <a href={`/${environment}/equipment/details/${row.original.id}/general.html`}>
                 {String(getValue() ?? "")}
               </a>{" "}
-              <a href={`/${environment}/equipment/edit/${row.original.id}.html`}>
+              <a
+                href={`/${environment}/equipment/edit/${row.original.id}.html`}
+                aria-label={`Edit ${String(getValue() ?? "equipment")}`}
+              >
                 <i className="fa fa-pencil-square-o fa-fw" />
               </a>
               {inactive && <span className="badge bg-danger">INACTIVE</span>}{" "}
@@ -272,8 +276,16 @@ export default function EquipmentTable({
                   <th key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder ? null : (
                       <div
+                        role={header.column.getCanSort() ? "button" : undefined}
+                        tabIndex={header.column.getCanSort() ? 0 : undefined}
                         style={header.column.getCanSort() ? { cursor: "pointer" } : {}}
                         onClick={header.column.getToggleSortingHandler()}
+                        onKeyDown={(e) => {
+                          if (header.column.getCanSort() && (e.key === "Enter" || e.key === " ")) {
+                            e.preventDefault();
+                            header.column.getToggleSortingHandler()?.(e);
+                          }
+                        }}
                         title={
                           header.column.getCanSort()
                             ? header.column.getNextSortingOrder() === "asc"

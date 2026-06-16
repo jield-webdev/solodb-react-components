@@ -19,7 +19,7 @@ export default function MonitorCard({ monitor }: { monitor: Monitor }) {
 
   if (requirementsQuery.isLoading) return <div>Loading requirements...</div>;
 
-  return requirementsQuery.data?.items.map((requirement, index) => {
+  return requirementsQuery.data?.items.map((requirement) => {
     let className = "bg-secondary-subtle";
 
     //Go over the latest_result and check if there is any value_is_valid which is false, then, and only then, change the className to bg-danger-subtle
@@ -39,7 +39,7 @@ export default function MonitorCard({ monitor }: { monitor: Monitor }) {
     }
 
     return (
-      <Card className={"mb-2 me-2"} key={index}>
+      <Card className={"mb-2 me-2"} key={requirement.id}>
         <Card.Body className={className}>
           <Card.Title>
             <Link to={`/${environment}/operator/monitor/` + monitor.id}>{monitor.name}</Link>

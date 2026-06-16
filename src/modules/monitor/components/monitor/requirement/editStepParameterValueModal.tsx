@@ -91,7 +91,19 @@ const EditStepParameterValueModal = ({
 
   return (
     <>
-      <span onClick={() => setModalShow(true)}>{monitorResultStepParameterValue.value}</span>
+      <span
+        role="button"
+        tabIndex={0}
+        onClick={() => setModalShow(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setModalShow(true);
+          }
+        }}
+      >
+        {monitorResultStepParameterValue.value}
+      </span>
       <Modal show={modalShow} size={"lg"} onHide={() => setModalShow(false)}>
         <Form onSubmit={handleSubmit((data) => updateMeasurementResult(data))} validated={validationState}>
           <Modal.Header closeButton>

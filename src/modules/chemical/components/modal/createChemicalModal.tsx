@@ -47,10 +47,11 @@ const CreateChemicalModal = ({
         </Modal.Header>
         <Modal.Body>
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label className={"col-sm-3 col-form-label text-end"}>CAS Number</label>
+            <label htmlFor={"cas_number"} className={"col-sm-3 col-form-label text-end"}>CAS Number</label>
             <div className={"col-sm-9"}>
               <Form.Control
                 as="input"
+                id={"cas_number"}
                 {...register("cas_number", {
                   required: "A cas number is required",
                 })}
@@ -63,10 +64,11 @@ const CreateChemicalModal = ({
           </InputGroup>
 
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label className={"col-sm-3 col-form-label text-end"}>Name</label>
+            <label htmlFor={"name"} className={"col-sm-3 col-form-label text-end"}>Name</label>
             <div className={"col-sm-9"}>
               <Form.Control
                 as="input"
+                id={"name"}
                 {...register("name", {
                   required: "A name is required",
                 })}
@@ -77,18 +79,19 @@ const CreateChemicalModal = ({
           </InputGroup>
 
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label className={"col-sm-3 col-form-label text-end"}>Description</label>
+            <label htmlFor={"description"} className={"col-sm-3 col-form-label text-end"}>Description</label>
             <div className={"col-sm-9"}>
-              <Form.Control as="textarea" rows={3} {...register("description")}></Form.Control>
+              <Form.Control as="textarea" rows={3} id={"description"} {...register("description")}></Form.Control>
               {errors.description && (
                 <Form.Control.Feedback type="invalid">{errors.description.message}</Form.Control.Feedback>
               )}
             </div>
           </InputGroup>
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label className={"col-sm-3 col-form-label text-end"}>Standard product</label>
+            <label htmlFor={"standard_product"} className={"col-sm-3 col-form-label text-end"}>Standard product</label>
             <div className={"col-sm-9"}>
               <Form.Select
+                id={"standard_product"}
                 {...register("standard_product", {
                   required: "A standard product is required",
                 })}
@@ -103,9 +106,10 @@ const CreateChemicalModal = ({
             </div>
           </InputGroup>
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label className={"col-sm-3 col-form-label text-end"}>Physical state</label>
+            <label htmlFor={"physical_state"} className={"col-sm-3 col-form-label text-end"}>Physical state</label>
             <div className={"col-sm-9"}>
               <Form.Select
+                id={"physical_state"}
                 {...register("physical_state", {
                   required: "A physical state is required",
                 })}

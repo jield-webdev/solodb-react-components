@@ -141,9 +141,17 @@ const RunPartIndicator = ({
     <React.Fragment>
       <div
         ref={target}
+        role="button"
+        tabIndex={0}
         onMouseEnter={openActions}
         onMouseLeave={scheduleHideActions}
         onClick={() => (showPartActions ? scheduleHideActions() : openActions())}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            showPartActions ? scheduleHideActions() : openActions();
+          }
+        }}
         className={`tray-grid__cell${runPart ? "" : " tray-grid__cell--empty"}`}
       >
         {badgeContent}

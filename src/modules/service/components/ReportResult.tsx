@@ -112,7 +112,12 @@ export default function ReportResults() {
   return (
     <React.Fragment>
       <div className="d-flex justify-content-center align-items-center gap-3 mb-3">
-        <button className="btn btn-sm btn-outline-primary" onClick={handlePrev} disabled={currentCategoryIndex === 0}>
+        <button
+          type="button"
+          className="btn btn-sm btn-outline-primary"
+          onClick={handlePrev}
+          disabled={currentCategoryIndex === 0}
+        >
           Previous
         </button>
 
@@ -121,6 +126,7 @@ export default function ReportResults() {
         </div>
 
         <button
+          type="button"
           className="btn btn-outline-primary btn-sm"
           onClick={handleNext}
           disabled={currentCategoryIndex === totalCategories - 1}

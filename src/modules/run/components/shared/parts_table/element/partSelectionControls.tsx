@@ -33,10 +33,10 @@ export const PartSelectionControls = ({
   return (
     <div className="d-flex flex-wrap gap-3">
       <div className="btn-group btn-group-sm" role="group" aria-label="Part selection controls">
-        <button className="part-check-all btn btn-outline-secondary" onClick={onSelectAll}>
+        <button type="button" className="part-check-all btn btn-outline-secondary" onClick={onSelectAll}>
           All
         </button>
-        <button className="part-check-none btn btn-outline-secondary" onClick={onSelectNone}>
+        <button type="button" className="part-check-none btn btn-outline-secondary" onClick={onSelectNone}>
           None
         </button>
       </div>

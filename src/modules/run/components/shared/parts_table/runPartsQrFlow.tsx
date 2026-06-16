@@ -172,8 +172,15 @@ const DisplayStepPartsInfo = ({
       <span
         className="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fw-semibold"
         role="button"
+        tabIndex={0}
         title="Show all the parts"
         onClick={onSelectAll}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onSelectAll();
+          }
+        }}
         style={{ cursor: "pointer" }}
       >
         This step has {remainingParts} more parts
@@ -182,9 +189,17 @@ const DisplayStepPartsInfo = ({
         This step has {selectedPartsLength} scanned parts
       </span>
       <span
+        role="button"
+        tabIndex={0}
         title="Show all the parts"
         style={{ cursor: "pointer" }}
         onClick={toggleShowCompletedParts}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleShowCompletedParts();
+          }
+        }}
         className="badge rounded-pill bg-success-subtle text-success-emphasis border border-success-subtle px-3 py-2 fw-semibold"
       >
         This step has {finishedParts} finished parts

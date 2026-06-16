@@ -102,8 +102,8 @@ export default function StatusMailComponent() {
   const renderEquipmentList = () => {
     if (!equipmentList.length) return <p>No equipment available.</p>;
 
-    // Sort the equipment list
-    equipmentList.sort((a, b) => {
+    // Sort the equipment list (copy first to avoid mutating state in place)
+    const sortedEquipmentList = [...equipmentList].sort((a, b) => {
       if (statusMail.classification === ClassificationsOptionEnum.ROOM) {
         return a.room.name.localeCompare(b.room.name);
       } else if (a.area && b.area && statusMail.classification === ClassificationsOptionEnum.AREA) {
@@ -118,7 +118,7 @@ export default function StatusMailComponent() {
     let lastFacility: Facility | null;
     let lastArea: Area | null = null;
     let lastRoom = "";
-    return equipmentList.map((equipment, index) => {
+    return sortedEquipmentList.map((equipment) => {
       const components = [];
 
       // Add headers conditionally based on classification
@@ -148,7 +148,7 @@ export default function StatusMailComponent() {
       // Add the equipment element
       components.push(
         <StatusMailEquipmentElement
-          key={index}
+          key={equipment.id}
           equipment={equipment}
           modules={moduleQuery.data!.items}
           issues={issueQuery.data!.items}

@@ -36,8 +36,8 @@ const RunChangelogModal = ({
           ) : (
             <Table size="sm" striped bordered hover>
               <tbody>
-                {data.items.map((changelog: Changelog, index: number) => (
-                  <tr key={index}>
+                {data.items.map((changelog: Changelog) => (
+                  <tr key={changelog.id}>
                     <td>
                       <DateFormat format="DD-MM-YYYY">{changelog.date_created}</DateFormat>
                     </td>
