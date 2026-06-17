@@ -8,6 +8,20 @@ interface FormValues {
   value: string;
 }
 
+function NotificationToast({ show, onClose }: { show: boolean; onClose: () => void }) {
+  return (
+    <ToastContainer position="top-end" className="p-3">
+      <Toast onClose={onClose} show={show} delay={3000} autohide bg={"light"}>
+        <Toast.Header>
+          <strong className="me-auto">Results saved</strong>
+          <small>Just now</small>
+        </Toast.Header>
+        <Toast.Body>Measurement results were saved successfully</Toast.Body>
+      </Toast>
+    </ToastContainer>
+  );
+}
+
 const EditStepParameterValueModal = ({
   monitorResultStepParameterValue,
   refetchMonitorStepParameterValues,
@@ -73,20 +87,6 @@ const EditStepParameterValueModal = ({
 
     //Reset the form
     reset();
-  }
-
-  function NotificationToast() {
-    return (
-      <ToastContainer position="top-end" className="p-3">
-        <Toast onClose={() => setToastShow(false)} show={toastShow} delay={3000} autohide bg={"light"}>
-          <Toast.Header>
-            <strong className="me-auto">Results saved</strong>
-            <small>Just now</small>
-          </Toast.Header>
-          <Toast.Body>Measurement results were saved successfully</Toast.Body>
-        </Toast>
-      </ToastContainer>
-    );
   }
 
   return (
@@ -158,7 +158,7 @@ const EditStepParameterValueModal = ({
           </Modal.Footer>
         </Form>
       </Modal>
-      <NotificationToast />
+      <NotificationToast show={toastShow} onClose={() => setToastShow(false)} />
     </>
   );
 };

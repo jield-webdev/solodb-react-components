@@ -30,13 +30,26 @@ export const MeasurementResultsBadges = ({
     return acc;
   }, {});
 
+  const stepPartsByPartId = new Map(stepParts.map((stepPart) => [stepPart.part_id, stepPart]));
+  const measurementResultByStepPartId = new Map<number, MeasurementResult>();
+  for (const result of measurementResults) {
+    for (const value of result.values) {
+      if (value.step_part_id !== undefined && value.step_part_id !== null && !measurementResultByStepPartId.has(value.step_part_id)) {
+        measurementResultByStepPartId.set(value.step_part_id, result);
+      }
+    }
+  }
+  const targetsByLoggingParameterId = new Map(
+    requirement.targets.map((target) => [target.logging_parameter.id, target])
+  );
+
   const getBadgeStatusClass = (runPart: RunPart): string => {
-    const stepPart = stepParts.find((sp) => sp.part_id === runPart.id);
+    const stepPart = stepPartsByPartId.get(runPart.id);
     if (!stepPart) {
       return "badge-inactive";
     }
 
-    const result = measurementResults.find((r) => r.values.some((v) => v.step_part_id === stepPart.id));
+    const result = measurementResultByStepPartId.get(stepPart.id);
 
     if (!result) {
       return "";
@@ -44,7 +57,7 @@ export const MeasurementResultsBadges = ({
 
     for (const value of result.values) {
       const val = parseFloat(value.string_value);
-      const target = requirement.targets.find((target) => target.logging_parameter.id == value.logging_parameter.id);
+      const target = targetsByLoggingParameterId.get(value.logging_parameter.id);
 
       if (!target) {
         continue;

@@ -75,24 +75,17 @@ const EcnModalForm: React.FC<EcnModalFormProps> = ({ equipment, showModal, onClo
   // Convert and upload attachments
   const uploadFiles = (filesToUpload: File[], ecnId: number) => {
     return new Promise<void>(async (resolve, reject) => {
-      try {
-        if (attachmentsUpdated && attachments && attachments != attachmentsUpdated) {
-          for (let i = 0; i < attachments.length; i++) {
-            const old = attachments[i].id;
-            let exist: boolean = false;
-            for (let j = 0; j < attachmentsUpdated.length; j++) {
-              const updated = attachmentsUpdated[j].id;
-              if (old == updated) {
-                exist = true;
-                break;
+        try {
+          if (attachmentsUpdated && attachments && attachments != attachmentsUpdated) {
+            const updatedAttachmentIds = new Set(attachmentsUpdated.map((attachment) => attachment.id));
+            const deleteRequests = [];
+            for (const attachment of attachments) {
+              if (!updatedAttachmentIds.has(attachment.id)) {
+                deleteRequests.push(axios.delete(`/delete/equipment/module/ecn/attachment/${attachment.id}`));
               }
             }
-
-            if (!exist) {
-              await axios.delete(`/delete/equipment/module/ecn/attachment/${attachments[i].id}`);
-            }
+            await Promise.all(deleteRequests);
           }
-        }
 
         if (filesToUpload.length > 0 && ecnId) {
           await Promise.all(

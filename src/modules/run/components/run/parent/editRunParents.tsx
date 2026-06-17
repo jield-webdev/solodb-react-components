@@ -16,13 +16,7 @@ export default function EditRunParents() {
 
   const addRunParentsMutation = useMutation({
     mutationFn: async (parentRuns: ParentRunSelectionState): Promise<RunParent[]> => {
-      const runParents: RunParent[] = [];
-
-      for (const payload of buildRunParentPayloads(run.id, parentRuns)) {
-        runParents.push(await createRunParent(payload));
-      }
-
-      return runParents;
+      return Promise.all(buildRunParentPayloads(run.id, parentRuns).map((payload) => createRunParent(payload)));
     },
     onSuccess: (_runParents, parentRuns) => {
       reloadRun();

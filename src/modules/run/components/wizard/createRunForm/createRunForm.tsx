@@ -58,28 +58,28 @@ export default function CreateRunForm({
   const [conclusion, setConclusion] = useState("");
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
-  const groupsQuery = useQuery({
+  const { data: groupsData, isError: isGroupsError, isLoading: isGroupsLoading } = useQuery({
     queryKey: ["organisation-groups", environment],
     queryFn: () => listOrganisationGroups({ environment }),
   });
 
-  const teamsQuery = useQuery({
+  const { data: teamsData, isError: isTeamsError, isLoading: isTeamsLoading } = useQuery({
     queryKey: ["organisation-teams", environment, TeamPurpose.Run],
     queryFn: () => listOrganisationTeams({ environment, purpose: TeamPurpose.Run }),
   });
 
-  const projectsQuery = useQuery({
+  const { data: projectsData, isError: isProjectsError, isLoading: isProjectsLoading } = useQuery({
     queryKey: ["organisation-projects", environment, ProjectPurpose.Run],
     queryFn: () => listOrganisationProjects({ environment, purpose: ProjectPurpose.Run }),
   });
 
   const trimmedName = name.trim();
   const trimmedMotivation = motivation.trim();
-  const isOrganisationLoading = groupsQuery.isLoading || teamsQuery.isLoading || projectsQuery.isLoading;
-  const hasOrganisationError = groupsQuery.isError || teamsQuery.isError || projectsQuery.isError;
-  const groups = groupsQuery.data?.items ?? [];
-  const teams = teamsQuery.data?.items ?? [];
-  const projects = projectsQuery.data?.items ?? [];
+  const isOrganisationLoading = isGroupsLoading || isTeamsLoading || isProjectsLoading;
+  const hasOrganisationError = isGroupsError || isTeamsError || isProjectsError;
+  const groups = groupsData?.items ?? [];
+  const teams = teamsData?.items ?? [];
+  const projects = projectsData?.items ?? [];
   const hasValidGroup = groupId !== null && groups.some((group) => group.id === groupId);
   const hasValidTeam = teamId !== null && teams.some((team) => team.id === teamId);
   const hasValidProject = projectId !== null && projects.some((project) => project.id === projectId);
@@ -189,7 +189,7 @@ export default function CreateRunForm({
           controlId="create-run-group"
           label="Group"
           options={groups}
-          isLoading={groupsQuery.isLoading}
+          isLoading={isGroupsLoading}
           value={groupId}
           onChange={setGroupId}
           showError={hasAttemptedSubmit && !hasValidGroup}
@@ -201,7 +201,7 @@ export default function CreateRunForm({
           controlId="create-run-team"
           label="Team"
           options={teams}
-          isLoading={teamsQuery.isLoading}
+          isLoading={isTeamsLoading}
           value={teamId}
           onChange={setTeamId}
           showError={hasAttemptedSubmit && !hasValidTeam}
@@ -213,7 +213,7 @@ export default function CreateRunForm({
           controlId="create-run-project"
           label="Project"
           options={projects}
-          isLoading={projectsQuery.isLoading}
+          isLoading={isProjectsLoading}
           value={projectId}
           onChange={setProjectId}
           showError={hasAttemptedSubmit && !hasValidProject}

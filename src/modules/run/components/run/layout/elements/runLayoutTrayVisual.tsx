@@ -7,6 +7,16 @@ import { notification } from "@jield/solodb-react-components/utils/notification"
 
 type RunTray = NonNullable<Run["run_trays"]>[number];
 
+const handlePartDragStart = (event: DragEvent<HTMLSpanElement>, stepPart: RunStepPart) => {
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", String(stepPart.id));
+};
+
+const handleSlotDragOver = (event: DragEvent<HTMLDivElement>) => {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+};
+
 export default function RunLayoutTrayVisual({
   step,
   tray,
@@ -23,16 +33,6 @@ export default function RunLayoutTrayVisual({
   const trayLabel = tray.label ? `${tray.name} - ${tray.label}` : tray.name;
   const partsById = useMemo(() => new Map(parts.map((part) => [part.id, part])), [parts]);
   const stepPartsById = useMemo(() => new Map(stepParts.map((stepPart) => [stepPart.id, stepPart])), [stepParts]);
-
-  const handlePartDragStart = (event: DragEvent<HTMLSpanElement>, stepPart: RunStepPart) => {
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", String(stepPart.id));
-  };
-
-  const handleSlotDragOver = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  };
 
   const handleSlotDrop = async (event: DragEvent<HTMLDivElement>, tray: RunTray, row: number, column: number) => {
     event.preventDefault();

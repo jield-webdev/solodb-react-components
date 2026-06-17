@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FilterData, FilterFormData } from "@jield/solodb-typescript-core";
 
 function cleanFilterData(data: FilterData): FilterData {
@@ -36,16 +36,7 @@ export function FilterBadges({
   filterForm: FilterFormData;
   setFilterFn: React.Dispatch<React.SetStateAction<FilterData | undefined>>;
 }) {
-  const [cleanedFilter, setCleanedFilter] = useState<FilterData | null>(null);
-
-  useEffect(() => {
-    if (filter === null) {
-      setCleanedFilter(null);
-      return;
-    }
-
-    setCleanedFilter(cleanFilterData(filter));
-  }, [filter]);
+  const cleanedFilter = filter === null ? null : cleanFilterData(filter);
 
   const handleClearFacet = (fieldsetName: string) => {
     const next: FilterData = filter

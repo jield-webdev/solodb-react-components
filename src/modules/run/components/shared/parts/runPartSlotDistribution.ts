@@ -85,24 +85,23 @@ export const buildSplitSlotAssignments = ({
     groupedParts.set(groupKey, group);
   });
 
-  Array.from(groupedParts.values())
-    .map((group) => [...group].sort(comparePartsWithinGroup))
-    .forEach((group) => {
-      const preferredSlotIndex = getSlotIndex(group[0]);
-      const slotIndex =
-        preferredSlotIndex !== null && preferredSlotIndex >= 0 && preferredSlotIndex < slotCount
-          ? preferredSlotIndex
-          : slots.reduce((bestIndex, slotGroups, index) => {
-              if (bestIndex === -1 || slotGroups.length < slots[bestIndex].length) {
-                return index;
-              }
-              return bestIndex;
-            }, -1);
+  for (const group of groupedParts.values()) {
+    const sortedGroup = [...group].sort(comparePartsWithinGroup);
+    const preferredSlotIndex = getSlotIndex(sortedGroup[0]);
+    const slotIndex =
+      preferredSlotIndex !== null && preferredSlotIndex >= 0 && preferredSlotIndex < slotCount
+        ? preferredSlotIndex
+        : slots.reduce((bestIndex, slotGroups, index) => {
+            if (bestIndex === -1 || slotGroups.length < slots[bestIndex].length) {
+              return index;
+            }
+            return bestIndex;
+          }, -1);
 
-      if (slotIndex !== -1) {
-        slots[slotIndex].push(group);
-      }
-    });
+    if (slotIndex !== -1) {
+      slots[slotIndex].push(sortedGroup);
+    }
+  }
 
   return slots.map((slotGroups) => slotGroups.sort(compareSplitGroups).flat());
 };

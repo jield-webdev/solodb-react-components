@@ -16,6 +16,14 @@ import {
   Requirement,
 } from "@jield/solodb-typescript-core";
 
+const renderGroupHeader = (step: RunStep) => (
+  <tr style={{ pointerEvents: "none" }}>
+    <td colSpan={5} style={{ margin: 0 }} className="bg-info">
+      <span>{step.step_group?.label}</span>
+    </td>
+  </tr>
+);
+
 export default function RunStepsElement() {
   const { run } = useContext(RunContext);
   const { showOnlyEmphasizedParameters, setShowOnlyEmphasizedParameters } = useContext(EmphasizedParametersContext);
@@ -58,11 +66,11 @@ export default function RunStepsElement() {
   const isError = queries.some((q) => q.isError);
 
   if (isError) {
-    queries
-      .filter((q) => q.isError)
-      .forEach((q, idx) => {
+    queries.forEach((q, idx) => {
+      if (q.isError) {
         console.error("RunStepsElement query error", { index: idx, error: q.error, run });
-      });
+      }
+    });
   }
 
   const runSteps = useMemo(() => (runStepsQuery.data?.items ?? []) as RunStep[], [runStepsQuery.data?.items]);
@@ -170,14 +178,6 @@ export default function RunStepsElement() {
       monitoredSteps[String(r.requirement_for_step.id)] = r;
     }
   }
-
-  const renderGroupHeader = (step: RunStep) => (
-    <tr style={{ pointerEvents: "none" }}>
-      <td colSpan={5} style={{ margin: 0 }} className="bg-info">
-        <span>{step.step_group?.label}</span>
-      </td>
-    </tr>
-  );
 
   const renderLabel = (step: RunStep) => {
     const label = step.label;

@@ -11,6 +11,14 @@ import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/
 import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
 import RunLayoutStep from "./elements/runStepInLayout";
 
+const renderGroupHeader = (step: RunStep) => (
+  <tr style={{ pointerEvents: "none" }}>
+    <td colSpan={2} style={{ margin: 0 }} className="bg-info">
+      <span>{step.step_group?.label}</span>
+    </td>
+  </tr>
+);
+
 export default function RunLayoutElement() {
   const { run } = useContext(RunContext);
   const [page, setPage] = useState<number>(1);
@@ -54,11 +62,11 @@ export default function RunLayoutElement() {
   useEffect(() => {
     if (!isError) return;
 
-    queries
-      .filter((query) => query.isError)
-      .forEach((query, index) => {
+    queries.forEach((query, index) => {
+      if (query.isError) {
         console.error("RunLayoutElement query error", { index, error: query.error, run });
-      });
+      }
+    });
   }, [isError, queries, run]);
 
   const seenGroups = new Set<string>();
@@ -97,14 +105,6 @@ export default function RunLayoutElement() {
       </tr>
     );
   };
-
-  const renderGroupHeader = (step: RunStep) => (
-    <tr style={{ pointerEvents: "none" }}>
-      <td colSpan={2} style={{ margin: 0 }} className="bg-info">
-        <span>{step.step_group?.label}</span>
-      </td>
-    </tr>
-  );
 
   if (isLoading) {
     return (

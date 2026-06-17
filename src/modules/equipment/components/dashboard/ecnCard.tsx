@@ -1,4 +1,4 @@
-import React, { JSX, useState } from "react";
+import React, { useState } from "react";
 import { Badge, Button, Card, ListGroup } from "react-bootstrap";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import EcnModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/ecnModalForm";
@@ -16,7 +16,7 @@ export default function EcnCard({
   ecnAttachments: EquipmentModuleEcnAttachment[];
   reloadQueryFn: (key: string[]) => void;
 }) {
-  const [modalElement, setModalElement] = useState<JSX.Element | null>(null);
+  const [modalElement, setModalElement] = useState<React.ReactNode>(null);
   const [showModal, setShowModal] = useState(false);
   const [currentEcn, setCurrentEcn] = useState(ecn);
 

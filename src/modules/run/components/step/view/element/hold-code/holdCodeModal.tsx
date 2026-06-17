@@ -21,6 +21,23 @@ type HoldCodeResponse = {
   page: number;
 };
 
+const loadOptions = (inputValue: string, callback: any) => {
+  axios
+    .get<HoldCodeResponse>("list/run/hold-code")
+    .then((response) => {
+      const { data } = response;
+      return data._embedded.items;
+    })
+    .then((holdCodes) => {
+      callback(
+        holdCodes.map((holdCode) => ({
+          value: holdCode.id,
+          label: holdCode.code,
+        }))
+      );
+    });
+};
+
 const HoldCodeModal = ({
   run,
   show,
@@ -66,23 +83,6 @@ const HoldCodeModal = ({
     } finally {
       setShow(false);
     }
-  };
-
-  const loadOptions = (inputValue: string, callback: any) => {
-    axios
-      .get<HoldCodeResponse>("list/run/hold-code")
-      .then((response) => {
-        const { data } = response;
-        return data._embedded.items;
-      })
-      .then((holdCodes) => {
-        callback(
-          holdCodes.map((holdCode) => ({
-            value: holdCode.id,
-            label: holdCode.code,
-          }))
-        );
-      });
   };
 
   return (

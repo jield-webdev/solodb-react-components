@@ -66,12 +66,13 @@ export default function ParentRunSelect({ selection, run }: ParentRunSelectProps
 
   const loadOptions = async (inputValue: string): Promise<RunOption[]> => {
     const query = inputValue.toLowerCase();
-    return runs
-      .filter(
-        (candidate) =>
-          !query || candidate.label.toLowerCase().includes(query) || candidate.name.toLowerCase().includes(query)
-      )
-      .map(toOption);
+    const options: RunOption[] = [];
+    for (const candidate of runs) {
+      if (!query || candidate.label.toLowerCase().includes(query) || candidate.name.toLowerCase().includes(query)) {
+        options.push(toOption(candidate));
+      }
+    }
+    return options;
   };
 
   const selectRun = (selected: Run) => {

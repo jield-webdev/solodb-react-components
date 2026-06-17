@@ -13,6 +13,10 @@ type SaveStatus = {
   message?: string;
   savedAt?: number;
 };
+type StatusByCategory = {
+  categoryId: string;
+  statuses: Record<number, SaveStatus>;
+};
 
 export default function Category({
   categoryId,
@@ -25,7 +29,9 @@ export default function Category({
 }) {
   const formCacheRef = useRef<FormCache>({});
   const saveTokenRef = useRef<Record<number, number>>({});
-  const [statusById, setStatusById] = useState<Record<number, SaveStatus>>({});
+  const categoryKey = String(categoryId);
+  const [statusByCategory, setStatusByCategory] = useState<StatusByCategory>({ categoryId: categoryKey, statuses: {} });
+  const statusById = statusByCategory.categoryId === categoryKey ? statusByCategory.statuses : {};
 
   const buildInitialValues = useCallback((source: ServiceEventReportResult[]): FormValues => {
     const init: FormValues = {};
@@ -68,36 +74,32 @@ export default function Category({
 
   // Initialise or restore form state when category changes
   useEffect(() => {
-    const cacheKey = String(categoryId);
-    const cached = formCacheRef.current[cacheKey];
+    const cached = formCacheRef.current[categoryKey];
 
     if (cached) {
       reset(cached);
     } else {
       const init = buildInitialValues(results);
-      formCacheRef.current[cacheKey] = init;
+      formCacheRef.current[categoryKey] = init;
       reset(init);
     }
-
-    setStatusById({});
-  }, [buildInitialValues, categoryId, reset, results]);
+  }, [buildInitialValues, categoryKey, reset, results]);
 
   const watchedValues = useWatch({ control });
 
   // Update cache when values change
   useEffect(() => {
-    const key = String(categoryId);
     if (!watchedValues) {
       return;
     }
 
     const entries = Object.entries(watchedValues) as [string, CriterionValue | undefined][];
 
-    formCacheRef.current[key] = entries.reduce<FormValues>((acc, [fieldKey, value]) => {
+    formCacheRef.current[categoryKey] = entries.reduce<FormValues>((acc, [fieldKey, value]) => {
       acc[fieldKey] = value ?? null;
       return acc;
     }, {});
-  }, [watchedValues, categoryId]);
+  }, [watchedValues, categoryKey]);
 
   const handleAutoSave = useCallback(
     async (result: ServiceEventReportResult) => {
@@ -112,9 +114,12 @@ export default function Category({
       const nextToken = (saveTokenRef.current[result.id] ?? 0) + 1;
       saveTokenRef.current[result.id] = nextToken;
 
-      setStatusById((prev) => ({
-        ...prev,
-        [result.id]: { state: "saving" },
+      setStatusByCategory((prev) => ({
+        categoryId: categoryKey,
+        statuses: {
+          ...(prev.categoryId === categoryKey ? prev.statuses : {}),
+          [result.id]: { state: "saving" },
+        },
       }));
 
       let valueToSend: CriterionValue = val ?? "";
@@ -127,30 +132,42 @@ export default function Category({
       try {
         await axios.patch(`/update/service/event/report/result/${result.id}`, { value: valueToSend });
         if (saveTokenRef.current[result.id] === nextToken) {
-          setStatusById((prev) => ({
-            ...prev,
-            [result.id]: { state: "saved", savedAt: Date.now() },
+          setStatusByCategory((prev) => ({
+            categoryId: categoryKey,
+            statuses: {
+              ...(prev.categoryId === categoryKey ? prev.statuses : {}),
+              [result.id]: { state: "saved", savedAt: Date.now() },
+            },
           }));
         }
       } catch (error) {
         console.error("Failed to save:", error);
         if (saveTokenRef.current[result.id] === nextToken) {
-          setStatusById((prev) => ({
-            ...prev,
-            [result.id]: { state: "error", message: "Save failed. Try again." },
+          setStatusByCategory((prev) => ({
+            categoryId: categoryKey,
+            statuses: {
+              ...(prev.categoryId === categoryKey ? prev.statuses : {}),
+              [result.id]: { state: "error", message: "Save failed. Try again." },
+            },
           }));
         }
       }
     },
-    [getValues, trigger]
+    [categoryKey, getValues, trigger]
   );
 
-  const handleDirty = useCallback((resultId: number) => {
-    setStatusById((prev) => ({
-      ...prev,
-      [resultId]: { state: "dirty" },
-    }));
-  }, []);
+  const handleDirty = useCallback(
+    (resultId: number) => {
+      setStatusByCategory((prev) => ({
+        categoryId: categoryKey,
+        statuses: {
+          ...(prev.categoryId === categoryKey ? prev.statuses : {}),
+          [resultId]: { state: "dirty" },
+        },
+      }));
+    },
+    [categoryKey]
+  );
 
   const hasUnsavedChanges = useMemo(
     () =>

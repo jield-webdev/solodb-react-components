@@ -46,23 +46,31 @@ export default function SetupUpdateEquipment() {
 
   const queryClient = useQueryClient();
 
-  const setupQuery = useQuery({
+  const {
+    data: setup,
+    error: setupError,
+    isError: isSetupError,
+    isLoading: isSetupLoading,
+  } = useQuery({
     queryKey: ["setup", id],
     queryFn: () => getSetup({ id: Number(id) }),
     enabled: Boolean(id),
   });
 
-  const filterFormQuery = useQuery({
+  const {
+    data: filterFormQueryData,
+    error: filterFormError,
+    isError: isFilterFormError,
+  } = useQuery({
     queryKey: ["filter", environment, filter],
     queryFn: () => getFilter({ service: "equipment", formResult: filter, environment: environment }),
     enabled: Boolean(environment),
   });
 
-  const isError = setupQuery.isError || filterFormQuery.isError;
-  const setup = setupQuery.data;
+  const isError = isSetupError || isFilterFormError;
   const previousFilterFormData = useRef<FilterFormData | undefined>(undefined);
   const filterFormData = useMemo<FilterFormData>(() => {
-    if (filterFormQuery.data === undefined) {
+    if (filterFormQueryData === undefined) {
       if (previousFilterFormData.current !== undefined) {
         return previousFilterFormData.current;
       }
@@ -86,9 +94,9 @@ export default function SetupUpdateEquipment() {
       } as FilterFormData;
     }
 
-    previousFilterFormData.current = filterFormQuery.data;
-    return filterFormQuery.data as FilterFormData;
-  }, [filterFormQuery.data]);
+    previousFilterFormData.current = filterFormQueryData;
+    return filterFormQueryData as FilterFormData;
+  }, [filterFormQueryData]);
 
   useEffect(() => {
     if (filterFormData === undefined || filter !== undefined) {
@@ -220,6 +228,18 @@ export default function SetupUpdateEquipment() {
     if (!setup) return;
     addEquipmentMutation.mutate(equipment);
   };
+
+  const availableEquipmentList = useMemo(() => {
+    const availableEquipment: Equipment[] = [];
+    for (const page of equipmentListData?.pages ?? []) {
+      for (const equipment of page.items ?? []) {
+        if (!equipment.is_in_fixed_setup && !selectedEquipmentMap.has(equipment.id)) {
+          availableEquipment.push(equipment);
+        }
+      }
+    }
+    return availableEquipment;
+  }, [equipmentListData?.pages, selectedEquipmentMap]);
   const removeEquipment = (equipment: Equipment) => {
     const setupEquipmentId = selectedSetupEquipmentIdMap.get(equipment.id);
     if (!setupEquipmentId) {
@@ -234,17 +254,17 @@ export default function SetupUpdateEquipment() {
     return (
       <div className="alert alert-danger my-3" role="alert">
         Error loading:{" "}
-        {[setupQuery, filterFormQuery]
-          .filter((q) => q.isError)
-          .map((q) => {
-            const message = q.error instanceof Error ? q.error.message : "Unknown error";
+        {[setupError, filterFormError]
+          .filter((queryError) => queryError !== null)
+          .map((queryError) => {
+            const message = queryError instanceof Error ? queryError.message : "Unknown error";
             return <span key={message}>Query error {message}</span>;
           })}
       </div>
     );
   }
 
-  if (setupQuery.isLoading) {
+  if (isSetupLoading) {
     return <LoadingComponent message={"Loading setup..."} />;
   }
 
@@ -290,13 +310,7 @@ export default function SetupUpdateEquipment() {
               setFilterFn={setFilter}
             />
             <EquipmentTable
-              equipmentList={
-                equipmentListData?.pages.flatMap((page) =>
-                  page.items
-                    ?.filter((equipment) => !equipment.is_in_fixed_setup)
-                    .filter((e) => !selectedEquipmentMap.has(e.id))
-                ) ?? []
-              }
+              equipmentList={availableEquipmentList}
               currentFilter={filter}
               setEquipmentSort={setEquipmentSort}
               addEquipment={addEquipment}

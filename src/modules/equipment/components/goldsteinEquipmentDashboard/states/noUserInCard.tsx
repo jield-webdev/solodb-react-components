@@ -1,6 +1,6 @@
 import { useGoldsteinClientDataContext } from "@jield/solodb-react-components/modules/admin/context/goldstein/DataContext";
 import { registerBadge } from "@jield/solodb-react-components/modules/admin/functions/goldstein/registerBadge";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 // Define the types for the props
 interface NoUserInCardProps {
@@ -8,9 +8,7 @@ interface NoUserInCardProps {
 }
 
 export default function NoUserInCard({ badgeUID }: NoUserInCardProps) {
-  const [onboardingWord, setOnboardingWord] = useState<string | undefined>(
-    undefined,
-  );
+  const [onboardingWord, setOnboardingWord] = useState<{ badgeUID: string; word: string } | null>(null);
 
   const { goldsteinData } = useGoldsteinClientDataContext();
 
@@ -20,12 +18,10 @@ export default function NoUserInCard({ badgeUID }: NoUserInCardProps) {
       badgeUID,
     );
 
-    setOnboardingWord(JSON.parse(rawOnboardingWord).onboarding_word);
+    setOnboardingWord({ badgeUID, word: JSON.parse(rawOnboardingWord).onboarding_word });
   };
 
-  useEffect(() => {
-    setOnboardingWord(undefined);
-  }, [badgeUID]);
+  const activeOnboardingWord = onboardingWord?.badgeUID === badgeUID ? onboardingWord.word : undefined;
 
   return (
     <div className="text-center">
@@ -38,9 +34,9 @@ export default function NoUserInCard({ badgeUID }: NoUserInCardProps) {
           <p className="card-text">
             <strong>Badge UUID:</strong> <code>{badgeUID}</code>
           </p>
-          {onboardingWord && (
+          {activeOnboardingWord && (
             <p className="card-text">
-              <strong>Your secret word:</strong> <code>{onboardingWord}</code>
+              <strong>Your secret word:</strong> <code>{activeOnboardingWord}</code>
             </p>
           )}
         </div>

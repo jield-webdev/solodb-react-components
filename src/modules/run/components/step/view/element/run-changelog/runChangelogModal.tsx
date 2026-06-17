@@ -5,6 +5,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { listRunChangelog, Changelog } from "@jield/solodb-typescript-core";
+import DOMPurify from "dompurify";
 
 const RunChangelogModal = ({
   show,
@@ -44,7 +45,7 @@ const RunChangelogModal = ({
                     <td>
                       <span
                         dangerouslySetInnerHTML={{
-                          __html: changelog.message,
+                          __html: DOMPurify.sanitize(changelog.message),
                         }}
                       />
                     </td>

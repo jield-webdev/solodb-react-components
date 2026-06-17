@@ -1,12 +1,12 @@
-import React, { JSX, useState } from "react";
+import React, { useState } from "react";
 import MessageModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/messageModalForm";
 import { Badge, Button } from "react-bootstrap";
-import moment from "moment";
 import ReactMarkdown from "react-markdown";
 import { LocationMessage } from "@jield/solodb-typescript-core";
+import { formatDate } from "@jield/solodb-react-components/utils/datetime";
 
 export default function MessageElement({ message }: { message: LocationMessage }) {
-  const [modalElement, setModalElement] = useState<JSX.Element | null>(null);
+  const [modalElement, setModalElement] = useState<React.ReactNode>(null);
   const [showModal, setShowModal] = useState(false);
   const [currentMessage, setCurrentMessage] = useState(message);
 
@@ -53,9 +53,9 @@ export default function MessageElement({ message }: { message: LocationMessage }
 
       <div className="card-footer bg-transparent">
         <small className="text-muted d-flex flex-wrap gap-3">
-          <span>Created: {moment(currentMessage.date_created).format("DD MMM YYYY")}</span>
+          <span>Created: {formatDate(currentMessage.date_created, "DD MMM YYYY")}</span>
           {currentMessage.last_update && (
-            <span>Updated: {moment(currentMessage.last_update).format("DD MMM YYYY")}</span>
+            <span>Updated: {formatDate(currentMessage.last_update, "DD MMM YYYY")}</span>
           )}
           {currentMessage.rooms.length > 0 && (
             <span>

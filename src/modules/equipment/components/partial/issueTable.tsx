@@ -1,8 +1,8 @@
-import React, { JSX, useState } from "react";
-import moment from "moment";
+import React, { useState } from "react";
 import IssueModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/issueModalForm";
 import ReactMarkdown from "react-markdown";
 import { Equipment, EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from "@jield/solodb-typescript-core";
+import { formatDate } from "@jield/solodb-react-components/utils/datetime";
 
 function IssueTableRow({
   issue,
@@ -17,7 +17,7 @@ function IssueTableRow({
   equipment: Equipment | undefined;
   reloadQueryFn: (key: string[]) => void;
 }) {
-  const [modalElement, setModalElement] = useState<JSX.Element | null>(null);
+  const [modalElement, setModalElement] = useState<React.ReactNode>(null);
   const [showModal, setShowModal] = useState(false);
 
   // Update currentIssue in state when a new issue arrives
@@ -63,7 +63,7 @@ function IssueTableRow({
         <td>
           <ReactMarkdown>{issue.description}</ReactMarkdown>
         </td>
-        <td className="text-nowrap">{moment(issue.forecast_up).format("DD MMMM YYYY")}</td>
+        <td className="text-nowrap">{formatDate(issue.forecast_up, "DD MMMM YYYY")}</td>
         <td className="text-nowrap">{issue.owner.full_name}</td>
         <td className="text-center">
           <button type="button" className="btn btn-sm btn-outline-light" onClick={handleShowModal}>

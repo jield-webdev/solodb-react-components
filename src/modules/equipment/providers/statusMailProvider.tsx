@@ -10,13 +10,13 @@ export default function StatusMailProvider({ children }: { children: React.React
   const { id } = useParams();
 
   //Use a query to fetch the statusMail
-  const statusMailQuery = useQuery({
+  const { data: statusMail, isFetching, isLoading } = useQuery({
     queryKey: ["statusMail", id],
     queryFn: () => getStatusMail({ id: parseInt(id!) }),
     enabled: !!id,
   });
 
-  if (statusMailQuery.isLoading || statusMailQuery.isFetching) {
+  if (isLoading || isFetching) {
     return (
       <ErrorBoundary>
         <LoadingComponent message="Loading status mail..." />
@@ -28,7 +28,7 @@ export default function StatusMailProvider({ children }: { children: React.React
     <ErrorBoundary>
       <StatusMailContext.Provider
         value={{
-          statusMail: statusMailQuery.data!,
+          statusMail: statusMail!,
         }}
       >
         <Suspense fallback={<LoadingComponent message="Loading..." />}>{children}</Suspense>

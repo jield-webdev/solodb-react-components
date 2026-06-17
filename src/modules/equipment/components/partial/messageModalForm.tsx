@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
 import Select, { StylesConfig } from "react-select";
@@ -23,6 +23,64 @@ type MessageTypeOption = {
   label: string;
 };
 
+const isDarkMode = () => {
+  return document.documentElement.getAttribute("data-bs-theme") === "dark";
+};
+
+const selectStyles: StylesConfig = {
+  control: (provided) => ({
+    ...provided,
+    backgroundColor: isDarkMode() ? "#212529" : provided.backgroundColor,
+    borderColor: isDarkMode() ? "#495057" : provided.borderColor,
+    color: isDarkMode() ? "#fff" : provided.color,
+  }),
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: isDarkMode() ? "#212529" : provided.backgroundColor,
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: isDarkMode()
+      ? state.isSelected
+        ? "#0d6efd"
+        : state.isFocused
+          ? "#343a40"
+          : "#212529"
+      : provided.backgroundColor,
+    color: isDarkMode() ? "#fff" : provided.color,
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: isDarkMode() ? "#fff" : provided.color,
+  }),
+  multiValue: (provided) => ({
+    ...provided,
+    backgroundColor: isDarkMode() ? "#343a40" : provided.backgroundColor,
+  }),
+  multiValueLabel: (provided) => ({
+    ...provided,
+    color: isDarkMode() ? "#fff" : provided.color,
+  }),
+  input: (provided) => ({
+    ...provided,
+    color: isDarkMode() ? "#fff" : provided.color,
+  }),
+};
+
+const getSelectedRoomOptions = (
+  selectedRooms: Room[] | undefined,
+  roomOptionsById: Map<Room["id"], RoomOption>
+): RoomOption[] => {
+  const selectedOptions: RoomOption[] = [];
+  for (const room of selectedRooms ?? []) {
+    const option = roomOptionsById.get(room.id);
+    if (option) {
+      selectedOptions.push(option);
+    }
+  }
+  return selectedOptions;
+};
+
 const MessageModalForm: React.FC<MessageModalFormProps> = ({ showModal, onClose, message }) => {
   const { register, handleSubmit, setValue, reset, control } = useForm<LocationMessage>({
     defaultValues: {
@@ -38,52 +96,7 @@ const MessageModalForm: React.FC<MessageModalFormProps> = ({ showModal, onClose,
   const [messageTypes, setMessageTypes] = useState<MessageTypeOption[]>([]);
 
   const [errorMessage, setErrorMessage] = useState<string>("");
-
-  // Function to check if dark mode is active
-  const isDarkMode = () => {
-    return document.documentElement.getAttribute("data-bs-theme") === "dark";
-  };
-
-  // Custom styles for react-select components
-  const selectStyles: StylesConfig = {
-    control: (provided) => ({
-      ...provided,
-      backgroundColor: isDarkMode() ? "#212529" : provided.backgroundColor,
-      borderColor: isDarkMode() ? "#495057" : provided.borderColor,
-      color: isDarkMode() ? "#fff" : provided.color,
-    }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: isDarkMode() ? "#212529" : provided.backgroundColor,
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: isDarkMode()
-        ? state.isSelected
-          ? "#0d6efd"
-          : state.isFocused
-            ? "#343a40"
-            : "#212529"
-        : provided.backgroundColor,
-      color: isDarkMode() ? "#fff" : provided.color,
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: isDarkMode() ? "#fff" : provided.color,
-    }),
-    multiValue: (provided) => ({
-      ...provided,
-      backgroundColor: isDarkMode() ? "#343a40" : provided.backgroundColor,
-    }),
-    multiValueLabel: (provided) => ({
-      ...provided,
-      color: isDarkMode() ? "#fff" : provided.color,
-    }),
-    input: (provided) => ({
-      ...provided,
-      color: isDarkMode() ? "#fff" : provided.color,
-    }),
-  };
+  const roomOptionsById = useMemo(() => new Map(roomOptions.map((option) => [option.value.id, option])), [roomOptions]);
 
   let { statusMail } = useContext(StatusMailContext);
 
@@ -106,16 +119,18 @@ const MessageModalForm: React.FC<MessageModalFormProps> = ({ showModal, onClose,
     axios
       .get("/list/location/message/type")
       .then((response) => {
-        const statusMailTypes = statusMail.filter.messageType;
+        const statusMailTypes = new Set(statusMail.filter.messageType);
         const types = (response.data._embedded.items as MessageType[]) || [];
-        const optionsParsed: MessageTypeOption[] = types
-          .filter((type) => {
-            return statusMailTypes.includes(type.id.toString());
-          })
-          .map((type) => ({
+        const optionsParsed: MessageTypeOption[] = [];
+        for (const type of types) {
+          if (!statusMailTypes.has(type.id.toString())) {
+            continue;
+          }
+          optionsParsed.push({
             value: type,
             label: type.type,
-          }));
+          });
+        }
         setMessageTypes(optionsParsed);
         setValue("type", message?.type || optionsParsed[0].value);
       })
@@ -214,7 +229,7 @@ const MessageModalForm: React.FC<MessageModalFormProps> = ({ showModal, onClose,
                   options={roomOptions}
                   classNamePrefix="react-select"
                   placeholder="Select one or more rooms"
-                  value={roomOptions.filter((opt) => field.value?.some((room: Room) => room.id === opt.value.id))}
+                  value={getSelectedRoomOptions(field.value, roomOptionsById)}
                   onChange={(selected) => field.onChange((selected as RoomOption[]).map((opt) => opt.value))}
                   styles={selectStyles}
                 />

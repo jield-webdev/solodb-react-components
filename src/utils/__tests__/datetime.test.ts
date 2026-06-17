@@ -41,9 +41,14 @@ describe("utils/datetime", () => {
       expect(formatDate(localDate, "DD-MM-YY H:m")).toBe("05-12-24 9:7");
     });
 
+    it("formats month names", () => {
+      expect(formatDate(localDate, "DD MMM YYYY")).toBe("05 Dec 2024");
+      expect(formatDate(localDate, "DD MMMM YYYY")).toBe("05 December 2024");
+    });
+
     it("replaces longer tokens before shorter ones", () => {
       // Ensure YYYY is not partially replaced by YY first
-      expect(formatDate(localDate, "YYYY YY")).toBe("2024 24");
+      expect(formatDate(localDate, "MMMM MMM MM YYYY YY")).toBe("December Dec 12 2024 24");
     });
   });
 

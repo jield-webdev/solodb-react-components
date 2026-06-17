@@ -1,4 +1,4 @@
-import React, { JSX, useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { Alert, Button, Col, Container, Row, Table } from "react-bootstrap";
@@ -28,10 +28,10 @@ export default function EquipmentDashboard() {
 
   const queryClient = useQueryClient();
 
-  const [issueModalElement, setIssueModalElement] = useState<JSX.Element | null>(null);
+  const [issueModalElement, setIssueModalElement] = useState<React.ReactNode>(null);
   const [showIssueModal, setShowIssueModal] = useState(false);
 
-  const [ecnModalElement, setEcnModalElement] = useState<JSX.Element | null>(null);
+  const [ecnModalElement, setEcnModalElement] = useState<React.ReactNode>(null);
   const [showEcnModal, setShowEcnModal] = useState<boolean>(false);
 
   const [runsQuery, monitorQuery, ecnQuery, issuesQuery, modulesQuery, ecnAttachmentsQuery, issueAttachmentsQuery] =

@@ -52,10 +52,15 @@ export const RunPartList = ({
     [parts]
   );
 
-  const stepPartsById = useMemo(
-    () => new Map(stepParts.filter((sp) => sp.step_id === step.id).map((sp) => [sp.part_id, sp])),
-    [stepParts, step]
-  );
+  const stepPartsById = useMemo(() => {
+    const map = new Map<number, RunStepPart>();
+    for (const stepPart of stepParts) {
+      if (stepPart.step_id === step.id) {
+        map.set(stepPart.part_id, stepPart);
+      }
+    }
+    return map;
+  }, [stepParts, step]);
 
   const trays = useMemo(() => [...(run.run_trays ?? [])].sort((a, b) => a.sequence - b.sequence), [run]);
 

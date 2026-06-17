@@ -1,4 +1,4 @@
-import React, { JSX, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./equipment.css";
 import EcnElement from "@jield/solodb-react-components/modules/equipment/components/partial/ecnElement";
 import IssueElement from "@jield/solodb-react-components/modules/equipment/components/partial/issueElement";
@@ -38,10 +38,10 @@ export default function StatusMailEquipmentElement({
   showIssues: 1 | 2 | 3;
   reservations: EquipmentModuleReservation[];
 }) {
-  const [issueModalElement, setIssueModalElement] = useState<JSX.Element | null>(null);
+  const [issueModalElement, setIssueModalElement] = useState<React.ReactNode>(null);
   const [showIssueModal, setShowIssueModal] = useState(false);
 
-  const [ecnModalElement, setEcnModalElement] = useState<JSX.Element | null>(null);
+  const [ecnModalElement, setEcnModalElement] = useState<React.ReactNode>(null);
   const [showEcnModal, setShowEcnModal] = useState<boolean>(false);
 
   const [equipmentModules, setEquipmentModules] = useState<EquipmentModule[]>([]);

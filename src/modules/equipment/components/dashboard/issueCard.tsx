@@ -1,4 +1,4 @@
-import React, { JSX, useState } from "react";
+import React, { useState } from "react";
 import { Badge, Button, Card, ListGroup } from "react-bootstrap";
 import IssueModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/issueModalForm";
 import ReactMarkdown from "react-markdown";
@@ -16,7 +16,7 @@ export default function IssueCard({
   issueAttachments: EquipmentModuleIssueAttachment[];
   reloadQueryFn: (key: string[]) => void;
 }) {
-  const [modalElement, setModalElement] = useState<JSX.Element | null>(null);
+  const [modalElement, setModalElement] = useState<React.ReactNode>(null);
   const [showModal, setShowModal] = useState(false);
   const [currentIssue, setCurrentIssue] = useState(issue);
 
