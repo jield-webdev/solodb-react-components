@@ -142,8 +142,8 @@ export default function RequirementResults({ requirement }: { requirement: Monit
         <Col>
           <h2>Charts</h2>
           <div className={"d-flex"}>
-            {targetQuery.data?.items.map((target, index) => {
-              return <RequirementChart target={target} results={resultsQuery.data!.items} key={index} />;
+            {targetQuery.data?.items.map((target) => {
+              return <RequirementChart target={target} results={resultsQuery.data!.items} key={target.id} />;
             })}
           </div>
         </Col>
@@ -175,19 +175,19 @@ export default function RequirementResults({ requirement }: { requirement: Monit
               <tr>
                 <th>ID</th>
                 <th>Date</th>
-                {targetQuery.data?.items.map((target, index) => {
-                  return <th key={index}>{target.logging_parameter.name}</th>;
+                {targetQuery.data?.items.map((target) => {
+                  return <th key={target.id}>{target.logging_parameter.name}</th>;
                 })}
-                {reportedStepParametersWithValues.map((stepParameter, index) => {
-                  return <th key={index}>{stepParameter.parameter.name}</th>;
+                {reportedStepParametersWithValues.map((stepParameter) => {
+                  return <th key={stepParameter.id}>{stepParameter.parameter.name}</th>;
                 })}
                 <th>+</th>
               </tr>
               <tr>
                 <th colSpan={2}></th>
-                {targetQuery.data?.items.map((target, index) => {
+                {targetQuery.data?.items.map((target) => {
                   return (
-                    <td key={index}>
+                    <td key={target.id}>
                       {target.min_value}
 
                       {target.is_value_inclusive && <span className={"text-muted px-2"}>&le;</span>}
@@ -202,31 +202,34 @@ export default function RequirementResults({ requirement }: { requirement: Monit
                     </td>
                   );
                 })}
-                {reportedStepParametersWithValues.map((stepParameter, index) => {
-                  return <th className={"table-secondary"} key={index} />;
+                {reportedStepParametersWithValues.map((stepParameter) => {
+                  return <th className={"table-secondary"} key={stepParameter.id} />;
                 })}
                 <th />
               </tr>
             </thead>
             <tbody>
-              {resultsQuery.data?.items.map((result, index) => {
+              {resultsQuery.data?.items.map((result) => {
                 return (
-                  <tr key={index}>
-                    <th key={index}>
+                  <tr key={result.id}>
+                    <th>
                       <small className={"text-muted"}>{result.id}</small>
                     </th>
                     <td>
                       {formatDateTime(result.date_created, "DD-MM-YY HH:mm")}
                     </td>
 
-                    {targetQuery.data?.items.map((target, index) => {
+                    {targetQuery.data?.items.map((target) => {
                       return (
-                        <td key={index}>
+                        <td key={target.id}>
                           {result.values
                             .filter((value) => value.logging_parameter.id === target.logging_parameter.id)
-                            .map((value, index) => {
+                            .map((value) => {
                               return (
-                                <span key={index} className={value.value_is_valid ? "text-success" : "text-danger"}>
+                                <span
+                                  key={`${value.logging_parameter.id}-${value.float_value}`}
+                                  className={value.value_is_valid ? "text-success" : "text-danger"}
+                                >
                                   {value.float_value}
                                 </span>
                               );
@@ -235,20 +238,20 @@ export default function RequirementResults({ requirement }: { requirement: Monit
                       );
                     })}
 
-                    {reportedStepParametersWithValues.map((stepParameter, index) => {
+                    {reportedStepParametersWithValues.map((stepParameter) => {
                       return (
-                        <td className={"table-secondary"} key={index}>
+                        <td className={"table-secondary"} key={stepParameter.id}>
                           {monitorStepParameterValuesQuery.data?.items
                             .filter(
                               (monitorStepParameterValue) =>
                                 monitorStepParameterValue.step_parameter.id === stepParameter.id &&
                                 monitorStepParameterValue.result.id === result.id
                             )
-                            .map((monitorResultStepParameterValue, index) => {
+                            .map((monitorResultStepParameterValue) => {
                               return (
                                 <EditStepParameterValueModal
                                   monitorResultStepParameterValue={monitorResultStepParameterValue}
-                                  key={index}
+                                  key={monitorResultStepParameterValue.id}
                                   refetchMonitorStepParameterValues={monitorStepParameterValuesQuery.refetch}
                                 />
                               );
@@ -295,7 +298,7 @@ export default function RequirementResults({ requirement }: { requirement: Monit
               <ul className={"list-group"}>
                 {uploadedFiles.map((file: File, i: number) => {
                   return (
-                    <li className={"list-group-item"} key={i}>
+                    <li className={"list-group-item"} key={file.url}>
                       <div className={"d-flex justify-content-between"}>
                         <span>
                           {i + 1} <a href={GetServerUri() + file.url}>{file.name}</a>

@@ -46,11 +46,11 @@ export default function EquipmentHeader() {
         <h1 className={"display-4"}>{equipment.name} Operator Dashboard</h1>
 
         <div>
-          {activeReservationQuery.data?.items.map((reservation, i) => {
+          {activeReservationQuery.data?.items.map((reservation) => {
             return (
               <div
                 className={"mx-2 p-2 rounded border-danger"}
-                key={i}
+                key={reservation.id}
                 style={{
                   backgroundColor: reservation.color,
                 }}
@@ -63,11 +63,11 @@ export default function EquipmentHeader() {
             );
           })}
 
-          {upcomingReservationQuery.data?.items.map((reservation, i) => {
+          {upcomingReservationQuery.data?.items.map((reservation) => {
             return (
               <div
                 className={"mx-2 p-2 rounded border-success border-2"}
-                key={i}
+                key={reservation.id}
                 style={{
                   backgroundColor: reservation.color,
                 }}

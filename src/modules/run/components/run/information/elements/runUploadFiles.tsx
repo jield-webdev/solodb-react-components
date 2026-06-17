@@ -224,8 +224,11 @@ export default function RunUploadFiles() {
 
       {selectedFiles.length > 0 && (
         <ListGroup className="mt-3">
-          {selectedFiles.map((file, idx) => (
-            <ListGroup.Item key={idx} className="d-flex justify-content-between align-items-center">
+          {selectedFiles.map((file) => (
+            <ListGroup.Item
+              key={`${file.name}-${file.lastModified}`}
+              className="d-flex justify-content-between align-items-center"
+            >
               <span>{file.name}</span>
               <small className="text-muted">{formatFileSize(file.size)}</small>
             </ListGroup.Item>

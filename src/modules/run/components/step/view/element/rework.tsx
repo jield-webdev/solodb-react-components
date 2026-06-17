@@ -18,10 +18,6 @@ const Rework = () => {
   const [comment, setComment] = useState<string>("");
   const [isCreatingRework, setIsCreatingRework] = useState<boolean>(false);
 
-  if (!runStep.has_recipe) {
-    return "Reworks are only possible for steps with a recipe";
-  }
-
   //We need to find the templates and the corresponding run step groups
   const [templateQuery, runStepQuery, templateStepQuery] = useQueries({
     queries: [
@@ -58,6 +54,10 @@ const Rework = () => {
       setReworkRecipes([...recipes]);
     }
   }, [runStepQuery.isSuccess, reworkSteps]);
+
+  if (!runStep.has_recipe) {
+    return "Reworks are only possible for steps with a recipe";
+  }
 
   function selectReworkTemplate(templateId: number) {
     //Go over the list of templates and select the one that matches the templateId
@@ -106,7 +106,7 @@ const Rework = () => {
           <div className={"row mb-3"}>
             <Form.Label className={"col-sm-3 col-form-label text-end"}>Template</Form.Label>
             <div className={"col-sm-9"}>
-              {reworkRecipes.length === 0 && <Alert variant={"info"}>Please select a rework step</Alert>}
+              {reworkRecipes.length === 0 && <Alert variant={"info"}>— Select a rework step</Alert>}
 
               {reworkRecipes.length > 0 && (
                 <Form.Control
@@ -117,9 +117,9 @@ const Rework = () => {
                 >
                   <option value={""}>— Select a template</option>
                   {templateQuery.data !== undefined &&
-                    templateQuery.data.templates.map((template: Template, i: React.Key) => {
+                    templateQuery.data.templates.map((template: Template) => {
                       return (
-                        <option key={i} value={template.id}>
+                        <option key={template.id} value={template.id}>
                           {template.label}: {template.name}
                         </option>
                       );
@@ -138,15 +138,16 @@ const Rework = () => {
                 <ul className={"list-group"}>
                   {!templateStepQuery.isLoading &&
                     templateStepQuery.data !== undefined &&
-                    templateStepQuery.data.steps.map((step: TemplateStep, i: React.Key) => {
+                    templateStepQuery.data.steps.map((step: TemplateStep) => {
                       //Stop the loop when the current step has been reached
                       return (
-                        <li key={i} className={"list-group-item "}>
+                        <li key={step.id} className={"list-group-item "}>
                           <div className={"form-check"}>
                             <input
                               type="checkbox"
                               className={"form-check-input"}
                               id={"templateStep" + step.id}
+                              aria-label={step.process_module.process.name}
                               name="templateStep"
                               onChange={(e) => {
                                 //Add all selected steps to the state
@@ -178,12 +179,12 @@ const Rework = () => {
               <ul className={"list-group"}>
                 {runStepQuery.isLoading && <option>Loading run steps...</option>}
                 {!runStepQuery.isLoading &&
-                  runStepQuery.data!.items.map((step: RunStep, i: React.Key) => {
+                  runStepQuery.data!.items.map((step: RunStep) => {
                     //Stop the loop when the current step has been reached
                     if (runStep.sequence >= step.sequence) {
                       return (
                         <li
-                          key={i}
+                          key={step.id}
                           className={
                             "list-group-item d-flex justify-content-between" +
                             (runStep.id === step.id ? " bg-success-subtle" : "")
@@ -194,6 +195,7 @@ const Rework = () => {
                               type="checkbox"
                               className={"form-check-input"}
                               id={"runStep" + step.id}
+                              aria-label={step.process_module.process.name}
                               name="runStep"
                               onChange={(e) => {
                                 //Add all selected steps to the state

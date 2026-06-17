@@ -127,6 +127,7 @@ const RunStepPartProductionTableRow = ({
             type="checkbox"
             id={`part-select-${runStepPart.part_id}`}
             name="tomato"
+            aria-label="Select part"
             className="form-check-input"
             checked={partIsSelected}
             onChange={() => setPartAsSelected?.(runStepPart.part_id)}

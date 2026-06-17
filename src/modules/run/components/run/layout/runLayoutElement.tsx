@@ -3,11 +3,9 @@ import { keepPreviousData, useQueries } from "@tanstack/react-query";
 import { Placeholder, Table } from "react-bootstrap";
 import {
   listRunParts,
-  listRunStepParts,
   listRunSteps,
   RunPart,
   RunStep,
-  RunStepPart,
 } from "@jield/solodb-typescript-core";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";

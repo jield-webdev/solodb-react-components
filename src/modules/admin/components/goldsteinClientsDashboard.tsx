@@ -198,7 +198,7 @@ export default function GoldsteinClientsDashboard() {
                 )}
               </td>
               <td>
-                <button className="btn btn-primary" onClick={() => editAssociation(assoc)}>
+                <button type="button" className="btn btn-primary" onClick={() => editAssociation(assoc)}>
                   Edit association
                 </button>
               </td>

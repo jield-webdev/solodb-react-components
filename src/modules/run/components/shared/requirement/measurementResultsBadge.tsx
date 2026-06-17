@@ -95,7 +95,7 @@ export const MeasurementResultsBadges = ({
             </div>
           ))
         : leveledParts.map((runPart) => badge(runPart))}
-      <label>(measurements)</label>
+      <span>(measurements)</span>
     </div>
   );
 };

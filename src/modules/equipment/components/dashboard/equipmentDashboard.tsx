@@ -133,8 +133,8 @@ export default function EquipmentDashboard() {
     <Container fluid>
       <div className={"d-flex justify-content-left"}>
         {monitorQuery.data?.items &&
-          monitorQuery.data.items.map((monitor, i) => {
-            return <MonitorCard monitor={monitor} key={i} />;
+          monitorQuery.data.items.map((monitor) => {
+            return <MonitorCard monitor={monitor} key={monitor.id} />;
           })}
       </div>
 
@@ -157,9 +157,9 @@ export default function EquipmentDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {runsQuery.data?.items.map((run: Run, i: React.Key) => {
+                {runsQuery.data?.items.map((run: Run) => {
                   return (
-                    <tr key={i}>
+                    <tr key={run.id}>
                       <td>
                         {run.first_unfinished_step && (
                           <Link to={`/${environment}/operator/run/step/${run.first_unfinished_step.id}`}>
@@ -214,8 +214,8 @@ export default function EquipmentDashboard() {
         </Col>
         <Col md={4}>
           <h2>Assistance</h2>
-          {modulesQuery.data?.items.map((module, i) => (
-            <React.Fragment key={i}>
+          {modulesQuery.data?.items.map((module) => (
+            <React.Fragment key={module.id}>
               <div className="d-flex justify-content-between">
                 <h3>{module.id !== equipment.main_tool_module_id ? module.name : "Main tool"}</h3>
                 <div>
@@ -244,9 +244,9 @@ export default function EquipmentDashboard() {
                   </div>
                 </div>
 
-                {findEcnNotes(module.id)?.map((ecn, j) => (
+                {findEcnNotes(module.id)?.map((ecn) => (
                   <EcnCard
-                    key={`ecn-${i}-${j}`}
+                    key={ecn.id}
                     ecn={ecn}
                     equipment={equipment}
                     ecnAttachments={ecnAttachmentsQuery.data?.items ?? []}
@@ -254,9 +254,9 @@ export default function EquipmentDashboard() {
                   />
                 ))}
 
-                {findIssues(module.id)?.map((issue, j) => (
+                {findIssues(module.id)?.map((issue) => (
                   <IssueCard
-                    key={`issue-${i}-${j}`}
+                    key={issue.id}
                     issue={issue}
                     equipment={equipment}
                     issueAttachments={issueAttachmentsQuery.data?.items ?? []}

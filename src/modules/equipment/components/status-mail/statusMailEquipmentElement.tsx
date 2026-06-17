@@ -159,10 +159,10 @@ export default function StatusMailEquipmentElement({
                     <div className="ms-2"></div>
                   </Card.Title>
                   <div className="mt-3">
-                    {findEcnNotes(mainTool.id).map((ecnNote, index) => (
+                    {findEcnNotes(mainTool.id).map((ecnNote) => (
                       <EcnElement
                         ecn={ecnNote}
-                        key={index}
+                        key={ecnNote.id}
                         equipment={equipment}
                         ecnAttachments={ecnAttachments}
                         reloadQueryFn={reloadQueryFn}
@@ -171,10 +171,10 @@ export default function StatusMailEquipmentElement({
                     ))}
 
                     {showIssues !== 1 &&
-                      findIssues(mainTool.id).map((issue, index) => (
+                      findIssues(mainTool.id).map((issue) => (
                         <IssueElement
                           issue={issue}
-                          key={index}
+                          key={issue.id}
                           equipment={equipment}
                           issueAttachments={issueAttachments}
                           reloadQueryFn={reloadQueryFn}
@@ -190,8 +190,8 @@ export default function StatusMailEquipmentElement({
           {/* Modules section - only shown if there are modules */}
           {equipmentModules.length > 0 && (
             <Col xs={12} md={mainTool ? 6 : 12}>
-              {equipmentModules.map((module: EquipmentModule, index: number) => (
-                <Card key={index} className="mb-3">
+              {equipmentModules.map((module: EquipmentModule) => (
+                <Card key={module.id} className="mb-3">
                   <Card.Body>
                     <Card.Title className="d-flex align-items-center">
                       <div className="d-flex align-items-center gap-2">
@@ -205,10 +205,10 @@ export default function StatusMailEquipmentElement({
                       </div>
                     </Card.Title>
                     <div className="mt-3">
-                      {findEcnNotes(module.id).map((ecnNote, index) => (
+                      {findEcnNotes(module.id).map((ecnNote) => (
                         <EcnElement
                           ecn={ecnNote}
-                          key={index}
+                          key={ecnNote.id}
                           equipment={equipment}
                           ecnAttachments={ecnAttachments}
                           reloadQueryFn={reloadQueryFn}
@@ -217,10 +217,10 @@ export default function StatusMailEquipmentElement({
                       ))}
 
                       {showIssues !== 1 &&
-                        findIssues(module.id).map((issue, index) => (
+                        findIssues(module.id).map((issue) => (
                           <IssueElement
                             issue={issue}
-                            key={index}
+                            key={issue.id}
                             equipment={equipment}
                             issueAttachments={issueAttachments}
                             reloadQueryFn={reloadQueryFn}

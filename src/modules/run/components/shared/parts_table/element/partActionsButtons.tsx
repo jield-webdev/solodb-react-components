@@ -8,8 +8,9 @@ export interface PartActionsButtonsProps {
 }
 
 export const PartActionsButtons = ({ availableActions, onActionSelected }: PartActionsButtonsProps) => {
-  if (availableActions.length === 0) return null;
   const [loadingActionId, setLoadingActionId] = useState<RunStepPartActionEnum | null>(null);
+
+  if (availableActions.length === 0) return null;
 
   const handleAction = async (action: RunStepPartActionEnum) => {
     if (loadingActionId !== null) return;

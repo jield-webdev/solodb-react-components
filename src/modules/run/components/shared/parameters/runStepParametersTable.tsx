@@ -98,8 +98,8 @@ export const RunStepParametersTable = ({
                 <small className={"text-muted"}>{param.sequence}</small>
               </td>
               <td>{param.parameter.name}</td>
-              {param.values.map((value, i: React.Key) => (
-                <td key={i}>
+              {param.values.map((value, i) => (
+                <td key={value.id ?? `${param.id}-${i}`}>
                   {editableParameters ? (
                     <RunStepParameterEditButton parameter={param} refetchFn={refetch} value={value} />
                   ) : (

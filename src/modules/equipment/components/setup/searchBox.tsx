@@ -21,6 +21,7 @@ export default function SharchBox({ setSearchQuery, resetFilter }: { setSearchQu
           <input
             type="search"
             name="query"
+            aria-label="Search"
             className="form-control"
             placeholder="Search"
             value={query}

@@ -96,10 +96,19 @@ export default function RequirementElement({
         <div className="d-flex align-items-center gap-2 flex-shrink-0">
           {runStep.id !== contextRunStep.id && (
             <i
+              role="button"
+              tabIndex={0}
+              aria-label={showRequirementDetail ? "Collapse details" : "Expand details"}
               className={"fa " + (showRequirementDetail ? "fa-chevron-down" : "fa-chevron-right")}
               style={{ cursor: "pointer" }}
               onClick={() => {
                 setShowRequirementDetail(!showRequirementDetail);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setShowRequirementDetail(!showRequirementDetail);
+                }
               }}
             />
           )}

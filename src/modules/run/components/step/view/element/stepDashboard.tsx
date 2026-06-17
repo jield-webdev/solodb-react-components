@@ -30,8 +30,18 @@ import {
   listRequirements,
   RunTypeEnum,
   listEcn,
+  type ApiFormattedResponse,
+  type Monitor,
 } from "@jield/solodb-typescript-core";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
+
+const emptyMonitorResponse: ApiFormattedResponse<Monitor> = {
+  items: [],
+  amountOfPages: 0,
+  currentPage: 0,
+  totalItems: 0,
+  hasMore: false,
+};
 
 const StepDashboard = () => {
   const { environment } = useParams();
@@ -44,9 +54,11 @@ const StepDashboard = () => {
       {
         queryKey: ["monitors", runStep.process_module.module.equipment],
         queryFn: () =>
-          listMonitors({
-            equipment: runStep.process_module.module.equipment,
-          }),
+          runStep.process_module.module.equipment
+            ? listMonitors({
+                equipment: runStep.process_module.module.equipment,
+              })
+            : emptyMonitorResponse,
       },
       {
         queryKey: ["ecn", runStep.process_module.module],
@@ -180,12 +192,13 @@ const StepDashboard = () => {
               <div className="form-check form-switch">
                 <input
                   type="checkbox"
+                  id="showOnlyEmphasizedParameters"
                   checked={showOnlyEmphasizedParameters}
                   className="form-check-input"
                   data-toggle="toggle"
                   onChange={() => setShowOnlyEmphasizedParameters(!showOnlyEmphasizedParameters)}
                 />
-                <label className="ms-2">Show only emphasized parameters</label>
+                <label htmlFor="showOnlyEmphasizedParameters" className="ms-2">Show only emphasized parameters</label>
               </div>
               <RunStepParametersTable
                 runStep={runStep}
@@ -245,13 +258,13 @@ const StepDashboard = () => {
             )}
 
             {monitorQuery.data?.items &&
-              monitorQuery.data.items.map((monitor, i) => {
-                return <MonitorCard monitor={monitor} key={i} />;
+              monitorQuery.data.items.map((monitor) => {
+                return <MonitorCard monitor={monitor} key={monitor.id} />;
               })}
 
-            {ecnQuery.data?.items.map(function (ecn, i: React.Key) {
+            {ecnQuery.data?.items.map(function (ecn) {
               return (
-                <Card className={"my-2"} key={i}>
+                <Card className={"my-2"} key={ecn.id}>
                   <Card.Header>ECN: {ecn.ecn}</Card.Header>
                   <Card.Body>
                     <Card.Text>

@@ -212,12 +212,13 @@ export default function RunStepsElement() {
         <div className="form-check form-switch">
           <input
             type="checkbox"
+            id="showOnlyEmphasizedParameters"
             checked={showOnlyEmphasizedParameters}
             className="form-check-input"
             data-toggle="toggle"
             onChange={() => setShowOnlyEmphasizedParameters(!showOnlyEmphasizedParameters)}
           />
-          <label className="ms-2">Show only emphasized parameters</label>
+          <label htmlFor="showOnlyEmphasizedParameters" className="ms-2">Show only emphasized parameters</label>
         </div>
       </div>
 

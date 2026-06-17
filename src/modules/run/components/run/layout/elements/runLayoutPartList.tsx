@@ -43,7 +43,7 @@ export const RunLayoutPartList = ({
     [leveledParts, currentStepParts]
   );
 
-  if (trays.length === 0) {
+  if (trays.length === 0 || leveledParts[0]?.part_level > 0) {
     return <RunPartList step={step} parts={parts} stepParts={stepParts} run={run} />;
   }
 

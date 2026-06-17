@@ -33,6 +33,7 @@ export default function SelectedEquipmentTable({
             </td>
             <td>
               <button
+                type="button"
                 onClick={() => {
                   removeEquipment(equipment);
                 }}
@@ -46,7 +47,10 @@ export default function SelectedEquipmentTable({
             </td>
             <td>
               <a href={`/${environment}/equipment/details/${equipment.id}/general.html`}>{equipment.name}</a>{" "}
-              <a href={`/${environment}/equipment/edit/${equipment.id}.html`}>
+              <a
+                href={`/${environment}/equipment/edit/${equipment.id}.html`}
+                aria-label={`Edit ${equipment.name}`}
+              >
                 <i className="fa fa-pencil-square-o fa-fw" />
               </a>
             </td>

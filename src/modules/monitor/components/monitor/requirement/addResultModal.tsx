@@ -134,7 +134,7 @@ const AddResultModal = ({
 
             {fields.map((field, index) => {
               return (
-                <Form.Group className="mb-3" key={index}>
+                <Form.Group className="mb-3" key={field.id}>
                   <Form.Label>{field.label}</Form.Label>
                   <InputGroup hasValidation>
                     <Form.Control

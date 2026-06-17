@@ -28,9 +28,9 @@ export default function RunTabs(props: { className?: string }) {
   //Now we can render the tabs
   return (
     <Nav variant="tabs" className={props.className} defaultActiveKey="/home" activeKey={url}>
-      {links.map((link, i) => {
+      {links.map((link) => {
         return (
-          <Nav.Item key={i}>
+          <Nav.Item key={link.link}>
             <Link to={link.link} className={"nav-link " + (link.link === url ? "active" : "")}>
               {link.title}
             </Link>
