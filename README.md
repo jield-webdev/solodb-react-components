@@ -102,4 +102,4 @@ Run the guided release script from the repository root:
 yarn release
 ```
 
-The script upgrades dependencies, shows the resulting changes, prompts for the next package version, optionally runs tests and a build, then commits, creates an annotated `vX.Y.Z` tag, and pushes the branch and tag to GitHub.
+The script starts from `develop`, upgrades dependencies, shows the resulting changes, prompts for the next package version, optionally runs tests and a build, commits the release on `develop`, merges it into `main`, pushes `main`, creates an annotated `vX.Y.Z` tag on `main`, pushes the tag to GitHub, and switches back to `develop`.
