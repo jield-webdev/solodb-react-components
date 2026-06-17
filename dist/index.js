@@ -413,17 +413,16 @@ async function nt({ environment: e, query: t, order: n, direction: r, page: i, p
 		hasMore: l.page < l.page_count
 	};
 }
-async function rt({ name: e, motivation: t, group_id: n, team_id: r, project_id: i, experimental_split: a, location: o, conclusion: s, run_type: c }) {
+async function rt({ name: e, motivation: t, group_id: n, team_id: r, project_id: i, parts: a, location: o, run_type: s }) {
 	return (await y.post("create/run", {
 		name: e,
 		motivation: t,
 		group_id: n,
 		team_id: r,
 		project_id: i,
-		...a === void 0 ? {} : { experimental_split: a },
+		...a === void 0 ? {} : { parts: a },
 		...o === void 0 ? {} : { location: o },
-		...s === void 0 ? {} : { conclusion: s },
-		...c === void 0 ? {} : { run_type: c }
+		...s === void 0 ? {} : { run_type: s }
 	})).data;
 }
 async function it({ run_id: e, parent_run_id: t, part_ids: n, amount_per_part: r, description: i }) {
@@ -25578,7 +25577,7 @@ var kF = ({ showModal: e, onClose: t, message: n }) => {
 							render: ({ field: e }) => /* @__PURE__ */ x(Zv, {
 								options: f,
 								classNamePrefix: "react-select",
-								placeholder: "Select a message type",
+								placeholder: "— Select a message type",
 								value: f.find((t) => t.value.id === e.value?.id) || null,
 								onChange: (t) => e.onChange(t?.value),
 								styles: _
@@ -30804,25 +30803,11 @@ function FR({ selection: e, run: t }) {
 }
 //#endregion
 //#region src/modules/run/components/wizard/createRunForm/formSection.tsx
-function IR({ title: e, isFirst: t = !1, children: n }) {
-	return /* @__PURE__ */ S(mu, {
-		className: `g-3 py-4${t ? "" : " border-top"}`,
-		children: [/* @__PURE__ */ x(ji, {
-			xs: 12,
-			md: 3,
-			children: /* @__PURE__ */ x("h3", {
-				className: "fs-5 mb-0",
-				children: e
-			})
-		}), /* @__PURE__ */ x(ji, {
-			xs: 12,
-			md: 9,
-			children: /* @__PURE__ */ x("div", {
-				className: "d-flex flex-column gap-3",
-				children: n
-			})
-		})]
-	});
+function IR({ title: e, children: t }) {
+	return /* @__PURE__ */ S("fieldset", { children: [/* @__PURE__ */ x("legend", {
+		className: "fs-5 mb-0",
+		children: e
+	}), t] });
 }
 //#endregion
 //#region src/modules/run/components/wizard/createRunForm/organisationSelect.tsx
@@ -30834,46 +30819,54 @@ var LR = (e) => {
 function RR({ controlId: e, label: t, options: n, isLoading: r, value: i, onChange: a, showError: o, disabled: s, helpText: c }) {
 	let l = t.toLowerCase(), u = `${l}s`;
 	return /* @__PURE__ */ S(U.Group, {
+		as: mu,
+		className: "mb-3",
 		controlId: e,
-		children: [
-			/* @__PURE__ */ S(U.Label, { children: [
+		children: [/* @__PURE__ */ S(U.Label, {
+			column: !0,
+			sm: 3,
+			children: [
 				t,
 				" ",
 				/* @__PURE__ */ x("span", {
 					className: "text-danger",
 					children: "*"
 				})
-			] }),
-			/* @__PURE__ */ S(U.Select, {
-				value: i ?? "",
-				onChange: (e) => a(LR(e.target.value)),
-				required: !0,
-				disabled: s,
-				isInvalid: o,
-				children: [/* @__PURE__ */ x("option", {
-					value: "",
-					children: r ? `Loading ${u}...` : `Select a ${l}`
-				}), n.map((e) => /* @__PURE__ */ x("option", {
-					value: e.id,
-					children: e.label
-				}, e.id))]
-			}),
-			o && /* @__PURE__ */ x(U.Control.Feedback, {
-				type: "invalid",
-				children: r ? `${t}s are still loading.` : `Select a ${l}.`
-			}),
-			/* @__PURE__ */ x(U.Text, {
-				muted: !0,
-				children: c
-			})
-		]
+			]
+		}), /* @__PURE__ */ S(ji, {
+			sm: 9,
+			children: [
+				/* @__PURE__ */ S(U.Select, {
+					value: i ?? "",
+					onChange: (e) => a(LR(e.target.value)),
+					required: !0,
+					disabled: s,
+					isInvalid: o,
+					children: [/* @__PURE__ */ x("option", {
+						value: "",
+						children: r ? `Loading ${u}...` : `— Select a ${l}`
+					}), n.map((e) => /* @__PURE__ */ x("option", {
+						value: e.id,
+						children: e.label
+					}, e.id))]
+				}),
+				o && /* @__PURE__ */ x(U.Control.Feedback, {
+					type: "invalid",
+					children: r ? `${t}s are still loading.` : `— Select a ${l}.`
+				}),
+				/* @__PURE__ */ x(U.Text, {
+					muted: !0,
+					children: c
+				})
+			]
+		})]
 	});
 }
 //#endregion
 //#region src/modules/run/components/wizard/createRunForm/selectionOverview.tsx
-function zR({ title: e, isEmpty: t, emptyText: n, children: r }) {
-	return /* @__PURE__ */ S("div", { children: [/* @__PURE__ */ S("div", {
-		className: "text-secondary small text-uppercase fw-semibold mb-2",
+function zR({ title: e, isEmpty: t, children: n }) {
+	return t ? "" : /* @__PURE__ */ S("div", { children: [/* @__PURE__ */ S("div", {
+		className: "text-secondary mb-2",
 		children: [
 			e,
 			" ",
@@ -30882,19 +30875,15 @@ function zR({ title: e, isEmpty: t, emptyText: n, children: r }) {
 				children: "(selected previously)"
 			})
 		]
-	}), t ? /* @__PURE__ */ x("p", {
-		className: "text-secondary fst-italic mb-0",
-		children: n
-	}) : /* @__PURE__ */ x("div", {
+	}), /* @__PURE__ */ x("div", {
 		className: "d-flex flex-column gap-2",
-		children: r
+		children: n
 	})] });
 }
 function BR({ selectedRuns: e, selectedSubstrates: t, partIdsByRunId: n }) {
 	return /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ x(zR, {
 		title: "Parent runs & parts",
 		isEmpty: e.length === 0,
-		emptyText: "No parent runs selected.",
 		children: e.map((e) => {
 			let t = n[e.id]?.length ?? 0;
 			return /* @__PURE__ */ S("div", {
@@ -30924,7 +30913,6 @@ function BR({ selectedRuns: e, selectedSubstrates: t, partIdsByRunId: n }) {
 	}), /* @__PURE__ */ x(zR, {
 		title: "Substrates",
 		isEmpty: t.length === 0,
-		emptyText: "No substrates selected.",
 		children: t.map(({ substrate: e, amount: t }) => /* @__PURE__ */ S("div", {
 			className: "d-flex align-items-center justify-content-between gap-3 bg-body-secondary rounded p-2",
 			children: [/* @__PURE__ */ S("div", {
@@ -30946,10 +30934,10 @@ function BR({ selectedRuns: e, selectedSubstrates: t, partIdsByRunId: n }) {
 //#endregion
 //#region src/modules/run/components/wizard/createRunForm/createRunForm.tsx
 function VR({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstrates: r, partIdsByRunId: i, onBack: a, onSubmit: o }) {
-	let { environment: s } = P(), [c, l] = v(""), [u, d] = v(""), [f, p] = v(null), [m, h] = v(null), [g, _] = v(null), [y, b] = v("research"), [C, w] = v(1), [T, E] = v(""), [D, O] = v(""), [A, j] = v(!1), M = k({
+	let { environment: s } = P(), [c, l] = v(""), [u, d] = v(""), [f, p] = v(null), [m, h] = v(null), [g, _] = v(null), [y, b] = v(Xt.RESEARCH), [C, w] = v(1), [T, E] = v(""), [D, O] = v(!1), A = k({
 		queryKey: ["organisation-groups", s],
 		queryFn: () => et({ environment: s })
-	}), N = k({
+	}), j = k({
 		queryKey: [
 			"organisation-teams",
 			s,
@@ -30959,7 +30947,7 @@ function VR({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstra
 			environment: s,
 			purpose: Qt.Run
 		})
-	}), ee = k({
+	}), M = k({
 		queryKey: [
 			"organisation-projects",
 			s,
@@ -30969,153 +30957,156 @@ function VR({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstra
 			environment: s,
 			purpose: Zt.Run
 		})
-	}), te = c.trim(), ne = u.trim(), re = M.isLoading || N.isLoading || ee.isLoading, ie = M.isError || N.isError || ee.isError, F = M.data?.items ?? [], ae = N.data?.items ?? [], oe = ee.data?.items ?? [], se = f !== null && F.some((e) => e.id === f), ce = m !== null && ae.some((e) => e.id === m), le = g !== null && oe.some((e) => e.id === g), ue = te === "", de = ne === "", fe = A && ue, pe = A && de, me = !ue && !de && se && ce && le && !re && !ie && !e;
+	}), N = c.trim(), ee = u.trim(), te = A.isLoading || j.isLoading || M.isLoading, ne = A.isError || j.isError || M.isError, re = A.data?.items ?? [], ie = j.data?.items ?? [], F = M.data?.items ?? [], ae = f !== null && re.some((e) => e.id === f), oe = m !== null && ie.some((e) => e.id === m), se = g !== null && F.some((e) => e.id === g), ce = N === "", le = ee === "", ue = D && ce, de = D && le, fe = !ce && !le && ae && oe && se && !te && !ne && !e;
 	return /* @__PURE__ */ S(U, {
 		noValidate: !0,
 		onSubmit: (e) => {
-			e.preventDefault(), j(!0), me && o({
-				name: te,
-				motivation: ne,
+			e.preventDefault(), O(!0), fe && o({
+				name: N,
+				motivation: ee,
 				groupId: f,
 				teamId: m,
 				projectId: g,
 				parts: Number.isFinite(C) ? Math.max(1, C) : 1,
 				location: T,
-				conclusion: D,
 				runType: y
 			});
 		},
+		className: "form-horizontal",
 		children: [
 			/* @__PURE__ */ S(IR, {
 				title: "Details",
-				isFirst: !0,
 				children: [
 					/* @__PURE__ */ S(U.Group, {
+						as: mu,
+						className: "mb-3",
 						controlId: "create-run-name",
-						children: [
-							/* @__PURE__ */ S(U.Label, { children: ["Run name ", /* @__PURE__ */ x("span", {
+						children: [/* @__PURE__ */ S(U.Label, {
+							column: !0,
+							sm: 3,
+							children: ["Run name ", /* @__PURE__ */ x("span", {
 								className: "text-danger",
 								children: "*"
-							})] }),
-							/* @__PURE__ */ x(U.Control, {
-								type: "text",
-								value: c,
-								onChange: (e) => l(e.target.value),
-								placeholder: "Give a run name",
-								required: !0,
-								disabled: e,
-								isInvalid: fe
-							}),
-							fe && /* @__PURE__ */ x(U.Control.Feedback, {
-								type: "invalid",
-								children: "Run name is required."
-							}),
-							/* @__PURE__ */ x(U.Text, {
-								muted: !0,
-								children: "Give a short and descriptive name for the run"
-							})
-						]
+							})]
+						}), /* @__PURE__ */ S(ji, {
+							sm: 9,
+							children: [
+								/* @__PURE__ */ x(U.Control, {
+									type: "text",
+									value: c,
+									onChange: (e) => l(e.target.value),
+									placeholder: "Give a run name",
+									required: !0,
+									disabled: e,
+									isInvalid: ue
+								}),
+								ue && /* @__PURE__ */ x(U.Control.Feedback, {
+									type: "invalid",
+									children: "Run name is required."
+								}),
+								/* @__PURE__ */ x(U.Text, {
+									muted: !0,
+									children: "Give a short and descriptive name for the run"
+								})
+							]
+						})]
 					}),
 					/* @__PURE__ */ S(U.Group, {
+						as: mu,
+						className: "mb-3",
 						controlId: "create-run-location",
-						children: [
-							/* @__PURE__ */ x(U.Label, { children: "Sample location" }),
-							/* @__PURE__ */ x(U.Control, {
+						children: [/* @__PURE__ */ x(U.Label, {
+							column: !0,
+							sm: 3,
+							children: "Sample location"
+						}), /* @__PURE__ */ S(ji, {
+							sm: 9,
+							children: [/* @__PURE__ */ x(U.Control, {
 								type: "text",
 								value: T,
 								onChange: (e) => E(e.target.value),
 								placeholder: "Location of the samples",
 								disabled: e
-							}),
-							/* @__PURE__ */ x(U.Text, {
+							}), /* @__PURE__ */ x(U.Text, {
 								muted: !0,
 								children: "Give here the location where the run samples are stored"
-							})
-						]
+							})]
+						})]
 					}),
 					/* @__PURE__ */ S(U.Group, {
+						as: mu,
+						className: "mb-3",
 						controlId: "create-run-motivation",
-						children: [
-							/* @__PURE__ */ S(U.Label, { children: ["Motivation ", /* @__PURE__ */ x("span", {
+						children: [/* @__PURE__ */ S(U.Label, {
+							column: !0,
+							sm: 3,
+							children: ["Motivation ", /* @__PURE__ */ x("span", {
 								className: "text-danger",
 								children: "*"
-							})] }),
-							/* @__PURE__ */ x(U.Control, {
-								as: "textarea",
-								rows: 3,
-								value: u,
-								onChange: (e) => d(e.target.value),
-								placeholder: "Why is this run being created?",
-								required: !0,
-								disabled: e,
-								isInvalid: pe
-							}),
-							pe && /* @__PURE__ */ x(U.Control.Feedback, {
-								type: "invalid",
-								children: "Motivation is required."
-							}),
-							/* @__PURE__ */ x(U.Text, {
-								muted: !0,
-								children: "Explain here the motivation for this run"
-							})
-						]
-					}),
-					/* @__PURE__ */ S(U.Group, {
-						controlId: "create-run-conclusion",
-						children: [
-							/* @__PURE__ */ x(U.Label, { children: "Conclusion" }),
-							/* @__PURE__ */ x(U.Control, {
-								type: "text",
-								value: D,
-								onChange: (e) => O(e.target.value),
-								placeholder: "Optional",
-								disabled: e
-							}),
-							/* @__PURE__ */ x(U.Text, {
-								muted: !0,
-								children: "Explain the conclusion of this run"
-							})
-						]
+							})]
+						}), /* @__PURE__ */ S(ji, {
+							sm: 9,
+							children: [
+								/* @__PURE__ */ x(U.Control, {
+									as: "textarea",
+									rows: 3,
+									value: u,
+									onChange: (e) => d(e.target.value),
+									placeholder: "Why is this run being created?",
+									required: !0,
+									disabled: e,
+									isInvalid: de
+								}),
+								de && /* @__PURE__ */ x(U.Control.Feedback, {
+									type: "invalid",
+									children: "Motivation is required."
+								}),
+								/* @__PURE__ */ x(U.Text, {
+									muted: !0,
+									children: "Explain here the motivation for this run"
+								})
+							]
+						})]
 					})
 				]
 			}),
 			/* @__PURE__ */ S(IR, {
 				title: "Organisation",
 				children: [
-					A && ie && /* @__PURE__ */ x(oi, {
+					D && ne && /* @__PURE__ */ x(oi, {
 						variant: "warning",
 						children: "Could not load organisation values."
 					}),
 					/* @__PURE__ */ x(RR, {
 						controlId: "create-run-group",
 						label: "Group",
-						options: F,
-						isLoading: M.isLoading,
+						options: re,
+						isLoading: A.isLoading,
 						value: f,
 						onChange: p,
-						showError: A && !se,
+						showError: D && !ae,
 						disabled: e,
 						helpText: "Select the group to which this run belongs"
 					}),
 					/* @__PURE__ */ x(RR, {
 						controlId: "create-run-team",
 						label: "Team",
-						options: ae,
-						isLoading: N.isLoading,
+						options: ie,
+						isLoading: j.isLoading,
 						value: m,
 						onChange: h,
-						showError: A && !ce,
+						showError: D && !oe,
 						disabled: e,
 						helpText: "Select the team to which this run belongs"
 					}),
 					/* @__PURE__ */ x(RR, {
 						controlId: "create-run-project",
 						label: "Project",
-						options: oe,
-						isLoading: ee.isLoading,
+						options: F,
+						isLoading: M.isLoading,
 						value: g,
 						onChange: _,
-						showError: A && !le,
+						showError: D && !se,
 						disabled: e,
 						helpText: "Select the project to which this run belongs"
 					})
@@ -31124,48 +31115,66 @@ function VR({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstra
 			/* @__PURE__ */ x(IR, {
 				title: "Parts",
 				children: /* @__PURE__ */ S(U.Group, {
+					as: mu,
+					className: "mb-3",
 					controlId: "create-run-parts",
-					children: [
-						/* @__PURE__ */ x(U.Label, { children: "Experimental split" }),
-						/* @__PURE__ */ x(U.Control, {
+					children: [/* @__PURE__ */ x(U.Label, {
+						column: !0,
+						sm: 3,
+						children: "Experimental split"
+					}), /* @__PURE__ */ S(ji, {
+						sm: 9,
+						children: [/* @__PURE__ */ x(U.Control, {
 							type: "number",
 							min: 1,
 							step: 1,
 							value: C,
 							onChange: (e) => w(Number(e.target.value)),
 							disabled: e
-						}),
-						/* @__PURE__ */ x(U.Text, {
+						}), /* @__PURE__ */ x(U.Text, {
 							muted: !0,
 							children: "Select here the amount of parts (experimental split) this run has, give only the main amount of parts, individual parts can be split later"
-						})
-					]
-				})
-			}),
-			/* @__PURE__ */ x(IR, {
-				title: "Type",
-				children: /* @__PURE__ */ S(U.Group, {
-					controlId: "create-run-type",
-					children: [/* @__PURE__ */ x(U.Label, { children: "Run type" }), /* @__PURE__ */ S(U.Select, {
-						value: y,
-						onChange: (e) => b(e.target.value),
-						disabled: e,
-						children: [/* @__PURE__ */ x("option", {
-							value: "research",
-							children: "Research"
-						}), /* @__PURE__ */ x("option", {
-							value: "production",
-							children: "Production"
 						})]
 					})]
 				})
 			}),
 			/* @__PURE__ */ x(IR, {
-				title: "Overview",
-				children: /* @__PURE__ */ x(BR, {
-					selectedRuns: n,
-					selectedSubstrates: r,
-					partIdsByRunId: i
+				title: "Type",
+				children: /* @__PURE__ */ S(U.Group, {
+					as: mu,
+					className: "mb-3",
+					controlId: "create-run-type",
+					children: [/* @__PURE__ */ x(U.Label, {
+						column: !0,
+						sm: 3,
+						children: "Run type"
+					}), /* @__PURE__ */ x(ji, {
+						sm: 9,
+						children: /* @__PURE__ */ S(U.Select, {
+							value: y,
+							onChange: (e) => b(e.target.value),
+							disabled: e,
+							children: [/* @__PURE__ */ x("option", {
+								value: Xt.RESEARCH,
+								children: "Research"
+							}), /* @__PURE__ */ x("option", {
+								value: Xt.PRODUCTION,
+								children: "Production"
+							})]
+						})
+					})]
+				})
+			}),
+			/* @__PURE__ */ x(mu, {
+				className: "my-3",
+				children: /* @__PURE__ */ x(ji, {
+					sm: 9,
+					className: "offset-sm-3",
+					children: /* @__PURE__ */ x(BR, {
+						selectedRuns: n,
+						selectedSubstrates: r,
+						partIdsByRunId: i
+					})
 				})
 			}),
 			t && /* @__PURE__ */ x(oi, {
@@ -31282,9 +31291,8 @@ function qR() {
 				group_id: e.groupId,
 				team_id: e.teamId,
 				project_id: e.projectId,
-				experimental_split: e.parts,
+				parts: e.parts,
 				location: e.location || null,
-				conclusion: e.conclusion || null,
 				run_type: e.runType
 			}), i = CR(r.id, t).map((e) => it(e)), a = n.map(({ substrate: e, amount: t }) => at({
 				run_id: r.id,
@@ -32492,7 +32500,7 @@ var xz = ({ run: e, show: n, setShow: r, runHoldCode: i, setRunHoldCode: a }) =>
 							render: ({ field: e }) => /* @__PURE__ */ x(Ox, {
 								isSearchable: !1,
 								defaultOptions: !0,
-								placeholder: "Select a hold code",
+								placeholder: "— Select a hold code",
 								loadOptions: g,
 								value: e.value,
 								onChange: (t) => {
@@ -33162,7 +33170,7 @@ var Oz = ({ pageSize: e = 25, hideLabel: n = !1 }) => {
 					children: [
 						m.length === 0 && /* @__PURE__ */ x(oi, {
 							variant: "info",
-							children: "Please select a rework step"
+							children: "— Select a rework step"
 						}),
 						m.length > 0 && /* @__PURE__ */ S(U.Control, {
 							as: "select",

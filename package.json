@@ -1,6 +1,6 @@
 {
   "name": "@jield/solodb-react-components",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "type": "module",
   "repository": "jield-webdev/solodb-react-components",
   "main": "./dist/index.cjs",
@@ -22,12 +22,13 @@
     "build": "tsc && vite build",
     "dev": "cd example && yarn dev",
     "example:install": "cd example && yarn install",
+    "release": "bash scripts/release.sh",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@jield/solodb-typescript-core": "1.2.2",
+    "@jield/solodb-typescript-core": "^1.2.3",
     "@testing-library/dom": "^10.4.1",
     "moment": "^2.30.1",
     "moment-timezone": "^0.6.2",
@@ -51,8 +52,8 @@
   },
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",
-    "@tanstack/react-query": "~5.101.0",
-    "@tanstack/react-query-devtools": "~5.101.0",
+    "@tanstack/react-query": "^5.101.0",
+    "@tanstack/react-query-devtools": "^5.101.0",
     "@tanstack/react-table": "^8.21.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

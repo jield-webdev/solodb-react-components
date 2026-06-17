@@ -232,7 +232,7 @@ const MessageModalForm: React.FC<MessageModalFormProps> = ({ showModal, onClose,
                 <Select
                   options={messageTypes}
                   classNamePrefix="react-select"
-                  placeholder="Select a message type"
+                  placeholder="— Select a message type"
                   value={messageTypes.find((opt) => opt.value.id === field.value?.id) || null}
                   onChange={(selected) => field.onChange((selected as MessageTypeOption)?.value)}
                   styles={selectStyles}

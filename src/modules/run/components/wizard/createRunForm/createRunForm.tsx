@@ -4,11 +4,12 @@ import {
   listOrganisationTeams,
   ProjectPurpose,
   type Run,
+  RunTypeEnum,
   TeamPurpose,
 } from "@jield/solodb-typescript-core";
 import { useQuery } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
-import { Alert, Button, Form } from "react-bootstrap";
+import { Alert, Button, Col, Form, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { type SelectedSubstrate } from "../substrateSelect";
 import FormSection from "./formSection";
@@ -23,8 +24,7 @@ export type CreateRunFormValues = {
   projectId: number;
   parts: number;
   location: string;
-  conclusion: string;
-  runType: "research" | "production";
+  runType: RunTypeEnum;
 };
 
 type CreateRunFormProps = {
@@ -52,10 +52,9 @@ export default function CreateRunForm({
   const [groupId, setGroupId] = useState<number | null>(null);
   const [teamId, setTeamId] = useState<number | null>(null);
   const [projectId, setProjectId] = useState<number | null>(null);
-  const [runType, setRunType] = useState<"research" | "production">("research");
+  const [runType, setRunType] = useState<RunTypeEnum>(RunTypeEnum.RESEARCH);
   const [parts, setParts] = useState(1);
   const [location, setLocation] = useState("");
-  const [conclusion, setConclusion] = useState("");
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
   const groupsQuery = useQuery({
@@ -112,71 +111,68 @@ export default function CreateRunForm({
       projectId,
       parts: Number.isFinite(parts) ? Math.max(1, parts) : 1,
       location,
-      conclusion,
       runType,
     });
   };
 
   return (
-    <Form noValidate onSubmit={handleSubmit}>
-      <FormSection title="Details" isFirst>
-        <Form.Group controlId="create-run-name">
-          <Form.Label>
+    <Form noValidate onSubmit={handleSubmit} className={"form-horizontal"}>
+      <FormSection title="Details">
+        <Form.Group as={Row} className="mb-3" controlId="create-run-name">
+          <Form.Label column sm={3}>
             Run name <span className="text-danger">*</span>
           </Form.Label>
-          <Form.Control
-            type="text"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="Give a run name"
-            required
-            disabled={isSubmitting}
-            isInvalid={showNameError}
-          />
-          {showNameError && <Form.Control.Feedback type="invalid">Run name is required.</Form.Control.Feedback>}
-          <Form.Text muted>Give a short and descriptive name for the run</Form.Text>
+          <Col sm={9}>
+            <Form.Control
+              type="text"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Give a run name"
+              required
+              disabled={isSubmitting}
+              isInvalid={showNameError}
+            />
+            {showNameError && <Form.Control.Feedback type="invalid">Run name is required.</Form.Control.Feedback>}
+            <Form.Text muted>Give a short and descriptive name for the run</Form.Text>
+          </Col>
         </Form.Group>
 
-        <Form.Group controlId="create-run-location">
-          <Form.Label>Sample location</Form.Label>
-          <Form.Control
-            type="text"
-            value={location}
-            onChange={(event) => setLocation(event.target.value)}
-            placeholder="Location of the samples"
-            disabled={isSubmitting}
-          />
-          <Form.Text muted>Give here the location where the run samples are stored</Form.Text>
+        <Form.Group as={Row} className="mb-3" controlId="create-run-location">
+          <Form.Label column sm={3}>
+            Sample location
+          </Form.Label>
+          <Col sm={9}>
+            <Form.Control
+              type="text"
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              placeholder="Location of the samples"
+              disabled={isSubmitting}
+            />
+            <Form.Text muted>Give here the location where the run samples are stored</Form.Text>
+          </Col>
         </Form.Group>
 
-        <Form.Group controlId="create-run-motivation">
-          <Form.Label>
+        <Form.Group as={Row} className="mb-3" controlId="create-run-motivation">
+          <Form.Label column sm={3}>
             Motivation <span className="text-danger">*</span>
           </Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            value={motivation}
-            onChange={(event) => setMotivation(event.target.value)}
-            placeholder="Why is this run being created?"
-            required
-            disabled={isSubmitting}
-            isInvalid={showMotivationError}
-          />
-          {showMotivationError && <Form.Control.Feedback type="invalid">Motivation is required.</Form.Control.Feedback>}
-          <Form.Text muted>Explain here the motivation for this run</Form.Text>
-        </Form.Group>
-
-        <Form.Group controlId="create-run-conclusion">
-          <Form.Label>Conclusion</Form.Label>
-          <Form.Control
-            type="text"
-            value={conclusion}
-            onChange={(event) => setConclusion(event.target.value)}
-            placeholder="Optional"
-            disabled={isSubmitting}
-          />
-          <Form.Text muted>Explain the conclusion of this run</Form.Text>
+          <Col sm={9}>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={motivation}
+              onChange={(event) => setMotivation(event.target.value)}
+              placeholder="Why is this run being created?"
+              required
+              disabled={isSubmitting}
+              isInvalid={showMotivationError}
+            />
+            {showMotivationError && (
+              <Form.Control.Feedback type="invalid">Motivation is required.</Form.Control.Feedback>
+            )}
+            <Form.Text muted>Explain here the motivation for this run</Form.Text>
+          </Col>
         </Form.Group>
       </FormSection>
 
@@ -223,44 +219,54 @@ export default function CreateRunForm({
       </FormSection>
 
       <FormSection title="Parts">
-        <Form.Group controlId="create-run-parts">
-          <Form.Label>Experimental split</Form.Label>
-          <Form.Control
-            type="number"
-            min={1}
-            step={1}
-            value={parts}
-            onChange={(event) => setParts(Number(event.target.value))}
-            disabled={isSubmitting}
-          />
-          <Form.Text muted>
-            Select here the amount of parts (experimental split) this run has, give only the main amount of parts,
-            individual parts can be split later
-          </Form.Text>
+        <Form.Group as={Row} className="mb-3" controlId="create-run-parts">
+          <Form.Label column sm={3}>
+            Experimental split
+          </Form.Label>
+          <Col sm={9}>
+            <Form.Control
+              type="number"
+              min={1}
+              step={1}
+              value={parts}
+              onChange={(event) => setParts(Number(event.target.value))}
+              disabled={isSubmitting}
+            />
+            <Form.Text muted>
+              Select here the amount of parts (experimental split) this run has, give only the main amount of parts,
+              individual parts can be split later
+            </Form.Text>
+          </Col>
         </Form.Group>
       </FormSection>
 
       <FormSection title="Type">
-        <Form.Group controlId="create-run-type">
-          <Form.Label>Run type</Form.Label>
-          <Form.Select
-            value={runType}
-            onChange={(event) => setRunType(event.target.value as "research" | "production")}
-            disabled={isSubmitting}
-          >
-            <option value="research">Research</option>
-            <option value="production">Production</option>
-          </Form.Select>
+        <Form.Group as={Row} className="mb-3" controlId="create-run-type">
+          <Form.Label column sm={3}>
+            Run type
+          </Form.Label>
+          <Col sm={9}>
+            <Form.Select
+              value={runType}
+              onChange={(event) => setRunType(event.target.value as unknown as RunTypeEnum)}
+              disabled={isSubmitting}
+            >
+              <option value={RunTypeEnum.RESEARCH}>Research</option>
+              <option value={RunTypeEnum.PRODUCTION}>Production</option>
+            </Form.Select>
+          </Col>
         </Form.Group>
       </FormSection>
 
-      <FormSection title="Overview">
-        <SelectionOverview
-          selectedRuns={selectedRuns}
-          selectedSubstrates={selectedSubstrates}
-          partIdsByRunId={partIdsByRunId}
-        />
-      </FormSection>
+      <Row className={"my-3"}>
+        <Col sm={9} className={"offset-sm-3"}>
+          <SelectionOverview
+            selectedRuns={selectedRuns}
+            selectedSubstrates={selectedSubstrates}
+            partIdsByRunId={partIdsByRunId}
+          />
+        </Col>
+      </Row>
 
       {errorMessage && (
         <Alert variant="danger" className="mb-4">

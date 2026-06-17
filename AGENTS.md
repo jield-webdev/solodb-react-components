@@ -15,6 +15,7 @@
 - Run tests: `yarn test`
 - Run tests in watch mode: `yarn test:watch`
 - Generate coverage report: `yarn coverage`
+- Run guided release flow: `yarn release`
 
 ## Architecture Map
 

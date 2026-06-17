@@ -34,9 +34,8 @@ export default function NewRunWizard() {
         group_id: runValues.groupId,
         team_id: runValues.teamId,
         project_id: runValues.projectId,
-        experimental_split: runValues.parts,
+        parts: runValues.parts,
         location: runValues.location || null,
-        conclusion: runValues.conclusion || null,
         run_type: runValues.runType,
       });
 

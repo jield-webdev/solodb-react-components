@@ -1,4 +1,4 @@
-import { Run } from '@jield/solodb-typescript-core';
+import { Run, RunTypeEnum } from '@jield/solodb-typescript-core';
 import { SelectedSubstrate } from '../substrateSelect';
 export type CreateRunFormValues = {
     name: string;
@@ -8,8 +8,7 @@ export type CreateRunFormValues = {
     projectId: number;
     parts: number;
     location: string;
-    conclusion: string;
-    runType: "research" | "production";
+    runType: RunTypeEnum;
 };
 type CreateRunFormProps = {
     isSubmitting: boolean;

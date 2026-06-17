@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-export default function FormSection({ title, isFirst, children, }: {
+export default function FormSection({ title, children }: {
     title: string;
     isFirst?: boolean;
     children: ReactNode;

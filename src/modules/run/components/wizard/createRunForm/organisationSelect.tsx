@@ -1,4 +1,4 @@
-import { Form } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
 
 type OrganisationOption = { id: number; label: string };
 
@@ -40,30 +40,32 @@ export default function OrganisationSelect({
   const entities = `${entity}s`;
 
   return (
-    <Form.Group controlId={controlId}>
-      <Form.Label>
+    <Form.Group as={Row} className="mb-3" controlId={controlId}>
+      <Form.Label column sm={3}>
         {label} <span className="text-danger">*</span>
       </Form.Label>
-      <Form.Select
-        value={value ?? ""}
-        onChange={(event) => onChange(parseSelectedId(event.target.value))}
-        required
-        disabled={disabled}
-        isInvalid={showError}
-      >
-        <option value="">{isLoading ? `Loading ${entities}...` : `Select a ${entity}`}</option>
-        {options.map((option) => (
-          <option key={option.id} value={option.id}>
-            {option.label}
-          </option>
-        ))}
-      </Form.Select>
-      {showError && (
-        <Form.Control.Feedback type="invalid">
-          {isLoading ? `${label}s are still loading.` : `Select a ${entity}.`}
-        </Form.Control.Feedback>
-      )}
-      <Form.Text muted>{helpText}</Form.Text>
+      <Col sm={9}>
+        <Form.Select
+          value={value ?? ""}
+          onChange={(event) => onChange(parseSelectedId(event.target.value))}
+          required
+          disabled={disabled}
+          isInvalid={showError}
+        >
+          <option value="">{isLoading ? `Loading ${entities}...` : `— Select a ${entity}`}</option>
+          {options.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.label}
+            </option>
+          ))}
+        </Form.Select>
+        {showError && (
+          <Form.Control.Feedback type="invalid">
+            {isLoading ? `${label}s are still loading.` : `— Select a ${entity}.`}
+          </Form.Control.Feedback>
+        )}
+        <Form.Text muted>{helpText}</Form.Text>
+      </Col>
     </Form.Group>
   );
 }
