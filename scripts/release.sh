@@ -89,10 +89,18 @@ require_command yarn
 [ -d .git ] || die "This script must be run from a git checkout."
 
 BRANCH="$(git symbolic-ref --quiet --short HEAD)" || die "Release must be created from a branch, not a detached HEAD."
+SOURCE_BRANCH="develop"
+RELEASE_BRANCH="main"
 REMOTE="${RELEASE_REMOTE:-origin}"
 
-printf "Release branch: %s\n" "$BRANCH"
+printf "Current branch: %s\n" "$BRANCH"
+printf "Source branch: %s\n" "$SOURCE_BRANCH"
+printf "Release branch: %s\n" "$RELEASE_BRANCH"
 printf "Release remote: %s\n" "$REMOTE"
+
+if [ "$BRANCH" != "$SOURCE_BRANCH" ]; then
+  die "Release must start from the '$SOURCE_BRANCH' branch. Current branch is '$BRANCH'."
+fi
 
 if ! git remote get-url "$REMOTE" >/dev/null 2>&1; then
   die "Git remote '$REMOTE' does not exist. Set RELEASE_REMOTE to use a different remote."
@@ -154,12 +162,28 @@ fi
 
 show_changes
 
-confirm "Commit, tag $TAG, and push to $REMOTE/$BRANCH?" "n" || die "Release cancelled before commit."
+confirm "Commit on $SOURCE_BRANCH, merge into $RELEASE_BRANCH, push $RELEASE_BRANCH, then tag $TAG on $RELEASE_BRANCH?" "n" || die "Release cancelled before commit."
 
 git add -A
 git commit -m "Release $TAG"
+
+printf "\nPushing %s before merging into %s...\n" "$SOURCE_BRANCH" "$RELEASE_BRANCH"
+git push "$REMOTE" "$SOURCE_BRANCH"
+
+printf "\nSwitching to %s and updating it from %s...\n" "$RELEASE_BRANCH" "$REMOTE"
+git switch "$RELEASE_BRANCH"
+git pull --ff-only "$REMOTE" "$RELEASE_BRANCH"
+
+printf "\nMerging %s into %s...\n" "$SOURCE_BRANCH" "$RELEASE_BRANCH"
+git merge --no-ff "$SOURCE_BRANCH" -m "Merge $SOURCE_BRANCH for $TAG"
+
+printf "\nPushing %s before creating the release tag...\n" "$RELEASE_BRANCH"
+git push "$REMOTE" "$RELEASE_BRANCH"
+
 git tag -a "$TAG" -m "Release $TAG"
-git push "$REMOTE" "$BRANCH"
 git push "$REMOTE" "$TAG"
+
+printf "\nSwitching back to %s...\n" "$SOURCE_BRANCH"
+git switch "$SOURCE_BRANCH"
 
 printf "\nRelease %s pushed to %s.\n" "$TAG" "$REMOTE"
