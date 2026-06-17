@@ -110,7 +110,7 @@ const Rework = () => {
           <div className={"row mb-3"}>
             <Form.Label className={"col-sm-3 col-form-label text-end"}>Template</Form.Label>
             <div className={"col-sm-9"}>
-              {reworkRecipes.length === 0 && <Alert variant={"info"}>Please select a rework step</Alert>}
+              {reworkRecipes.length === 0 && <Alert variant={"info"}>— Select a rework step</Alert>}
 
               {reworkRecipes.length > 0 && (
                 <Form.Control

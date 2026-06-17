@@ -15,14 +15,12 @@ void (async () => {
 
   ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
-      <Providers
-        child={
-          <BrowserRouter>
-            <PageRoutes />
-            {import.meta.env.DEV && <ReactQueryDevtools />}
-          </BrowserRouter>
-        }
-      />
+      <Providers>
+        <BrowserRouter>
+          <PageRoutes />
+          {import.meta.env.DEV && <ReactQueryDevtools />}
+        </BrowserRouter>
+      </Providers>
     </React.StrictMode>
   );
 })();

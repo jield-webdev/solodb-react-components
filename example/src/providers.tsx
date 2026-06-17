@@ -1,15 +1,15 @@
 import { AuthProvider, NotificationProvider, ScannerProvider } from "@jield/solodb-react-components";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 const queryClient = new QueryClient();
 
-export const Providers = ({ child }: { child: ReactNode }) => {
+export const Providers = ({ children }: { children: ReactNode }) => {
   return (
     <AuthProvider>
       <ScannerProvider>
         <NotificationProvider>
-          <QueryClientProvider client={queryClient}>{child}</QueryClientProvider>
+          <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
         </NotificationProvider>
       </ScannerProvider>
     </AuthProvider>

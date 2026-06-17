@@ -93,3 +93,13 @@ yarn build
 yarn run example:install
 yarn dev
 ```
+
+## Release
+
+Run the guided release script from the repository root:
+
+```bash
+yarn release
+```
+
+The script starts from `develop`, upgrades dependencies, shows the resulting changes, prompts for the next package version, optionally runs tests and a build, commits the release on `develop`, merges it into `main`, pushes `main`, creates an annotated `vX.Y.Z` tag on `main`, pushes the tag to GitHub, and switches back to `develop`.

@@ -9,27 +9,16 @@ type SelectionOverviewProps = {
   partIdsByRunId: Record<number, number[]>;
 };
 
-function OverviewBlock({
-  title,
-  isEmpty,
-  emptyText,
-  children,
-}: {
-  title: string;
-  isEmpty: boolean;
-  emptyText: string;
-  children: ReactNode;
-}) {
+function OverviewBlock({ title, isEmpty, children }: { title: string; isEmpty: boolean; children: ReactNode }) {
+  if (isEmpty) {
+    return "";
+  }
   return (
     <div>
-      <div className="text-secondary small text-uppercase fw-semibold mb-2">
+      <div className="text-secondary mb-2">
         {title} <span className="text-body-tertiary">(selected previously)</span>
       </div>
-      {isEmpty ? (
-        <p className="text-secondary fst-italic mb-0">{emptyText}</p>
-      ) : (
-        <div className="d-flex flex-column gap-2">{children}</div>
-      )}
+      <div className="d-flex flex-column gap-2">{children}</div>
     </div>
   );
 }
@@ -42,11 +31,7 @@ export default function SelectionOverview({
 }: SelectionOverviewProps) {
   return (
     <>
-      <OverviewBlock
-        title="Parent runs & parts"
-        isEmpty={selectedRuns.length === 0}
-        emptyText="No parent runs selected."
-      >
+      <OverviewBlock title="Parent runs & parts" isEmpty={selectedRuns.length === 0}>
         {selectedRuns.map((run) => {
           const selectedPartCount = partIdsByRunId[run.id]?.length ?? 0;
           return (
@@ -69,7 +54,7 @@ export default function SelectionOverview({
         })}
       </OverviewBlock>
 
-      <OverviewBlock title="Substrates" isEmpty={selectedSubstrates.length === 0} emptyText="No substrates selected.">
+      <OverviewBlock title="Substrates" isEmpty={selectedSubstrates.length === 0}>
         {selectedSubstrates.map(({ substrate, amount }) => (
           <div
             key={substrate.id}

@@ -110,7 +110,7 @@ const HoldCodeModal = ({
                     <AsyncSelect
                       isSearchable={false}
                       defaultOptions
-                      placeholder={"Select a hold code"}
+                      placeholder={"— Select a hold code"}
                       loadOptions={loadOptions}
                       value={field.value}
                       onChange={(e) => {
@@ -125,7 +125,9 @@ const HoldCodeModal = ({
           )}
 
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label htmlFor={"holdCodeDescription"} className={"col-sm-3 col-form-label text-end"}>Message</label>
+            <label htmlFor={"holdCodeDescription"} className={"col-sm-3 col-form-label text-end"}>
+              Message
+            </label>
             <div className={"col-sm-9"}>
               <Form.Control
                 as="textarea"
