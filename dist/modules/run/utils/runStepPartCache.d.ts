@@ -7,7 +7,10 @@ type UpdateRunStepPartCacheOptions = {
 type UpdateRunStepPartCacheByRunStepOptions = UpdateRunStepPartCacheOptions | {
     latestActions: RunStepPartState[] | ApiFormattedResponse<RunStepPartState>;
 };
+type UpsertRunStepPartCacheOptions = {
+    updateSubsequent?: boolean;
+};
 export declare const updateRunStepPartCache: (queryClient: QueryClient, options: UpdateRunStepPartCacheOptions) => void;
 export declare const updateRunStepPartCacheByRunStep: (queryClient: QueryClient, runStep: RunStep, options: UpdateRunStepPartCacheByRunStepOptions) => void;
-export declare const upsertRunStepPartCache: (queryClient: QueryClient, runStep: RunStep, runStepPart: RunStepPart) => void;
+export declare const upsertRunStepPartCache: (queryClient: QueryClient, runStep: RunStep, runStepPart: RunStepPart, options?: UpsertRunStepPartCacheOptions) => void;
 export {};
