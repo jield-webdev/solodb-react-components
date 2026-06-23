@@ -71,6 +71,11 @@ export const TrayGrid = ({
   }
 
   const trayCapacity = trayType.rows * trayType.columns;
+  const forbiddenSlotIndices = new Set<number>(
+    (trayType.forbidden_slots ?? [])
+      .map((slot) => getSlotIndex(trayType, slot.y, slot.x))
+      .filter((index): index is number => index !== null)
+  );
   const trayOrientation = trayType.orientation === "ttb" ? "ttb" : "ltr";
   const trayStyle: CSSProperties = {
     "--tray-columns": trayType.columns,
@@ -124,7 +129,10 @@ export const TrayGrid = ({
     <TrayBulkActions label={label} trayStepParts={trayStepParts} runStep={step}>
       <div className="tray-grid" data-orientation={trayOrientation} style={trayStyle}>
         {slots.map((runParts, slotIndex) =>
-          isSplitLevel ? (
+          forbiddenSlotIndices.has(slotIndex) ? (
+            // forbidden position: keep the grid cell empty (nothing rendered)
+            <div key={`slot-${tray.id}-${slotIndex}`} aria-hidden="true" />
+          ) : isSplitLevel ? (
             <MultiPartCell key={`slot-${tray.id}-${slotIndex}`} runParts={runParts} context={context} />
           ) : (
             <SlotCell key={`slot-${tray.id}-${slotIndex}`} runPart={runParts[0] ?? null} context={context} />
