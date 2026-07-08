@@ -1,4 +1,4 @@
-import { JSX } from 'react';
+import { default as React } from 'react';
 import { EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment } from '@jield/solodb-typescript-core';
 interface IssueTableProps {
     issues: EquipmentModuleIssue[];
@@ -6,5 +6,5 @@ interface IssueTableProps {
     issueAttachments: EquipmentModuleIssueAttachment[];
     reloadQueryFn: (key: string[]) => void;
 }
-export default function IssueTable({ issues, modules, issueAttachments, reloadQueryFn }: IssueTableProps): JSX.Element;
+export default function IssueTable({ issues, modules, issueAttachments, reloadQueryFn }: IssueTableProps): React.JSX.Element;
 export {};
