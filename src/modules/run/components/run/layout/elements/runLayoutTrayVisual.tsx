@@ -7,6 +7,16 @@ import { notification } from "@jield/solodb-react-components/utils/notification"
 
 type RunTray = NonNullable<Run["run_trays"]>[number];
 
+const handlePartDragStart = (event: DragEvent<HTMLSpanElement>, stepPart: RunStepPart) => {
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", String(stepPart.id));
+};
+
+const handleSlotDragOver = (event: DragEvent<HTMLDivElement>) => {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+};
+
 export default function RunLayoutTrayVisual({
   step,
   tray,
@@ -24,16 +34,6 @@ export default function RunLayoutTrayVisual({
   const partsById = useMemo(() => new Map(parts.map((part) => [part.id, part])), [parts]);
   const stepPartsById = useMemo(() => new Map(stepParts.map((stepPart) => [stepPart.id, stepPart])), [stepParts]);
 
-  const handlePartDragStart = (event: DragEvent<HTMLSpanElement>, stepPart: RunStepPart) => {
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", String(stepPart.id));
-  };
-
-  const handleSlotDragOver = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  };
-
   const handleSlotDrop = async (event: DragEvent<HTMLDivElement>, tray: RunTray, row: number, column: number) => {
     event.preventDefault();
     const stepPartId = Number(event.dataTransfer.getData("text/plain"));
@@ -41,6 +41,11 @@ export default function RunLayoutTrayVisual({
 
     if (!stepPart) {
       console.error("Unable to update run step part tray: stepPart not found");
+      return;
+    }
+
+    if (trayType && (trayType.forbidden_slots ?? []).some((slot) => slot.x === column && slot.y === row)) {
+      // forbidden slots cannot hold a part
       return;
     }
 
@@ -108,6 +113,11 @@ export default function RunLayoutTrayVisual({
     "--tray-rows": trayType.rows,
     "--tray-columns": trayType.columns,
   } as CSSProperties;
+  const forbiddenSlotIndices = new Set<number>(
+    (trayType.forbidden_slots ?? [])
+      .map((slot) => getSlotIndex(trayType, slot.y, slot.x))
+      .filter((index): index is number => index !== null)
+  );
   const slots: (RunStepPart | null)[] = Array.from({ length: trayCapacity }, () => null);
 
   stepParts.forEach((stepPart) => {
@@ -120,7 +130,10 @@ export default function RunLayoutTrayVisual({
       stepPart.tray_column ?? part.tray_column
     );
 
-    if (slotIndex === null) return;
+    if (slotIndex === null) {
+      console.log(stepPart);
+      return;
+    }
 
     if (stepPart.has_failed_in_previouse_state) return;
 
@@ -145,6 +158,11 @@ export default function RunLayoutTrayVisual({
             const part = stepPart ? partsById.get(stepPart.part_id) : null;
             const partBadgeColor = getPartBadgeColor(stepPart);
             const partBadgeTooltip = getPartBadgeTooltip(stepPart);
+
+            if (forbiddenSlotIndices.has(slotIndex)) {
+              // forbidden position: keep the grid cell empty (no slot box, not droppable)
+              return <div key={`${tray.id}-${pocketNumber}`} className="tray-visual__pocket" aria-hidden="true" />;
+            }
 
             return (
               <div key={`${tray.id}-${pocketNumber}`} className="tray-visual__pocket">
@@ -231,11 +249,11 @@ const getTrayUpdateErrorMessage = (error: unknown): string => {
 
 const getStepPartSlotPriority = (stepPart: RunStepPart): number => {
   if (stepPart.tray_id != null && !stepPart.failed) {
-      return 1;
+    return 1;
   }
 
   if (stepPart.tray_id != null) {
-      return 2;
+    return 2;
   }
 
   return 3;

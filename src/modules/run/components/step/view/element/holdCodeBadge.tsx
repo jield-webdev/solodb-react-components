@@ -9,7 +9,7 @@ const HoldCodeBadge = () => {
   const [modalShow, setModalShow] = useState<boolean>(false);
   const [runHoldCode, setRunHoldCode] = useState<HoldCodeInterface | undefined>(run.hold_code);
 
-  const OpenHoldCode = () => {
+  const openHoldCode = () => {
     setModalShow(true); //Show the modal
     return;
   };
@@ -28,11 +28,11 @@ const HoldCodeBadge = () => {
             fontSize: "1.5rem",
             cursor: "pointer",
           }}
-          onClick={() => OpenHoldCode()}
+          onClick={() => openHoldCode()}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
-              OpenHoldCode();
+              openHoldCode();
             }
           }}
         >
@@ -44,7 +44,7 @@ const HoldCodeBadge = () => {
         <Badge
           bg={"secondary"}
           className={"handle"}
-          onClick={() => OpenHoldCode()}
+          onClick={() => openHoldCode()}
           style={{
             fontSize: "1.5rem",
             cursor: "pointer",

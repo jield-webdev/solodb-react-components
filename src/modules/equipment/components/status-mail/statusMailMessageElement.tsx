@@ -1,6 +1,6 @@
 import MessageElement from "@jield/solodb-react-components/modules/equipment/components/partial/messageElement";
 import MessageModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/messageModalForm";
-import { JSX, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Button } from "react-bootstrap";
 import { LocationMessage } from "@jield/solodb-typescript-core";
 
@@ -11,7 +11,7 @@ export default function StatusMailMessageElement({
   messageList: LocationMessage[];
   refetchFn: () => void;
 }) {
-  const [modalElement, setModalElement] = useState<JSX.Element | null>(null);
+  const [modalElement, setModalElement] = useState<ReactNode>(null);
   const [showModal, setShowModal] = useState(false);
 
   const handleShowModal = () => {

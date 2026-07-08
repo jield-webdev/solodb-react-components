@@ -1,2 +1,2 @@
-import { JSX } from 'react';
-export default function EquipmentDashboard(): JSX.Element;
+import { default as React } from 'react';
+export default function EquipmentDashboard(): React.JSX.Element;

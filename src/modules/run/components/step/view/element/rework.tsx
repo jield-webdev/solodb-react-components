@@ -48,10 +48,14 @@ const Rework = () => {
   //This has to be wrapped in a useEffect hook
   useEffect(() => {
     if (runStepQuery.isSuccess && reworkSteps.length > 0) {
-      let recipes = runStepQuery
-        .data!.items.filter((step: RunStep) => reworkSteps.includes(step.id))
-        .map((step: RunStep) => step.recipe_version!.recipe);
-      setReworkRecipes([...recipes]);
+      const reworkStepIds = new Set(reworkSteps);
+      const recipes = [];
+      for (const step of runStepQuery.data!.items) {
+        if (reworkStepIds.has(step.id)) {
+          recipes.push(step.recipe_version!.recipe);
+        }
+      }
+      setReworkRecipes(recipes);
     }
   }, [runStepQuery.isSuccess, reworkSteps]);
 

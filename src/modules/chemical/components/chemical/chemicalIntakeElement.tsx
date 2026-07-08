@@ -39,11 +39,26 @@ export default function ChemicalIntakeElement() {
 
   const selectedRoom = watch("room");
 
+  const clearScanResults = useCallback(() => {
+    setScannedBarcode(null);
+    setFoundContainer(null);
+    setFoundExternalLabels([]);
+    setEnableExternalLabelRegistration(false);
+  }, []);
+
   useEffect(() => {
-    if (!selectedRoom) return;
+    clearScanResults();
+
+    if (!selectedRoom) {
+      setRoom(null);
+      setLocation(null);
+      setHasExternalLabelling(false);
+      return;
+    }
+
     setRoom(selectedRoom);
     setHasExternalLabelling(selectedRoom.building.site.has_external_chemical_labelling);
-  }, [selectedRoom]);
+  }, [selectedRoom, clearScanResults]);
 
   useEffect(() => {
     const roomId = new URLSearchParams(window.location.search).get("room");
@@ -70,12 +85,9 @@ export default function ChemicalIntakeElement() {
 
   const resetForm = useCallback(() => {
     reset({ room });
-    setScannedBarcode(null);
     setLocation(null);
-    setFoundContainer(null);
-    setFoundExternalLabels([]);
-    setEnableExternalLabelRegistration(false);
-  }, [reset, room]);
+    clearScanResults();
+  }, [reset, room, clearScanResults]);
 
   // Scanner: handle QR scans to select chemical container
   const scanCallbackId = useId();
@@ -88,39 +100,46 @@ export default function ChemicalIntakeElement() {
     };
   }, []);
 
-  const onScanKeys = useCallback(async (keys: string) => {
-    if (keys.includes("/l/")) return;
+  const onScanKeys = useCallback(
+    async (keys: string) => {
+      if (!room || keys.includes("/l/")) return;
 
-    setScannedBarcode(keys);
+      setScannedBarcode(keys);
 
-    if (keys.includes("/cc/")) {
-      const containerId = keys.split("/cc/")[1];
-      const container = await getChemicalContainer({ id: parseInt(containerId) });
-      setFoundContainer(container);
-    }
-
-    try {
-      const response = await listChemicalContainerExternalLabels({ qrCodeContent: keys });
-
-      if (response?.items?.length > 0) {
-        setFoundExternalLabels(response.items);
-        setEnableExternalLabelRegistration(false);
-      } else {
-        setEnableExternalLabelRegistration(true);
-        setFoundExternalLabels([]);
+      if (keys.includes("/cc/")) {
+        const containerId = keys.split("/cc/")[1];
+        const container = await getChemicalContainer({ id: parseInt(containerId) });
+        setFoundContainer(container);
       }
-    } catch (error) {
-      console.error("Error fetching chemical container external labels", error);
-      setFoundExternalLabels([]);
-      setEnableExternalLabelRegistration(false);
-    }
-  }, []);
+
+      try {
+        const response = await listChemicalContainerExternalLabels({ qrCodeContent: keys });
+
+        if (response?.items?.length > 0) {
+          setFoundExternalLabels(response.items);
+          setEnableExternalLabelRegistration(false);
+        } else {
+          setEnableExternalLabelRegistration(true);
+          setFoundExternalLabels([]);
+        }
+      } catch (error) {
+        console.error("Error fetching chemical container external labels", error);
+        setFoundExternalLabels([]);
+        setEnableExternalLabelRegistration(false);
+      }
+    },
+    [room]
+  );
 
   useEffect(() => {
     removeCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId);
+    if (!room) {
+      return () => removeCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId);
+    }
+
     addCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId, onScanKeys);
     return () => removeCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId);
-  }, [onScanKeys]);
+  }, [onScanKeys, room]);
 
   // Scanner: handle reset-form QR
   const resetFormCallbackId = useId();
@@ -138,7 +157,11 @@ export default function ChemicalIntakeElement() {
           <div style={{ width: "fit-content" }}>
             <RoomSelectElement control={control} name="room" />
           </div>
-          <p className={"pt-3"}>Reading from scanner: {readingKeys}</p>
+          <p className={"pt-3 h3"}>
+            {room
+              ? `Reading from scanner: ${scannedBarcode ?? "No chemical barcode scanned"}`
+              : "Chemical scanner disabled"}
+          </p>
         </div>
 
         <div className="d-flex flex-column">
@@ -146,6 +169,14 @@ export default function ChemicalIntakeElement() {
           <span className="text-muted">Reset form</span>
         </div>
       </div>
+
+      {!room && (
+        <Alert variant="warning" className="mt-3">
+          <Alert.Heading>No room selected</Alert.Heading>
+          Select a room before scanning chemical barcodes. Chemical intake scanning is disabled until a room is
+          selected.
+        </Alert>
+      )}
 
       {room && (
         <>
@@ -173,7 +204,7 @@ export default function ChemicalIntakeElement() {
         </Alert>
       )}
 
-      {!foundContainer && scannedBarcode && (
+      {!foundContainer && scannedBarcode && foundExternalLabels.length > 0 && (
         <Table>
           <thead>
             <tr>

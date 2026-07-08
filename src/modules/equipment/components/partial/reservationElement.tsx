@@ -1,6 +1,6 @@
 import { Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
-import moment from "moment";
 import { EquipmentModuleReservation } from "@jield/solodb-typescript-core";
+import { formatDate } from "@jield/solodb-react-components/utils/datetime";
 
 export default function ReservationElement({
   reservations,
@@ -22,11 +22,11 @@ export default function ReservationElement({
           <p>
             {reservations[0].active
               ? "Currently active"
-              : `Upcoming in: ${moment(reservations[0].start).format("DD MMMM YYYY")}`}
+              : `Upcoming in: ${formatDate(reservations[0].start, "DD MMMM YYYY")}`}
           </p>
           <p>
             {reservations[1]
-              ? `Next upcoming reservation in: ${moment(reservations[1].start).format("DD MMMM YYYY")}`
+              ? `Next upcoming reservation in: ${formatDate(reservations[1].start, "DD MMMM YYYY")}`
               : "No next upcoming reservations"}
           </p>
         </Tooltip>

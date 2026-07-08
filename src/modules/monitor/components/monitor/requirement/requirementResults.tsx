@@ -15,11 +15,9 @@ import { listMonitorRequirementResultMonitorStepParameterValues, listMonitorRequ
 export default function RequirementResults({ requirement }: { requirement: MonitorRequirement }) {
   const AMOUNT_OF_FILES = 11;
 
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [uploadStatus, setUploadStatus] = useState("");
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(15);
-  const [reportedStepParametersWithValues, setReportedStepParametersWithValues] = useState<MonitorStepParameter[]>([]);
 
   const [requirementFilesQuery, targetQuery, resultsQuery, monitorStepParameterValuesQuery] = useQueries({
     queries: [
@@ -64,29 +62,18 @@ export default function RequirementResults({ requirement }: { requirement: Monit
     ],
   });
 
-  //Fill the status with the images and files
-  useEffect(() => {
-    setUploadedFiles([]);
-    !requirementFilesQuery.isLoading &&
-      requirementFilesQuery.data!.items.forEach((file: File) => {
-        // if (file.has_monitor_step_loggings) {
-        setUploadedFiles((uploadedFiles) => [...uploadedFiles, file]);
-        // }
-      });
-  }, [requirementFilesQuery.isLoading]);
-
   //We need to grab all moduleStepParameters with values to create the columns
-  useEffect(() => {
-    if (!monitorStepParameterValuesQuery.data) return;
+  const reportedStepParametersWithValues = useMemo<MonitorStepParameter[]>(() => {
+    if (!monitorStepParameterValuesQuery.data) return [];
 
-    const uniqueValues = Array.from(
+    return Array.from(
       new Map(
         monitorStepParameterValuesQuery.data.items.map((value) => [value.step_parameter.id, value.step_parameter])
       ).values()
     );
+  }, [monitorStepParameterValuesQuery.data]);
 
-    setReportedStepParametersWithValues(uniqueValues);
-  }, [monitorStepParameterValuesQuery.isLoading, monitorStepParameterValuesQuery.data]);
+  const uploadedFiles = requirementFilesQuery.data?.items ?? [];
 
   const onDrop = useCallback(
     (acceptedFiles: any) => {
@@ -220,42 +207,51 @@ export default function RequirementResults({ requirement }: { requirement: Monit
                     </td>
 
                     {targetQuery.data?.items.map((target) => {
+                      const valueElements: React.ReactNode[] = [];
+                      for (const value of result.values) {
+                        if (value.logging_parameter.id !== target.logging_parameter.id) {
+                          continue;
+                        }
+
+                        valueElements.push(
+                          <span
+                            key={`${value.logging_parameter.id}-${value.float_value}`}
+                            className={value.value_is_valid ? "text-success" : "text-danger"}
+                          >
+                            {value.float_value}
+                          </span>
+                        );
+                      }
+
                       return (
                         <td key={target.id}>
-                          {result.values
-                            .filter((value) => value.logging_parameter.id === target.logging_parameter.id)
-                            .map((value) => {
-                              return (
-                                <span
-                                  key={`${value.logging_parameter.id}-${value.float_value}`}
-                                  className={value.value_is_valid ? "text-success" : "text-danger"}
-                                >
-                                  {value.float_value}
-                                </span>
-                              );
-                            })}
+                          {valueElements}
                         </td>
                       );
                     })}
 
                     {reportedStepParametersWithValues.map((stepParameter) => {
+                      const valueElements: React.ReactNode[] = [];
+                      for (const monitorStepParameterValue of monitorStepParameterValuesQuery.data?.items ?? []) {
+                        if (
+                          monitorStepParameterValue.step_parameter.id !== stepParameter.id ||
+                          monitorStepParameterValue.result.id !== result.id
+                        ) {
+                          continue;
+                        }
+
+                        valueElements.push(
+                          <EditStepParameterValueModal
+                            monitorResultStepParameterValue={monitorStepParameterValue}
+                            key={monitorStepParameterValue.id}
+                            refetchMonitorStepParameterValues={monitorStepParameterValuesQuery.refetch}
+                          />
+                        );
+                      }
+
                       return (
                         <td className={"table-secondary"} key={stepParameter.id}>
-                          {monitorStepParameterValuesQuery.data?.items
-                            .filter(
-                              (monitorStepParameterValue) =>
-                                monitorStepParameterValue.step_parameter.id === stepParameter.id &&
-                                monitorStepParameterValue.result.id === result.id
-                            )
-                            .map((monitorResultStepParameterValue) => {
-                              return (
-                                <EditStepParameterValueModal
-                                  monitorResultStepParameterValue={monitorResultStepParameterValue}
-                                  key={monitorResultStepParameterValue.id}
-                                  refetchMonitorStepParameterValues={monitorStepParameterValuesQuery.refetch}
-                                />
-                              );
-                            })}
+                          {valueElements}
                         </td>
                       );
                     })}

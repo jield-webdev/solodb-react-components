@@ -6,7 +6,7 @@ import { RunStepContext } from "@jield/solodb-react-components/modules/run/conte
 import { useQueries } from "@tanstack/react-query";
 import { MeasurementResultsBadges } from "@jield/solodb-react-components/modules/run/components/shared/requirement/measurementResultsBadge";
 import RequirementDetails from "@jield/solodb-react-components/modules/run/components/step/view/element/step-overview/requirementDetails";
-import { listMeasurementResults, Requirement, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
+import { listMeasurementResults, MeasurementResult, Requirement, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 
 export default function RequirementElement({
   requirement,
@@ -42,11 +42,18 @@ export default function RequirementElement({
       return "";
     }
 
+    const valuesByStepPartId = new Map<number, MeasurementResult["values"][number]>();
+    for (const result of measurementResultsQuery.data.items as MeasurementResult[]) {
+      for (const value of result.values) {
+        if (value.step_part_id !== undefined && value.step_part_id !== null) {
+          valuesByStepPartId.set(value.step_part_id, value);
+        }
+      }
+    }
+
     let failed = false;
     for (const stepPart of runStepParts) {
-      const value = measurementResultsQuery.data?.items
-        .find((r) => r.values.some((v) => v.step_part_id === stepPart.id))
-        ?.values.find((v) => v.step_part_id === stepPart.id);
+      const value = valuesByStepPartId.get(stepPart.id);
 
       if (!(value && !isNaN(parseFloat(value.string_value)))) {
         return runStep.id === contextRunStep.id ? "bg-success-subtle" : "";

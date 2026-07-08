@@ -71,6 +71,11 @@ export default function RequirementStepInList({
     [measurementResultsQuery.data?.items]
   );
 
+  const targetsByLoggingParameterId = useMemo(
+    () => new Map(requirement.targets.map((target) => [target.logging_parameter.id, target])),
+    [requirement.targets]
+  );
+
 
   const getRowStatus = (measurementResults: MeasurementResult[]): string => {
     if (measurementResults.length == 0) {
@@ -88,7 +93,7 @@ export default function RequirementStepInList({
         }
 
         const val = parseFloat(value.string_value);
-        const target = requirement.targets.find((target) => target.logging_parameter.id == value.logging_parameter.id);
+        const target = targetsByLoggingParameterId.get(value.logging_parameter.id);
 
         if (!target) {
             return false;

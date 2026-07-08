@@ -25,26 +25,48 @@ const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: nu
 
   const runId = run?.id ?? null;
 
-  const runPartsQuery = useQuery({
+  const {
+    data: runPartsData,
+    error: runPartsError,
+    isError: isRunPartsError,
+    isLoading: isRunPartsLoading,
+  } = useQuery({
     queryKey: ["runParts", `${runId}`],
     queryFn: () => listRunParts({ run }),
     enabled: !!runId,
   });
 
-  const runStepPartsQuery = useQuery({
+  const {
+    data: runStepPartsData,
+    error: runStepPartsError,
+    isError: isRunStepPartsError,
+    isLoading: isRunStepPartsLoading,
+  } = useQuery({
     queryKey: ["runStepParts", `${runId}`],
     queryFn: () => listRunStepParts({ run }),
     enabled: !!runId,
   });
 
-  const runStepsQuery = useQuery({
+  const {
+    data: runStepsData,
+    error: runStepsError,
+    isError: isRunStepsError,
+    isFetching: isRunStepsFetching,
+    isLoading: isRunStepsLoading,
+    isPlaceholderData: isRunStepsPlaceholderData,
+  } = useQuery({
     queryKey: ["runSteps", runId, page, pageSize],
     queryFn: () => listRunSteps({ run, page, pageSize }),
     enabled: !!runId,
     placeholderData: keepPreviousData,
   });
 
-  const requirementsQuery = useQuery({
+  const {
+    data: requirementsData,
+    error: requirementsError,
+    isError: isRequirementsError,
+    isLoading: isRequirementsLoading,
+  } = useQuery({
     queryKey: ["requirements", runId],
     queryFn: () => listRequirements({ run }),
     enabled: !!runId,
@@ -52,15 +74,15 @@ const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: nu
   });
 
   const isLoading =
-    runPartsQuery.isLoading || runStepPartsQuery.isLoading || runStepsQuery.isLoading || requirementsQuery.isLoading;
+    isRunPartsLoading || isRunStepPartsLoading || isRunStepsLoading || isRequirementsLoading;
   const isError =
-    runPartsQuery.isError || runStepPartsQuery.isError || runStepsQuery.isError || requirementsQuery.isError;
-  const error = runPartsQuery.error || runStepPartsQuery.error || runStepsQuery.error || requirementsQuery.error;
+    isRunPartsError || isRunStepPartsError || isRunStepsError || isRequirementsError;
+  const error = runPartsError || runStepPartsError || runStepsError || requirementsError;
 
-  const runParts = runPartsQuery.data?.items ?? [];
-  const runStepParts = runStepPartsQuery.data?.items ?? [];
-  const steps = runStepsQuery.data?.items ?? [];
-  const requirements = requirementsQuery.data?.items ?? [];
+  const runParts = runPartsData?.items ?? [];
+  const runStepParts = runStepPartsData?.items ?? [];
+  const steps = runStepsData?.items ?? [];
+  const requirements = requirementsData?.items ?? [];
 
   const seenGroups = new Set<string>();
   const firstInGroupSteps = steps.filter((step) => {
@@ -86,10 +108,10 @@ const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: nu
     if (isError) {
       console.error("RunStepSimpleList query error", {
         runId,
-        errors: [runPartsQuery.error, runStepPartsQuery.error, runStepsQuery.error, requirementsQuery.error],
+        errors: [runPartsError, runStepPartsError, runStepsError, requirementsError],
       });
     }
-  }, [isError, runId, runPartsQuery.error, runStepPartsQuery.error, runStepsQuery.error, requirementsQuery.error]);
+  }, [isError, runId, runPartsError, runStepPartsError, runStepsError, requirementsError]);
 
   return (
     <div>
@@ -131,11 +153,11 @@ const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: nu
         </div>
       )}
       <PaginationLinks
-        data={runStepsQuery.data as any}
+        data={runStepsData as any}
         setPage={setPage}
-        isPlaceholderData={runStepsQuery.isPlaceholderData}
+        isPlaceholderData={isRunStepsPlaceholderData}
       />
-      {runStepsQuery.isFetching ? <span> Loading...</span> : null}
+      {isRunStepsFetching ? <span> Loading...</span> : null}
     </div>
   );
 };

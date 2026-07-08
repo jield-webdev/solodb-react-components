@@ -1,9 +1,9 @@
-import React, { JSX, useState } from "react";
+import React, { useState } from "react";
 import { Badge, Button } from "react-bootstrap";
 import IssueModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/issueModalForm";
-import moment from "moment/moment";
 import ReactMarkdown from "react-markdown";
 import { Equipment, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleIssueType } from "@jield/solodb-typescript-core";
+import { formatDate } from "@jield/solodb-react-components/utils/datetime";
 
 export default function IssueElement({
   issue,
@@ -18,7 +18,7 @@ export default function IssueElement({
   reloadQueryFn: (key: string[]) => void;
   expanded?: boolean;
 }) {
-  const [modalElement, setModalElement] = useState<JSX.Element | null>(null);
+  const [modalElement, setModalElement] = useState<React.ReactNode>(null);
   const [showModal, setShowModal] = useState(false);
 
   const [isExpanded, setIsExpanded] = useState(expanded);
@@ -92,19 +92,19 @@ export default function IssueElement({
 
             <div>
               <small className="text-muted">Date Created</small>
-              <div className="text-body">{moment(issue.date_created).format("DD MMMM YYYY")}</div>
+              <div className="text-body">{formatDate(issue.date_created, "DD MMMM YYYY")}</div>
             </div>
 
             {issue.date_closed && (
               <div>
                 <small className="text-muted">Date Closed</small>
-                <div className="text-body">{moment(issue.date_closed).format("DD MMMM YYYY")}</div>
+                <div className="text-body">{formatDate(issue.date_closed, "DD MMMM YYYY")}</div>
               </div>
             )}
 
             <div>
               <small className="text-muted">Forecast Up</small>
-              <div className="text-body">{moment(issue.forecast_up).format("DD MMMM YYYY")}</div>
+              <div className="text-body">{formatDate(issue.forecast_up, "DD MMMM YYYY")}</div>
             </div>
 
             <div>
@@ -131,7 +131,7 @@ export default function IssueElement({
             {issue.last_update && (
               <div>
                 <small className="text-muted">Last Update</small>
-                <div className="text-body">{moment(issue.last_update).format("DD MMMM YYYY")}</div>
+                <div className="text-body">{formatDate(issue.last_update, "DD MMMM YYYY")}</div>
               </div>
             )}
           </div>

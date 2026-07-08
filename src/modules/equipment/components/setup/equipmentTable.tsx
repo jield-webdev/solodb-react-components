@@ -12,6 +12,16 @@ import {
 import EditSortingPropertiesModal from "./editSortingPropertiesModal";
 import { Equipment, EquipmentGrade, FilterData } from "@jield/solodb-typescript-core";
 
+type EquipmentPropertyColumn = {
+  property: string;
+  label: string;
+  type: "int" | "float" | "string";
+};
+
+const isReserved = (equipment: Equipment): boolean => {
+  return equipment.main_tool_latest_status?.status.status === "RESERVED";
+};
+
 export default function EquipmentTable({
   equipmentList,
   currentFilter,
@@ -32,10 +42,6 @@ export default function EquipmentTable({
 }) {
   const { environment } = useParams();
 
-  const isReserved = (equipment: Equipment): boolean => {
-    return equipment.main_tool_latest_status?.status.status === "RESERVED";
-  };
-
   const [blacklistedEquipmentProperties, setBlacklistedEquipmentProperties] = useState<string[]>([]);
   const [showEditSortingPropertiesModal, setShowEditSortingPropertiesModal] = useState<boolean>(false);
 
@@ -46,21 +52,27 @@ export default function EquipmentTable({
   }, [currentFilter]);
 
   const properties = useMemo(() => {
-    return Array.from(
-      new Map(
-        equipmentList
-          .flatMap((eq) =>
-            (eq.properties ?? []).map((prop) => ({
-              property: prop.property,
-              label: prop.label,
-              type: prop.int_value != null ? "int" : prop.float_value != null ? "float" : "string",
-            }))
-          )
-          .map((p) => [p.property, p])
-      )
-        .values()
-        .filter((prop) => !blacklistedEquipmentProperties.includes(prop.property))
-    );
+    const propertyMap = new Map<string, EquipmentPropertyColumn>();
+    const blacklistedProperties = new Set(blacklistedEquipmentProperties);
+
+    for (const equipment of equipmentList) {
+      for (const prop of equipment.properties ?? []) {
+        propertyMap.set(prop.property, {
+          property: prop.property,
+          label: prop.label,
+          type: prop.int_value != null ? "int" : prop.float_value != null ? "float" : "string",
+        });
+      }
+    }
+
+    const visibleProperties: EquipmentPropertyColumn[] = [];
+    for (const prop of propertyMap.values()) {
+      if (!blacklistedProperties.has(prop.property)) {
+        visibleProperties.push(prop);
+      }
+    }
+
+    return visibleProperties;
   }, [equipmentList, blacklistedEquipmentProperties]);
 
   /*
@@ -328,16 +340,18 @@ export default function EquipmentTable({
         blacklistedEquipmentProperties={blacklistedEquipmentProperties}
         setBlacklistedEquipmentProperties={setBlacklistedEquipmentProperties}
         properties={Array.from(
-          new Map(
-            equipmentList
-              .flatMap((eq) =>
-                (eq.properties ?? []).map((prop) => ({
+          (() => {
+            const propertyMap = new Map<string, { value: string; label: string }>();
+            for (const equipment of equipmentList) {
+              for (const prop of equipment.properties ?? []) {
+                propertyMap.set(prop.property, {
                   value: prop.property,
                   label: prop.label,
-                }))
-              )
-              .map((p) => [p.value, p])
-          ).values()
+                });
+              }
+            }
+            return propertyMap.values();
+          })()
         )}
       />
     </>

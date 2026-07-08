@@ -11,6 +11,8 @@ type SaveStatus = {
   savedAt?: number;
 };
 
+const stringValue = (value: CriterionValue) => (typeof value === "string" ? value : "");
+
 export default function Criterion({
   result,
   status,
@@ -69,7 +71,6 @@ export default function Criterion({
     }
     return "";
   })();
-  const stringValue = (value: CriterionValue) => (typeof value === "string" ? value : "");
   const criterionValues = criterionVersion.criterion.values ?? {};
 
   return (

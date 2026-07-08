@@ -69,10 +69,18 @@ export function usePartActions({
       });
     }
 
-    return (parts as RunPart[])
-      .filter((part) => selectedParts.get(part.id))
-      .map((part) => (getRunStepPart ? getRunStepPart(part) : undefined))
-      .filter((stepPart): stepPart is RunStepPart => stepPart !== undefined);
+    const selectedStepParts: RunStepPart[] = [];
+    for (const part of parts as RunPart[]) {
+      if (!selectedParts.get(part.id)) {
+        continue;
+      }
+
+      const stepPart = getRunStepPart ? getRunStepPart(part) : undefined;
+      if (stepPart) {
+        selectedStepParts.push(stepPart);
+      }
+    }
+    return selectedStepParts;
   }, [parts, selectedParts, getRunPart, getRunStepPart]);
 
   const performActionToSelectedParts = useCallback(

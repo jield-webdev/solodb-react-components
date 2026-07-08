@@ -4,6 +4,13 @@ import { useParams } from "react-router-dom";
 import { Alert, Table } from "react-bootstrap";
 import { listServices, Service } from "@jield/solodb-typescript-core";
 
+const formatDuration = (minutes: number): string => {
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}min` : ""}`.trim();
+};
+
 export default function ListEquipmentReport() {
   const { id } = useParams<{ id: string }>();
   const [serviceList, setServiceList] = useState<Service[]>([]);
@@ -35,14 +42,6 @@ export default function ListEquipmentReport() {
   if (isError) {
     return <div>Error loading services.</div>;
   }
-
-  // Helper function to format duration
-  const formatDuration = (minutes: number): string => {
-    if (minutes < 60) return `${minutes} min`;
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}min` : ""}`.trim();
-  };
 
   if (servicesQuery.data!.items.length === 0) {
     return (

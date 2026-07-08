@@ -58,26 +58,23 @@ export default function RequirementChart({
   }
 
   results.forEach((result) => {
-    result.values
-      .filter((value) => {
-        return value.logging_parameter.id === target.logging_parameter.id;
-      })
-      .filter((value) => {
-        return value.float_value !== 0;
-      })
-      .forEach((value) => {
-        let date = new Date(result.date_created);
-        data.push([date, value.float_value]);
-        if (target.target) {
-          data[data.length - 1].push(target.target);
-        }
-        if (target.min_value) {
-          data[data.length - 1].push(target.min_value);
-        }
-        if (target.max_value) {
-          data[data.length - 1].push(target.max_value);
-        }
-      });
+    for (const value of result.values) {
+      if (value.logging_parameter.id !== target.logging_parameter.id || value.float_value === 0) {
+        continue;
+      }
+
+      let date = new Date(result.date_created);
+      data.push([date, value.float_value]);
+      if (target.target) {
+        data[data.length - 1].push(target.target);
+      }
+      if (target.min_value) {
+        data[data.length - 1].push(target.min_value);
+      }
+      if (target.max_value) {
+        data[data.length - 1].push(target.max_value);
+      }
+    }
   });
 
   //If there are no values, add a fake value to show the chart

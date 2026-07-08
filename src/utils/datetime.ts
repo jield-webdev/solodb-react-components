@@ -33,28 +33,43 @@ export function parseToDate(input: DateInput): Date | null {
  */
 export function formatDate(input: DateInput, format: string): string {
   const date = parseToDate(input);
-  if (!date) return '';
+  if (!date) return "";
 
-  const pad = (num: number) => num.toString().padStart(2, '0');
+  const pad = (num: number) => num.toString().padStart(2, "0");
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const shortMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   const tokens: Record<string, string> = {
-    'YYYY': date.getFullYear().toString(),
-    'YY': date.getFullYear().toString().slice(-2),
-    'MM': pad(date.getMonth() + 1),
-    'DD': pad(date.getDate()),
-    'HH': pad(date.getHours()),
-    'mm': pad(date.getMinutes()),
-    'H': date.getHours().toString(),
-    'm': date.getMinutes().toString(),
+    "YYYY": date.getFullYear().toString(),
+    "YY": date.getFullYear().toString().slice(-2),
+    "MMMM": monthNames[date.getMonth()],
+    "MMM": shortMonthNames[date.getMonth()],
+    "MM": pad(date.getMonth() + 1),
+    "DD": pad(date.getDate()),
+    "HH": pad(date.getHours()),
+    "mm": pad(date.getMinutes()),
+    "H": date.getHours().toString(),
+    "m": date.getMinutes().toString(),
   };
 
-  let result = format;
-  // Sort by length descending to replace longer tokens first
-  Object.keys(tokens).sort((a, b) => b.length - a.length).forEach(token => {
-    result = result.replace(new RegExp(token, 'g'), tokens[token]);
-  });
+  const tokenPattern = Object.keys(tokens)
+    .sort((a, b) => b.length - a.length)
+    .join("|");
 
-  return result;
+  return format.replace(new RegExp(tokenPattern, "g"), (token) => tokens[token]);
 }
 
 /**

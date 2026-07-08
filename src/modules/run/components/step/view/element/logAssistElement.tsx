@@ -2,6 +2,20 @@ import React, { useState } from "react";
 import { Button, Form, Modal, Toast, ToastContainer } from "react-bootstrap";
 import axios from "axios";
 
+function NotificationToast({ show, onClose }: { show: boolean; onClose: () => void }) {
+  return (
+    <ToastContainer position="top-end" className="p-3">
+      <Toast onClose={onClose} show={show} delay={3000} autohide bg={"light"}>
+        <Toast.Header>
+          <strong className="me-auto">Assist logged</strong>
+          <small>Just now</small>
+        </Toast.Header>
+        <Toast.Body>Assist was logged successfully</Toast.Body>
+      </Toast>
+    </ToastContainer>
+  );
+}
+
 const LogAssistElement = ({ moduleId, size  }: { moduleId: number; size: "lg" | "sm" | undefined }) => {
   //We need a local variable to save the form content to prevent that the information is already shown
   //on the alert even before we submit
@@ -26,20 +40,6 @@ const LogAssistElement = ({ moduleId, size  }: { moduleId: number; size: "lg" | 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setModalIssueContent(e.target.value);
   };
-
-  function NotificationToast() {
-    return (
-      <ToastContainer position="top-end" className="p-3">
-        <Toast onClose={() => setToastShow(false)} show={toastShow} delay={3000} autohide bg={"light"}>
-          <Toast.Header>
-            <strong className="me-auto">Assist logged</strong>
-            <small>Just now</small>
-          </Toast.Header>
-          <Toast.Body>Assist was logged successfully</Toast.Body>
-        </Toast>
-      </ToastContainer>
-    );
-  }
 
   return (
     <>
@@ -73,7 +73,7 @@ const LogAssistElement = ({ moduleId, size  }: { moduleId: number; size: "lg" | 
           </Button>
         </Modal.Footer>
       </Modal>
-      <NotificationToast />
+      <NotificationToast show={toastShow} onClose={() => setToastShow(false)} />
     </>
   );
 };

@@ -1,9 +1,9 @@
-import React, { JSX, useState } from "react";
+import React, { useState } from "react";
 import EcnModalForm from "@jield/solodb-react-components/modules/equipment/components/partial/ecnModalForm";
 import { Badge, Button } from "react-bootstrap";
-import moment from "moment";
 import ReactMarkdown from "react-markdown";
 import { Equipment, EquipmentModuleEcn, EquipmentModuleEcnAttachment } from "@jield/solodb-typescript-core";
+import { formatDate } from "@jield/solodb-react-components/utils/datetime";
 
 export default function EcnElement({
   ecn,
@@ -18,7 +18,7 @@ export default function EcnElement({
   reloadQueryFn: (key: string[]) => void;
   expanded?: boolean;
 }) {
-  const [modalElement, setModalElement] = useState<JSX.Element | null>(null);
+  const [modalElement, setModalElement] = useState<React.ReactNode>(null);
   const [showModal, setShowModal] = useState(false);
   const [currentEcn, setCurrentEcn] = useState(ecn);
 
@@ -94,13 +94,13 @@ export default function EcnElement({
 
             <div className="flex-fill pe-3 mb-2">
               <small className="text-muted">Date Created</small>
-              <div className="text-body">{moment(currentEcn.date_created).format("DD MMMM YYYY")}</div>
+              <div className="text-body">{formatDate(currentEcn.date_created, "DD MMMM YYYY")}</div>
             </div>
 
             {currentEcn.date_closed && (
               <div className="flex-fill pe-3 mb-2">
                 <small className="text-muted">Date Closed</small>
-                <div className="text-danger">{moment(currentEcn.date_closed).format("DD MMMM YYYY")}</div>
+                <div className="text-danger">{formatDate(currentEcn.date_closed, "DD MMMM YYYY")}</div>
               </div>
             )}
 
@@ -119,7 +119,7 @@ export default function EcnElement({
             {currentEcn.last_update && (
               <div className="flex-fill pe-3 mb-2">
                 <small className="text-muted">Last Update</small>
-                <div className="text-body">{moment(currentEcn.last_update).format("DD MMMM YYYY")}</div>
+                <div className="text-body">{formatDate(currentEcn.last_update, "DD MMMM YYYY")}</div>
               </div>
             )}
           </div>

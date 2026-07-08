@@ -10,7 +10,7 @@ import {
 
 export default function ReportResults() {
   const { id } = useParams<{ id: string }>();
-  const location = useLocation();
+  const routerLocation = useLocation();
   const navigate = useNavigate();
   const [groupedReports, setGroupedReports] = useState<Record<string, ServiceEventReportResult[]>>();
   const [categoryLabels, setCategoryLabels] = useState<Record<string, string>>({});
@@ -72,7 +72,7 @@ export default function ReportResults() {
   // When categories are available, initialize from URL (category param) or default to first
   useEffect(() => {
     if (!totalCategories) return;
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(routerLocation.search);
     const categoryFromUrl = params.get("category");
     if (categoryFromUrl) {
       const idx = categories.indexOf(categoryFromUrl);
@@ -83,20 +83,20 @@ export default function ReportResults() {
     }
     // fallback to first category
     setCurrentCategoryIndex(0);
-  }, [totalCategories, location.search, categories]);
+  }, [totalCategories, routerLocation.search, categories]);
 
   // Keep URL in sync when currentCategoryIndex changes
   useEffect(() => {
     if (!totalCategories) return;
     const currentCategory = categories[currentCategoryIndex];
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(routerLocation.search);
     if (currentCategory) {
       if (params.get("category") !== currentCategory) {
         params.set("category", currentCategory);
-        navigate({ pathname: location.pathname, search: params.toString() }, { replace: false });
+        navigate({ pathname: routerLocation.pathname, search: params.toString() }, { replace: false });
       }
     }
-  }, [currentCategoryIndex, totalCategories, categories, location.pathname, location.search, navigate]);
+  }, [currentCategoryIndex, totalCategories, categories, routerLocation.pathname, routerLocation.search, navigate]);
 
   if (!groupedReports) return <div>Loading…</div>;
   if (totalCategories === 0) return <div>No categories found</div>;

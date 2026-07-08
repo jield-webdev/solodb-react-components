@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Alert, Button, Form, Modal, Spinner } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Requirement, MeasurementResult, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 
 export const FillValueModal = ({
@@ -24,6 +24,10 @@ export const FillValueModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const resultValuesByLoggingParameterId = useMemo(
+    () => new Map(result?.values.map((value) => [value.logging_parameter.id, value]) ?? []),
+    [result?.values]
+  );
 
   // initialize the values dictionary
   useEffect(() => {
@@ -35,13 +39,13 @@ export const FillValueModal = ({
     for (const target of requirement.targets) {
       let value = "";
       if (result !== undefined) {
-        value = result.values.find((v) => v.logging_parameter.id == target.logging_parameter.id)?.string_value ?? "";
+        value = resultValuesByLoggingParameterId.get(target.logging_parameter.id)?.string_value ?? "";
       }
       newValuesDictionary[target.logging_parameter.id] = value;
     }
 
     setValuesDictionary(newValuesDictionary);
-  }, [requirement]);
+  }, [requirement, resultValuesByLoggingParameterId]);
 
   useEffect(() => {
     setSuccess(false);
@@ -73,16 +77,16 @@ export const FillValueModal = ({
       setSuccess(false);
       setLoading(true);
 
-      const patchPromises = Object.entries(valuesDictionary).map(async ([key, value]) => {
-        const loggingParameter = Number.parseInt(key);
-        const patchBody = { value };
+      await Promise.all(
+        Object.entries(valuesDictionary).map(([key, value]) => {
+          const loggingParameter = Number.parseInt(key);
+          const patchBody = { value };
 
-        const valueId = result?.values.find((v) => v.logging_parameter.id === loggingParameter)?.id;
+          const valueId = resultValuesByLoggingParameterId.get(loggingParameter)?.id;
 
-        await axios.patch(`/update/run/measurement/result/value/${valueId ?? 0}`, patchBody);
-      });
-
-      await Promise.all(patchPromises);
+          return axios.patch(`/update/run/measurement/result/value/${valueId ?? 0}`, patchBody);
+        })
+      );
 
       setSuccess(true);
       refetchFn(["requirement", "measurementResults", JSON.stringify(requirement.measurement.id)]);

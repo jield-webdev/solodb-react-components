@@ -65,11 +65,11 @@ export default function RequirementValuesByStep({
   // log any query errors to the console
   const hasError = queries.some((q) => q.isError);
   if (hasError) {
-    queries
-      .filter((q) => q.isError)
-      .forEach((q, idx) => {
+    queries.forEach((q, idx) => {
+      if (q.isError) {
         console.error("StepDashboard query error", { index: idx, error: q.error });
-      });
+      }
+    });
     return <>Error fetching data</>;
   }
 

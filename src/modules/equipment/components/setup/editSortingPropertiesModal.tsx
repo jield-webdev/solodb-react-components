@@ -7,6 +7,48 @@ type Property = {
   label: string;
 };
 
+const isDarkMode = () => document.documentElement.getAttribute("data-bs-theme") === "dark";
+
+const selectStyles: StylesConfig<Property, true> = {
+  control: (provided) => ({
+    ...provided,
+    backgroundColor: isDarkMode() ? "#212529" : provided.backgroundColor,
+    borderColor: isDarkMode() ? "#495057" : provided.borderColor,
+    color: isDarkMode() ? "#fff" : provided.color,
+  }),
+  menu: (provided) => ({
+    ...provided,
+    backgroundColor: isDarkMode() ? "#212529" : provided.backgroundColor,
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    backgroundColor: isDarkMode()
+      ? state.isSelected
+        ? "#0d6efd"
+        : state.isFocused
+          ? "#343a40"
+          : "#212529"
+      : provided.backgroundColor,
+    color: isDarkMode() ? "#fff" : provided.color,
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: isDarkMode() ? "#fff" : provided.color,
+  }),
+  multiValue: (provided) => ({
+    ...provided,
+    backgroundColor: isDarkMode() ? "#343a40" : provided.backgroundColor,
+  }),
+  multiValueLabel: (provided) => ({
+    ...provided,
+    color: isDarkMode() ? "#fff" : provided.color,
+  }),
+  input: (provided) => ({
+    ...provided,
+    color: isDarkMode() ? "#fff" : provided.color,
+  }),
+};
+
 export default function EditSortingPropertiesModal({
   show,
   onClose,
@@ -18,66 +60,29 @@ export default function EditSortingPropertiesModal({
   onClose: () => void;
   properties: Property[];
   blacklistedEquipmentProperties: string[];
-  setBlacklistedEquipmentProperties: React.Dispatch<React.SetStateAction<string[]>>; 
+  setBlacklistedEquipmentProperties: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
   const [selected, setSelected] = useState<MultiValue<Property>>([]);
 
   useEffect(() => {
-    setSelected(properties.filter((prop) => !blacklistedEquipmentProperties.includes(prop.value))); 
-  }, [properties]);
+    setSelected(properties.filter((prop) => !blacklistedEquipmentProperties.includes(prop.value)));
+  }, [properties, blacklistedEquipmentProperties]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const newBlacklistedEquipmentProperties = properties.filter(((prop) => !selected.includes(prop))).map((item) => item.value); 
-    setBlacklistedEquipmentProperties(newBlacklistedEquipmentProperties);  
+    const selectedValues = new Set(selected.map((prop) => prop.value));
+    const newBlacklistedEquipmentProperties: string[] = [];
+    for (const prop of properties) {
+      if (!selectedValues.has(prop.value)) {
+        newBlacklistedEquipmentProperties.push(prop.value);
+      }
+    }
+    setBlacklistedEquipmentProperties(newBlacklistedEquipmentProperties);
     onClose();
   };
 
   const handleChange = (value: MultiValue<Property>) => {
     setSelected(value);
-  };
-
-  const isDarkMode = () =>
-    document.documentElement.getAttribute("data-bs-theme") === "dark";
-
-  const selectStyles: StylesConfig<Property, true> = {
-    control: (provided) => ({
-      ...provided,
-      backgroundColor: isDarkMode() ? "#212529" : provided.backgroundColor,
-      borderColor: isDarkMode() ? "#495057" : provided.borderColor,
-      color: isDarkMode() ? "#fff" : provided.color,
-    }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: isDarkMode() ? "#212529" : provided.backgroundColor,
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: isDarkMode()
-        ? state.isSelected
-          ? "#0d6efd"
-          : state.isFocused
-          ? "#343a40"
-          : "#212529"
-        : provided.backgroundColor,
-      color: isDarkMode() ? "#fff" : provided.color,
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: isDarkMode() ? "#fff" : provided.color,
-    }),
-    multiValue: (provided) => ({
-      ...provided,
-      backgroundColor: isDarkMode() ? "#343a40" : provided.backgroundColor,
-    }),
-    multiValueLabel: (provided) => ({
-      ...provided,
-      color: isDarkMode() ? "#fff" : provided.color,
-    }),
-    input: (provided) => ({
-      ...provided,
-      color: isDarkMode() ? "#fff" : provided.color,
-    }),
   };
 
   return (
@@ -96,7 +101,7 @@ export default function EditSortingPropertiesModal({
               placeholder="Select one or more properties"
               options={properties}
               value={selected}
-              onChange={handleChange} 
+              onChange={handleChange}
               styles={selectStyles}
             />
           </Form.Group>
@@ -114,4 +119,3 @@ export default function EditSortingPropertiesModal({
     </Modal>
   );
 }
-

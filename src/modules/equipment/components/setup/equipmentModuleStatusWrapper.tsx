@@ -3,11 +3,11 @@ import ModuleStatusElement from "../partial/moduleStatusElement";
 import { Equipment, listModules } from "@jield/solodb-typescript-core";
 
 export const EquipmentModuleStatusWrapper = ({ equipment }: { equipment: Equipment }) => {
-  const moduleQuery = useQuery({
+  const { data: moduleData, isFetching, isLoading } = useQuery({
     queryKey: ["module", equipment.id],
     queryFn: () => listModules({ equipment: equipment }),
   });
-  if (moduleQuery.isLoading || moduleQuery.isFetching) {
+  if (isLoading || isFetching) {
     return (
       <div className={"d-flex justify-content-center flex-row align-items-center"}>
         <div className={"d-flex flex-column align-items-center"}>
@@ -19,15 +19,14 @@ export const EquipmentModuleStatusWrapper = ({ equipment }: { equipment: Equipme
     );
   }
 
-  if (moduleQuery.data == undefined || moduleQuery.data.items.length <= 0) {
+  if (moduleData == undefined || moduleData.items.length <= 0) {
     return <></>;
   }
 
   return (
     <ModuleStatusElement
       module={
-        moduleQuery.data.items.find((module) => module.id === equipment.main_tool_module_id) ??
-        moduleQuery.data.items[0]
+        moduleData.items.find((module) => module.id === equipment.main_tool_module_id) ?? moduleData.items[0]
       }
     />
   );

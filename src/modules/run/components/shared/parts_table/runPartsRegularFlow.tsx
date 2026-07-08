@@ -64,9 +64,12 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
   useQrPartNotifications({ runStepParts: runStepParts, runParts: runParts });
 
   useEffect(() => {
-    const selectedIds = Array.from(selectedParts.entries())
-      .filter(([, isSelected]) => isSelected)
-      .map(([id]) => id);
+    const selectedIds: number[] = [];
+    for (const [id, isSelected] of selectedParts.entries()) {
+      if (isSelected) {
+        selectedIds.push(id);
+      }
+    }
     queryClient.setQueryData(["runPartSelection", runStep.id], selectedIds);
   }, [queryClient, runStep.id, selectedParts]);
 
@@ -82,9 +85,10 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
 
   const traySelections = useMemo(() => {
     const trayPartsMap = new Map<number, { id: number; label: string; partIds: number[] }>();
+    const runPartsById = new Map(runParts.map((part) => [part.id, part]));
 
     runStepParts.forEach((stepPart) => {
-      const runPart = runParts.find((p) => p.id === stepPart.part_id);
+      const runPart = runPartsById.get(stepPart.part_id);
       const tray = runPart?.tray;
       if (!tray) return;
       const entry = trayPartsMap.get(tray.id) ?? {
@@ -103,22 +107,36 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
     const trays = [...(run.run_trays ?? [])].sort((a, b) => a.sequence - b.sequence);
     const orderedTrays =
       trays.length > 0
-        ? trays
-            .filter((tray) => trayPartsMap.has(tray.id))
-            .map((tray) => {
-              const entry = trayPartsMap.get(tray.id)!;
-              return {
-                ...entry,
-                label: tray.name ?? tray.label ?? entry.label,
-              };
-            })
+        ? (() => {
+            const nextTrays: { id: number; label: string; partIds: number[] }[] = [];
+            for (const tray of trays) {
+              const entry = trayPartsMap.get(tray.id);
+              if (entry) {
+                nextTrays.push({
+                  ...entry,
+                  label: tray.name ?? tray.label ?? entry.label,
+                });
+              }
+            }
+            return nextTrays;
+          })()
         : Array.from(trayPartsMap.values()).sort((a, b) => a.label.localeCompare(b.label));
 
     return orderedTrays.map((tray) => ({
       ...tray,
       allSelected: tray.partIds.every((partId) => selectedParts.get(partId)),
     }));
-  }, [run.run_trays, selectedParts, runStepParts]);
+  }, [run.run_trays, selectedParts, runParts, runStepParts]);
+
+  const actionsDropdown = useMemo(
+    () =>
+      USE_DROPDOWN ? (
+        <PartActionsDropdown availableActions={availableActions} onActionSelected={performActionToSelectedParts} />
+      ) : (
+        <PartActionsButtons availableActions={availableActions} onActionSelected={performActionToSelectedParts} />
+      ),
+    [availableActions, performActionToSelectedParts]
+  );
 
   if (isLoading) {
     return <LoadingComponent message={"Loading run parts"} />;
@@ -147,16 +165,7 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
           hasSelectedParts={hasSelectedParts}
           traySelections={traySelections}
           onToggleTray={(partIds, nextSelected) => setPartsSelection(partIds, nextSelected)}
-          actionsDropdown={
-            USE_DROPDOWN ? (
-              <PartActionsDropdown
-                availableActions={availableActions}
-                onActionSelected={performActionToSelectedParts}
-              />
-            ) : (
-              <PartActionsButtons availableActions={availableActions} onActionSelected={performActionToSelectedParts} />
-            )
-          }
+          actionsDropdown={actionsDropdown}
         />
       )}
     </>
