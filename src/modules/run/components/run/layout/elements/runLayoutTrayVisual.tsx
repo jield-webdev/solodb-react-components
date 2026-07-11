@@ -59,20 +59,29 @@ export default function RunLayoutTrayVisual({
       return;
     }
 
-    const existingStepPartInSlot = stepParts.find(
-      (candidate) =>
-        candidate.id !== stepPart.id &&
-        candidate.step_id === step.id &&
-        candidate.tray_id === tray.id &&
-        candidate.tray_row === row &&
-        candidate.tray_column === column &&
-        !(candidate.has_failed_in_previouse_state || candidate.failed)
-    );
+    const existingStepPartInSlot = stepParts.find((candidate) => {
+      if (
+        candidate.id === stepPart.id ||
+        candidate.step_id !== step.id ||
+        candidate.has_failed_in_previouse_state ||
+        candidate.failed
+      ) {
+        return false;
+      }
+
+      const candidatePart = partsById.get(candidate.part_id);
+
+      return (
+        (candidate.tray_id ?? candidatePart?.tray?.id) === tray.id &&
+        (candidate.tray_row ?? candidatePart?.tray_row) === row &&
+        (candidate.tray_column ?? candidatePart?.tray_column) === column
+      );
+    });
 
     if (existingStepPartInSlot) {
       notification({
         notificationHeader: "Tray part change",
-        notificationBody: "Two PartTrays can not be in the same tray position",
+        notificationBody: "This position is occupied by a part that has not failed in this or a previous step.",
         notificationType: "danger",
       });
       return;
