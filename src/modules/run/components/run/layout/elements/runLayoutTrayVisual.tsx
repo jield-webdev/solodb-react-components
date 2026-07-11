@@ -54,6 +54,12 @@ export default function RunLayoutTrayVisual({
       return;
     }
 
+    const part = partsById.get(stepPart.part_id);
+    if (part?.tray?.id === tray.id && part.tray_column === column && part.tray_row === row) {
+      // prevent changing back to the part's original spot
+      return;
+    }
+
     const existingStepPartInSlot = stepParts.find(
       (candidate) =>
         candidate.id !== stepPart.id &&
