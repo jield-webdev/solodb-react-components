@@ -118,7 +118,7 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
                   <small className="text-muted">{i + 1}</small>
                 </td>
                 <td>
-                  <a href={`${GetServerUri()}${file.url}`}>{file.name}</a>
+                  <a href={`${file.url}`}>{file.name}</a>
                   {file.has_run_step_loggings && <Badge className="ms-1 bg-primary">Logging</Badge>}
                 </td>
                 <td>
