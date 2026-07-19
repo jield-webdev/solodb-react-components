@@ -1,12 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { keepPreviousData, useQueries } from "@tanstack/react-query";
 import { Placeholder, Table } from "react-bootstrap";
-import {
-  listRunParts,
-  listRunSteps,
-  RunPart,
-  RunStep,
-} from "@jield/solodb-typescript-core";
+import { listRunParts, listRunSteps, RunPart, RunStep } from "@jield/solodb-typescript-core";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
 import RunLayoutStep from "./elements/runStepInLayout";
@@ -99,7 +94,12 @@ export default function RunLayoutElement() {
       <tr style={{ cursor: "pointer" }} onClick={() => toggleLabel(labelId)}>
         <td colSpan={2} style={{ margin: 0 }} className="bg-secondary">
           <span className="label-toggle">
-            <i className={"fa " + (Boolean(toggledLabels.get(step.label?.id ?? -1)) ? "fa-caret-down" : "fa-caret-right")} /> {label.label}
+            <i
+              className={
+                "fa " + (Boolean(toggledLabels.get(step.label?.id ?? -1)) ? "fa-caret-down" : "fa-caret-right")
+              }
+            />{" "}
+            {label.label}
           </span>
         </td>
       </tr>
@@ -109,7 +109,7 @@ export default function RunLayoutElement() {
   if (isLoading) {
     return (
       <div>
-        <h2>Run layout edit</h2>
+        <h2>Loading run layout editor</h2>
         <Table borderless hover striped size="sm">
           <thead>
             <tr>
@@ -153,7 +153,7 @@ export default function RunLayoutElement() {
 
   return (
     <div>
-      <h2>Run layout edit</h2>
+      <h2>Edit run layout</h2>
       <Table borderless hover striped size="sm">
         <thead>
           <tr>
@@ -168,12 +168,7 @@ export default function RunLayoutElement() {
               {(!step.has_label || Boolean(toggledLabels.get(step.label?.id ?? -1))) && (
                 <>
                   {step.has_step_group && firstInGroupSteps.includes(step) && renderGroupHeader(step)}
-                  <RunLayoutStep
-                    key={`step-${step.id}`}
-                    step={step}
-                    parts={runParts}
-                    run={run}
-                  />
+                  <RunLayoutStep key={`step-${step.id}`} step={step} parts={runParts} run={run} />
                 </>
               )}
             </React.Fragment>

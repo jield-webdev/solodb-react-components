@@ -63,8 +63,7 @@ export default function RunLayoutTrayVisual({
       if (
         candidate.id === stepPart.id ||
         candidate.step_id !== step.id ||
-        candidate.has_failed_in_previouse_state ||
-        candidate.failed
+        candidate.has_failed_in_previouse_state
       ) {
         return false;
       }
