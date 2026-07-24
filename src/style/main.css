@@ -28,6 +28,24 @@
   }
 }
 
+.scanner-waiting-caret {
+  animation: scanner-caret-blink 1s steps(1, end) infinite;
+  display: inline-block;
+  margin-left: 0.1em;
+}
+
+@keyframes scanner-caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanner-waiting-caret {
+    animation: none;
+  }
+}
+
 /* Tray layout */
 .tray-grid-group {
   display: flex;

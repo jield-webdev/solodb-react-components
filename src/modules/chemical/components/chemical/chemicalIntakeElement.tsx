@@ -18,6 +18,11 @@ import {
 } from "@jield/solodb-typescript-core";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
 import { ScannedKeysType } from "@jield/solodb-react-components/modules/core/utils/parseScannerType";
+import {
+  extractRoomNumber,
+  normalizeScannedQrCodeContent,
+  scannedCodeIsRoomCode,
+} from "@jield/solodb-react-components/modules/chemical/utils/chemicalContainerUtils";
 
 export default function ChemicalIntakeElement() {
   const { environment } = useParams();
@@ -32,6 +37,9 @@ export default function ChemicalIntakeElement() {
   const [scannedBarcode, setScannedBarcode] = useState<string | null>(null);
   const [room, setRoom] = useState<Room | null>(null);
   const [location, setLocation] = useState<Location | null>(null);
+  const [isWindowActive, setIsWindowActive] = useState(() => {
+    return typeof document === "undefined" || document.hasFocus();
+  });
 
   const { control, watch, reset, setValue } = useForm<{ room: Room | null }>({
     defaultValues: { room: null },
@@ -83,11 +91,30 @@ export default function ChemicalIntakeElement() {
     });
   }, [setValue]);
 
+  useEffect(() => {
+    const updateWindowActivity = () => {
+      setIsWindowActive(document.hasFocus() && document.visibilityState === "visible");
+    };
+
+    updateWindowActivity();
+    window.addEventListener("focus", updateWindowActivity);
+    window.addEventListener("blur", updateWindowActivity);
+    document.addEventListener("visibilitychange", updateWindowActivity);
+
+    return () => {
+      window.removeEventListener("focus", updateWindowActivity);
+      window.removeEventListener("blur", updateWindowActivity);
+      document.removeEventListener("visibilitychange", updateWindowActivity);
+    };
+  }, []);
+
   const resetForm = useCallback(() => {
-    reset({ room });
+    reset({ room: null });
+    setRoom(null);
     setLocation(null);
+    setHasExternalLabelling(false);
     clearScanResults();
-  }, [reset, room, clearScanResults]);
+  }, [reset, clearScanResults]);
 
   // Scanner: handle QR scans to select chemical container
   const scanCallbackId = useId();
@@ -101,7 +128,18 @@ export default function ChemicalIntakeElement() {
   }, []);
 
   const onScanKeys = useCallback(
-    async (keys: string) => {
+    async (readKeys: string) => {
+      const keys = normalizeScannedQrCodeContent(readKeys);
+
+      if (scannedCodeIsRoomCode(keys)) {
+        const roomId = extractRoomNumber(keys);
+        if (roomId !== null) {
+          const selectedRoom = await getRoom({ id: roomId });
+          setValue("room", selectedRoom);
+        }
+        return;
+      }
+
       if (!room || keys.includes("/l/")) return;
 
       setScannedBarcode(keys);
@@ -128,18 +166,14 @@ export default function ChemicalIntakeElement() {
         setEnableExternalLabelRegistration(false);
       }
     },
-    [room]
+    [room, setValue]
   );
 
   useEffect(() => {
     removeCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId);
-    if (!room) {
-      return () => removeCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId);
-    }
-
     addCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId, onScanKeys);
     return () => removeCallbackFn(ScannedKeysType.WILD_CARD, scanCallbackId);
-  }, [onScanKeys, room]);
+  }, [onScanKeys]);
 
   // Scanner: handle reset-form QR
   const resetFormCallbackId = useId();
@@ -154,14 +188,22 @@ export default function ChemicalIntakeElement() {
     <div>
       <div className="d-flex justify-content-between">
         <div>
-          <div style={{ width: "fit-content" }}>
-            <RoomSelectElement control={control} name="room" />
-          </div>
+          {room ? <h1>{room.name}</h1> : <RoomSelectElement control={control} name="room" />}
           <p className={"pt-3 h3"}>
-            {room
-              ? `Reading from scanner: ${scannedBarcode ?? "No chemical barcode scanned"}`
-              : "Chemical scanner disabled"}
+            {room ? (
+              <>
+                Reading from scanner: {readingKeys || "Waiting for scan"}
+                {!readingKeys && (
+                  <span aria-hidden="true" className="scanner-waiting-caret">
+                    |
+                  </span>
+                )}
+              </>
+            ) : (
+              "Chemical scanner disabled"
+            )}
           </p>
+          {room && scannedBarcode && <p className="text-muted">Last scanned: {scannedBarcode}</p>}
         </div>
 
         <div className="d-flex flex-column">
@@ -180,6 +222,23 @@ export default function ChemicalIntakeElement() {
 
       {room && (
         <>
+          {!isWindowActive && (
+            <Alert variant="warning" className="mt-3">
+              Scanner input is paused because this browser window is not active. Click <strong>Activate window</strong>{" "}
+              or bring this window to the foreground before scanning.
+              <div className="mt-2">
+                <button
+                  className="btn btn-warning"
+                  onClick={() => {
+                    window.focus();
+                  }}
+                  type="button"
+                >
+                  Activate window
+                </button>
+              </div>
+            </Alert>
+          )}
           {hasExternalLabelling ? (
             <Alert>
               Lab {room.name} has external labels, each chemical material should have a material from the internal
@@ -197,7 +256,7 @@ export default function ChemicalIntakeElement() {
           {foundContainer.location.name} in {foundContainer.location.zone_group.room.name}
           <a
             className="alert-link"
-            href={`${environment}/chemical/container/details/${foundContainer.id}/general.html`}
+            href={`/${environment}/chemical/container/details/${foundContainer.id}/general.html`}
           >
             Go to container
           </a>
