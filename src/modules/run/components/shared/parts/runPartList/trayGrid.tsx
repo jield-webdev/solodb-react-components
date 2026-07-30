@@ -1,36 +1,19 @@
 import { type CSSProperties } from "react";
-import { Run, RunPart, RunStepPart, TrayType } from "@jield/solodb-typescript-core";
+import { RunPart, RunStepPart } from "@jield/solodb-typescript-core";
+import {
+  getForbiddenSlotIndices,
+  getSlotIndex,
+  getStepPartSlotPriority,
+  type RunTray,
+} from "@jield/solodb-react-components/modules/run/utils/runTrays";
 import { buildDisplaySlotIndexByPartId, buildSplitSlotAssignments } from "../runPartSlotDistribution";
 import { MultiPartCell, PartBadge, SlotCell, type RunPartRenderContext } from "./partCell";
 import { TrayBulkActions } from "./trayBulkActions";
-
-type RunTray = NonNullable<Run["run_trays"]>[number];
-
-const getSlotIndex = (trayType: TrayType, row: number | null, column: number | null): number | null => {
-  if (!row || !column) return null;
-  if (row < 1 || column < 1 || row > trayType.rows || column > trayType.columns) return null;
-  if (trayType.orientation === "ttb") {
-    return (column - 1) * trayType.rows + (row - 1);
-  }
-  return (row - 1) * trayType.columns + (column - 1);
-};
 
 const toTrayStepParts = (trayParts: RunPart[], stepPartsById: Map<number, RunStepPart>): RunStepPart[] =>
   trayParts
     .map((part) => stepPartsById.get(part.id))
     .filter((sp): sp is RunStepPart => sp !== undefined);
-
-const getStepPartSlotPriority = (stepPart: RunStepPart | undefined): number => {
-  if (stepPart?.tray_id != null && !stepPart?.failed) {
-      return 1;
-  }
-
-  if (stepPart?.tray_id != null) {
-      return 2;
-  }
-
-  return 3;
-};
 
 export const TrayGrid = ({
   tray,
@@ -71,11 +54,7 @@ export const TrayGrid = ({
   }
 
   const trayCapacity = trayType.rows * trayType.columns;
-  const forbiddenSlotIndices = new Set<number>(
-    (trayType.forbidden_slots ?? [])
-      .map((slot) => getSlotIndex(trayType, slot.y, slot.x))
-      .filter((index): index is number => index !== null)
-  );
+  const forbiddenSlotIndices = getForbiddenSlotIndices(trayType);
   const trayOrientation = trayType.orientation === "ttb" ? "ttb" : "ltr";
   const trayStyle: CSSProperties = {
     "--tray-columns": trayType.columns,

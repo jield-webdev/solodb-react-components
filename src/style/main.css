@@ -168,6 +168,12 @@
   padding: 12px;
 }
 
+/* Extra trays only park unused parts, mark them apart from the physical trays of the run. */
+.tray-visual--extra .tray-visual__frame {
+  background: transparent;
+  border: 1px dashed #adb5bd;
+}
+
 .tray-visual__grid {
   display: grid;
   grid-template-columns: repeat(var(--tray-columns), 64px);

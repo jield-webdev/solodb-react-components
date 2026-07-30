@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { RunStep, Run, RunPart, listRunStepParts, RunStepPart } from "@jield/solodb-typescript-core";
+import { getLeveledPartsForStep } from "@jield/solodb-react-components/modules/run/utils/runParts";
 import { RunLayoutPartList } from "./runLayoutPartList";
 import { keepPreviousData, useQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -25,18 +26,7 @@ export default function RunStepInLayout({ step, parts, run }: { step: RunStep; p
     [runStepPartsQuery.data?.items]
   );
 
-  const leveledParts = useMemo(
-    () =>
-      parts
-        .filter((p) => p.part_level === step.part_level)
-        .sort((a, b) => {
-          if (a.root_id && b.root_id && a.root_id !== b.root_id) {
-            return a.root_id - b.root_id;
-          }
-          return a.left - b.left;
-        }),
-    [parts]
-  );
+  const leveledParts = useMemo(() => getLeveledPartsForStep(parts, step), [parts, step]);
 
   return (
     <tr>

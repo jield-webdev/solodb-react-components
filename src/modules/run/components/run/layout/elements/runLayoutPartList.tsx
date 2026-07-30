@@ -1,9 +1,15 @@
 import { useMemo } from "react";
 import { Run, RunPart, RunStep, RunStepPart } from "@jield/solodb-typescript-core";
+import { RunPartList } from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartList";
 import {
+  buildPlaceholderExtraTray,
+  buildTraySlots,
+  getExtraTrays,
+  getNextExtraTrayId,
+  getNormalTrays,
   groupPartsByTrayId,
-  RunPartList,
-} from "@jield/solodb-react-components/modules/run/components/shared/parts/runPartList";
+  isTrayFull,
+} from "@jield/solodb-react-components/modules/run/utils/runTrays";
 import RunLayoutTrayVisual from "./runLayoutTrayVisual";
 
 export const RunLayoutPartList = ({
@@ -17,41 +23,45 @@ export const RunLayoutPartList = ({
   stepParts: RunStepPart[];
   run: Run;
 }) => {
-  const trays = useMemo(() => [...(run.run_trays ?? [])].sort((a, b) => a.sequence - b.sequence), [run]);
+  const normalTrays = useMemo(() => getNormalTrays(run), [run]);
+  const extraTrays = useMemo(() => getExtraTrays(run), [run]);
 
   const currentStepParts = useMemo(
     () => stepParts.filter((stepPart) => stepPart.step_id === step.id),
     [stepParts, step.id]
   );
 
-  const leveledParts = useMemo(
-    () =>
-      parts
-        .filter((part) => part.part_level === step.part_level)
-        .sort((a, b) => {
-          if (a.root_id && b.root_id && a.root_id !== b.root_id) {
-            return a.root_id - b.root_id;
-          }
+  const partsByTrayId = useMemo(() => groupPartsByTrayId(parts, currentStepParts), [parts, currentStepParts]);
 
-          return a.left - b.left;
-        }),
-    [parts]
-  );
+  // Only offer the next extra tray once the last one has no free slot left in this step, so operators
+  // never face more empty extra trays than they can fill and the backend keeps creating them in sequence.
+  const visibleExtraTrays = useMemo(() => {
+    const lastExtraTray = extraTrays[extraTrays.length - 1];
 
-  const partsByTrayId = useMemo(
-    () => groupPartsByTrayId(leveledParts, currentStepParts),
-    [leveledParts, currentStepParts]
-  );
+    if (lastExtraTray) {
+      const slots = buildTraySlots(
+        lastExtraTray.tray_type,
+        partsByTrayId.get(lastExtraTray.id) ?? [],
+        currentStepParts
+      );
 
-  if (trays.length === 0 || leveledParts[0]?.part_level > 0) {
+      if (!isTrayFull(slots, lastExtraTray.tray_type)) return extraTrays;
+    }
+
+    const placeholder = buildPlaceholderExtraTray(run, getNextExtraTrayId(extraTrays));
+
+    return placeholder ? [...extraTrays, placeholder] : extraTrays;
+  }, [extraTrays, partsByTrayId, currentStepParts, run]);
+
+  if (normalTrays.length === 0 || parts[0]?.part_level > 0) {
     return <RunPartList step={step} parts={parts} stepParts={stepParts} run={run} />;
   }
 
   return (
     <div className="d-flex flex-wrap gap-4">
-      {trays.map((tray) => (
+      {[...normalTrays, ...visibleExtraTrays].map((tray) => (
         <RunLayoutTrayVisual
-          key={tray.id}
+          key={`tray-${tray.id}`}
           step={step}
           tray={tray}
           parts={partsByTrayId.get(tray.id) ?? []}
