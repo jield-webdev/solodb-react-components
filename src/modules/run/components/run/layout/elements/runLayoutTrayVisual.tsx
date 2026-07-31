@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { RunPart, RunStep, RunStepPart, updateRunStepPartTray } from "@jield/solodb-typescript-core";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
+import { upsertRunTrayCache } from "@jield/solodb-react-components/modules/run/utils/runCache";
 import { upsertRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import {
   buildTraySlots,
@@ -43,7 +44,7 @@ export default function RunLayoutTrayVisual({
   const partsById = useMemo(() => new Map(parts.map((part) => [part.id, part])), [parts]);
   const stepPartsById = useMemo(() => new Map(stepParts.map((stepPart) => [stepPart.id, stepPart])), [stepParts]);
 
-  const handleSlotDrop = async (event: DragEvent<HTMLDivElement>, tray: RunTray, row: number, column: number) => {
+  const handleSlotDrop = async (event: DragEvent<HTMLDivElement>, row: number, column: number) => {
     event.preventDefault();
     const stepPartId = Number(event.dataTransfer.getData("text/plain"));
     const stepPart = stepPartsById.get(stepPartId);
@@ -128,14 +129,20 @@ export default function RunLayoutTrayVisual({
         true,
         isExtraTray ? tray.extra_tray_id : undefined
       );
-      upsertRunStepPartCache(queryClient, step, response.data, { updateSubsequent: true });
-
-      console.log(response);
 
       if (isNewExtraTray) {
-        // The extra tray was just created, reload the run so it enters run.run_trays with its real id.
-        reloadRun();
+        if (response.data.tray_id) {
+          // The backend just created the extra tray; adopt its real id so the placeholder stops being
+          // rendered and the moved part is grouped under a tray that exists.
+          upsertRunTrayCache(queryClient, run.id, { ...tray, id: response.data.tray_id });
+        } else {
+          // Without a tray id there is nothing to patch into run.run_trays, and the step part below
+          // would point at a tray the run does not know about. Refetch the run instead of losing it.
+          reloadRun();
+        }
       }
+
+      upsertRunStepPartCache(queryClient, step, response.data, { updateSubsequent: true });
 
       notification({
         notificationHeader: "Tray part change",
@@ -198,7 +205,7 @@ export default function RunLayoutTrayVisual({
                   data-tray-column={column}
                   data-pocket-number={pocketNumber}
                   onDragOver={handleSlotDragOver}
-                  onDrop={(event) => handleSlotDrop(event, tray, row, column)}
+                  onDrop={(event) => handleSlotDrop(event, row, column)}
                 >
                   {part && stepPart ? (
                     <OverlayTrigger

@@ -23,12 +23,12 @@ export default function RunLayoutElement() {
   const queries = useQueries({
     queries: [
       {
-        queryKey: ["runSteps", JSON.stringify(run), page],
+        queryKey: ["runSteps", run.id, page],
         queryFn: () => listRunSteps({ run, page, pageSize }),
         placeholderData: keepPreviousData,
       },
       {
-        queryKey: ["runParts", JSON.stringify(run)],
+        queryKey: ["runParts", run.id],
         queryFn: () => listRunParts({ run }),
       },
     ],
@@ -64,16 +64,13 @@ export default function RunLayoutElement() {
     });
   }, [isError, queries, run]);
 
-  const seenGroups = new Set<string>();
-  const firstInGroupSteps = runSteps.filter((step) => {
-    if (!step.has_step_group || typeof step.step_group?.id !== "number") {
-      return false;
-    }
-    if (seenGroups.has(String(step.step_group.id))) {
-      return false;
-    }
-    seenGroups.add(String(step.step_group.id));
-    return true;
+  const seenGroups = new Set<number>();
+  const firstInGroupStepIds = new Set<number>();
+  runSteps.forEach((step) => {
+    if (!step.has_step_group || typeof step.step_group?.id !== "number") return;
+    if (seenGroups.has(step.step_group.id)) return;
+    seenGroups.add(step.step_group.id);
+    firstInGroupStepIds.add(step.id);
   });
 
   const toggleLabel = (id: number) => {
@@ -90,17 +87,19 @@ export default function RunLayoutElement() {
 
     if (!step.is_own_label || !label || labelId === undefined) return null;
 
+    const isExpanded = Boolean(toggledLabels.get(labelId));
+
     return (
-      <tr style={{ cursor: "pointer" }} onClick={() => toggleLabel(labelId)}>
-        <td colSpan={2} style={{ margin: 0 }} className="bg-secondary">
-          <span className="label-toggle">
-            <i
-              className={
-                "fa " + (Boolean(toggledLabels.get(step.label?.id ?? -1)) ? "fa-caret-down" : "fa-caret-right")
-              }
-            />{" "}
-            {label.label}
-          </span>
+      <tr>
+        <td colSpan={2} style={{ margin: 0 }} className="bg-secondary p-0">
+          <button
+            type="button"
+            className="label-toggle btn btn-link text-reset text-decoration-none d-block w-100 text-start"
+            onClick={() => toggleLabel(labelId)}
+            aria-expanded={isExpanded}
+          >
+            <i className={"fa " + (isExpanded ? "fa-caret-down" : "fa-caret-right")} /> {label.label}
+          </button>
         </td>
       </tr>
     );
@@ -167,7 +166,7 @@ export default function RunLayoutElement() {
               {step.has_label && renderLabel(step)}
               {(!step.has_label || Boolean(toggledLabels.get(step.label?.id ?? -1))) && (
                 <>
-                  {step.has_step_group && firstInGroupSteps.includes(step) && renderGroupHeader(step)}
+                  {step.has_step_group && firstInGroupStepIds.has(step.id) && renderGroupHeader(step)}
                   <RunLayoutStep key={`step-${step.id}`} step={step} parts={runParts} run={run} />
                 </>
               )}

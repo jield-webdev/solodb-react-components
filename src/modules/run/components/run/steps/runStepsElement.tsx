@@ -37,23 +37,23 @@ export default function RunStepsElement() {
   const queries = useQueries({
     queries: [
       {
-        queryKey: ["runSteps", JSON.stringify(run), page],
+        queryKey: ["runSteps", run.id, page],
         queryFn: () => listRunSteps({ run, page, pageSize }),
         placeholderData: keepPreviousData,
       },
       {
-        queryKey: ["runParts", JSON.stringify(run)],
+        queryKey: ["runParts", run.id],
         queryFn: () => listRunParts({ run }),
       },
       {
-        queryKey: ["requirements", JSON.stringify(run)],
+        queryKey: ["requirements", run.id],
         queryFn: () => listRequirements({ run: run }),
       },
     ],
   });
 
   const reloadQueriesByKey = (key: any[]) => {
-    const finalKeys = [...key, JSON.stringify(run)];
+    const finalKeys = [...key, run.id];
     if (key[0] === "runSteps") {
       finalKeys.push(page);
     }
@@ -160,16 +160,13 @@ export default function RunStepsElement() {
   }
   if (isError) return <div className="text-danger">Error loading run steps.</div>;
 
-  const seenGroups = new Set<string>();
-  const firstInGroupSteps = runSteps.filter((step) => {
-    if (!step.has_step_group || typeof step.step_group?.id !== "number") {
-      return false;
-    }
-    if (seenGroups.has(String(step.step_group.id))) {
-      return false;
-    }
-    seenGroups.add(String(step.step_group.id));
-    return true;
+  const seenGroups = new Set<number>();
+  const firstInGroupStepIds = new Set<number>();
+  runSteps.forEach((step) => {
+    if (!step.has_step_group || typeof step.step_group?.id !== "number") return;
+    if (seenGroups.has(step.step_group.id)) return;
+    seenGroups.add(step.step_group.id);
+    firstInGroupStepIds.add(step.id);
   });
 
   const monitoredSteps: { [key: string]: Requirement } = {};
@@ -193,13 +190,19 @@ export default function RunStepsElement() {
       });
     };
 
+    const isExpanded = Boolean(toggledLabels.get(labelId));
+
     return (
-      <tr style={{ cursor: "pointer" }} onClick={() => toggleLabel(labelId)}>
-        <td colSpan={5} style={{ margin: 0 }} className="bg-secondary">
-          <span className="label-toggle">
-            <i className={"fa " + (toggledLabels.get(step.label?.id ?? -1) ? "fa-caret-down" : "fa-caret-right")} />{" "}
-            {label.label}
-          </span>
+      <tr>
+        <td colSpan={5} style={{ margin: 0 }} className="bg-secondary p-0">
+          <button
+            type="button"
+            className="label-toggle btn btn-link text-reset text-decoration-none d-block w-100 text-start"
+            onClick={() => toggleLabel(labelId)}
+            aria-expanded={isExpanded}
+          >
+            <i className={"fa " + (isExpanded ? "fa-caret-down" : "fa-caret-right")} /> {label.label}
+          </button>
         </td>
       </tr>
     );
@@ -240,7 +243,7 @@ export default function RunStepsElement() {
                 {step.has_label && renderLabel(step)}
                 {(!step.has_label || toggledLabels.get(step.label?.id ?? -1)) && (
                   <>
-                    {step.has_step_group && firstInGroupSteps.includes(step) && renderGroupHeader(step)}
+                    {step.has_step_group && firstInGroupStepIds.has(step.id) && renderGroupHeader(step)}
                     {step.has_requirement ? (
                       (() => {
                         const requirement = requirements.find((r) => r.step.id === step.id) as Requirement;

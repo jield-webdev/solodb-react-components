@@ -1,21 +1,36 @@
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import { Run, getRun } from "@jield/solodb-typescript-core";
+import { getRun } from "@jield/solodb-typescript-core";
+import { getRunQueryKey } from "@jield/solodb-react-components/modules/run/utils/runCache";
 
 export const useRun = () => {
-  const [run, setRun] = useState<Run | null>(null);
   const { id } = useParams();
-  //Grab the id from the params
-  useEffect(() => {
-    if (run === null || id !== run.id.toString()) {
-      getRun({ id: parseInt(id!) }).then(setRun);
-    }
-  }, [id, run]);
+  const runId = parseInt(id!);
+  const hasRunId = Number.isInteger(runId);
 
-  //Create a reload feature
-  function reloadRun() {
-    getRun({ id: parseInt(id!) }).then(setRun);
-  }
+  const {
+    data: run = null,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: getRunQueryKey(runId),
+    queryFn: () => getRun({ id: runId }),
+    // Without an :id in the route parseInt yields NaN; never send that to the API.
+    enabled: hasRunId,
+  });
 
-  return { run, reloadRun };
+  const reloadRun = useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
+  return {
+    run,
+    isError: isError || !hasRunId,
+    // A missing route id is not something a refetch can recover from; the query stays disabled.
+    canRetry: hasRunId,
+    error: hasRunId ? error : new Error("No run id in the route."),
+    reloadRun,
+  };
 };
