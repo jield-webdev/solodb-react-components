@@ -1,5 +1,6 @@
 import { useContext, useMemo, type CSSProperties, type DragEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import axios, { type AxiosResponse } from "axios";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { RunPart, RunStep, RunStepPart, updateRunStepPartTray } from "@jield/solodb-typescript-core";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
@@ -121,7 +122,7 @@ export default function RunLayoutTrayVisual({
     upsertRunStepPartCache(queryClient, step, expectedStepPart);
 
     try {
-      const response = await updateRunStepPartTray(
+      const response = await updateRunStepPartTrayWithExtraTray(
         stepPart,
         targetTray,
         row,
@@ -254,6 +255,27 @@ const getTrayUpdateErrorMessage = (error: unknown): string => {
   }
 
   return "Could not move part.";
+};
+
+const updateRunStepPartTrayWithExtraTray = (
+  stepPart: RunStepPart,
+  tray: RunTray,
+  row: number,
+  column: number,
+  updateSubsequent: boolean,
+  extraTrayId?: number
+): Promise<AxiosResponse<RunStepPart>> => {
+  if (extraTrayId === undefined) {
+    return updateRunStepPartTray(stepPart, tray, row, column, updateSubsequent);
+  }
+
+  return axios.create().patch<RunStepPart>(`update/run/step/part/${stepPart.id}/tray`, {
+    tray_id: tray.id,
+    tray_row: row,
+    tray_column: column,
+    update_subsequent: updateSubsequent,
+    extra_tray_id: extraTrayId,
+  });
 };
 
 const getPartBadgeColor = (stepPart: RunStepPart | null): string => {

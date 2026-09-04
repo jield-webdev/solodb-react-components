@@ -1,6 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { Run } from "@jield/solodb-typescript-core";
-import type { RunTray } from "@jield/solodb-react-components/modules/run/utils/runTrays";
+import { getExtraTrayId, type RunTray } from "@jield/solodb-react-components/modules/run/utils/runTrays";
 
 export const getRunQueryKey = (runId: number) => ["run", runId] as const;
 
@@ -11,7 +11,7 @@ export const upsertRunTrayCache = (queryClient: QueryClient, runId: number, tray
     const existingTrays = run.run_trays ?? [];
     const trayIndex = existingTrays.findIndex(
       (candidate) =>
-        candidate.id === tray.id || (tray.extra_tray_id > 0 && candidate.extra_tray_id === tray.extra_tray_id)
+        candidate.id === tray.id || (tray.extra_tray_id > 0 && getExtraTrayId(candidate) === tray.extra_tray_id)
     );
     const runTrays =
       trayIndex === -1

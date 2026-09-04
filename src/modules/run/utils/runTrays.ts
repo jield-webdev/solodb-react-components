@@ -1,6 +1,16 @@
 import { Run, RunPart, RunStepPart, TrayType } from "@jield/solodb-typescript-core";
 
-export type RunTray = NonNullable<Run["run_trays"]>[number];
+type CoreRunTray = NonNullable<Run["run_trays"]>[number];
+
+export type RunTray = CoreRunTray & { extra_tray_id: number };
+
+export const getExtraTrayId = (tray: CoreRunTray): number => {
+  const extraTrayId = (tray as { extra_tray_id?: unknown }).extra_tray_id;
+
+  return typeof extraTrayId === "number" ? extraTrayId : 0;
+};
+
+const toRunTray = (tray: CoreRunTray): RunTray => ({ ...tray, extra_tray_id: getExtraTrayId(tray) });
 
 // A run tray with extra_tray_id === 0 is a physical tray; > 0 marks the nth "extra tray", a false
 // tray where unused parts are parked. The backend creates an extra tray on the first move into it,
@@ -10,10 +20,16 @@ export const PLACEHOLDER_EXTRA_TRAY_ID = -1;
 // --- Tray selection ---
 
 export const getNormalTrays = (run: Run): RunTray[] =>
-  (run.run_trays ?? []).filter((tray) => !tray.extra_tray_id).sort((a, b) => a.sequence - b.sequence);
+  (run.run_trays ?? [])
+    .map(toRunTray)
+    .filter((tray) => !tray.extra_tray_id)
+    .sort((a, b) => a.sequence - b.sequence);
 
 export const getExtraTrays = (run: Run): RunTray[] =>
-  (run.run_trays ?? []).filter((tray) => tray.extra_tray_id > 0).sort((a, b) => a.extra_tray_id - b.extra_tray_id);
+  (run.run_trays ?? [])
+    .map(toRunTray)
+    .filter((tray) => tray.extra_tray_id > 0)
+    .sort((a, b) => a.extra_tray_id - b.extra_tray_id);
 
 // Extra trays reuse `sequence` (it mirrors their extra_tray_id), so sorting the raw list by sequence
 // interleaves them with the physical trays. Always keep the physical trays first.

@@ -198,7 +198,7 @@ const StepDashboard = () => {
                   data-toggle="toggle"
                   onChange={() => setShowOnlyEmphasizedParameters(!showOnlyEmphasizedParameters)}
                 />
-                <label htmlFor="showOnlyEmphasizedParameters" className="ms-2">Show only emphasized parameters</label>
+                <label htmlFor="showOnlyEmphasizedParameters" className="ms-2">Show only emphasized parametersss</label>
               </div>
               <RunStepParametersTable
                 runStep={runStep}
