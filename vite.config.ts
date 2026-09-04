@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import dts from "vite-plugin-dts";
 
+const projectRoot = import.meta.dirname;
+
 // https://vitejs.dev/config/
 // @ts-ignore
 export default defineConfig(({ mode }) => {
@@ -23,7 +25,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       // Path aliases for cleaner imports
       alias: {
-        "@jield/solodb-react-components": path.join(__dirname, "./src"),
+        "@jield/solodb-react-components": path.join(projectRoot, "./src"),
         // "@modules": path.join(__dirname, "./src/modules"),
       },
     },
@@ -34,7 +36,7 @@ export default defineConfig(({ mode }) => {
       outDir: "dist",
       // Library mode configuration
       lib: {
-        entry: path.resolve(__dirname, "src/index.ts"),
+        entry: path.resolve(projectRoot, "src/index.ts"),
         name: "SoloDBReactComponents",
         formats: ["es", "cjs"],
         fileName: (format) => (format === "cjs" ? "index.cjs" : "index.js"),
@@ -74,7 +76,7 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: "jsdom",
       globals: true,
-      setupFiles: [path.resolve(__dirname, "src/setupTests.ts")],
+      setupFiles: [path.resolve(projectRoot, "src/setupTests.ts")],
       coverage: {
         reporter: ["text", "html"],
         provider: "v8",
