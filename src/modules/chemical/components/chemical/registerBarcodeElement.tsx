@@ -238,7 +238,7 @@ export default function RegisterBarcodeElement({
           <div className="d-flex justify-content-between align-items-center gap-2">
             <a
               className="btn btn-primary"
-              href={`${environment}/chemical/container/details/${createdContainer.id}/general.html`}
+              href={`/${environment}/chemical/container/details/${createdContainer.id}/general.html`}
             >
               Go to container
             </a>

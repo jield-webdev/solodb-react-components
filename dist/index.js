@@ -31052,94 +31052,180 @@ var oF = ({ show: e, setShow: t, onChemicalCreate: n }) => {
 			]
 		})
 	});
-};
-//#endregion
-//#region src/modules/chemical/form/chemicalSelectFormElement.tsx
-function sF({ control: e, name: t, setValue: n, errors: r }) {
-	let [i, a] = v({}), [o, s] = v(!1), [c, l] = v(null), u = (e, t) => {
-		try {
-			Te({ query: e }).then((e) => {
-				let n = e.items.map((e) => ({
-					value: e.id,
-					label: e.name + (e.cas_number ? " (" + e.cas_number + ")" : "")
-				})), r = { ...i };
-				n.forEach((e) => {
-					r[e.value] = e;
-				}), a(r), t(n);
-			});
-		} catch (e) {
-			console.error("Error fetching chemicals:", e);
-		}
-	}, d = (e) => e && i[e] ? i[e] : c || null;
+}, sF = "—", cF = (e) => e.is_standard_product || e.standard_product === Ut.STANDARD_PRODUCT;
+function lF({ control: e, name: t, setValue: n, errors: r }) {
+	let i = f(), [a, o] = v([]), [s, c] = v(""), [l, u] = v(!0), [p, m] = v(null), [h, g] = v(!1);
+	d(() => {
+		let e = !0;
+		u(!0), m(null);
+		let t = window.setTimeout(async () => {
+			try {
+				let t = await Te({ query: s.trim() });
+				e && o(t.items);
+			} catch (t) {
+				console.error("Error fetching chemicals:", t), e && (o([]), m("Chemicals could not be loaded. Please try again."));
+			} finally {
+				e && u(!1);
+			}
+		}, s ? 250 : 0);
+		return () => {
+			e = !1, window.clearTimeout(t);
+		};
+	}, [s]);
+	let _ = (e) => {
+		o((t) => [e, ...t.filter((t) => t.id !== e.id)]), g(!1), n(t, e.id, {
+			shouldDirty: !0,
+			shouldValidate: !0
+		});
+	}, y = r?.[t]?.message ?? r?.chemical?.message;
 	return /* @__PURE__ */ S(b, { children: [/* @__PURE__ */ S(G.Group, {
 		className: "mb-3",
-		children: [/* @__PURE__ */ x(G.Label, { children: "Search Existing Chemicals" }), /* @__PURE__ */ S(uu, { children: [
+		children: [
+			/* @__PURE__ */ x(G.Label, {
+				htmlFor: i,
+				children: "Search existing chemicals"
+			}),
+			/* @__PURE__ */ x(G.Control, {
+				id: i,
+				type: "search",
+				value: s,
+				placeholder: "Search by name or CAS number",
+				onChange: (e) => c(e.target.value),
+				className: "mb-2"
+			}),
 			/* @__PURE__ */ x(od, {
 				name: t,
 				control: e,
-				render: ({ field: e }) => /* @__PURE__ */ x(wx, {
-					isSearchable: !0,
-					isClearable: !0,
-					defaultOptions: !0,
-					placeholder: "— Select a chemical, or start typing",
-					loadOptions: u,
-					value: d(e.value),
-					styles: Dx,
-					onChange: (t) => {
-						l(null), e.onChange(t?.value);
-					}
+				render: ({ field: e }) => /* @__PURE__ */ x("div", {
+					className: "table-responsive border rounded",
+					children: /* @__PURE__ */ S(fu, {
+						hover: !0,
+						size: "sm",
+						className: "mb-0 align-middle",
+						children: [/* @__PURE__ */ x("thead", {
+							className: "table-light",
+							children: /* @__PURE__ */ S("tr", { children: [
+								/* @__PURE__ */ x("th", {
+									scope: "col",
+									children: "Chemical"
+								}),
+								/* @__PURE__ */ x("th", {
+									scope: "col",
+									children: "CAS number"
+								}),
+								/* @__PURE__ */ x("th", {
+									scope: "col",
+									children: "Formula"
+								}),
+								/* @__PURE__ */ x("th", {
+									scope: "col",
+									children: "CRMH"
+								}),
+								/* @__PURE__ */ x("th", {
+									scope: "col",
+									children: "Standard product"
+								}),
+								/* @__PURE__ */ x("th", {
+									scope: "col",
+									className: "text-end",
+									children: "Action"
+								})
+							] })
+						}), /* @__PURE__ */ S("tbody", { children: [
+							l && /* @__PURE__ */ x("tr", { children: /* @__PURE__ */ S("td", {
+								colSpan: 6,
+								className: "py-3 text-center text-muted",
+								children: [/* @__PURE__ */ x("span", {
+									className: "spinner-border spinner-border-sm me-2",
+									"aria-hidden": "true"
+								}), "Loading chemicals…"]
+							}) }),
+							!l && p && /* @__PURE__ */ x("tr", { children: /* @__PURE__ */ x("td", {
+								colSpan: 6,
+								className: "py-3 text-center text-danger",
+								children: p
+							}) }),
+							!l && !p && a.length === 0 && /* @__PURE__ */ x("tr", { children: /* @__PURE__ */ x("td", {
+								colSpan: 6,
+								className: "py-3 text-center text-muted",
+								children: "No chemicals found."
+							}) }),
+							!l && !p && a.map((t) => {
+								let n = Number(e.value) === t.id;
+								return /* @__PURE__ */ S("tr", {
+									className: n ? "table-primary" : void 0,
+									style: { cursor: "pointer" },
+									"aria-selected": n,
+									onClick: () => e.onChange(t.id),
+									children: [
+										/* @__PURE__ */ x("td", {
+											className: "fw-semibold",
+											children: t.name
+										}),
+										/* @__PURE__ */ x("td", { children: t.cas_number || sF }),
+										/* @__PURE__ */ x("td", { children: t.chemical_formula || sF }),
+										/* @__PURE__ */ x("td", { children: t.cmr.length > 0 ? t.cmr.join(", ") : sF }),
+										/* @__PURE__ */ x("td", { children: cF(t) ? "Yes" : "No" }),
+										/* @__PURE__ */ x("td", {
+											className: "text-end",
+											children: /* @__PURE__ */ x(U, {
+												type: "button",
+												size: "sm",
+												variant: n ? "success" : "outline-primary",
+												disabled: n,
+												"aria-label": `${n ? "Selected" : "Select"} ${t.name}`,
+												onClick: (n) => {
+													n.stopPropagation(), e.onChange(t.id);
+												},
+												children: n ? "Selected" : "Select"
+											})
+										})
+									]
+								}, t.id);
+							})
+						] })]
+					})
 				})
 			}),
-			r.chemical && /* @__PURE__ */ x(G.Control.Feedback, {
+			y && /* @__PURE__ */ x(G.Control.Feedback, {
 				type: "invalid",
-				children: r.chemical.message
+				className: "d-block",
+				children: String(y)
 			}),
-			/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x(U, {
+			/* @__PURE__ */ x(U, {
+				type: "button",
 				variant: "primary",
 				className: "mt-2",
-				onClick: () => s(!0),
+				onClick: () => g(!0),
 				children: "Create New Chemical"
-			}) })
-		] })]
+			})
+		]
 	}), /* @__PURE__ */ x(oF, {
-		show: o,
-		setShow: s,
-		onChemicalCreate: async (e) => {
-			try {
-				let r = await y.post("create/chemical", e), i = {
-					value: r.data.id,
-					label: r.data.name + (r.data.cas_number ? ` (${r.data.cas_number})` : "")
-				};
-				a((e) => ({
-					...e,
-					[i.value]: i
-				})), l(i), s(!1), n(t, r.data.id);
-			} catch (e) {
-				console.error("Error creating chemical:", e);
-			}
-		}
+		show: h,
+		setShow: g,
+		onChemicalCreate: _
 	})] });
 }
 //#endregion
 //#region src/modules/chemical/utils/chemicalContainerUtils.ts
-function cF(e) {
+function uF(e) {
 	return /\/l\/\d+$/.test(e);
 }
-function lF(e) {
+function dF(e) {
 	let t = e.match(/\/l\/(\d+)$/);
 	return t ? parseInt(t[1], 10) : null;
 }
-function uF(e) {
+function fF(e) {
 	return /\/r\/\d+$/.test(e);
 }
-function dF(e) {
+function pF(e) {
 	let t = e.match(/\/r\/(\d+)$/);
 	return t ? parseInt(t[1], 10) : null;
 }
-function fF(e) {
+function mF(e) {
 	return e.replace(/\\+\|/g, "|");
 }
-var pF = [
+var hF = [
 	{
 		value: "g",
 		label: "Gram"
@@ -31249,15 +31335,15 @@ var pF = [
 		label: "Microliter"
 	}
 ].sort((e, t) => e.label.localeCompare(t.label));
-function mF() {
+function gF() {
 	let e = /* @__PURE__ */ new Date();
 	return e.setFullYear(e.getFullYear() + 5), e.toISOString().split("T")[0];
 }
 //#endregion
 //#region src/modules/chemical/components/chemical/registerBarcodeElement.tsx
-function hF({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) {
+function _F({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) {
 	let { user: a } = u(he), { environment: o } = I(), { addCallbackFn: s, removeCallbackFn: c } = BA(), [p, m] = v(null), { register: h, control: g, handleSubmit: _, watch: C, setValue: w, formState: { errors: T, isSubmitting: E } } = Tf({ defaultValues: {
-		expire_date: mF(),
+		expire_date: gF(),
 		owner: {
 			value: a?.id,
 			label: a?.full_name
@@ -31267,8 +31353,8 @@ function hF({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 		D && Ve({ id: D }).then((e) => i(e));
 	}, [D]);
 	let O = f(), k = l((e) => {
-		if (cF(e)) {
-			let t = lF(e);
+		if (uF(e)) {
+			let t = dF(e);
 			t !== null && (Ve({ id: t }).then((e) => i(e)), w("location", t));
 		}
 		e.startsWith("reset-scan-location") && j();
@@ -31316,7 +31402,7 @@ function hF({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 				}) })]
 			}),
 			r && /* @__PURE__ */ S(b, { children: [
-				/* @__PURE__ */ x(sF, {
+				/* @__PURE__ */ x(lF, {
 					control: g,
 					errors: T,
 					setValue: w,
@@ -31366,7 +31452,7 @@ function hF({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 									children: [/* @__PURE__ */ x(Gs.Item, {
 										eventKey: "",
 										children: "(no unit)"
-									}, 0), pF.map((e) => /* @__PURE__ */ S(Gs.Item, {
+									}, 0), hF.map((e) => /* @__PURE__ */ S(Gs.Item, {
 										eventKey: e.value,
 										children: [
 											e.label,
@@ -31416,7 +31502,7 @@ function hF({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 			className: "d-flex justify-content-between align-items-center gap-2",
 			children: [/* @__PURE__ */ x("a", {
 				className: "btn btn-primary",
-				href: `${o}/chemical/container/details/${p.id}/general.html`,
+				href: `/${o}/chemical/container/details/${p.id}/general.html`,
 				children: "Go to container"
 			}), /* @__PURE__ */ x(rF, {
 				value: "reset-form",
@@ -31429,7 +31515,7 @@ function hF({ room: e, barcode: t, resetForm: n, location: r, setLocation: i }) 
 }
 //#endregion
 //#region src/modules/chemical/form/chemicalContainerTypeSelectFormElement.tsx
-function gF({ control: e, errors: t }) {
+function vF({ control: e, errors: t }) {
 	let [n, r] = v({}), i = (e, t) => {
 		try {
 			we({ query: e }).then((e) => {
@@ -31463,7 +31549,7 @@ function gF({ control: e, errors: t }) {
 }
 //#endregion
 //#region src/modules/chemical/components/chemical/registerContainerElement.tsx
-function _F({ room: e, resetForm: t, location: n, setLocation: r }) {
+function yF({ room: e, resetForm: t, location: n, setLocation: r }) {
 	let { user: i } = u(he), { environment: a } = I(), { addCallbackFn: o, removeCallbackFn: s } = BA(), [c, p] = v(null), m = /* @__PURE__ */ new Date();
 	m.setFullYear(m.getFullYear() + 5);
 	let { register: h, control: g, handleSubmit: _, watch: C, setValue: w, formState: { errors: T, isSubmitting: E } } = Tf({ defaultValues: {
@@ -31481,8 +31567,8 @@ function _F({ room: e, resetForm: t, location: n, setLocation: r }) {
 	let O = l(() => {
 		r(null), w("location", 0);
 	}, [r, w]), k = f(), A = l(async (e) => {
-		if (cF(e)) {
-			let t = lF(e);
+		if (uF(e)) {
+			let t = dF(e);
 			t !== null && (r(await Ve({ id: t })), w("location", t));
 			return;
 		}
@@ -31525,7 +31611,7 @@ function _F({ room: e, resetForm: t, location: n, setLocation: r }) {
 				}) })]
 			}),
 			n && /* @__PURE__ */ S(b, { children: [
-				/* @__PURE__ */ x(sF, {
+				/* @__PURE__ */ x(lF, {
 					control: g,
 					errors: T,
 					setValue: w,
@@ -31575,7 +31661,7 @@ function _F({ room: e, resetForm: t, location: n, setLocation: r }) {
 									children: [/* @__PURE__ */ x(Gs.Item, {
 										eventKey: "",
 										children: "(no unit)"
-									}, 0), pF.map((e) => /* @__PURE__ */ S(Gs.Item, {
+									}, 0), hF.map((e) => /* @__PURE__ */ S(Gs.Item, {
 										eventKey: e.value,
 										children: [
 											e.label,
@@ -31598,7 +31684,7 @@ function _F({ room: e, resetForm: t, location: n, setLocation: r }) {
 					className: "mb-3 row",
 					children: [
 						/* @__PURE__ */ x(G.Label, { children: "Container type" }),
-						/* @__PURE__ */ x(gF, {
+						/* @__PURE__ */ x(vF, {
 							control: g,
 							...h("container_type", { required: "Container type is required" }),
 							errors: T
@@ -31647,7 +31733,7 @@ function _F({ room: e, resetForm: t, location: n, setLocation: r }) {
 				}) }),
 				/* @__PURE__ */ x("div", { children: /* @__PURE__ */ x("a", {
 					className: "btn btn-primary",
-					href: `${a}/chemical/container/details/${c.id}/general.html`,
+					href: `/${a}/chemical/container/details/${c.id}/general.html`,
 					children: "Go to container"
 				}) }),
 				/* @__PURE__ */ x(rF, {
@@ -31662,7 +31748,7 @@ function _F({ room: e, resetForm: t, location: n, setLocation: r }) {
 }
 //#endregion
 //#region src/modules/chemical/components/chemical/chemicalIntakeElement.tsx
-function vF() {
+function bF() {
 	let { environment: e } = I(), { addReadingCallbackFn: t, removeReadingCallbackFn: n, addCallbackFn: r, removeCallbackFn: i } = BA(), [a, o] = v(""), [s, c] = v([]), [u, p] = v(null), [m, h] = v(!1), [g, _] = v(!1), [y, C] = v(null), [w, T] = v(null), [E, D] = v(null), [O, k] = v(() => typeof document > "u" || document.hasFocus()), { control: A, watch: j, reset: M, setValue: N } = Tf({ defaultValues: { room: null } }), P = j("room"), ee = l(() => {
 		C(null), p(null), c([]), h(!1);
 	}, []);
@@ -31697,9 +31783,9 @@ function vF() {
 		n(te);
 	}), []);
 	let L = l(async (e) => {
-		let t = fF(e);
-		if (uF(t)) {
-			let e = dF(t);
+		let t = mF(e);
+		if (fF(t)) {
+			let e = pF(t);
 			if (e !== null) {
 				let t = await He({ id: e });
 				N("room", t);
@@ -31826,14 +31912,14 @@ function vF() {
 				children: t.container.location.name
 			}) })
 		] }, t.id)) })] }),
-		!u && m && w && y && /* @__PURE__ */ x(hF, {
+		!u && m && w && y && /* @__PURE__ */ x(_F, {
 			room: w,
 			barcode: y,
 			location: E,
 			setLocation: D,
 			resetForm: F
 		}),
-		!u && w && !g && /* @__PURE__ */ x(_F, {
+		!u && w && !g && /* @__PURE__ */ x(yF, {
 			room: w,
 			location: E,
 			setLocation: D,
@@ -31843,7 +31929,7 @@ function vF() {
 }
 //#endregion
 //#region src/modules/admin/components/goldsteinClientsDashboard/cardReadedValue.tsx
-function yF({ badge_uuid: e }) {
+function xF({ badge_uuid: e }) {
 	return /* @__PURE__ */ S("span", {
 		className: "rounded p-2 bg-success",
 		children: ["Card read: ", e]
@@ -31851,10 +31937,10 @@ function yF({ badge_uuid: e }) {
 }
 //#endregion
 //#region src/modules/admin/components/goldsteinClientsDashboard/userAuthenticated.tsx
-function bF({ user_id: e }) {
+function SF({ user_id: e }) {
 	let [t, n] = v("");
 	return d(() => {
-		let t = "https://" + CF + `/api/onelab/view/user/${e}`;
+		let t = "https://" + TF + `/api/onelab/view/user/${e}`;
 		(async () => {
 			try {
 				let e = await fetch(t);
@@ -31872,18 +31958,18 @@ function bF({ user_id: e }) {
 }
 //#endregion
 //#region src/modules/admin/components/goldsteinClientsDashboard/equipmentConnected.tsx
-function xF() {
+function CF() {
 	return /* @__PURE__ */ x("div", {});
 }
 //#endregion
 //#region src/modules/admin/components/goldsteinClientsDashboard.tsx
-var SF = [
+var wF = [
 	"all",
 	"equipment",
 	"not_set"
-], CF = document.getElementById("root")?.dataset.goldsteinEndpoint ?? "", wF = "mock-token", TF = 10, EF = 15;
-async function DF(e) {
-	let t = "https://" + CF + "/api/update/client-association", n = prompt("Select the new association for the client:", e);
+], TF = document.getElementById("root")?.dataset.goldsteinEndpoint ?? "", EF = "mock-token", DF = 10, OF = 15;
+async function kF(e) {
+	let t = "https://" + TF + "/api/update/client-association", n = prompt("Select the new association for the client:", e);
 	if (n === null) {
 		alert("Please enter a not null value");
 		return;
@@ -31893,7 +31979,7 @@ async function DF(e) {
 		alert("Please follow the correct format: $item:$id");
 		return;
 	}
-	if (!SF.slice(1).includes(r)) {
+	if (!wF.slice(1).includes(r)) {
 		alert("Please select a valid $item: (equipment, not_set)");
 		return;
 	}
@@ -31909,10 +31995,10 @@ async function DF(e) {
 	let s = await o.text();
 	alert(s);
 }
-function OF() {
+function AF() {
 	let e = _(null), [t, n] = v(/* @__PURE__ */ new Map());
 	async function r(e) {
-		let t = My(e.notifications_list, /* @__PURE__ */ new Date(), TF, EF);
+		let t = My(e.notifications_list, /* @__PURE__ */ new Date(), DF, OF);
 		n(t);
 	}
 	function i() {
@@ -31936,7 +32022,7 @@ function OF() {
 			(e.current === null || e.current.readyState === WebSocket.CLOSED || e.current.readyState === WebSocket.CLOSING) && o();
 		}, 1e3);
 	}, o = () => {
-		Ay("wss://" + CF + "/ws", wF).then((t) => {
+		Ay("wss://" + TF + "/ws", EF).then((t) => {
 			e.current !== null && e.current.close(), t.onmessage = (e) => {
 				ky(e, r);
 			}, t.onclose = () => {
@@ -31954,7 +32040,7 @@ function OF() {
 	d(() => (o(), () => {
 		e.current && (e.current.close(), console.log("Web socket disconnected"));
 	}), []);
-	let [s, c] = v(SF[0]);
+	let [s, c] = v(wF[0]);
 	return d(() => {
 		i();
 	}, [s]), /* @__PURE__ */ S("div", { children: [
@@ -31967,7 +32053,7 @@ function OF() {
 			id: "typeFilter",
 			value: s,
 			onChange: (e) => c(e.target.value),
-			children: SF.map((e) => /* @__PURE__ */ x("option", {
+			children: wF.map((e) => /* @__PURE__ */ x("option", {
 				value: e,
 				children: e
 			}, e))
@@ -31984,14 +32070,14 @@ function OF() {
 			] }) }), /* @__PURE__ */ x("tbody", { children: Array.from(t.entries()).map(([e, t]) => /* @__PURE__ */ S("tr", { children: [
 				/* @__PURE__ */ x("td", { children: e }),
 				/* @__PURE__ */ S("td", { children: [
-					t.status === jy.CLIENT_CONNECTED && /* @__PURE__ */ x(xF, {}),
-					t.status === jy.CARD_READED && /* @__PURE__ */ x(yF, { badge_uuid: t.message.badgeUUID }),
-					t.status === jy.USER_AUTHENTICATED && /* @__PURE__ */ x(bF, { user_id: t.message.userID })
+					t.status === jy.CLIENT_CONNECTED && /* @__PURE__ */ x(CF, {}),
+					t.status === jy.CARD_READED && /* @__PURE__ */ x(xF, { badge_uuid: t.message.badgeUUID }),
+					t.status === jy.USER_AUTHENTICATED && /* @__PURE__ */ x(SF, { user_id: t.message.userID })
 				] }),
 				/* @__PURE__ */ x("td", { children: /* @__PURE__ */ x("button", {
 					type: "button",
 					className: "btn btn-primary",
-					onClick: () => DF(e),
+					onClick: () => kF(e),
 					children: "Edit association"
 				}) })
 			] }, e)) })]
@@ -32000,8 +32086,8 @@ function OF() {
 }
 //#endregion
 //#region src/modules/service/components/report/Criterion.tsx
-var kF = (e) => typeof e == "string" ? e : "";
-function AF({ result: e, status: t, onAutoSave: n, onDirty: r }) {
+var jF = (e) => typeof e == "string" ? e : "";
+function MF({ result: e, status: t, onAutoSave: n, onDirty: r }) {
 	let { control: i, formState: a } = Hd(), o = e.criterion_version, s = String(e.id), c = o.criterion.background_color && o.criterion.has_background_color ? { backgroundColor: o.criterion.background_color } : void 0, l = a.errors[s]?.message, u = o.required, d = (e) => u ? Array.isArray(e) ? e.length > 0 || "This field is required." : typeof e == "boolean" || e != null && e !== "" || "This field is required." : !0, f = l ? "is-invalid" : t?.state === "saved" ? "is-valid" : t?.state === "dirty" ? "border-warning" : "", p = l ? "border border-danger rounded p-2" : t?.state === "saved" ? "border border-success rounded p-2" : t?.state === "dirty" ? "border border-warning rounded p-2" : "", m = o.criterion.values ?? {};
 	return /* @__PURE__ */ S("div", {
 		className: `form-group mb-3 rounded ${o.highlighted ? "border border-warning" : ""}`,
@@ -32028,7 +32114,7 @@ function AF({ result: e, status: t, onAutoSave: n, onDirty: r }) {
 							type: "number",
 							step: o.criterion.input_type === "float" ? "0.01" : "1",
 							className: `form-control ${f}`,
-							value: kF(t.value),
+							value: jF(t.value),
 							onChange: (n) => {
 								t.onChange(n.target.value), r(e.id);
 							},
@@ -32041,7 +32127,7 @@ function AF({ result: e, status: t, onAutoSave: n, onDirty: r }) {
 							"aria-label": o.criterion.criterion,
 							type: "date",
 							className: `form-control ${f}`,
-							value: kF(t.value),
+							value: jF(t.value),
 							onChange: (n) => {
 								t.onChange(n.target.value), r(e.id);
 							},
@@ -32054,7 +32140,7 @@ function AF({ result: e, status: t, onAutoSave: n, onDirty: r }) {
 							"aria-label": o.criterion.criterion,
 							className: `form-control ${f}`,
 							rows: 3,
-							value: kF(t.value),
+							value: jF(t.value),
 							onChange: (n) => {
 								t.onChange(n.target.value), r(e.id);
 							},
@@ -32067,7 +32153,7 @@ function AF({ result: e, status: t, onAutoSave: n, onDirty: r }) {
 							"aria-label": o.criterion.criterion,
 							type: "text",
 							className: `form-control ${f}`,
-							value: kF(t.value),
+							value: jF(t.value),
 							onChange: (n) => {
 								t.onChange(n.target.value), r(e.id);
 							},
@@ -32078,7 +32164,7 @@ function AF({ result: e, status: t, onAutoSave: n, onDirty: r }) {
 						case "select": return /* @__PURE__ */ S("select", {
 							id: `result-${e.id}`,
 							className: `form-select ${f}`,
-							value: kF(t.value),
+							value: jF(t.value),
 							onChange: (i) => {
 								t.onChange(i.target.value), r(e.id), n(e);
 							},
@@ -32199,7 +32285,7 @@ function AF({ result: e, status: t, onAutoSave: n, onDirty: r }) {
 }
 //#endregion
 //#region src/modules/service/components/report/Category.tsx
-function jF({ categoryId: e, label: t, results: n }) {
+function NF({ categoryId: e, label: t, results: n }) {
 	let r = _({}), i = _({}), a = String(e), [o, s] = v({
 		categoryId: a,
 		statuses: {}
@@ -32297,7 +32383,7 @@ function jF({ categoryId: e, label: t, results: n }) {
 		return window.addEventListener("beforeunload", e), () => window.removeEventListener("beforeunload", e);
 	}, [E]), /* @__PURE__ */ S(Ud, {
 		...f,
-		children: [/* @__PURE__ */ x("legend", { children: t }), n.map((e) => /* @__PURE__ */ x(AF, {
+		children: [/* @__PURE__ */ x("legend", { children: t }), n.map((e) => /* @__PURE__ */ x(MF, {
 			result: e,
 			status: c[e.id],
 			onAutoSave: w,
@@ -32307,7 +32393,7 @@ function jF({ categoryId: e, label: t, results: n }) {
 }
 //#endregion
 //#region src/modules/service/components/ReportResult.tsx
-function MF() {
+function PF() {
 	let { id: e } = I(), n = ee(), r = F(), [i, a] = v(), [o, s] = v({}), [c, l] = v({}), [u, f] = v(0), [p, m] = v(null);
 	d(() => {
 		e && (Dt({ id: Number(e) }).then((e) => {
@@ -32385,7 +32471,7 @@ function MF() {
 				children: "Next"
 			})
 		]
-	}), /* @__PURE__ */ x(jF, {
+	}), /* @__PURE__ */ x(NF, {
 		categoryId: g[u],
 		label: o[g[u]],
 		results: i[g[u]]
@@ -32393,7 +32479,7 @@ function MF() {
 }
 //#endregion
 //#region src/modules/iris/components/irisOperatorDashboardUtils.ts
-var NF = {
+var FF = {
 	active: "text-bg-warning",
 	approved: "text-bg-success",
 	canceled: "text-bg-secondary",
@@ -32413,16 +32499,16 @@ var NF = {
 	success: "text-bg-success",
 	uploaded: "text-bg-success"
 };
-function PF(e) {
+function IF(e) {
 	let t = e.trim().toLowerCase();
-	return t in NF ? NF[t] : /(fail|error|reject|invalid|deny)/.test(t) ? "text-bg-danger" : /(complete|done|success|approve|upload|finish|ready|ok)/.test(t) ? "text-bg-success" : /(run|process|progress|pending|queue|start|wait|active)/.test(t) ? "text-bg-warning" : /(cancel|skip|expire|close|stop)/.test(t) ? "text-bg-secondary" : "text-bg-info";
+	return t in FF ? FF[t] : /(fail|error|reject|invalid|deny)/.test(t) ? "text-bg-danger" : /(complete|done|success|approve|upload|finish|ready|ok)/.test(t) ? "text-bg-success" : /(run|process|progress|pending|queue|start|wait|active)/.test(t) ? "text-bg-warning" : /(cancel|skip|expire|close|stop)/.test(t) ? "text-bg-secondary" : "text-bg-info";
 }
-function FF(e) {
+function LF(e) {
 	return e instanceof Map ? Array.from(e.entries()) : Array.isArray(e) ? e.flatMap((e) => Array.isArray(e) && e.length === 2 && typeof e[0] == "string" && typeof e[1] == "string" ? [[e[0], e[1]]] : []) : typeof e == "object" && e ? Object.entries(e).flatMap(([e, t]) => typeof t == "string" ? [[e, t]] : []) : [];
 }
 //#endregion
 //#region src/modules/iris/components/operatorDashboard/irisOperatorEventDetailsUtils.ts
-var IF = {
+var RF = {
 	approve: {
 		action: "approve",
 		buttonClassName: "btn-success",
@@ -32447,7 +32533,7 @@ var IF = {
 		label: "Reject",
 		successMessage: "Upload rejected."
 	}
-}, LF = {
+}, zF = {
 	awaiting_approval: [
 		"approve",
 		"reject",
@@ -32461,10 +32547,10 @@ var IF = {
 		"fail"
 	]
 };
-function RF(e) {
-	return (LF[e] ?? []).map((e) => IF[e]);
+function BF(e) {
+	return (zF[e] ?? []).map((e) => RF[e]);
 }
-function zF(e) {
+function VF(e) {
 	if (typeof e == "object" && e && "response" in e) {
 		let t = e.response;
 		if (typeof t?.data?.message == "string") return t.data.message;
@@ -32473,8 +32559,8 @@ function zF(e) {
 }
 //#endregion
 //#region src/modules/iris/components/operatorDashboard/IrisOperatorEventDetails.tsx
-function BF({ event: e, contentEntries: t, irisEndpoint: n, onEventUpdated: r }) {
-	let [i, a] = v(null), [o, s] = v(""), [c, u] = v(""), d = h(() => e ? RF(e.state) : [], [e]), f = l(async (t) => {
+function HF({ event: e, contentEntries: t, irisEndpoint: n, onEventUpdated: r }) {
+	let [i, a] = v(null), [o, s] = v(""), [c, u] = v(""), d = h(() => e ? BF(e.state) : [], [e]), f = l(async (t) => {
 		if (e) {
 			a(t), s(""), u("");
 			try {
@@ -32486,7 +32572,7 @@ function BF({ event: e, contentEntries: t, irisEndpoint: n, onEventUpdated: r })
 				let o = d.find((e) => e.action === t);
 				r(a), u(o?.successMessage ?? "Action completed.");
 			} catch (e) {
-				s(zF(e));
+				s(VF(e));
 			} finally {
 				a(null);
 			}
@@ -32528,7 +32614,7 @@ function BF({ event: e, contentEntries: t, irisEndpoint: n, onEventUpdated: r })
 						})] }), /* @__PURE__ */ x("div", {
 							className: "d-flex align-items-start",
 							children: /* @__PURE__ */ x("span", {
-								className: `badge ${PF(e.state)}`,
+								className: `badge ${IF(e.state)}`,
 								children: e.state
 							})
 						})]
@@ -32686,7 +32772,7 @@ function BF({ event: e, contentEntries: t, irisEndpoint: n, onEventUpdated: r })
 }
 //#endregion
 //#region src/modules/iris/components/operatorDashboard/IrisOperatorEventList.tsx
-function VF({ activeContext: e, events: t, selectedEventUid: n, onSelectEvent: r }) {
+function UF({ activeContext: e, events: t, selectedEventUid: n, onSelectEvent: r }) {
 	return /* @__PURE__ */ S("div", {
 		className: "border rounded overflow-hidden h-100",
 		children: [/* @__PURE__ */ S("div", {
@@ -32713,7 +32799,7 @@ function VF({ activeContext: e, events: t, selectedEventUid: n, onSelectEvent: r
 								className: t ? "text-white" : "",
 								children: e.uid
 							}), /* @__PURE__ */ x("span", {
-								className: `badge ${PF(e.state)}`,
+								className: `badge ${IF(e.state)}`,
 								children: e.state
 							})]
 						}), /* @__PURE__ */ S("div", {
@@ -32736,7 +32822,7 @@ function VF({ activeContext: e, events: t, selectedEventUid: n, onSelectEvent: r
 }
 //#endregion
 //#region src/modules/iris/hooks/useIrisStreamContextEvents.ts
-function HF({ irisEndpoint: e, context: t, onMessage: n, onError: r }) {
+function WF({ irisEndpoint: e, context: t, onMessage: n, onError: r }) {
 	let i = _(null), a = _(null), o = _(!0), s = _(0), [c, l] = v(!1);
 	return d(() => {
 		if (!t) return;
@@ -32781,7 +32867,7 @@ function HF({ irisEndpoint: e, context: t, onMessage: n, onError: r }) {
 }
 //#endregion
 //#region src/modules/iris/components/IrisOperatorDashboard.tsx
-function UF() {
+function GF() {
 	let [e, t] = v(""), [n, r] = v(""), [i, a] = v([]), [o, s] = v(""), [c, u] = v(""), f = rn();
 	d(() => {
 		n && Rt({
@@ -32793,7 +32879,7 @@ function UF() {
 	}, [n]);
 	let p = l((e) => {
 		n !== "" && e.context === n && (u(""), a((t) => [e, ...t.filter((t) => t.uid !== e.uid)]), s(e.uid));
-	}, [n]), { isConnected: m } = HF({
+	}, [n]), { isConnected: m } = WF({
 		irisEndpoint: f,
 		context: n,
 		onMessage: p,
@@ -32810,7 +32896,7 @@ function UF() {
 		}, [n])
 	}), g = l((t) => {
 		t.preventDefault(), r(e), a([]), s(""), u("");
-	}, [e]), _ = h(() => i.length === 0 ? null : i.find((e) => e.uid === o) ?? i[0], [i, o]), y = h(() => _ ? FF(_.content) : [], [_]);
+	}, [e]), _ = h(() => i.length === 0 ? null : i.find((e) => e.uid === o) ?? i[0], [i, o]), y = h(() => _ ? LF(_.content) : [], [_]);
 	return /* @__PURE__ */ x("div", {
 		className: "w-100",
 		children: /* @__PURE__ */ x("div", {
@@ -32857,7 +32943,7 @@ function UF() {
 						className: "row g-3",
 						children: [/* @__PURE__ */ x("div", {
 							className: "col-xl-5",
-							children: /* @__PURE__ */ x(VF, {
+							children: /* @__PURE__ */ x(UF, {
 								activeContext: n,
 								events: i,
 								selectedEventUid: _?.uid || "",
@@ -32865,7 +32951,7 @@ function UF() {
 							})
 						}), /* @__PURE__ */ x("div", {
 							className: "col-xl-7",
-							children: /* @__PURE__ */ x(BF, {
+							children: /* @__PURE__ */ x(HF, {
 								event: _,
 								contentEntries: y,
 								irisEndpoint: f,
@@ -32880,7 +32966,7 @@ function UF() {
 }
 //#endregion
 //#region src/utils/keySequenceListener.ts
-function WF(e) {
+function KF(e) {
 	switch (e) {
 		case "Shift": return !0;
 		case "Alt": return !0;
@@ -32889,25 +32975,25 @@ function WF(e) {
 	}
 	return !1;
 }
-function GF(e) {
+function qF(e) {
 	switch (e) {
 		case "Enter": return !0;
 		default: return !1;
 	}
 }
-function KF(e, t) {
+function JF(e, t) {
 	let n = "", r = () => {
 		n = "", t && t(n);
 	};
 	return (i) => {
 		if (i.target instanceof HTMLInputElement || i.target instanceof HTMLTextAreaElement) return;
 		let a = i.key;
-		if (!WF(a)) {
+		if (!KF(a)) {
 			if (a === "Escape") {
 				r();
 				return;
 			}
-			if (GF(a)) {
+			if (qF(a)) {
 				e(n), r();
 				return;
 			}
@@ -32917,7 +33003,7 @@ function KF(e, t) {
 }
 //#endregion
 //#region src/modules/core/providers/scannerProvider.tsx
-var qF = ({ children: e }) => {
+var YF = ({ children: e }) => {
 	let [t, n] = v(""), r = _(/* @__PURE__ */ new Map()), i = _(/* @__PURE__ */ new Map()), a = (e) => {
 		c(() => {
 			i.current.forEach((t) => t(e));
@@ -32930,7 +33016,7 @@ var qF = ({ children: e }) => {
 		});
 	};
 	return d(() => {
-		let e = KF(o, a);
+		let e = JF(o, a);
 		return document.addEventListener("keydown", e), () => {
 			document.removeEventListener("keydown", e);
 		};
@@ -32955,7 +33041,7 @@ var qF = ({ children: e }) => {
 };
 //#endregion
 //#region src/modules/run/hooks/useSelectRunWithScanner.ts
-function JF({ runsList: e, onFail: t = (e) => null }) {
+function XF({ runsList: e, onFail: t = (e) => null }) {
 	let [n, r] = v(null), { lastlyReadedKeys: i } = BA();
 	return d(() => {
 		let n = i.replace(/_/g, "-").toUpperCase(), a = e.find((e) => n.includes(e.label));
@@ -32971,6 +33057,6 @@ function JF({ runsList: e, onFail: t = (e) => null }) {
 	}, [i]), { selectedRun: n };
 }
 //#endregion
-export { he as AuthContext, fn as AuthProvider, sA as BatchCardElement, AP as ChemicalHeaderElement, vF as ChemicalIntakeElement, oA as DateFormat, lM as EditRunParents, dA as EmphasizedParametersContext, kP as EmphasizedParametersProvider, IO as EquipmentContext, VO as EquipmentDashboard, GO as EquipmentHeaderElement, UO as EquipmentProvider, OF as GoldsteinClientsDashboard, ib as GoldsteinEquipmentDashboard, EP as InputModal, UF as IrisOperatorDashboard, Ef as ModuleStatusElement, NO as MonitorCard, Fk as MonitorContext, Nk as MonitorHeaderElement, Mk as MonitorPage, Ik as MonitorProvider, cM as NewRunWizard, KA as NotificationProvider, Ck as PaginationLinks, MF as ReportResults, rA as RunContext, uA as RunHeaderElement, pM as RunInformationElement, wM as RunLayoutElement, iA as RunProvider, PM as RunStepChecklist, Tj as RunStepContext, DP as RunStepExecuteElement, OP as RunStepExecuteMinimal, DM as RunStepHeaderElement, EM as RunStepProvider, Mj as RunStepsElement, zA as ScannerContext, qF as ScannerProvider, Sy as SetupUpdateEquipment, MO as StatusMailComponent, ab as StatusMailContext, KO as StatusMailProvider, ij as StepDetails, en as initSolodbComponents, GA as notification, an as useAuth, BA as useScannerContext, JF as useSelectRunWithScanner };
+export { he as AuthContext, fn as AuthProvider, sA as BatchCardElement, AP as ChemicalHeaderElement, bF as ChemicalIntakeElement, oA as DateFormat, lM as EditRunParents, dA as EmphasizedParametersContext, kP as EmphasizedParametersProvider, IO as EquipmentContext, VO as EquipmentDashboard, GO as EquipmentHeaderElement, UO as EquipmentProvider, AF as GoldsteinClientsDashboard, ib as GoldsteinEquipmentDashboard, EP as InputModal, GF as IrisOperatorDashboard, Ef as ModuleStatusElement, NO as MonitorCard, Fk as MonitorContext, Nk as MonitorHeaderElement, Mk as MonitorPage, Ik as MonitorProvider, cM as NewRunWizard, KA as NotificationProvider, Ck as PaginationLinks, PF as ReportResults, rA as RunContext, uA as RunHeaderElement, pM as RunInformationElement, wM as RunLayoutElement, iA as RunProvider, PM as RunStepChecklist, Tj as RunStepContext, DP as RunStepExecuteElement, OP as RunStepExecuteMinimal, DM as RunStepHeaderElement, EM as RunStepProvider, Mj as RunStepsElement, zA as ScannerContext, YF as ScannerProvider, Sy as SetupUpdateEquipment, MO as StatusMailComponent, ab as StatusMailContext, KO as StatusMailProvider, ij as StepDetails, en as initSolodbComponents, GA as notification, an as useAuth, BA as useScannerContext, XF as useSelectRunWithScanner };
 
 //# sourceMappingURL=index.js.map
