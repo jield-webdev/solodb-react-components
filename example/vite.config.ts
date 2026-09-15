@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       // In development, override the @ alias to point to the main src
       // Use local source code for these libraries
+      "@jield/solodb-react-components/style.css": path.join(__dirname, "../src/style/main.css"),
       "@jield/solodb-react-components": path.join(__dirname, "../src"),
     },
     dedupe: ["react", "react-dom"],

@@ -60,6 +60,9 @@ const ReportResults = lazy(() => import("@jield/solodb-react-components").then((
 const ChemicalIntakeElement = lazy(() =>
   import("@jield/solodb-react-components").then((m) => ({ default: m.ChemicalIntakeElement }))
 );
+const PlaceFloorPlanItems = lazy(() =>
+  import("@jield/solodb-react-components").then((m) => ({ default: m.PlaceFloorPlanItems }))
+);
 
 // Loading component
 const LoadingComponent: React.FC<{ message?: string }> = ({ message }) => {
@@ -101,6 +104,9 @@ const ROUTES = {
   CHEMICAL: {
     BASE: "/:environment/chemical",
     INTAKE: "/:environment/chemical/intake",
+  },
+  ROOM: {
+    PLACE_FLOOR_PLAN_ITEMS: "/:environment/room/floor-plan/place-items/:id.html",
   },
   GOLDSTEIN: {
     DASHBOARD: "/admin/goldstein/dashboard.html",
@@ -202,6 +208,9 @@ export default function PageRoutes() {
             <Route index element={<ChemicalIntakeElement />} />
           </Route>
         </Route>
+
+        {/* Room routes */}
+        <Route path={ROUTES.ROOM.PLACE_FLOOR_PLAN_ITEMS} element={<PlaceFloorPlanItems />} />
 
         {/* Goldstein routes */}
         <Route path={ROUTES.GOLDSTEIN.DASHBOARD} element={<GoldsteinClientsDashboard />} />

@@ -9,6 +9,7 @@
 ## Setup and Development Commands
 
 - Install dependencies: `yarn install`
+- The package links `@jield/solodb-typescript-core` from `../solodb-typescript-core`; keep that sibling checkout available before installing dependencies.
 - Install example app dependencies: `yarn example:install`
 - Build library (TypeScript + Vite library build): `yarn build`
 - Start example app in dev mode: `yarn dev`
@@ -21,7 +22,7 @@
 
 - `src/index.ts`: package entrypoint; controls all public exports.
 - `src/modules/core/`: auth provider/context/hooks, shared primitives, runtime config.
-- `src/modules/equipment/`, `src/modules/monitor/`, `src/modules/run/`, `src/modules/chemical/`, `src/modules/admin/`, `src/modules/service/`: domain modules.
+- `src/modules/equipment/`, `src/modules/monitor/`, `src/modules/run/`, `src/modules/chemical/`, `src/modules/room/`, `src/modules/admin/`, `src/modules/service/`: domain modules.
 - `src/modules/partial/`: shared cross-domain UI components.
 - `src/utils/`: general utility helpers and tests.
 - `src/style/`: package-level styles.
@@ -31,6 +32,7 @@
 
 - Any new consumer-facing component, provider, hook, or type must be exported from `src/index.ts`.
 - Keep export names stable unless a breaking change is explicitly requested.
+- Consumer apps must import `@jield/solodb-react-components/style.css` for the generated library stylesheet.
 - Preserve peer dependency boundaries (React, React DOM, React Router, TanStack Query/Table, axios) so they remain external to the library bundle.
 
 ## Runtime Configuration Rules
