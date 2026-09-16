@@ -1,15 +1,24 @@
-import { MouseEvent } from "react";
 import { FloorPlan, PolygonPoints } from "@jield/solodb-typescript-core";
 import { FloorPlanPolygonData } from "@jield/solodb-react-components/modules/room/components/partial/floorPlanPolygon";
 import { usePolygonDrag } from "@jield/solodb-react-components/modules/room/hooks/usePolygonDrag";
 import {
-  clientToFloorPlanPoint,
-  insertPointOnNearestEdge,
+  RectangleHandle,
+  rectangleFromPoints,
+  rectangleHandleArea,
+  rectangleHandles,
 } from "@jield/solodb-react-components/modules/room/utils/floorPlanGeometry";
 import EditableFloorPlanShape from "./editableFloorPlanShape";
-import FloorPlanHandle from "./floorPlanHandle";
+import FloorPlanResizeArea from "./floorPlanResizeArea";
 
-export default function EditableFloorPlanPolygon({
+const resizeBandSize = 10;
+
+const handleCursor = ({ x, y }: RectangleHandle) => {
+  if (x === null) return "ns-resize";
+  if (y === null) return "ew-resize";
+  return (x === "left") === (y === "top") ? "nwse-resize" : "nesw-resize";
+};
+
+export default function EditableFloorPlanRectangle({
   floorPlan,
   polygon,
   unitsPerPixel,
@@ -22,16 +31,9 @@ export default function EditableFloorPlanPolygon({
 }) {
   const { points, isDragging, startDrag, groupProps } = usePolygonDrag({
     floorPlan,
-    points: polygon.points,
+    points: rectangleFromPoints(floorPlan, polygon.points),
     onCommit: onChange,
   });
-
-  const insertPoint = (event: MouseEvent<SVGPolygonElement>) => {
-    const svg = event.currentTarget.ownerSVGElement;
-    if (!svg) return;
-
-    onChange(insertPointOnNearestEdge(points, clientToFloorPlanPoint(svg, floorPlan, event)));
-  };
 
   return (
     <EditableFloorPlanShape
@@ -40,14 +42,14 @@ export default function EditableFloorPlanPolygon({
       isDragging={isDragging}
       unitsPerPixel={unitsPerPixel}
       groupProps={groupProps}
-      shapeProps={{ onPointerDown: (event) => startDrag(event, { kind: "move" }), onDoubleClick: insertPoint }}
+      shapeProps={{ onPointerDown: (event) => startDrag(event, { kind: "move" }) }}
     >
-      {points.map((point, index) => (
-        <FloorPlanHandle
-          key={index}
-          point={point}
-          unitsPerPixel={unitsPerPixel}
-          onPointerDown={(event) => startDrag(event, { kind: "vertex", index })}
+      {rectangleHandles.map((handle) => (
+        <FloorPlanResizeArea
+          key={`${handle.x}-${handle.y}`}
+          area={rectangleHandleArea(points, handle, resizeBandSize * unitsPerPixel)}
+          cursor={handleCursor(handle)}
+          onPointerDown={(event) => startDrag(event, { kind: "resize", handle })}
         />
       ))}
     </EditableFloorPlanShape>

@@ -11,6 +11,7 @@ export default function FloorPlanTargetList({
   isError,
   disabled,
   onSelect,
+  onPress,
 }: {
   title: string;
   targets: FloorPlanTarget[];
@@ -21,6 +22,7 @@ export default function FloorPlanTargetList({
   isError: boolean;
   disabled: boolean;
   onSelect: (target: FloorPlanTarget) => void;
+  onPress: (target: FloorPlanTarget) => void;
 }) {
   return (
     <Card className="mb-3">
@@ -37,6 +39,7 @@ export default function FloorPlanTargetList({
               action
               active={isSelected}
               disabled={disabled}
+              onPointerDown={disabled ? undefined : (event) => event.button === 0 && onPress(target)}
               onClick={() => onSelect(target)}
               className="d-flex justify-content-between align-items-center"
             >

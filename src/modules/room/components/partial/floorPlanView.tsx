@@ -7,35 +7,43 @@ import FloorPlanPolygon, {
 import { floorPlanImageUrl } from "@jield/solodb-react-components/modules/room/utils/floorPlanTargets";
 import { clientToFloorPlanPoint } from "@jield/solodb-react-components/modules/room/utils/floorPlanGeometry";
 
+type PointHandler = (point: PolygonPoint) => void;
+
 export default function FloorPlanView({
   floorPlan,
   polygons,
   onClick,
+  onPointerMove,
+  onPointerUp,
+  onPointerLeave,
   onPolygonClick,
   children,
 }: {
   floorPlan: FloorPlan;
   polygons: FloorPlanPolygonData[];
-  onClick?: (point: PolygonPoint) => void;
+  onClick?: PointHandler;
+  onPointerMove?: PointHandler;
+  onPointerUp?: PointHandler;
+  onPointerLeave?: () => void;
   onPolygonClick?: (polygon: FloorPlanPolygonData) => void;
   children?: (unitsPerPixel: number) => ReactNode;
 }) {
   const { ref, width } = useElementWidth<SVGSVGElement>();
   const unitsPerPixel = width > 0 ? floorPlan.width / width : 1;
 
-  const handleClick = (event: MouseEvent<SVGSVGElement>) => {
-    onClick?.(clientToFloorPlanPoint(event.currentTarget, floorPlan, event));
-  };
+  const withPoint = (handler: PointHandler | undefined) =>
+    handler &&
+    ((event: MouseEvent<SVGSVGElement>) => handler(clientToFloorPlanPoint(event.currentTarget, floorPlan, event)));
 
   const handleKeyDown = (event: KeyboardEvent<SVGSVGElement>) => {
-    if (!onClick || (event.key !== "Enter" && event.key !== " ")) return;
+    if (!onClick || event.key !== " ") return;
 
     event.preventDefault();
     onClick({ x: Math.round(floorPlan.width / 2), y: Math.round(floorPlan.height / 2) });
   };
 
   return (
-    <div className="floor-plan">
+    <div className={"floor-plan" + (onClick ? " floor-plan--drawing" : "")}>
       <img
         className="floor-plan__image"
         src={floorPlanImageUrl(floorPlan)}
@@ -47,7 +55,10 @@ export default function FloorPlanView({
         ref={ref}
         className={"floor-plan__overlay" + (onClick ? " floor-plan__overlay--drawing" : "")}
         viewBox={`0 0 ${floorPlan.width} ${floorPlan.height}`}
-        onClick={handleClick}
+        onClick={withPoint(onClick)}
+        onPointerMove={withPoint(onPointerMove)}
+        onPointerUp={withPoint(onPointerUp)}
+        onPointerLeave={onPointerLeave}
         onKeyDown={onClick ? handleKeyDown : undefined}
         role={onClick ? "application" : undefined}
         aria-label={onClick ? "Floor plan drawing area" : undefined}
@@ -61,11 +72,7 @@ export default function FloorPlanView({
             targetType={polygon.target.type}
             variant={polygon.variant}
             unitsPerPixel={unitsPerPixel}
-            className={[
-              onPolygonClick ? "floor-plan__polygon--selectable" : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
+            className={onPolygonClick ? "floor-plan__polygon--selectable" : ""}
             shapeProps={
               onPolygonClick && {
                 onClick: (event) => {
