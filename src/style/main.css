@@ -297,8 +297,8 @@
 }
 
 .floor-plan__polygon--equipment polygon {
-    fill: rgba(13, 110, 253, 0.52);
-    stroke: #084298;
+    fill: var(--floor-plan-equipment-back-color, rgba(108, 117, 125, 0.35));
+    stroke: #6c757d;
 }
 
 .floor-plan__polygon--zone-group polygon {
