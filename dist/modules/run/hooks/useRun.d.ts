@@ -1,5 +1,7 @@
-import { Run } from '@jield/solodb-typescript-core';
 export declare const useRun: () => {
-    run: Run | null;
+    run: import('@jield/solodb-typescript-core').Run | null;
+    isError: boolean;
+    canRetry: boolean;
+    error: Error | null;
     reloadRun: () => void;
 };

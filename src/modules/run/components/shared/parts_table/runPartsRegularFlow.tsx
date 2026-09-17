@@ -16,6 +16,7 @@ import { usePartSelection } from "@jield/solodb-react-components/modules/run/hoo
 import { usePartActions } from "@jield/solodb-react-components/modules/run/hooks/run/parts/usePartActions";
 import { PartActionsDropdown } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partActionsDropdown";
 import { PartSelectionControls } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partSelectionControls";
+import { getOrderedTrays } from "@jield/solodb-react-components/modules/run/utils/runTrays";
 import { PartActionsButtons } from "./element/partActionsButtons";
 import useQrPartNotifications from "../../../hooks/run/parts/useQrPartNotifications";
 import isRunStepReadyForProcessing from "../../../utils/isRunStepReadyForProcessing";
@@ -104,7 +105,7 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
       return [];
     }
 
-    const trays = [...(run.run_trays ?? [])].sort((a, b) => a.sequence - b.sequence);
+    const trays = getOrderedTrays(run);
     const orderedTrays =
       trays.length > 0
         ? (() => {
@@ -126,7 +127,7 @@ const RunPartsRegularFlow = ({ run, runStep }: Props) => {
       ...tray,
       allSelected: tray.partIds.every((partId) => selectedParts.get(partId)),
     }));
-  }, [run.run_trays, selectedParts, runParts, runStepParts]);
+  }, [run, selectedParts, runParts, runStepParts]);
 
   const actionsDropdown = useMemo(
     () =>

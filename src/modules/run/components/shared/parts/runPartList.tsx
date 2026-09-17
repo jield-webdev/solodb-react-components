@@ -1,32 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Run, RunPart, RunStep, RunStepPart, RunTypeEnum } from "@jield/solodb-typescript-core";
+import { getLeveledPartsForStep } from "@jield/solodb-react-components/modules/run/utils/runParts";
+import { getOrderedTrays, groupPartsByTrayId } from "@jield/solodb-react-components/modules/run/utils/runTrays";
 import { FlatGrid } from "./runPartList/flatGrid";
 import { TrayGrid } from "./runPartList/trayGrid";
 import { type RunPartRenderContext } from "./runPartList/partCell";
 import { useMemo } from "react";
-
-export const getTrayIdPerStepPart = (part: RunPart, stepPart: RunStepPart | null | undefined): number => {
-    if (!stepPart  || !stepPart.tray_id) {
-        return part.tray?.id ?? 0;
-    }
-
-    return stepPart.tray_id;
-};
-
-export const groupPartsByTrayId = (parts: RunPart[], stepParts: RunStepPart[]): Map<number, RunPart[]> => {
-  const stepPartsByPartId = new Map(stepParts.map((stepPart) => [stepPart.part_id, stepPart]));
-
-  return parts.reduce<Map<number, RunPart[]>>((acc, part) => {
-    if (!part.tray) return acc;
-
-    const trayId = getTrayIdPerStepPart(part, stepPartsByPartId.get(part.id));
-
-    const list = acc.get(trayId) ?? [];
-    list.push(part);
-    acc.set(trayId, list);
-    return acc;
-  }, new Map());
-};
 
 export const RunPartList = ({
   step,
@@ -39,18 +18,7 @@ export const RunPartList = ({
   stepParts: RunStepPart[];
   run: Run;
 }) => {
-  const leveledParts = useMemo(
-    () =>
-      parts
-        .filter((p) => p.part_level === step.part_level)
-        .sort((a, b) => {
-          if (a.root_id && b.root_id && a.root_id !== b.root_id) {
-            return a.root_id - b.root_id;
-          }
-          return a.left - b.left;
-        }),
-    [parts]
-  );
+  const leveledParts = useMemo(() => getLeveledPartsForStep(parts, step), [parts, step]);
 
   const stepPartsById = useMemo(() => {
     const map = new Map<number, RunStepPart>();
@@ -62,7 +30,7 @@ export const RunPartList = ({
     return map;
   }, [stepParts, step]);
 
-  const trays = useMemo(() => [...(run.run_trays ?? [])].sort((a, b) => a.sequence - b.sequence), [run]);
+  const trays = useMemo(() => getOrderedTrays(run), [run]);
 
   const partsByTrayId = useMemo(() => groupPartsByTrayId(leveledParts, stepParts), [leveledParts, stepParts]);
   const allNonTrayParts = useMemo(() => parts.filter((part) => !part.tray), [parts]);

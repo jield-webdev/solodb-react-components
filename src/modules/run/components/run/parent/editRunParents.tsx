@@ -22,6 +22,10 @@ export default function EditRunParents() {
       reloadRun();
       queryClient.invalidateQueries({ queryKey: [environment] });
       queryClient.invalidateQueries({ queryKey: [run.id] });
+      // Key filters match by prefix, so [run.id] only reaches the parent run picker. The run scoped
+      // lists used to refetch because the run object was part of their key; name them explicitly now.
+      queryClient.invalidateQueries({ queryKey: ["runParts", run.id] });
+      queryClient.invalidateQueries({ queryKey: ["runSteps", run.id] });
       parentRuns.selectedRuns.forEach((parentRun) => {
         queryClient.invalidateQueries({ queryKey: [parentRun.id] });
       });

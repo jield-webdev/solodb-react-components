@@ -28,6 +28,7 @@ export { default as RunStepProvider } from './modules/run/providers/runStepProvi
 export { default as EmphasizedParametersProvider } from './modules/run/providers/emphasizedParametersProvider';
 export { default as ChemicalHeaderElement } from './modules/chemical/components/chemicalHeaderElement';
 export { default as ChemicalIntakeElement } from './modules/chemical/components/chemical/chemicalIntakeElement';
+export { default as PlaceFloorPlanItems } from './modules/room/components/floor-plan/placeFloorPlanItems';
 export { default as GoldsteinClientsDashboard } from './modules/admin/components/goldsteinClientsDashboard';
 export { default as ReportResults } from './modules/service/components/ReportResult';
 export { default as IrisOperatorDashboard } from './modules/iris/components/IrisOperatorDashboard';

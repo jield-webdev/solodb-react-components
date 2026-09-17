@@ -18,7 +18,7 @@ const RunChangelogModal = ({
   const [page, setPage] = useState<number>(1);
 
   const { isPending, isLoading, isError, error, data, isFetching, isPlaceholderData } = useQuery({
-    queryKey: ["run_changelog", run, page],
+    queryKey: ["run_changelog", run.id, page],
     queryFn: () => listRunChangelog({ run: run, page: page }),
     placeholderData: keepPreviousData,
   });

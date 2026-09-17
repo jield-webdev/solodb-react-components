@@ -1,11 +1,20 @@
-import { useMemo, type CSSProperties, type DragEvent } from "react";
+import { useContext, useMemo, type CSSProperties, type DragEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import axios, { type AxiosResponse } from "axios";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { Run, RunPart, RunStep, RunStepPart, TrayType, updateRunStepPartTray } from "@jield/solodb-typescript-core";
+import { RunPart, RunStep, RunStepPart, updateRunStepPartTray } from "@jield/solodb-typescript-core";
+import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
+import { upsertRunTrayCache } from "@jield/solodb-react-components/modules/run/utils/runCache";
 import { upsertRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
+import {
+  buildTraySlots,
+  getForbiddenSlotIndices,
+  getSlotPosition,
+  isPlaceholderExtraTray,
+  resolveTrayForUpdate,
+  type RunTray,
+} from "@jield/solodb-react-components/modules/run/utils/runTrays";
 import { notification } from "@jield/solodb-react-components/utils/notification";
-
-type RunTray = NonNullable<Run["run_trays"]>[number];
 
 const handlePartDragStart = (event: DragEvent<HTMLSpanElement>, stepPart: RunStepPart) => {
   event.dataTransfer.effectAllowed = "move";
@@ -29,12 +38,14 @@ export default function RunLayoutTrayVisual({
   stepParts: RunStepPart[];
 }) {
   const queryClient = useQueryClient();
+  const { run, reloadRun } = useContext(RunContext);
   const trayType = tray.tray_type;
   const trayLabel = tray.label ? `${tray.name} - ${tray.label}` : tray.name;
+  const isExtraTray = tray.extra_tray_id > 0;
   const partsById = useMemo(() => new Map(parts.map((part) => [part.id, part])), [parts]);
   const stepPartsById = useMemo(() => new Map(stepParts.map((stepPart) => [stepPart.id, stepPart])), [stepParts]);
 
-  const handleSlotDrop = async (event: DragEvent<HTMLDivElement>, tray: RunTray, row: number, column: number) => {
+  const handleSlotDrop = async (event: DragEvent<HTMLDivElement>, row: number, column: number) => {
     event.preventDefault();
     const stepPartId = Number(event.dataTransfer.getData("text/plain"));
     const stepPart = stepPartsById.get(stepPartId);
@@ -49,29 +60,57 @@ export default function RunLayoutTrayVisual({
       return;
     }
 
-    if (stepPart.tray_id === tray.id && stepPart.tray_column === column && stepPart.tray_row === row) {
+    const part = partsById.get(stepPart.part_id);
+    if (
+      (stepPart.tray_id ?? part?.tray?.id) === tray.id &&
+      (stepPart.tray_column ?? part?.tray_column) === column &&
+      (stepPart.tray_row ?? part?.tray_row) === row
+    ) {
       // prevent changing to the same spot
       return;
     }
 
-    const existingStepPartInSlot = stepParts.find(
-      (candidate) =>
-        candidate.id !== stepPart.id &&
-        candidate.step_id === step.id &&
-        candidate.tray_id === tray.id &&
-        candidate.tray_row === row &&
-        candidate.tray_column === column &&
-        !(candidate.has_failed_in_previouse_state || candidate.failed)
-    );
+    const existingStepPartInSlot = stepParts.find((candidate) => {
+      if (
+        candidate.id === stepPart.id ||
+        candidate.step_id !== step.id ||
+        candidate.has_failed_in_previouse_state
+      ) {
+        return false;
+      }
+
+      const candidatePart = partsById.get(candidate.part_id);
+
+      return (
+        (candidate.tray_id ?? candidatePart?.tray?.id) === tray.id &&
+        (candidate.tray_row ?? candidatePart?.tray_row) === row &&
+        (candidate.tray_column ?? candidatePart?.tray_column) === column
+      );
+    });
 
     if (existingStepPartInSlot) {
       notification({
         notificationHeader: "Tray part change",
-        notificationBody: "Two PartTrays can not be in the same tray position",
+        notificationBody: "This position is occupied by a part that has not failed in this or a previous step.",
         notificationType: "danger",
       });
       return;
     }
+
+    // An extra tray that does not exist yet still needs a real tray id in the request; the backend
+    // resolves and creates the extra tray from extra_tray_id and ignores the tray id in that case.
+    const targetTray = resolveTrayForUpdate(run, tray);
+
+    if (!targetTray) {
+      notification({
+        notificationHeader: "Tray part change",
+        notificationBody: "This run has no tray to move the part to.",
+        notificationType: "danger",
+      });
+      return;
+    }
+
+    const isNewExtraTray = isPlaceholderExtraTray(tray);
 
     const expectedStepPart: RunStepPart = {
       ...stepPart,
@@ -83,8 +122,29 @@ export default function RunLayoutTrayVisual({
     upsertRunStepPartCache(queryClient, step, expectedStepPart);
 
     try {
-      const response = await updateRunStepPartTray(stepPart, tray, row, column, true);
+      const response = await updateRunStepPartTrayWithExtraTray(
+        stepPart,
+        targetTray,
+        row,
+        column,
+        true,
+        isExtraTray ? tray.extra_tray_id : undefined
+      );
+
+      if (isNewExtraTray) {
+        if (response.data.tray_id) {
+          // The backend just created the extra tray; adopt its real id so the placeholder stops being
+          // rendered and the moved part is grouped under a tray that exists.
+          upsertRunTrayCache(queryClient, run.id, { ...tray, id: response.data.tray_id });
+        } else {
+          // Without a tray id there is nothing to patch into run.run_trays, and the step part below
+          // would point at a tray the run does not know about. Refetch the run instead of losing it.
+          reloadRun();
+        }
+      }
+
       upsertRunStepPartCache(queryClient, step, response.data, { updateSubsequent: true });
+
       notification({
         notificationHeader: "Tray part change",
         notificationBody: "Part moved successfully",
@@ -108,47 +168,20 @@ export default function RunLayoutTrayVisual({
     );
   }
 
-  const trayCapacity = trayType.rows * trayType.columns;
   const trayStyle: CSSProperties = {
     "--tray-rows": trayType.rows,
     "--tray-columns": trayType.columns,
   } as CSSProperties;
-  const forbiddenSlotIndices = new Set<number>(
-    (trayType.forbidden_slots ?? [])
-      .map((slot) => getSlotIndex(trayType, slot.y, slot.x))
-      .filter((index): index is number => index !== null)
-  );
-  const slots: (RunStepPart | null)[] = Array.from({ length: trayCapacity }, () => null);
-
-  stepParts.forEach((stepPart) => {
-    const part = partsById.get(stepPart.part_id);
-    if (!part) return;
-
-    const slotIndex = getSlotIndex(
-      trayType,
-      stepPart.tray_row ?? part.tray_row,
-      stepPart.tray_column ?? part.tray_column
-    );
-
-    if (slotIndex === null) {
-      console.log(stepPart);
-      return;
-    }
-
-    if (stepPart.has_failed_in_previouse_state) return;
-
-    const slotPriority = getStepPartSlotPriority(stepPart);
-
-    const currentStepPart = slots[slotIndex];
-    const currentSlotPriority = currentStepPart ? getStepPartSlotPriority(currentStepPart) : null;
-
-    if (currentSlotPriority !== null && currentSlotPriority < slotPriority) return;
-
-    slots[slotIndex] = stepPart;
-  });
+  const forbiddenSlotIndices = getForbiddenSlotIndices(trayType);
+  const slots = buildTraySlots(trayType, parts, stepParts);
 
   return (
-    <section className="tray-visual my-2" style={trayStyle} aria-label={tray.name}>
+    <section
+      className={`tray-visual my-2${isExtraTray ? " tray-visual--extra" : ""}`}
+      style={trayStyle}
+      aria-label={tray.name}
+      data-extra-tray-id={isExtraTray ? tray.extra_tray_id : undefined}
+    >
       <h4 className="h6 mb-2">{trayLabel}</h4>
       <div className="tray-visual__frame">
         <div className="tray-visual__grid" data-orientation={trayType.orientation === "ttb" ? "ttb" : "ltr"}>
@@ -173,7 +206,7 @@ export default function RunLayoutTrayVisual({
                   data-tray-column={column}
                   data-pocket-number={pocketNumber}
                   onDragOver={handleSlotDragOver}
-                  onDrop={(event) => handleSlotDrop(event, tray, row, column)}
+                  onDrop={(event) => handleSlotDrop(event, row, column)}
                 >
                   {part && stepPart ? (
                     <OverlayTrigger
@@ -204,29 +237,6 @@ export default function RunLayoutTrayVisual({
   );
 }
 
-const getSlotIndex = (trayType: TrayType, row: number | null, column: number | null): number | null => {
-  if (!row || !column) return null;
-  if (row < 1 || column < 1 || row > trayType.rows || column > trayType.columns) return null;
-  if (trayType.orientation === "ttb") {
-    return (column - 1) * trayType.rows + (row - 1);
-  }
-  return (row - 1) * trayType.columns + (column - 1);
-};
-
-const getSlotPosition = (trayType: TrayType, slotIndex: number) => {
-  if (trayType.orientation === "ttb") {
-    return {
-      row: (slotIndex % trayType.rows) + 1,
-      column: Math.floor(slotIndex / trayType.rows) + 1,
-    };
-  }
-
-  return {
-    row: Math.floor(slotIndex / trayType.columns) + 1,
-    column: (slotIndex % trayType.columns) + 1,
-  };
-};
-
 const getTrayUpdateErrorMessage = (error: unknown): string => {
   if (typeof error === "object" && error !== null && "response" in error) {
     const response = (error as { response?: { data?: { detail?: unknown; message?: unknown } } }).response;
@@ -247,16 +257,25 @@ const getTrayUpdateErrorMessage = (error: unknown): string => {
   return "Could not move part.";
 };
 
-const getStepPartSlotPriority = (stepPart: RunStepPart): number => {
-  if (stepPart.tray_id != null && !stepPart.failed) {
-    return 1;
+const updateRunStepPartTrayWithExtraTray = (
+  stepPart: RunStepPart,
+  tray: RunTray,
+  row: number,
+  column: number,
+  updateSubsequent: boolean,
+  extraTrayId?: number
+): Promise<AxiosResponse<RunStepPart>> => {
+  if (extraTrayId === undefined) {
+    return updateRunStepPartTray(stepPart, tray, row, column, updateSubsequent);
   }
 
-  if (stepPart.tray_id != null) {
-    return 2;
-  }
-
-  return 3;
+  return axios.create().patch<RunStepPart>(`update/run/step/part/${stepPart.id}/tray`, {
+    tray_id: tray.id,
+    tray_row: row,
+    tray_column: column,
+    update_subsequent: updateSubsequent,
+    extra_tray_id: extraTrayId,
+  });
 };
 
 const getPartBadgeColor = (stepPart: RunStepPart | null): string => {

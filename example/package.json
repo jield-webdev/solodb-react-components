@@ -7,19 +7,19 @@
     "dev": "vite"
   },
   "dependencies": {
-    "@jield/solodb-react-components": "^1.2.3",
-    "@tanstack/react-query": "^5.101.0",
+    "@jield/solodb-react-components": "^1.2.7",
+    "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-table": "^8.21.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router-dom": "^7.18.0"
+    "react-router-dom": "^7.18.1"
   },
   "devDependencies": {
-    "@tanstack/react-query-devtools": "^5.101.0",
+    "@tanstack/react-query-devtools": "^5.101.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.2",
-    "typescript": "^6.0.3",
-    "vite": "^8.0.16"
+    "@vitejs/plugin-react": "^6.0.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.5"
   }
 }

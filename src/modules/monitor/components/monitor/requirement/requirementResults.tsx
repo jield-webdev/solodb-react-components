@@ -297,7 +297,7 @@ export default function RequirementResults({ requirement }: { requirement: Monit
                     <li className={"list-group-item"} key={file.url}>
                       <div className={"d-flex justify-content-between"}>
                         <span>
-                          {i + 1} <a href={GetServerUri() + file.url}>{file.name}</a>
+                          {i + 1} <a href={file.url}>{file.name}</a>
                           {file.has_monitor_step_loggings && <Badge className={"ms-1 bg-primary"}>Logging</Badge>}
                         </span>
                         <span>

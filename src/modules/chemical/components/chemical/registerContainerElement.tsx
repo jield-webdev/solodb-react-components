@@ -47,8 +47,6 @@ export default function RegisterContainerElement({
   const { environment } = useParams();
   const { addCallbackFn, removeCallbackFn } = useScannerContext();
 
-  //Keep a state for the location, because we need to change the behavior of the form in case a location has been scanned
-  // const [scannedLocation, setScannedLocation] = useState<Location | null>(location);
   const [createdContainer, setCreatedContainer] = useState<ChemicalContainer | null>(null);
 
   let currentDate = new Date();
@@ -273,7 +271,7 @@ export default function RegisterContainerElement({
             <div>
               <a
                 className={"btn btn-primary"}
-                href={`${environment}/chemical/container/details/${createdContainer.id}/general.html`}
+                href={`/${environment}/chemical/container/details/${createdContainer.id}/general.html`}
               >
                 Go to container
               </a>

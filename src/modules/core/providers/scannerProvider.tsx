@@ -28,10 +28,10 @@ export const ScannerProvider = ({ children }: { children: ReactElement }) => {
   useEffect(() => {
     const listener = makeKeyListener(onReadKeys, onReadingKeys);
 
-    document.addEventListener("keyup", listener);
+    document.addEventListener("keydown", listener);
 
     return () => {
-      document.removeEventListener("keyup", listener);
+      document.removeEventListener("keydown", listener);
     };
   }, [onReadKeys, onReadingKeys]);
 

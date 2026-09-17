@@ -3,11 +3,14 @@ import { useParams } from "react-router-dom";
 import React, { Dispatch, SetStateAction, useMemo, useState } from "react";
 import {
   ColumnDef,
+  columnVisibilityFeature,
+  createSortedRowModel,
   flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
+  rowSortingFeature,
   SortingState,
-  useReactTable,
+  tableFeatures,
+  Updater,
+  useTable,
 } from "@tanstack/react-table";
 import EditSortingPropertiesModal from "./editSortingPropertiesModal";
 import { Equipment, EquipmentGrade, FilterData } from "@jield/solodb-typescript-core";
@@ -17,6 +20,14 @@ type EquipmentPropertyColumn = {
   label: string;
   type: "int" | "float" | "string";
 };
+
+const equipmentTableFeatures = tableFeatures({
+  columnVisibilityFeature,
+  rowSortingFeature,
+  sortedRowModel: createSortedRowModel(),
+});
+
+type EquipmentColumnDef = ColumnDef<typeof equipmentTableFeatures, Equipment>;
 
 const isReserved = (equipment: Equipment): boolean => {
   return equipment.main_tool_latest_status?.status.status === "RESERVED";
@@ -82,9 +93,9 @@ export default function EquipmentTable({
 
   // Keep external sort in sync with TanStack sorting
   const handleSortingChange = React.useCallback(
-    (updater: SortingState | ((old: SortingState) => SortingState)) => {
+    (updater: Updater<SortingState>) => {
       setSorting((prev) => {
-        const next = typeof updater === "function" ? (updater as any)(prev) : updater;
+        const next = typeof updater === "function" ? updater(prev) : updater;
 
         // Mirror the first sort rule to your external state
         if (!next.length) {
@@ -107,8 +118,8 @@ export default function EquipmentTable({
     [setEquipmentSort]
   );
 
-  const columns = React.useMemo<ColumnDef<Equipment>[]>(() => {
-    const baseColumns: ColumnDef<Equipment>[] = [
+  const columns = React.useMemo<EquipmentColumnDef[]>(() => {
+    const baseColumns: EquipmentColumnDef[] = [
       {
         accessorKey: "number",
         cell: (info) => info.getValue(),
@@ -182,7 +193,7 @@ export default function EquipmentTable({
         },
       },
     ];
-    const nonPropertiesColumns: ColumnDef<Equipment>[] = [
+    const nonPropertiesColumns: EquipmentColumnDef[] = [
       {
         header: "Types",
         accessorFn: (row) => row.types?.join(", ") ?? "",
@@ -214,7 +225,7 @@ export default function EquipmentTable({
     if (properties.length === 0 || !showEquipmentProperties) {
       baseColumns.push(...nonPropertiesColumns);
     } else {
-      const renderPropertiesColumns: ColumnDef<Equipment>[] = properties.map((prop) => {
+      const renderPropertiesColumns: EquipmentColumnDef[] = properties.map((prop) => {
         const customAccessorFn = (row: Equipment) => {
           if (prop.type === "int") {
             return row.properties?.find((property) => property.property == prop.property)?.int_value ?? 0;
@@ -252,12 +263,11 @@ export default function EquipmentTable({
     return baseColumns;
   }, [environment, addDisabled, addEquipment, showEquipmentProperties, properties]);
 
-  const table = useReactTable({
+  const table = useTable({
+    features: equipmentTableFeatures,
     columns,
     data: equipmentList,
     debugTable: false,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     onSortingChange: handleSortingChange,
     state: {
       sorting,

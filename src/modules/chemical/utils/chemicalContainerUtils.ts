@@ -8,6 +8,19 @@ export function extractLabelNumber(url: string): number | null {
   return match ? parseInt(match[1], 10) : null;
 }
 
+export function scannedCodeIsRoomCode(url: string): boolean {
+  return /\/r\/\d+$/.test(url);
+}
+
+export function extractRoomNumber(url: string): number | null {
+  const match = url.match(/\/r\/(\d+)$/);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+export function normalizeScannedQrCodeContent(content: string): string {
+  return content.replace(/\\+\|/g, "|");
+}
+
 export const AMOUNT_UNITS = [
   { value: "g", label: "Gram" },
   { value: "kg", label: "Kilogram" },

@@ -4,7 +4,7 @@ Reusable React components, providers, and hooks for building SoloDB-powered appl
 
 ## Features
 
-- Ready-to-use dashboards and UI elements for Equipment, Monitor, Run, Chemical, Admin, and Service modules
+- Ready-to-use dashboards and UI elements for Equipment, Monitor, Run, Chemical, Room, Admin, and Service modules
 - Context providers and hooks for authentication and domain state
 - Lightweight runtime configuration via `initSolodbComponents`
 - TypeScript types exported for key domain entities
@@ -14,9 +14,11 @@ Reusable React components, providers, and hooks for building SoloDB-powered appl
 
 This library relies on the following peer dependencies in your app:
 
-- react (19) and react-dom (19)
-- @tanstack/react-query ~5.90
-- @tanstack/react-table ^8
+- `react` and `react-dom` (`^19`)
+- `@tanstack/react-query` (`^5.90`)
+- `@tanstack/react-table` (`^8.21`)
+- `axios` (`^1.13.2`)
+- `react-router-dom` (`^7.9`)
 
 Ensure these are installed in your application. Refer to `package.json` for the full list and exact versions.
 
@@ -25,7 +27,7 @@ Ensure these are installed in your application. Refer to `package.json` for the 
 1) Configure the library at app startup (optional but recommended):
 
 ```ts
-import { initSolodbComponents } from "solodb-react-components";
+import { initSolodbComponents } from "@jield/solodb-react-components";
 
 initSolodbComponents({
   // example: baseUrl, feature flags, timezone, etc.
@@ -58,9 +60,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 );
 ```
 
+3) Import the library stylesheet through its package export:
+
+```ts
+import "@jield/solodb-react-components/style.css";
+```
+
 ## Exports overview
 
-All exports are available from the package root (`solodb-react-components`):
+All JavaScript and TypeScript exports are available from the package root (`@jield/solodb-react-components`):
 
 - Providers: `AuthProvider`, `EquipmentProvider`, `StatusMailProvider`, `MonitorProvider`, `RunProvider`, `RunStepProvider`, `EmphasizedParametersProvider`
 - Components (selection):
@@ -68,6 +76,7 @@ All exports are available from the package root (`solodb-react-components`):
   - Monitor: `MonitorCard`, `MonitorPage`, `MonitorHeaderElement`
   - Run: `RunHeaderElement`, `RunStepsElement`, `RunInformationElement`, `RunStepHeaderElement`, `RunStepExecuteElement`
   - Chemical: `ChemicalHeaderElement`, `ChemicalIntakeElement`
+  - Room: `PlaceFloorPlanItems`
   - Admin: `GoldsteinClientsDashboard`
   - Service: `ReportResults`
   - Partials: `PaginationLinks`, `InputModal`, `DateFormat`
@@ -81,6 +90,8 @@ For the complete and up‑to‑date list, see `src/index.ts`.
 ## Example application
 
 This repository includes an example app showing typical integration.
+
+For repository development, `@jield/solodb-typescript-core` is linked from `../solodb-typescript-core`. Keep that repository checked out alongside this one before installing dependencies.
 
 Run it locally:
 

@@ -44,6 +44,9 @@ export { default as EmphasizedParametersProvider } from "./modules/run/providers
 export { default as ChemicalHeaderElement } from "./modules/chemical/components/chemicalHeaderElement";
 export { default as ChemicalIntakeElement } from "./modules/chemical/components/chemical/chemicalIntakeElement";
 
+// Room Components
+export { default as PlaceFloorPlanItems } from "./modules/room/components/floor-plan/placeFloorPlanItems";
+
 // Admin Components
 export { default as GoldsteinClientsDashboard } from "./modules/admin/components/goldsteinClientsDashboard";
 
