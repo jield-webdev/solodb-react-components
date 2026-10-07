@@ -4,7 +4,6 @@ import {
   performRunStepPartAction,
   performRunStepPartActions,
   RunStepPartActionEnum,
-  RunStepPartStateEnum,
   RunStepPart,
   RunStep,
   RunPart,
@@ -98,11 +97,7 @@ export function usePartActions({
         const runStepPart = actionableStepParts[0];
         const latestAction = await performRunStepPartAction({
           runStepPart,
-          // NOTE: the core library currently types this param as `RunStepPartStateEnum`
-          // even though `available_actions` entries are `RunStepPartActionEnum`.
-          // The numeric value is sent as-is to the backend, so this cast is safe until
-          // the core library's typing is corrected.
-          runStepPartAction: action as unknown as RunStepPartStateEnum,
+          runStepPartAction: action,
         });
         updateRunStepPartCache(queryClient, { runStepPart, latestAction });
         return;
@@ -111,14 +106,10 @@ export function usePartActions({
       const latestActions = await performRunStepPartActions({
         runStepPartActions: actionableStepParts.map((runStepPart) => ({
           runStepPart,
-          // NOTE: the core library currently types this param as `RunStepPartStateEnum`
-          // even though `available_actions` entries are `RunStepPartActionEnum`.
-          // The numeric value is sent as-is to the backend, so this cast is safe until
-          // the core library's typing is corrected.
-          runStepPartAction: action as unknown as RunStepPartStateEnum,
+          runStepPartAction: action,
         })),
       });
-      updateRunStepPartCacheByRunStep(queryClient, runStep, { latestActions });
+      updateRunStepPartCacheByRunStep(queryClient, runStep, { runStepParts: actionableStepParts, latestActions });
     },
     [getSelectedRunStepParts, queryClient, runStep]
   );

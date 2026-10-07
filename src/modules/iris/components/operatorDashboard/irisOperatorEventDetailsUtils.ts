@@ -48,9 +48,12 @@ export function getAllowedActionsForState(state: string): IrisOperatorEventActio
 
 export function getErrorMessage(error: unknown): string {
   if (typeof error === "object" && error !== null && "response" in error) {
-    const errorResponse = (error as { response?: { data?: { message?: unknown } } }).response;
+    const errorResponse = (error as { response?: { data?: { message?: unknown; error?: unknown } } }).response;
     if (typeof errorResponse?.data?.message === "string") {
       return errorResponse.data.message;
+    }
+    if (typeof errorResponse?.data?.error === "string") {
+      return errorResponse.data.error;
     }
   }
 

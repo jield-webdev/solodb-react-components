@@ -3,10 +3,21 @@ import React, { useContext, useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import UserFormElement from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
 import { AuthContext } from "@jield/solodb-react-components/modules/core/contexts/authContext";
-import { Equipment, EquipmentModule, EquipmentModuleEcn, EquipmentModuleEcnAttachment, fileToBase64, listModules } from "@jield/solodb-typescript-core";
+import {
+  createEcn,
+  createEcnAttachment,
+  deleteEcn,
+  deleteEcnAttachment,
+  Equipment,
+  EquipmentModule,
+  EquipmentModuleEcn,
+  EquipmentModuleEcnAttachment,
+  fileToBase64,
+  listModules,
+  updateEcn,
+} from "@jield/solodb-typescript-core";
 
 interface EcnModalFormProps {
   equipment: Equipment;
@@ -75,30 +86,28 @@ const EcnModalForm: React.FC<EcnModalFormProps> = ({ equipment, showModal, onClo
   // Convert and upload attachments
   const uploadFiles = (filesToUpload: File[], ecnId: number) => {
     return new Promise<void>(async (resolve, reject) => {
-        try {
-          if (attachmentsUpdated && attachments && attachments != attachmentsUpdated) {
-            const updatedAttachmentIds = new Set(attachmentsUpdated.map((attachment) => attachment.id));
-            const deleteRequests = [];
-            for (const attachment of attachments) {
-              if (!updatedAttachmentIds.has(attachment.id)) {
-                deleteRequests.push(axios.delete(`/delete/equipment/module/ecn/attachment/${attachment.id}`));
-              }
+      try {
+        if (attachmentsUpdated && attachments && attachments != attachmentsUpdated) {
+          const updatedAttachmentIds = new Set(attachmentsUpdated.map((attachment) => attachment.id));
+          const deleteRequests = [];
+          for (const attachment of attachments) {
+            if (!updatedAttachmentIds.has(attachment.id)) {
+              deleteRequests.push(deleteEcnAttachment({ id: attachment.id }));
             }
-            await Promise.all(deleteRequests);
           }
+          await Promise.all(deleteRequests);
+        }
 
         if (filesToUpload.length > 0 && ecnId) {
           await Promise.all(
             filesToUpload.map(async (file) => {
               const base64Content = await fileToBase64(file);
-              const attachement: any = {
+              await createEcnAttachment({
                 ecn_id: ecnId,
                 filename: file.name,
                 type: file.type,
                 content: base64Content,
-              };
-
-              await axios.post(`/create/equipment/module/ecn/attachment`, attachement);
+              });
             })
           );
         }
@@ -113,27 +122,26 @@ const EcnModalForm: React.FC<EcnModalFormProps> = ({ equipment, showModal, onClo
   // Submit logic
   const handleFormSubmit = async (data: any) => {
     try {
-      let updatedEcn;
+      let updatedEcn: EquipmentModuleEcn;
+
+      const ownerId: number | undefined = data?.owner?.value ?? ecn?.owner?.id;
+      if (ownerId === undefined) {
+        return;
+      }
 
       const ecnData = {
-        module_id: data.module_id,
         ecn: data.ecn,
         description: data.description,
-        owner: data?.owner.value || ecn?.owner,
+        owner: ownerId,
       };
 
       if (ecn) {
         await uploadFiles(files, ecn.id);
-
-        // Update the issue via Axios
-        const response = await axios.patch(`/update/equipment/module/ecn/${ecn?.id}`, ecnData);
-        updatedEcn = response.data;
+        updatedEcn = await updateEcn({ id: ecn.id, moduleId: ecn.module_id, ...ecnData });
       } else {
-        // Create the issue via Axios
-        const response = await axios.post(`/create/equipment/module/ecn`, ecnData);
-        updatedEcn = response.data;
+        updatedEcn = await createEcn({ moduleId: Number(data.module_id), ...ecnData });
 
-        uploadFiles(files, updatedEcn.id);
+        await uploadFiles(files, updatedEcn.id);
 
         updatedEcn.attachments = files.length;
       }
@@ -146,14 +154,15 @@ const EcnModalForm: React.FC<EcnModalFormProps> = ({ equipment, showModal, onClo
   };
 
   async function handleClose() {
-    await axios.delete(`/delete/equipment/module/ecn/${ecn?.id}`);
+    if (!ecn) return;
+    await deleteEcn({ id: ecn.id });
 
     //Closed means that the date_closed property is set on the updatedEcn, so we can do that here locally
     const updatedEcn = {
       ...ecn,
       date_closed: new Date().toISOString(),
       last_update: new Date().toISOString(),
-      updated_by: user?.full_name,
+      updated_by: user,
     };
 
     onClose(updatedEcn as EquipmentModuleEcn);

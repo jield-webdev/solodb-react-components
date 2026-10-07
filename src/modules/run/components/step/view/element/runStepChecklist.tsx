@@ -1,16 +1,18 @@
 import React, { useContext, useMemo, useState, useEffect, useCallback } from "react";
 import { Alert, Button, ListGroup } from "react-bootstrap";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import axios, { AxiosResponse } from "axios";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { useQuery } from "@tanstack/react-query";
-import ChecklistItemElement from "@jield/solodb-react-components/modules/run/components/step/view/element/checklist/checklistItemElement";
+import ChecklistItemElement, {
+  withCanFinish,
+} from "@jield/solodb-react-components/modules/run/components/step/view/element/checklist/checklistItemElement";
 import {
   listRunStepChecklistItems,
   Run,
   RunStep,
-  RunStepChecklistItem,
   finishStep,
+  skipStep,
+  unSkipStep,
 } from "@jield/solodb-typescript-core";
 import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 
@@ -57,7 +59,7 @@ export default function RunStepChecklist({
   //Grab the checklist, via a tanstack query
   const { data, error, isLoading, refetch } = useQuery({
     queryKey: ["checklist", resolvedRunStep?.id],
-    queryFn: () => listRunStepChecklistItems({ runStep: resolvedRunStep! }),
+    queryFn: () => listRunStepChecklistItems({ runStep: resolvedRunStep!, pageSize: 1000 }),
     enabled: Boolean(resolvedRunStep),
   });
 
@@ -85,7 +87,7 @@ export default function RunStepChecklist({
       setStatusMessage(statusMessages.skipping);
       setIsProcessing(true);
       try {
-        await axios.create().patch(`update/run/step/skip/${targetRunStep.id}`, {});
+        await skipStep(targetRunStep);
         setStatusMessage(statusMessages.operationSkipped);
         resolvedReloadRunStep();
       } finally {
@@ -100,7 +102,7 @@ export default function RunStepChecklist({
       setStatusMessage(statusMessages.unskipping);
       setIsProcessing(true);
       try {
-        await axios.create().patch(`update/run/step/un-skip/${targetRunStep.id}`, {});
+        await unSkipStep(targetRunStep);
         setStatusMessage(statusMessages.operationUnskipped);
         resolvedReloadRunStep();
       } finally {
@@ -113,10 +115,7 @@ export default function RunStepChecklist({
   const { checklistItems, canFinishOperation } = useMemo(() => {
     const items = data?.items ?? [];
     const firstPendingIndex = items.findIndex((item) => !item.is_executed);
-    const enhancedItems = items.map((item, index) => ({
-      ...item,
-      can_finish: index === firstPendingIndex,
-    })) as RunStepChecklistItem[];
+    const enhancedItems = withCanFinish(items);
     const canFinish = Boolean(resolvedRunStep && !resolvedRunStep.is_finished && firstPendingIndex === -1);
     return { checklistItems: enhancedItems, canFinishOperation: canFinish };
   }, [data, resolvedRunStep]);
@@ -139,7 +138,7 @@ export default function RunStepChecklist({
 
       {checklistItems.length > 0 && (
         <ListGroup>
-          {checklistItems.map((checklistItem: RunStepChecklistItem) => (
+          {checklistItems.map((checklistItem) => (
             <ChecklistItemElement checklistItem={checklistItem} refetch={refetch} key={checklistItem.id} />
           ))}
         </ListGroup>

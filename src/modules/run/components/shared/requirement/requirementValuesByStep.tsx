@@ -1,3 +1,7 @@
+import {
+  getMeasurementNumericValue,
+  isOutsideTarget,
+} from "@jield/solodb-react-components/modules/run/utils/measurementTarget";
 import { Button } from "react-bootstrap";
 import { FillValueModal } from "./fillValueModal";
 import { useEffect, useState } from "react";
@@ -78,15 +82,12 @@ export default function RequirementValuesByStep({
   }
 
   const getRowStatusClass = (value: MeasurementResultValue): string => {
-    if (!(value && !isNaN(parseFloat(value.string_value)))) return "";
-
-    const val = parseFloat(value.string_value);
+    const val = getMeasurementNumericValue(value);
+    if (val === null) return "";
     const target = requirement.targets.find((t) => t.logging_parameter.id === value.logging_parameter.id);
     if (!target) return "";
 
-    const failed = target.inclusive
-      ? !(target.min_value <= val && target.max_value >= val)
-      : !(target.min_value < val && target.max_value > val);
+    const failed = isOutsideTarget(target, val);
 
     return failed ? "table-danger text-light" : "";
   };

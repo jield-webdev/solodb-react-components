@@ -48,15 +48,13 @@ export default function MessageElement({ message }: { message: LocationMessage }
       </div>
 
       <div className="card-body">
-        <ReactMarkdown>{currentMessage.description}</ReactMarkdown>
+        <ReactMarkdown>{currentMessage.description ?? ""}</ReactMarkdown>
       </div>
 
       <div className="card-footer bg-transparent">
         <small className="text-muted d-flex flex-wrap gap-3">
           <span>Created: {formatDate(currentMessage.date_created, "DD MMM YYYY")}</span>
-          {currentMessage.last_update && (
-            <span>Updated: {formatDate(currentMessage.last_update, "DD MMM YYYY")}</span>
-          )}
+          {currentMessage.last_update && <span>Updated: {formatDate(currentMessage.last_update, "DD MMM YYYY")}</span>}
           {currentMessage.rooms.length > 0 && (
             <span>
               Rooms:{" "}
@@ -68,7 +66,7 @@ export default function MessageElement({ message }: { message: LocationMessage }
               ))}
             </span>
           )}
-          <span>Owner: {currentMessage.owner.full_name}</span>
+          {currentMessage.owner && <span>Owner: {currentMessage.owner.full_name}</span>}
         </small>
       </div>
 

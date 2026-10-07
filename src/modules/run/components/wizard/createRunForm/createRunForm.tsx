@@ -57,19 +57,31 @@ export default function CreateRunForm({
   const [location, setLocation] = useState("");
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
 
-  const { data: groupsData, isError: isGroupsError, isLoading: isGroupsLoading } = useQuery({
+  const {
+    data: groupsData,
+    isError: isGroupsError,
+    isLoading: isGroupsLoading,
+  } = useQuery({
     queryKey: ["organisation-groups", environment],
-    queryFn: () => listOrganisationGroups({ environment }),
+    queryFn: () => listOrganisationGroups({ environment, page_size: 1000 }),
   });
 
-  const { data: teamsData, isError: isTeamsError, isLoading: isTeamsLoading } = useQuery({
+  const {
+    data: teamsData,
+    isError: isTeamsError,
+    isLoading: isTeamsLoading,
+  } = useQuery({
     queryKey: ["organisation-teams", environment, TeamPurpose.Run],
-    queryFn: () => listOrganisationTeams({ environment, purpose: TeamPurpose.Run }),
+    queryFn: () => listOrganisationTeams({ environment, purpose: TeamPurpose.Run, page_size: 1000 }),
   });
 
-  const { data: projectsData, isError: isProjectsError, isLoading: isProjectsLoading } = useQuery({
+  const {
+    data: projectsData,
+    isError: isProjectsError,
+    isLoading: isProjectsLoading,
+  } = useQuery({
     queryKey: ["organisation-projects", environment, ProjectPurpose.Run],
-    queryFn: () => listOrganisationProjects({ environment, purpose: ProjectPurpose.Run }),
+    queryFn: () => listOrganisationProjects({ environment, purpose: ProjectPurpose.Run, page_size: 1000 }),
   });
 
   const trimmedName = name.trim();
@@ -248,7 +260,7 @@ export default function CreateRunForm({
           <Col sm={9}>
             <Form.Select
               value={runType}
-              onChange={(event) => setRunType(event.target.value as unknown as RunTypeEnum)}
+              onChange={(event) => setRunType(Number(event.target.value) as RunTypeEnum)}
               disabled={isSubmitting}
             >
               <option value={RunTypeEnum.RESEARCH}>Research</option>

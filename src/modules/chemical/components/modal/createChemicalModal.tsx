@@ -1,11 +1,15 @@
-import React from "react";
-import { Button, Form, InputGroup, Modal } from "react-bootstrap";
-import axios from "axios";
+import React, { useState } from "react";
+import { Alert, Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { Chemical, ChemicalPhysicalStateEnum, ChemicalStandardProductEnum } from "@jield/solodb-typescript-core";
+import {
+  Chemical,
+  ChemicalPhysicalStateEnum,
+  ChemicalStandardProductEnum,
+  createChemical,
+} from "@jield/solodb-typescript-core";
 
 //Infer the types from the Chemical interface
-type Inputs = Omit<Chemical, "id">;
+type Inputs = Omit<Chemical, "id"> & { description?: string };
 
 const CreateChemicalModal = ({
   show,
@@ -26,16 +30,25 @@ const CreateChemicalModal = ({
     defaultValues: {},
   });
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const onSubmit: SubmitHandler<Inputs> = async (values: Inputs) => {
+    setSubmitError(null);
     try {
-      const response = await axios.post("create/chemical", values);
+      const chemical = await createChemical({
+        name: values.name,
+        cas_number: values.cas_number ?? undefined,
+        description: values.description || undefined,
+        standard_product: Number(values.standard_product) as ChemicalStandardProductEnum,
+        physical_state: Number(values.physical_state) as ChemicalPhysicalStateEnum,
+      });
 
       //Pass the created chemical to the parent component
-      if (response.data) {
-        onChemicalCreate(response.data);
-      }
-    } finally {
+      onChemicalCreate(chemical);
       setShow(false);
+    } catch (e) {
+      console.error("Error creating chemical:", e);
+      setSubmitError("Could not create the chemical. Please check the values and try again.");
     }
   };
 
@@ -46,8 +59,11 @@ const CreateChemicalModal = ({
           <Modal.Title>Create new chemical</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {submitError && <Alert variant="danger">{submitError}</Alert>}
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label htmlFor={"cas_number"} className={"col-sm-3 col-form-label text-end"}>CAS Number</label>
+            <label htmlFor={"cas_number"} className={"col-sm-3 col-form-label text-end"}>
+              CAS Number
+            </label>
             <div className={"col-sm-9"}>
               <Form.Control
                 as="input"
@@ -64,7 +80,9 @@ const CreateChemicalModal = ({
           </InputGroup>
 
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label htmlFor={"name"} className={"col-sm-3 col-form-label text-end"}>Name</label>
+            <label htmlFor={"name"} className={"col-sm-3 col-form-label text-end"}>
+              Name
+            </label>
             <div className={"col-sm-9"}>
               <Form.Control
                 as="input"
@@ -79,7 +97,9 @@ const CreateChemicalModal = ({
           </InputGroup>
 
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label htmlFor={"description"} className={"col-sm-3 col-form-label text-end"}>Description</label>
+            <label htmlFor={"description"} className={"col-sm-3 col-form-label text-end"}>
+              Description
+            </label>
             <div className={"col-sm-9"}>
               <Form.Control as="textarea" rows={3} id={"description"} {...register("description")}></Form.Control>
               {errors.description && (
@@ -88,7 +108,9 @@ const CreateChemicalModal = ({
             </div>
           </InputGroup>
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label htmlFor={"standard_product"} className={"col-sm-3 col-form-label text-end"}>Standard product</label>
+            <label htmlFor={"standard_product"} className={"col-sm-3 col-form-label text-end"}>
+              Standard product
+            </label>
             <div className={"col-sm-9"}>
               <Form.Select
                 id={"standard_product"}
@@ -106,7 +128,9 @@ const CreateChemicalModal = ({
             </div>
           </InputGroup>
           <InputGroup hasValidation className={"mb-3 row"}>
-            <label htmlFor={"physical_state"} className={"col-sm-3 col-form-label text-end"}>Physical state</label>
+            <label htmlFor={"physical_state"} className={"col-sm-3 col-form-label text-end"}>
+              Physical state
+            </label>
             <div className={"col-sm-9"}>
               <Form.Select
                 id={"physical_state"}

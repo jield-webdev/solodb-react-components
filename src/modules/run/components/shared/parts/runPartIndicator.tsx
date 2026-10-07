@@ -1,14 +1,13 @@
 import { Button, Overlay, OverlayTrigger, Tooltip } from "react-bootstrap";
-import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   performRunStepPartAction,
+  createRunStepPart as createRunStepPartRequest,
   RunPart,
   RunStep,
   RunStepPart,
   RunStepPartActionEnum,
   RunStepPartState,
-  RunStepPartStateEnum,
 } from "@jield/solodb-typescript-core";
 import {
   updateRunStepPartCacheByRunStep,
@@ -77,15 +76,9 @@ const RunPartIndicator = ({
 
   const createRunStepPart = () => {
     if (!runPart || !runStep) return;
-    axios
-      .post("/create/run/step/part", {
-        run_part_id: runPart.id,
-        run_step_id: runStep.id,
-      })
-      .then((response) => {
-        const nextStepPart = { ...response.data } as RunStepPart;
-        upsertRunStepPartCache(queryClient, runStep, nextStepPart);
-      });
+    createRunStepPartRequest({ runPart, runStep }).then((nextStepPart) => {
+      upsertRunStepPartCache(queryClient, runStep, nextStepPart);
+    });
   };
 
   const doRunStepPartAction = async ({
@@ -97,11 +90,7 @@ const RunPartIndicator = ({
   }) => {
     const latestAction: RunStepPartState = await performRunStepPartAction({
       runStepPart: targetStepPart,
-      // NOTE: the core library currently types this param as `RunStepPartStateEnum`
-      // even though `available_actions` entries are `RunStepPartActionEnum`.
-      // The numeric value is sent as-is to the backend, so this cast is safe until
-      // the core library's typing is corrected.
-      runStepPartAction: runStepPartAction as unknown as RunStepPartStateEnum,
+      runStepPartAction: runStepPartAction,
     });
 
     if (!runStep) return;

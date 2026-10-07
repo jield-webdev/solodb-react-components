@@ -3,7 +3,7 @@ import { Button, Form } from "react-bootstrap";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { RunStep } from "@jield/solodb-typescript-core";
+import { RunStep, updateStep } from "@jield/solodb-typescript-core";
 
 type Inputs = {
   remark: string;
@@ -55,9 +55,7 @@ export default function StepRemark({
         return;
       }
 
-      await axios.patch("update/run/step/" + resolvedRunStep.id, {
-        remark: data.remark,
-      });
+      await updateStep({ runStep: resolvedRunStep, remark: data.remark });
       const response = await axios.get("view/run/step/" + resolvedRunStep.id);
       setRunStep({
         ...resolvedRunStep,

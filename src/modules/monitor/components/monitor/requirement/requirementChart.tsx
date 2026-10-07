@@ -26,7 +26,7 @@ export default function RequirementChart({
   let seriesIndex: any = 1;
 
   //We have to dynamically add a series in case we have a target
-  if (target.target) {
+  if (target.target !== null) {
     data[0].push("Target");
     (options.series as any)[seriesIndex] = {
       color: "#38e22c",
@@ -37,7 +37,7 @@ export default function RequirementChart({
     seriesIndex++;
   }
 
-  if (target.min_value) {
+  if (target.min_value !== null) {
     data[0].push("Min");
     (options.series as any)[seriesIndex] = {
       color: "#e2431e",
@@ -47,7 +47,7 @@ export default function RequirementChart({
     };
     seriesIndex++;
   }
-  if (target.max_value) {
+  if (target.max_value !== null) {
     data[0].push("Max");
     (options.series as any)[seriesIndex] = {
       color: "#e2431e",
@@ -59,19 +59,19 @@ export default function RequirementChart({
 
   results.forEach((result) => {
     for (const value of result.values) {
-      if (value.logging_parameter.id !== target.logging_parameter.id || value.float_value === 0) {
+      if (value.logging_parameter.id !== target.logging_parameter.id || value.float_value === null) {
         continue;
       }
 
-      let date = new Date(result.date_created);
+      let date = new Date(result.date_create);
       data.push([date, value.float_value]);
-      if (target.target) {
+      if (target.target !== null) {
         data[data.length - 1].push(target.target);
       }
-      if (target.min_value) {
+      if (target.min_value !== null) {
         data[data.length - 1].push(target.min_value);
       }
-      if (target.max_value) {
+      if (target.max_value !== null) {
         data[data.length - 1].push(target.max_value);
       }
     }

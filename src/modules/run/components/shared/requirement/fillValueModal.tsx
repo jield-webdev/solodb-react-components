@@ -1,7 +1,14 @@
-import axios from "axios";
 import { Alert, Button, Form, Modal, Spinner } from "react-bootstrap";
 import { useEffect, useMemo, useState } from "react";
-import { Requirement, MeasurementResult, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
+import {
+  createMeasurementResult,
+  deleteMeasurementResult,
+  Requirement,
+  MeasurementResult,
+  RunPart,
+  RunStepPart,
+  updateMeasurementResultValue,
+} from "@jield/solodb-typescript-core";
 
 export const FillValueModal = ({
   requirement,
@@ -59,7 +66,11 @@ export const FillValueModal = ({
       setSuccess(false);
       setLoading(true);
 
-      await axios.delete(`/delete/run/measurement/result/${result?.id ?? 0}`);
+      if (!result) {
+        throw new Error("No measurement result to delete");
+      }
+
+      await deleteMeasurementResult({ result });
 
       setSuccess(true);
       refetchFn(["requirement", "measurementResults", JSON.stringify(requirement.measurement.id)]);
@@ -80,11 +91,13 @@ export const FillValueModal = ({
       await Promise.all(
         Object.entries(valuesDictionary).map(([key, value]) => {
           const loggingParameter = Number.parseInt(key);
-          const patchBody = { value };
+          const resultValue = resultValuesByLoggingParameterId.get(loggingParameter);
 
-          const valueId = resultValuesByLoggingParameterId.get(loggingParameter)?.id;
+          if (!resultValue) {
+            throw new Error(`No measurement result value found for logging parameter ${loggingParameter}`);
+          }
 
-          return axios.patch(`/update/run/measurement/result/value/${valueId ?? 0}`, patchBody);
+          return updateMeasurementResultValue({ resultValue, value });
         })
       );
 
@@ -99,25 +112,21 @@ export const FillValueModal = ({
   };
 
   const postFn = async () => {
-    const postBody: any = {
-      measurement: requirement.measurement.id,
-      values: Object.entries(valuesDictionary).flatMap((entry) => {
-        return { logging_parameter: Number.parseInt(entry[0]), value: entry[1] };
-      }),
-    };
-
-    if (stepPart) {
-      postBody.step_part = stepPart?.id ?? 0;
-      postBody.part = part?.id ?? 0;
-      postBody.step = requirement.step.id ?? 0;
-    }
+    const values = Object.entries(valuesDictionary).map((entry) => ({
+      logging_parameter: Number.parseInt(entry[0]),
+      value: entry[1],
+    }));
 
     try {
       setError(null);
       setSuccess(false);
       setLoading(true);
 
-      await axios.post(`/create/run/measurement/result`, postBody);
+      await createMeasurementResult({
+        measurement: requirement.measurement,
+        values,
+        ...(stepPart ? { stepPartId: stepPart.id, partId: part?.id ?? 0, stepId: requirement.step.id ?? 0 } : {}),
+      });
 
       setSuccess(true);
       refetchFn(["requirement", "measurementResults", JSON.stringify(requirement.measurement.id)]);

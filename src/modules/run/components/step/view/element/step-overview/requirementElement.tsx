@@ -1,4 +1,8 @@
 import React, { useContext, useState } from "react";
+import {
+  getMeasurementNumericValue,
+  isOutsideTarget,
+} from "@jield/solodb-react-components/modules/run/utils/measurementTarget";
 import { Badge } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 import DateFormat from "@jield/solodb-react-components/modules/partial/dateFormat";
@@ -6,7 +10,13 @@ import { RunStepContext } from "@jield/solodb-react-components/modules/run/conte
 import { useQueries } from "@tanstack/react-query";
 import { MeasurementResultsBadges } from "@jield/solodb-react-components/modules/run/components/shared/requirement/measurementResultsBadge";
 import RequirementDetails from "@jield/solodb-react-components/modules/run/components/step/view/element/step-overview/requirementDetails";
-import { listMeasurementResults, MeasurementResult, Requirement, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
+import {
+  listMeasurementResults,
+  MeasurementResult,
+  Requirement,
+  RunPart,
+  RunStepPart,
+} from "@jield/solodb-typescript-core";
 
 export default function RequirementElement({
   requirement,
@@ -55,19 +65,12 @@ export default function RequirementElement({
     for (const stepPart of runStepParts) {
       const value = valuesByStepPartId.get(stepPart.id);
 
-      if (!(value && !isNaN(parseFloat(value.string_value)))) {
+      const val = getMeasurementNumericValue(value);
+      if (val === null) {
         return runStep.id === contextRunStep.id ? "bg-success-subtle" : "";
       }
 
-      const val = parseFloat(value.string_value);
-
-      const foundFail = requirement.targets.some((t) => {
-        if (t.inclusive) {
-          return !(t.min_value <= val && t.max_value >= val);
-        } else {
-          return !(t.min_value < val && t.max_value > val);
-        }
-      });
+      const foundFail = requirement.targets.some((t) => isOutsideTarget(t, val));
 
       if (foundFail) {
         failed = true;
@@ -84,15 +87,11 @@ export default function RequirementElement({
   return (
     <>
       {!hideLabel && runStep.has_label && runStep.is_own_label && (
-        <div className="bg-info text-white rounded px-3 py-1">
-          {runStep.label?.label}
-        </div>
+        <div className="bg-info text-white rounded px-3 py-1">{runStep.label?.label}</div>
       )}
 
       {runStep.step_group && firstInGroup && (
-        <div className="bg-secondary text-white rounded px-3 py-1">
-          {runStep.step_group?.label}
-        </div>
+        <div className="bg-secondary text-white rounded px-3 py-1">{runStep.step_group?.label}</div>
       )}
 
       <div
@@ -143,7 +142,9 @@ export default function RequirementElement({
         </div>
         <div className="d-flex align-items-center gap-3 flex-shrink-0 ms-auto">
           <span className="text-nowrap">{runStep.finish_user ? runStep.finish_user.initials : ""}</span>
-          <span className="text-nowrap">{runStep.has_rework ? <span className={"badge bg-primary"}>Rework</span> : ""}</span>
+          <span className="text-nowrap">
+            {runStep.has_rework ? <span className={"badge bg-primary"}>Rework</span> : ""}
+          </span>
           <span className="text-nowrap">
             {runStep.is_finished ? <DateFormat format={"DD-MM-YYYY"}>{runStep.finish_date!}</DateFormat> : ""}
           </span>

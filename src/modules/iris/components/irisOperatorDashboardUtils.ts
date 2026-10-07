@@ -49,30 +49,10 @@ export function getStateBadgeClass(state: string): string {
   return "text-bg-info";
 }
 
-export function getContentEntries(content: FileUploadEvent["content"]): ContentEntry[] {
-  if (content instanceof Map) {
-    return Array.from(content.entries());
+export function getContentEntries(content: FileUploadEvent["content"] | null | undefined): ContentEntry[] {
+  if (!content) {
+    return [];
   }
 
-  if (Array.isArray(content)) {
-    return (content as unknown[]).flatMap((entry) => {
-      if (Array.isArray(entry) && entry.length === 2 && typeof entry[0] === "string" && typeof entry[1] === "string") {
-        return [[entry[0], entry[1]] as ContentEntry];
-      }
-
-      return [];
-    });
-  }
-
-  if (typeof content === "object" && content !== null) {
-    return Object.entries(content as Record<string, unknown>).flatMap(([key, value]) => {
-      if (typeof value === "string") {
-        return [[key, value] as ContentEntry];
-      }
-
-      return [];
-    });
-  }
-
-  return [];
+  return Object.entries(content);
 }

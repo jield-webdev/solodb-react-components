@@ -21,8 +21,14 @@ const substrateToOption = (substrate: Substrate): SubstrateOption => ({
 });
 
 const loadOptions = async (inputValue: string): Promise<SubstrateOption[]> => {
-  const response = await listSubstrate({ query: inputValue || undefined });
-  return response.items.map(substrateToOption);
+  // The list endpoint no longer supports a server-side query, so filter client-side.
+  const response = await listSubstrate({ pageSize: 1000 });
+  const search = inputValue.trim().toLowerCase();
+  return response.items
+    .filter((substrate) =>
+      search === "" ? true : `${substrate.label} ${substrate.short_label}`.toLowerCase().includes(search)
+    )
+    .map(substrateToOption);
 };
 
 // customStyles is option-type agnostic, so narrowing it to SubstrateOption is safe.

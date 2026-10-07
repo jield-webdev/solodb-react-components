@@ -14,15 +14,15 @@ export default function EcnCard({
   ecn: EquipmentModuleEcn;
   equipment: Equipment;
   ecnAttachments: EquipmentModuleEcnAttachment[];
-  reloadQueryFn: (key: string[]) => void;
+  reloadQueryFn: (key: (string | number)[]) => void;
 }) {
   const [modalElement, setModalElement] = useState<React.ReactNode>(null);
   const [showModal, setShowModal] = useState(false);
   const [currentEcn, setCurrentEcn] = useState(ecn);
 
   const reloadECN = (updatedEcn: EquipmentModuleEcn) => {
-    reloadQueryFn(["ecn", equipment.name]);
-    reloadQueryFn(["ecn", "attachment", equipment.name]);
+    reloadQueryFn(["ecn", equipment.id]);
+    reloadQueryFn(["ecn", "attachment", equipment.id]);
     setCurrentEcn({
       ...currentEcn,
       ...updatedEcn,

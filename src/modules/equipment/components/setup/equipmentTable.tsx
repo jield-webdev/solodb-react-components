@@ -29,10 +29,6 @@ const equipmentTableFeatures = tableFeatures({
 
 type EquipmentColumnDef = ColumnDef<typeof equipmentTableFeatures, Equipment>;
 
-const isReserved = (equipment: Equipment): boolean => {
-  return equipment.main_tool_latest_status?.status.status === "RESERVED";
-};
-
 export default function EquipmentTable({
   equipmentList,
   currentFilter,
@@ -130,11 +126,9 @@ export default function EquipmentTable({
         enableSorting: false,
         cell: ({ row }) => {
           const equipment = row.original;
-          const reserved = isReserved(equipment);
 
           return (
             <>
-              {reserved && <span className="badge bg-info badge-inactive">RESERVED</span>}{" "}
               {equipment.is_in_fixed_setup && (
                 <span className="badge bg-info badge-inactive">In Fixed setup {equipment.fixed_setup?.name}</span>
               )}{" "}
@@ -198,6 +192,7 @@ export default function EquipmentTable({
         header: "Types",
         accessorFn: (row) => row.types?.join(", ") ?? "",
         id: "types",
+        enableSorting: false,
         cell: ({ getValue }) => <>{String(getValue() ?? "")}</>,
       },
 
@@ -205,6 +200,7 @@ export default function EquipmentTable({
         header: "Grade",
         accessorFn: (row) => row.grade,
         id: "grade",
+        enableSorting: false,
         cell: ({ getValue }) => (
           <>
             {parseInt(getValue() as string) === EquipmentGrade.Equipment ? "Equipment" : null}
@@ -218,6 +214,7 @@ export default function EquipmentTable({
         header: "Lab",
         accessorFn: (row) => row.room?.name ?? "",
         id: "roomName",
+        enableSorting: false,
         cell: ({ getValue }) => <>{String(getValue() ?? "")}</>,
       },
     ];
@@ -241,6 +238,8 @@ export default function EquipmentTable({
         return {
           header: prop.label,
           id: `property-${prop.property}`,
+          // The API only supports ordering on name, number and mes_name
+          enableSorting: false,
           accessorFn: (row) => customAccessorFn(row),
           cell: ({ row }) => {
             const equipment = row.original;

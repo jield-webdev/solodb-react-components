@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { Card, Col, Form, Row } from "react-bootstrap";
 import { Control, Controller } from "react-hook-form";
 import { QRCodeSVG } from "qrcode.react";
@@ -11,7 +10,6 @@ interface RoomSelectElementProps {
 }
 
 export default function RoomSelectElement({ control, name }: RoomSelectElementProps) {
-  const { environment } = useParams();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,8 +17,8 @@ export default function RoomSelectElement({ control, name }: RoomSelectElementPr
     async function fetchRooms() {
       try {
         const response = await listRooms({
-          environment: environment,
           withLocations: true,
+          pageSize: 1000,
         });
         setRooms(response.items);
       } catch (e) {

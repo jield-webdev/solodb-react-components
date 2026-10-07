@@ -6,7 +6,6 @@ import {
   Run,
   RunPart,
   RunStep,
-  RunStepChecklistItem,
   RunStepPart,
   startStep,
 } from "@jield/solodb-typescript-core";
@@ -17,7 +16,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import RunPartsQrFlow from "../../shared/parts_table/runPartsQrFlow";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { Alert, Button, ListGroup, OverlayTrigger, Placeholder, Tooltip } from "react-bootstrap";
-import ChecklistItemElement from "./element/checklist/checklistItemElement";
+import ChecklistItemElement, { withCanFinish } from "./element/checklist/checklistItemElement";
 
 export default function RunStepExecuteMinimal({
   run,
@@ -32,7 +31,7 @@ export default function RunStepExecuteMinimal({
 }) {
   const { data: checklistData, refetch } = useQuery({
     queryKey: ["checklist", runStep?.id],
-    queryFn: () => listRunStepChecklistItems({ runStep: runStep }),
+    queryFn: () => listRunStepChecklistItems({ runStep: runStep, pageSize: 1000 }),
   });
 
   const checklistItems = useMemo(() => checklistData?.items, [checklistData]);
@@ -139,7 +138,7 @@ export default function RunStepExecuteMinimal({
 
               {checklistItems.length > 0 && (
                 <ListGroup>
-                  {checklistItems.map((checklistItem: RunStepChecklistItem) => (
+                  {withCanFinish(checklistItems).map((checklistItem) => (
                     <ChecklistItemElement checklistItem={checklistItem} refetch={refetch} key={checklistItem.id} />
                   ))}
                 </ListGroup>

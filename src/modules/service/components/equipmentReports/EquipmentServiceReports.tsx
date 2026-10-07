@@ -62,7 +62,6 @@ export default function ListEquipmentReport() {
             <th>Name</th>
             <th>Type</th>
             <th>Team</th>
-            <th>Department</th>
             <th>Duration</th>
             <th>Report</th>
           </tr>
@@ -78,7 +77,6 @@ export default function ListEquipmentReport() {
               </td>
               <td>{svc.type?.name || "N/A"}</td>
               <td>{svc.team?.name || "N/A"}</td>
-              <td>{svc.department?.name || "N/A"}</td>
               <td>{formatDuration(svc.minutes_needed_for_service)}</td>
               <td>
                 {svc.latest_event_report_id && (

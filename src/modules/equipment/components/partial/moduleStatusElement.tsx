@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form"; // react-hook-form for managing form
-import axios from "axios"; // axios for server calls
 import { Badge, Button, Form, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import {
+  createEquipmentModuleStatus,
   EquipmentModule,
   EquipmentModuleStatus,
   EquipmentStatus,
@@ -46,7 +46,7 @@ export default function ModuleStatusElement({
     if (showModal && statusOptions.length > 0) {
       reset({
         status: moduleStatus ? moduleStatus.status.id.toString() : "",
-        description: moduleStatus ? moduleStatus.description : "",
+        description: moduleStatus?.description ?? "",
         email_responsible_users: false,
         email_trained_users: false,
       });
@@ -71,25 +71,17 @@ export default function ModuleStatusElement({
   const onSubmit = async (data: Inputs) => {
     setFormState("Saving...");
     try {
-      let postData: any = {
-        module: module.id,
+      // Send the updated status to the server
+      const result = await createEquipmentModuleStatus({
+        moduleId: module.id,
         status: Number(data.status),
         description: data.description,
-      };
-
-      if (data.email_responsible_users) {
-        postData.email_responsible_users = Boolean(data.email_responsible_users);
-      }
-
-      if (data.email_trained_users) {
-        postData.email_trained_users = Boolean(data.email_trained_users);
-      }
-
-      // Send the updated status to the server
-      let result = await axios.post<EquipmentModuleStatus>(`/create/equipment/module/status`, postData);
+        emailResponsibleUsers: data.email_responsible_users ? true : undefined,
+        emailTrainedUsers: data.email_trained_users ? true : undefined,
+      });
 
       setFormState("Save");
-      setModuleStatus(result.data);
+      setModuleStatus(result);
       refetchFn();
 
       handleCloseModal();

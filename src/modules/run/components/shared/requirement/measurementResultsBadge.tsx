@@ -1,3 +1,7 @@
+import {
+  getMeasurementNumericValue,
+  isOutsideTarget,
+} from "@jield/solodb-react-components/modules/run/utils/measurementTarget";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Requirement, RunStep, MeasurementResult, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 
@@ -34,7 +38,11 @@ export const MeasurementResultsBadges = ({
   const measurementResultByStepPartId = new Map<number, MeasurementResult>();
   for (const result of measurementResults) {
     for (const value of result.values) {
-      if (value.step_part_id !== undefined && value.step_part_id !== null && !measurementResultByStepPartId.has(value.step_part_id)) {
+      if (
+        value.step_part_id !== undefined &&
+        value.step_part_id !== null &&
+        !measurementResultByStepPartId.has(value.step_part_id)
+      ) {
         measurementResultByStepPartId.set(value.step_part_id, result);
       }
     }
@@ -56,21 +64,15 @@ export const MeasurementResultsBadges = ({
     }
 
     for (const value of result.values) {
-      const val = parseFloat(value.string_value);
+      const val = getMeasurementNumericValue(value);
       const target = targetsByLoggingParameterId.get(value.logging_parameter.id);
 
-      if (!target) {
+      if (!target || val === null) {
         continue;
       }
 
-      if (target.inclusive) {
-        if (!(target.min_value <= val && target.max_value >= val)) {
-          return "badge-failed";
-        }
-      } else {
-        if (!(target.min_value < val && target.max_value > val)) {
-          return "badge-failed";
-        }
+      if (isOutsideTarget(target, val)) {
+        return "badge-failed";
       }
     }
 

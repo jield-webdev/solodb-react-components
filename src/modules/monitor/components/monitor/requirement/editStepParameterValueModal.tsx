@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, InputGroup, Modal, Toast, ToastContainer } from "react-bootstrap";
 import { useFieldArray, useForm } from "react-hook-form";
-import axios from "axios";
-import { MonitorResultStepParameterValue } from "@jield/solodb-typescript-core";
+import {
+  deleteMonitorResultStepParameterValue,
+  MonitorResultStepParameterValue,
+  updateMonitorResultStepParameterValue,
+} from "@jield/solodb-typescript-core";
 
 interface FormValues {
   value: string;
@@ -45,7 +48,7 @@ const EditStepParameterValueModal = ({
     formState: { errors, isValid },
   } = useForm<FormValues>({
     defaultValues: {
-      value: monitorResultStepParameterValue.value.toString(),
+      value: monitorResultStepParameterValue.value?.toString() ?? "",
     },
   });
 
@@ -59,7 +62,8 @@ const EditStepParameterValueModal = ({
   }, [formValues, isValid]);
 
   async function updateMeasurementResult(data: FormValues) {
-    await axios.patch("update/monitor/requirement/result/step-parameter-value/" + monitorResultStepParameterValue.id, {
+    await updateMonitorResultStepParameterValue({
+      stepParameterValue: monitorResultStepParameterValue,
       value: data.value,
     });
 
@@ -74,10 +78,7 @@ const EditStepParameterValueModal = ({
   }
 
   async function deleteMeasurementResult() {
-    await axios.delete(
-      "delete/monitor/requirement/result/step-parameter-value/" + monitorResultStepParameterValue.id,
-      {}
-    );
+    await deleteMonitorResultStepParameterValue({ stepParameterValue: monitorResultStepParameterValue });
 
     setToastShow(true);
     setModalShow(false);

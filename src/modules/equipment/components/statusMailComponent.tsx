@@ -31,48 +31,46 @@ export default function StatusMailComponent() {
   const queries = useQueries({
     queries: [
       {
-        queryKey: ["equipment", "status_mail", JSON.stringify(statusMail.filter)],
+        queryKey: ["equipment", "status_mail", statusMail.id],
         queryFn: () => listEquipment({ statusMail: statusMail }),
       },
       {
-        queryKey: ["module", "status_mail", JSON.stringify(statusMail.filter)],
+        queryKey: ["module", "status_mail", statusMail.id],
         queryFn: () => listModules({ statusMail: statusMail }),
       },
       {
-        queryKey: ["ecn", "status_mail", JSON.stringify(statusMail.filter)],
+        queryKey: ["ecn", "status_mail", statusMail.id],
         queryFn: () => listEcn({ statusMail: statusMail }),
       },
       {
-        queryKey: ["issue", "status_mail", JSON.stringify(statusMail.filter)],
+        queryKey: ["issue", "status_mail", statusMail.id],
         queryFn: () => listIssues({ statusMail: statusMail }),
       },
       {
-        queryKey: ["messages", "status_mail", JSON.stringify(statusMail.filter)],
+        queryKey: ["messages", "status_mail", statusMail.id],
         queryFn: () => listLocationMessages({ statusMail: statusMail }),
       },
       {
-        queryKey: ["ecn", "attachment", "status_mail", JSON.stringify(statusMail.filter)],
+        queryKey: ["ecn", "attachment", "status_mail", statusMail.id],
         queryFn: () => listEcnAttachments({ statusMail: statusMail }),
       },
       {
-        queryKey: ["issue", "attachment", "status_mail", JSON.stringify(statusMail.filter)],
+        queryKey: ["issue", "attachment", "status_mail", statusMail.id],
         queryFn: () => listIssueAttachments({ statusMail: statusMail }),
       },
       {
-        queryKey: ["reservation", "active", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => listReservations({ which: "active" }),
+        queryKey: ["reservation", "active", "status_mail", statusMail.id],
+        queryFn: () => listReservations({ which: "active", pageSize: 1000 }),
       },
       {
-        queryKey: ["reservation", "upcoming", "status_mail", JSON.stringify(statusMail.filter)],
-        queryFn: () => listReservations({ which: "upcoming" }),
+        queryKey: ["reservation", "upcoming", "status_mail", statusMail.id],
+        queryFn: () => listReservations({ which: "upcoming", pageSize: 1000 }),
       },
     ],
   });
 
   const reloadQueriesByKey = (key: any[]) => {
-    let finalKeys = key;
-    finalKeys.push(JSON.stringify(statusMail.filter));
-    queryClient.refetchQueries({ queryKey: finalKeys });
+    queryClient.refetchQueries({ queryKey: [...key, statusMail.id] });
   };
 
   const [
@@ -105,7 +103,7 @@ export default function StatusMailComponent() {
     // Sort the equipment list (copy first to avoid mutating state in place)
     const sortedEquipmentList = [...equipmentList].sort((a, b) => {
       if (statusMail.classification === ClassificationsOptionEnum.ROOM) {
-        return a.room.name.localeCompare(b.room.name);
+        return (a.room?.name ?? "").localeCompare(b.room?.name ?? "");
       } else if (a.area && b.area && statusMail.classification === ClassificationsOptionEnum.AREA) {
         return a.area.title.localeCompare(b.area.title);
       } else if (a.area && b.area && statusMail.classification === ClassificationsOptionEnum.AREA_PER_FACILITY) {
@@ -115,7 +113,7 @@ export default function StatusMailComponent() {
     });
 
     // Render the equipment list with headers
-    let lastFacility: Facility | null;
+    let lastFacility: Facility | null = null;
     let lastArea: Area | null = null;
     let lastRoom = "";
     return sortedEquipmentList.map((equipment) => {
@@ -123,23 +121,24 @@ export default function StatusMailComponent() {
 
       // Add headers conditionally based on classification
       if (statusMail.classification === ClassificationsOptionEnum.ROOM) {
-        if (equipment.room.name !== lastRoom) {
-          components.push(<h2 key={`room-${equipment.room.name}`}>Room: {equipment.room.name}</h2>);
-          lastRoom = equipment.room.name;
+        const roomName = equipment.room?.name ?? "";
+        if (roomName !== lastRoom) {
+          components.push(<h2 key={`room-${roomName}`}>Room: {roomName}</h2>);
+          lastRoom = roomName;
         }
       } else if (statusMail.classification === ClassificationsOptionEnum.AREA) {
-        if (equipment.area && equipment.area !== lastArea) {
+        if (equipment.area && equipment.area.id !== lastArea?.id) {
           components.push(<h2 key={`area-${equipment.area.id}`}>Area: {equipment.area.title}</h2>);
           lastArea = equipment.area;
         }
       } else if (statusMail.classification === ClassificationsOptionEnum.AREA_PER_FACILITY) {
-        if (equipment.area && equipment.area.facility !== lastFacility) {
+        if (equipment.area && equipment.area.facility.id !== lastFacility?.id) {
           components.push(
             <h2 key={`facility-${equipment.area.facility.id}`}>Facility: {equipment.area.facility.title}</h2>
           );
           lastFacility = equipment.area.facility;
         }
-        if (equipment.area && equipment.area !== lastArea) {
+        if (equipment.area && equipment.area.id !== lastArea?.id) {
           components.push(<h4 key={`area-${equipment.area.id}`}>Area: {equipment.area.title}</h4>);
           lastArea = equipment.area;
         }

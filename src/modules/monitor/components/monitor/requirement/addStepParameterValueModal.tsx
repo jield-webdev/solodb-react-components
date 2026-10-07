@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, InputGroup, Modal, Toast, ToastContainer } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import axios from "axios";
-import { MonitorRequirement, MonitorMeasurementResult, MonitorStepParameter, listEquipmentModuleParameters, listMonitorRequirementResultMonitorStepParameterValues, listMonitorStepParameters } from "@jield/solodb-typescript-core";
+import {
+  createMonitorResultStepParameterValue,
+  getEquipmentModule,
+  MonitorRequirement,
+  MonitorMeasurementResult,
+  MonitorStepParameter,
+  listEquipmentModuleParameters,
+  listMonitorRequirementResultMonitorStepParameterValues,
+  listMonitorStepParameters,
+} from "@jield/solodb-typescript-core";
 
 interface FormValues {
   id: number;
@@ -56,18 +64,22 @@ const AddStepParameterValueModal = ({
   useEffect(() => {
     async function populate() {
       //We have to know with monitor step parameters are available for this requirement, and which have been already chosen
-      const [monitorStepParameterValues, response, equipmentModuleParameters] = await Promise.all([
+      const [monitorStepParameterValues, response, equipmentModule] = await Promise.all([
         listMonitorRequirementResultMonitorStepParameterValues({
           result: result,
+          pageSize: 1000,
         }),
         listMonitorStepParameters({
           requirement: requirement,
+          pageSize: 1000,
         }),
-        //Fetch also all the parameters from the equipment, we have to filter on them, and only show these who are selected on the tool
-        listEquipmentModuleParameters({
-          module: requirement.step.process_module.module,
-        }),
+        getEquipmentModule({ id: requirement.step.equipment_module_id }),
       ]);
+
+      //Fetch also all the parameters from the equipment, we have to filter on them, and only show these who are selected on the tool
+      const equipmentModuleParameters = equipmentModule
+        ? await listEquipmentModuleParameters({ module: equipmentModule, pageSize: 1000 })
+        : null;
 
       //The response items can have no overlap with the parameters in the monitorStepParameterValues items
       //We have to filter out the parameters that are already chosen
@@ -77,7 +89,7 @@ const AddStepParameterValueModal = ({
 
       //We keep the items which are also int he equipmentModuleParameters
       response.items = response.items.filter((item) =>
-        equipmentModuleParameters.items.map((value) => value.parameter.id).includes(item.parameter.id)
+        (equipmentModuleParameters?.items ?? []).map((value) => value.parameter.id).includes(item.parameter.id)
       );
 
       setMonitorStepParameters(response.items);
@@ -99,9 +111,14 @@ const AddStepParameterValueModal = ({
   }, [formValues, isValid]);
 
   async function saveMeasurementResult(data: FormValues) {
-    await axios.post("create/monitor/requirement/result/step-parameter-value", {
-      result: result.id,
-      step_parameter: data.module_step_parameter_id,
+    const stepParameter = monitorStepParameters.find((item) => item.id === Number(data.module_step_parameter_id));
+    if (!stepParameter) {
+      return;
+    }
+
+    await createMonitorResultStepParameterValue({
+      result: result,
+      stepParameter: stepParameter,
       value: data.value,
     });
 
@@ -128,7 +145,7 @@ const AddStepParameterValueModal = ({
           <Modal.Body>
             <Form.Group className="mb-3">
               <Form.Label>Date</Form.Label>
-              <Form.Control type={"text"} value={result.date_created} readOnly={true} />
+              <Form.Control type={"text"} value={result.date_create} readOnly={true} />
             </Form.Group>
 
             <Form.Group className="mb-3">

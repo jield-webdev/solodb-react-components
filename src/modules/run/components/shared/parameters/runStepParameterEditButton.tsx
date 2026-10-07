@@ -1,23 +1,21 @@
-import axios from "axios";
 import { useState } from "react";
-import { RunStepParameter, StepParameterValue } from "@jield/solodb-typescript-core";
+import { RunStepParameter, saveStepParameterValue, StepParameterValue } from "@jield/solodb-typescript-core";
 
-export const RunStepParameterEditButton = ({ parameter, value, refetchFn }: {parameter: RunStepParameter; value: StepParameterValue; refetchFn: () => void }) => {
+export const RunStepParameterEditButton = ({
+  parameter,
+  value,
+  refetchFn,
+}: {
+  parameter: RunStepParameter;
+  value: StepParameterValue;
+  refetchFn: () => void;
+}) => {
   const [showEdit, setShowEdit] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>(value.value);
 
   const editValue = async (newValue: string) => {
-    const payload: any = {
-      value: newValue,
-    };
-
     try {
-      if (value.id !== undefined) {
-            await axios.patch(`/update/run/step/parameter/value/${value.id}`, payload);
-      } else {
-            payload.parameter = parameter.id;
-            await axios.post(`/create/run/step/parameter/value`, payload);
-      }
+      await saveStepParameterValue({ parameter, value, newValue });
     } catch (e) {
       console.error("Failed to update parameter value with error: ", e);
     }

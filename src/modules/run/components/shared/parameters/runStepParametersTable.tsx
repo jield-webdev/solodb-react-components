@@ -17,7 +17,7 @@ export const RunStepParametersTable = ({
 }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["runStepParameters", runStep.id],
-    queryFn: () => listRunStepParameters({ runStep: runStep }),
+    queryFn: () => listRunStepParameters({ runStep: runStep, pageSize: 1000 }),
   });
 
   const queryClient = useQueryClient();

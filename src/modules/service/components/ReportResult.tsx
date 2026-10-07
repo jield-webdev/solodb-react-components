@@ -17,40 +17,48 @@ export default function ReportResults() {
   const [categorySequences, setCategorySequences] = useState<Record<string, number>>({});
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState<number>(0);
   const [report, setReport] = useState<ServiceEventReport | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Load data
   useEffect(() => {
     if (!id) return;
 
+    setLoadError(null);
+
     // Fetch results
-    listReportResult({ id: Number(id) }).then((data) => {
-      const grouped = data.reduce(
-        (acc: Record<string, ServiceEventReportResult[]>, item) => {
-          const categoryObj = item.criterion_version.type.category;
-          const key = String(categoryObj.id);
-          if (!acc[key]) {
-            acc[key] = [];
-          }
-          acc[key].push(item);
-          return acc;
-        },
-        {} as Record<string, ServiceEventReportResult[]>
-      );
+    listReportResult({ id: Number(id) })
+      .then((data) => {
+        const grouped = data.reduce(
+          (acc: Record<string, ServiceEventReportResult[]>, item) => {
+            const categoryObj = item.criterion_version.type.category;
+            const key = String(categoryObj.id);
+            if (!acc[key]) {
+              acc[key] = [];
+            }
+            acc[key].push(item);
+            return acc;
+          },
+          {} as Record<string, ServiceEventReportResult[]>
+        );
 
-      // Build labels and sequences map
-      const labels: Record<string, string> = {};
-      const sequences: Record<string, number> = {};
-      data.forEach((item) => {
-        const c = item.criterion_version.type.category as any;
-        const key = String(c.id);
-        labels[key] = c.category;
-        sequences[key] = typeof c.sequence === "number" ? c.sequence : Number.MAX_SAFE_INTEGER;
+        // Build labels and sequences map
+        const labels: Record<string, string> = {};
+        const sequences: Record<string, number> = {};
+        data.forEach((item) => {
+          const c = item.criterion_version.type.category as any;
+          const key = String(c.id);
+          labels[key] = c.category;
+          sequences[key] = typeof c.sequence === "number" ? c.sequence : Number.MAX_SAFE_INTEGER;
+        });
+
+        setGroupedReports(grouped);
+        setCategoryLabels(labels);
+        setCategorySequences(sequences);
+      })
+      .catch((error) => {
+        console.error("Error loading report results:", error);
+        setLoadError("Error loading report results");
       });
-
-      setGroupedReports(grouped);
-      setCategoryLabels(labels);
-      setCategorySequences(sequences);
-    });
 
     // Fetch report meta (event details)
     getServiceEventReport({ id: Number(id) })
@@ -98,6 +106,7 @@ export default function ReportResults() {
     }
   }, [currentCategoryIndex, totalCategories, categories, routerLocation.pathname, routerLocation.search, navigate]);
 
+  if (loadError) return <div className="alert alert-danger">{loadError}</div>;
   if (!groupedReports) return <div>Loading…</div>;
   if (totalCategories === 0) return <div>No categories found</div>;
 

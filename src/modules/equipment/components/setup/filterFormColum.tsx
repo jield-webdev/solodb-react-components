@@ -2,7 +2,12 @@ import { Fieldset, FieldsetElement, FilterData, FilterFormData } from "@jield/so
 import { populateFilterData } from "../setupUpdateEquipment";
 
 function getValueOptions(element: FieldsetElement): Record<string, string> | undefined {
-  return element.value_options ?? element.options?.value_options;
+  const valueOptions = element.value_options ?? element.options?.value_options;
+  if (Array.isArray(valueOptions)) {
+    // The API can send a plain list of values; use the value as its own label
+    return Object.fromEntries(valueOptions.map((option) => [option, option]));
+  }
+  return valueOptions;
 }
 
 function safeId(...parts: Array<string | undefined | null>): string {

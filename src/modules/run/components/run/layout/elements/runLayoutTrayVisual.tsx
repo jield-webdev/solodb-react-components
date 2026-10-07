@@ -1,8 +1,14 @@
 import { useContext, useMemo, type CSSProperties, type DragEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import axios, { type AxiosResponse } from "axios";
+import { type AxiosResponse } from "axios";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { RunPart, RunStep, RunStepPart, updateRunStepPartTray } from "@jield/solodb-typescript-core";
+import {
+  TrayTypeOrientationEnum,
+  RunPart,
+  RunStep,
+  RunStepPart,
+  updateRunStepPartTray,
+} from "@jield/solodb-typescript-core";
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 import { upsertRunTrayCache } from "@jield/solodb-react-components/modules/run/utils/runCache";
 import { upsertRunStepPartCache } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
@@ -71,11 +77,7 @@ export default function RunLayoutTrayVisual({
     }
 
     const existingStepPartInSlot = stepParts.find((candidate) => {
-      if (
-        candidate.id === stepPart.id ||
-        candidate.step_id !== step.id ||
-        candidate.has_failed_in_previouse_state
-      ) {
+      if (candidate.id === stepPart.id || candidate.step_id !== step.id || candidate.has_failed_in_previous_state) {
         return false;
       }
 
@@ -184,7 +186,10 @@ export default function RunLayoutTrayVisual({
     >
       <h4 className="h6 mb-2">{trayLabel}</h4>
       <div className="tray-visual__frame">
-        <div className="tray-visual__grid" data-orientation={trayType.orientation === "ttb" ? "ttb" : "ltr"}>
+        <div
+          className="tray-visual__grid"
+          data-orientation={trayType.orientation === TrayTypeOrientationEnum.TTB ? "ttb" : "ltr"}
+        >
           {slots.map((stepPart, slotIndex) => {
             const pocketNumber = slotIndex + 1;
             const { row, column } = getSlotPosition(trayType, slotIndex);
@@ -265,17 +270,7 @@ const updateRunStepPartTrayWithExtraTray = (
   updateSubsequent: boolean,
   extraTrayId?: number
 ): Promise<AxiosResponse<RunStepPart>> => {
-  if (extraTrayId === undefined) {
-    return updateRunStepPartTray(stepPart, tray, row, column, updateSubsequent);
-  }
-
-  return axios.create().patch<RunStepPart>(`update/run/step/part/${stepPart.id}/tray`, {
-    tray_id: tray.id,
-    tray_row: row,
-    tray_column: column,
-    update_subsequent: updateSubsequent,
-    extra_tray_id: extraTrayId,
-  });
+  return updateRunStepPartTray(stepPart, tray, row, column, updateSubsequent, extraTrayId);
 };
 
 const getPartBadgeColor = (stepPart: RunStepPart | null): string => {

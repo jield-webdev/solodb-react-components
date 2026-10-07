@@ -24,5 +24,5 @@ export const groupPartsByLevel = (parts: RunPart[]): PartLevelGroup[] => {
 };
 
 export const getPartLabel = (part: RunPart): string => {
-  return part.parsed_label || part.scanner_label || part.label || part.short_label;
+  return part.parsed_label || part.scanner_label || part.label || part.short_label || "";
 };

@@ -64,7 +64,7 @@ function PartToggleBadge({ runId, part, selection }: { runId: number; part: RunP
       bg={selected ? "primary" : "dark"}
       onClick={() => selection.togglePart(runId, part.id)}
       aria-pressed={selected}
-      title={part.label}
+      title={part.label ?? undefined}
       className={`border-0 fs-6 fw-normal px-3 py-2${selected ? " step-part-selected" : ""}`}
       style={{ cursor: "pointer" }}
     >

@@ -3,9 +3,8 @@ import { Badge, Button, ListGroup, Table } from "react-bootstrap";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import React, { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useDropzone } from "react-dropzone";
-import { RunStep, listRunStepFiles, File } from "@jield/solodb-typescript-core";
+import { RunStep, listRunStepFiles, File, deleteStepFile, uploadStepFile } from "@jield/solodb-typescript-core";
 
 const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return "0 Bytes";
@@ -40,7 +39,7 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
   const onClickDeleteFile = async (file: File) => {
     if (confirm(`Are you sure you want to delete ${file.name}? You can not undo this action`)) {
       try {
-        await axios.delete(`delete/run/step/file/${file.id}`);
+        await deleteStepFile({ file });
         refetch();
       } catch (error: any) {
         console.error(error);
@@ -72,8 +71,9 @@ export default function UploadFilesToStep({ runStep, refetchFn }: { runStep: Run
         const binaryStr = reader.result;
 
         try {
-          await axios.create().post("update/run/step/upload-file/" + runStep.id, {
-            content: binaryStr,
+          await uploadStepFile({
+            runStep,
+            content: binaryStr as string,
             filename: file.name,
             type: file.type,
           });

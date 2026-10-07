@@ -2,12 +2,23 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import ModuleStatusElement from "@jield/solodb-react-components/modules/equipment/components/partial/moduleStatusElement";
+import {
+  getMeasurementNumericValue,
+  isOutsideTarget,
+} from "@jield/solodb-react-components/modules/run/utils/measurementTarget";
 import { Badge, Placeholder } from "react-bootstrap";
 import RequirementDetails from "@jield/solodb-react-components/modules/run/components/run/steps/element/requirementDetails";
 import { keepPreviousData, useQueries, useQueryClient } from "@tanstack/react-query";
 import { MeasurementResultsBadges } from "@jield/solodb-react-components/modules/run/components/shared/requirement/measurementResultsBadge";
-import { Requirement, RunStep, RunPart, RunStepPart, EquipmentModule, MeasurementResult, listMeasurementResults,
-  listRunStepParts
+import {
+  Requirement,
+  RunStep,
+  RunPart,
+  RunStepPart,
+  EquipmentModule,
+  MeasurementResult,
+  listMeasurementResults,
+  listRunStepParts,
 } from "@jield/solodb-typescript-core";
 
 export default function RequirementStepInList({
@@ -43,7 +54,7 @@ export default function RequirementStepInList({
         queryFn: () => listMeasurementResults({ measurement: requirement.measurement }),
       },
       {
-        queryKey: ["runStepParts", (requirement.requirement_for_step?.id ?? requirement.step.id)],
+        queryKey: ["runStepParts", requirement.requirement_for_step?.id ?? requirement.step.id],
         queryFn: () => listRunStepParts({ step: requirement.requirement_for_step ?? requirement.step }),
         placeholderData: keepPreviousData,
       },
@@ -76,7 +87,6 @@ export default function RequirementStepInList({
     [requirement.targets]
   );
 
-
   const getRowStatus = (measurementResults: MeasurementResult[]): string => {
     if (measurementResults.length == 0) {
       if (isLoading) {
@@ -88,22 +98,17 @@ export default function RequirementStepInList({
     let failed = false;
     for (const measurement of measurementResults) {
       const foundFail = measurement.values.some((value) => {
-        if (!(value && !isNaN(parseFloat(value.string_value)))) {
+        const val = getMeasurementNumericValue(value);
+        if (val === null) {
           return false;
         }
-
-        const val = parseFloat(value.string_value);
         const target = targetsByLoggingParameterId.get(value.logging_parameter.id);
 
         if (!target) {
-            return false;
+          return false;
         }
 
-        if (target.inclusive) {
-          return !(target.min_value <= val && target.max_value >= val);
-        } else {
-          return !(target.min_value < val && target.max_value > val);
-        }
+        return isOutsideTarget(target, val);
       });
 
       if (foundFail) {

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { keepPreviousData, useQueries } from "@tanstack/react-query";
 import { Alert, Badge, Col, Row, Table } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
-import axios from "axios";
 import { formatDateTime } from "@jield/solodb-react-components/utils/datetime";
 import { GetServerUri } from "@jield/solodb-react-components/modules/core/utils/getServerUri";
 import RequirementChart from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/requirementChart";
@@ -10,7 +9,16 @@ import PaginationLinks from "@jield/solodb-react-components/modules/partial/pagi
 import AddResultModal from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/addResultModal";
 import AddStepParameterValueModal from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/addStepParameterValueModal";
 import EditStepParameterValueModal from "@jield/solodb-react-components/modules/monitor/components/monitor/requirement/editStepParameterValueModal";
-import { listMonitorRequirementResultMonitorStepParameterValues, listMonitorRequirementResults, listMonitorRequirementTargets, listMonitorStepFiles, MonitorRequirement, MonitorStepParameter, File } from "@jield/solodb-typescript-core";
+import {
+  uploadMonitorRequirementFile,
+  listMonitorRequirementResultMonitorStepParameterValues,
+  listMonitorRequirementResults,
+  listMonitorRequirementTargets,
+  listMonitorStepFiles,
+  MonitorRequirement,
+  MonitorStepParameter,
+  File,
+} from "@jield/solodb-typescript-core";
 
 export default function RequirementResults({ requirement }: { requirement: MonitorRequirement }) {
   const AMOUNT_OF_FILES = 11;
@@ -48,14 +56,14 @@ export default function RequirementResults({ requirement }: { requirement: Monit
         placeholderData: keepPreviousData,
       },
       {
-        queryKey: ["requirement", "monitor_step_parameters", requirement, page, pageSize],
+        queryKey: ["requirement", "monitor_step_parameters", requirement],
+        //Different collection than the results, so fetch as many as possible and match them by result id
         queryFn: () =>
           listMonitorRequirementResultMonitorStepParameterValues({
             requirement: requirement,
-            pageSize: pageSize,
+            pageSize: 1000,
             order: "date-created",
             direction: "desc",
-            page: page,
           }),
         placeholderData: keepPreviousData,
       },
@@ -86,14 +94,15 @@ export default function RequirementResults({ requirement }: { requirement: Monit
 
           //Upload the file to the server
           try {
-            await axios.create().post("update/monitor/requirement/upload-file/" + requirement.id, {
-              content: binaryStr,
+            await uploadMonitorRequirementFile({
+              requirement: requirement,
+              content: binaryStr as string,
               filename: file.name,
               type: file.type,
             });
           } catch (error: any) {
             //We know that the error is an AxiosError
-            setUploadStatus("Upload failed due to: " + error.response.data.detail);
+            setUploadStatus("Upload failed due to: " + (error.response?.data?.detail ?? error.message));
           }
 
           await requirementFilesQuery.refetch();
@@ -202,9 +211,7 @@ export default function RequirementResults({ requirement }: { requirement: Monit
                     <th>
                       <small className={"text-muted"}>{result.id}</small>
                     </th>
-                    <td>
-                      {formatDateTime(result.date_created, "DD-MM-YY HH:mm")}
-                    </td>
+                    <td>{formatDateTime(result.date_create, "DD-MM-YY HH:mm")}</td>
 
                     {targetQuery.data?.items.map((target) => {
                       const valueElements: React.ReactNode[] = [];
@@ -216,18 +223,20 @@ export default function RequirementResults({ requirement }: { requirement: Monit
                         valueElements.push(
                           <span
                             key={`${value.logging_parameter.id}-${value.float_value}`}
-                            className={value.value_is_valid ? "text-success" : "text-danger"}
+                            className={
+                              value.value_is_valid === null
+                                ? undefined
+                                : value.value_is_valid
+                                  ? "text-success"
+                                  : "text-danger"
+                            }
                           >
                             {value.float_value}
                           </span>
                         );
                       }
 
-                      return (
-                        <td key={target.id}>
-                          {valueElements}
-                        </td>
-                      );
+                      return <td key={target.id}>{valueElements}</td>;
                     })}
 
                     {reportedStepParametersWithValues.map((stepParameter) => {
@@ -305,9 +314,7 @@ export default function RequirementResults({ requirement }: { requirement: Monit
                           kiB
                         </span>
                       </div>
-                      <small className={"text-muted"}>
-                        {formatDateTime(file.date_created, "DD-MM-YY HH:mm")}
-                      </small>
+                      <small className={"text-muted"}>{formatDateTime(file.date_created, "DD-MM-YY HH:mm")}</small>
                     </li>
                   );
                 })}

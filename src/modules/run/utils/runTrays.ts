@@ -1,4 +1,4 @@
-import { Run, RunPart, RunStepPart, TrayType } from "@jield/solodb-typescript-core";
+import { TrayTypeOrientationEnum, Run, RunPart, RunStepPart, TrayType } from "@jield/solodb-typescript-core";
 
 type CoreRunTray = NonNullable<Run["run_trays"]>[number];
 
@@ -61,7 +61,11 @@ export const buildPlaceholderExtraTray = (run: Run, extraTrayId: number): RunTra
 export const resolveTrayForUpdate = (run: Run, tray: RunTray): RunTray | null => {
   if (!isPlaceholderExtraTray(tray)) return tray;
 
-  return getExtraTrays(run).find((candidate) => candidate.extra_tray_id === tray.extra_tray_id) ?? getNormalTrays(run)[0] ?? null;
+  return (
+    getExtraTrays(run).find((candidate) => candidate.extra_tray_id === tray.extra_tray_id) ??
+    getNormalTrays(run)[0] ??
+    null
+  );
 };
 
 // --- Grouping parts per tray ---
@@ -95,14 +99,14 @@ export const groupPartsByTrayId = (parts: RunPart[], stepParts: RunStepPart[]): 
 export const getSlotIndex = (trayType: TrayType, row: number | null, column: number | null): number | null => {
   if (!row || !column) return null;
   if (row < 1 || column < 1 || row > trayType.rows || column > trayType.columns) return null;
-  if (trayType.orientation === "ttb") {
+  if (trayType.orientation === TrayTypeOrientationEnum.TTB) {
     return (column - 1) * trayType.rows + (row - 1);
   }
   return (row - 1) * trayType.columns + (column - 1);
 };
 
 export const getSlotPosition = (trayType: TrayType, slotIndex: number): { row: number; column: number } => {
-  if (trayType.orientation === "ttb") {
+  if (trayType.orientation === TrayTypeOrientationEnum.TTB) {
     return {
       row: (slotIndex % trayType.rows) + 1,
       column: Math.floor(slotIndex / trayType.rows) + 1,
@@ -147,9 +151,13 @@ export const buildTraySlots = (
   stepParts.forEach((stepPart) => {
     const part = partsById.get(stepPart.part_id);
     if (!part) return;
-    if (stepPart.has_failed_in_previouse_state) return;
+    if (stepPart.has_failed_in_previous_state) return;
 
-    const slotIndex = getSlotIndex(trayType, stepPart.tray_row ?? part.tray_row, stepPart.tray_column ?? part.tray_column);
+    const slotIndex = getSlotIndex(
+      trayType,
+      stepPart.tray_row ?? part.tray_row,
+      stepPart.tray_column ?? part.tray_column
+    );
     if (slotIndex === null) return;
 
     const currentStepPart = slots[slotIndex];
