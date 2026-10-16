@@ -64,6 +64,10 @@ const PlaceFloorPlanItems = lazy(() =>
   import("@jield/solodb-react-components").then((m) => ({ default: m.PlaceFloorPlanItems }))
 );
 
+const PrimillaChatPage = lazy(() =>
+  import("@jield/solodb-react-components").then((m) => ({ default: m.PrimillaChatPage }))
+);
+
 // Loading component
 const LoadingComponent: React.FC<{ message?: string }> = ({ message }) => {
   const displayMessage = message || "Loading...";
@@ -114,6 +118,9 @@ const ROUTES = {
   },
   SERVICE: {
     REPORT_RESULTS: "/:environment/service/event/report/:id/results",
+  },
+  PRIMILLA: {
+    CHAT: "/:environment/primilla/chat",
   },
 };
 
@@ -218,6 +225,9 @@ export default function PageRoutes() {
 
         {/*SERVICES*/}
         <Route path={ROUTES.SERVICE.REPORT_RESULTS} element={<ReportResults />} />
+
+        {/*PRIMILLA*/}
+        <Route path={ROUTES.PRIMILLA.CHAT} element={<PrimillaChatPage />} />
 
         {/* 404 Not Found route */}
         <Route path="*" element={<NotFound />} />

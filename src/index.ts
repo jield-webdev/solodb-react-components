@@ -56,6 +56,9 @@ export { default as ReportResults } from "./modules/service/components/ReportRes
 // Iris components
 export { default as IrisOperatorDashboard } from "./modules/iris/components/IrisOperatorDashboard";
 
+// Primilla components
+export { default as PrimillaChatPage } from "./modules/primilla/components/chat/chatPage"
+
 // Partial Components
 export { default as PaginationLinks } from "./modules/partial/paginationLinks";
 export { default as InputModal } from "./modules/partial/modal";
