@@ -22,7 +22,7 @@
 
 - `src/index.ts`: package entrypoint; controls all public exports.
 - `src/modules/core/`: auth provider/context/hooks, shared primitives, runtime config.
-- `src/modules/equipment/`, `src/modules/monitor/`, `src/modules/run/`, `src/modules/chemical/`, `src/modules/room/`, `src/modules/admin/`, `src/modules/service/`: domain modules.
+- `src/modules/primilla/` (AI chat page, SSE streaming hook), `src/modules/equipment/`, `src/modules/monitor/`, `src/modules/run/`, `src/modules/chemical/`, `src/modules/room/`, `src/modules/admin/`, `src/modules/service/`: domain modules.
 - `src/modules/partial/`: shared cross-domain UI components.
 - `src/utils/`: general utility helpers and tests.
 - `src/style/`: package-level styles.

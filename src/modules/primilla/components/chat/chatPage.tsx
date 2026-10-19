@@ -1,21 +1,25 @@
-import { useState } from "react";
-import { usePrimilla } from "../../hooks/usePrimilla"
+import { usePrimillaChat } from "../../hooks/usePrimillaChat";
+import ChatInput from "./chatInput";
+import ChatMessageList from "./chatMessageList";
+import PrimillaIcon from "./primillaIcon";
 
 export default function PrimillaChatPage() {
-  const { sendMessage } = usePrimilla();
-
-  const [message, setMessage] = useState<string>("");
-
-  const sendMessageHandler = async () => {
-        const resp = await sendMessage({message: message});
-
-        console.log(resp);
-  }; 
+  const { messages, isPending, sendMessage } = usePrimillaChat();
 
   return (
-    <div>
-        <input type="text" value={message} onChange={(t) => setMessage(t.target.value)} />
-        <button onClick={() => sendMessageHandler()}>SEND</button>
+    <div
+      className="d-flex flex-column gap-3 mx-auto"
+      style={{ maxWidth: "80rem", height: "calc(100vh - 8rem)", minHeight: "24rem" }}
+    >
+      <header className="d-flex align-items-center gap-2 border-bottom pb-2">
+        <span className="text-primary">
+          <PrimillaIcon size={32} />
+        </span>
+        <h1 className="h3 mb-0">Primilla</h1>
+        <span className="text-body-secondary">Your SoloDB assistant</span>
+      </header>
+      <ChatMessageList messages={messages} />
+      <ChatInput disabled={isPending} onSend={sendMessage} />
     </div>
-  )
+  );
 }
