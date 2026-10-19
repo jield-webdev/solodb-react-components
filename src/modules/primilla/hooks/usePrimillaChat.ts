@@ -1,7 +1,14 @@
 import { useCallback, useRef, useState } from "react";
 import { ChatMessage } from "../interfaces/primilla";
 import { toHistory } from "../utils/chatHistory";
+import { applyToolEvent, closeToolCalls } from "../utils/toolCalls";
 import { usePrimilla } from "./usePrimilla";
+
+const finishMessage = (message: ChatMessage): ChatMessage => ({
+  ...message,
+  isStreaming: false,
+  toolCalls: closeToolCalls(message.toolCalls),
+});
 
 export const usePrimillaChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -24,18 +31,20 @@ export const usePrimillaChat = () => {
       setMessages((current) => [
         ...current,
         { id: assistantId - 1, role: "user", content: message },
-        { id: assistantId, role: "assistant", content: "" },
+        { id: assistantId, role: "assistant", content: "", isStreaming: true },
       ]);
 
       mutate(
         {
           request: { message, history },
           onChunk: (chunk) => updateMessage(assistantId, (m) => ({ ...m, content: m.content + chunk })),
+          onTool: (event) =>
+            updateMessage(assistantId, (m) => ({ ...m, toolCalls: applyToolEvent(m.toolCalls ?? [], event) })),
         },
         {
           onSuccess: ({ message: content, attachments }) =>
-            updateMessage(assistantId, (m) => ({ ...m, content, attachments })),
-          onError: (error) => updateMessage(assistantId, (m) => ({ ...m, error: error.message })),
+            updateMessage(assistantId, (m) => ({ ...finishMessage(m), content, attachments })),
+          onError: (error) => updateMessage(assistantId, (m) => ({ ...finishMessage(m), error: error.message })),
         }
       );
     },

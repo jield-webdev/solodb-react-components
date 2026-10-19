@@ -1,12 +1,23 @@
-import { Attachment, PostMessageRequest, PostMessageResponse } from "../interfaces/primilla";
+import { Attachment, PostMessageRequest, PostMessageResponse, ToolEvent } from "../interfaces/primilla";
 import { getPrimillaPathUrl, PrimillaError, primillaFetch } from "./primillaApi";
 import { readSseEvents } from "./readSseEvents";
 
-const DONE_MARKER = "[DONE]";
+export interface StreamHandlers {
+  onChunk: (chunk: string) => void;
+  onTool: (event: ToolEvent) => void;
+}
+
+const getStreamErrorMessage = (data: string): string => {
+  try {
+    return (JSON.parse(data) as { error?: string }).error ?? "Primilla failed while answering";
+  } catch {
+    return "Primilla failed while answering";
+  }
+};
 
 export async function streamMessage(
   request: PostMessageRequest,
-  onChunk: (chunk: string) => void
+  { onChunk, onTool }: StreamHandlers
 ): Promise<PostMessageResponse> {
   if (!request.message.trim()) {
     throw new PrimillaError("The message cannot be empty");
@@ -26,17 +37,23 @@ export async function streamMessage(
   let attachments: Attachment[] | undefined;
 
   for await (const { event, data } of readSseEvents(response.body)) {
-    if (event === "error") {
-      throw new PrimillaError("Primilla failed while answering, please try again");
-    }
-    if (event === "attachments") {
-      attachments = JSON.parse(data) as Attachment[];
-    } else if (data === DONE_MARKER) {
-      return { message, attachments };
-    } else {
-      const chunk = JSON.parse(data) as string;
-      message += chunk;
-      onChunk(chunk);
+    switch (event) {
+      case "done":
+        return { message, attachments };
+      case "error":
+        throw new PrimillaError(getStreamErrorMessage(data));
+      case "tool":
+        onTool(JSON.parse(data) as ToolEvent);
+        break;
+      case "attachments":
+        attachments = JSON.parse(data) as Attachment[];
+        break;
+      case "message": {
+        const chunk = JSON.parse(data) as string;
+        message += chunk;
+        onChunk(chunk);
+        break;
+      }
     }
   }
 

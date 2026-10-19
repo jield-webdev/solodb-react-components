@@ -22,11 +22,25 @@ export interface PostMessageResponse {
   attachments?: Attachment[];
 }
 
+export interface ToolEvent {
+  name: string;
+  state: "start" | "done" | "error";
+}
+
+export interface ToolCall {
+  id: number;
+  name: string;
+  state: "running" | "done" | "error";
+  awaitingStart?: boolean;
+}
+
 export interface ChatMessage {
   id: number;
   role: ChatRole;
   content: string;
   attachments?: Attachment[];
+  toolCalls?: ToolCall[];
+  isStreaming?: boolean;
   error?: string;
 }
 
