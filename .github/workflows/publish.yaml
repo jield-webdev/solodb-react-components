@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Unique prerelease version, e.g. 1.3.3-beta.0'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -20,6 +26,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Enable Corepack
         run: |
@@ -29,8 +36,49 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      - name: Prepare package version and npm tag
+        id: release
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          node --input-type=commonjs <<'NODE'
+          const fs = require("node:fs");
+          const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+          const manual = process.env.GITHUB_EVENT_NAME === "workflow_dispatch";
+          const version = manual ? process.env.INPUT_VERSION : pkg.version;
+          const number = "(?:0|[1-9][0-9]*)";
+          const identifier = "(?:0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)";
+          const semver = new RegExp(`^${number}\\.${number}\\.${number}(?:-${identifier}(?:\\.${identifier})*)?$`);
+
+          if (typeof version !== "string" || !semver.test(version) || version !== version.trim()) {
+            throw new Error("Use a valid SemVer version without build metadata, e.g. 1.3.3-beta.0.");
+          }
+
+          const prerelease = version.includes("-");
+          if (manual && !prerelease) {
+            throw new Error("Manual publishing requires a prerelease version; use a vX.Y.Z tag for stable releases.");
+          }
+          if (!manual && process.env.GITHUB_REF !== `refs/tags/v${version}`) {
+            throw new Error("The pushed tag must match the package.json version exactly.");
+          }
+
+          if (manual) {
+            pkg.version = version;
+            fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2) + "\n");
+          }
+
+          const npmTag = prerelease ? "beta" : "latest";
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `version=${version}\nnpm_tag=${npmTag}\n`);
+          console.log(`Publishing ${pkg.name}@${version} under ${npmTag}`);
+          NODE
+
+      - name: Test
+        run: yarn vitest run
+
       - name: Build
         run: yarn build
 
       - name: Publish to npm
-        run: npm publish 
+        env:
+          NPM_TAG: ${{ steps.release.outputs.npm_tag }}
+        run: npm publish --tag "$NPM_TAG"
