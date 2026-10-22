@@ -107,12 +107,65 @@ yarn run example:install
 yarn dev
 ```
 
-## Release
+## Deployment
 
-Run the guided release script from the repository root:
+Packages are published to npm by [Publish Package](.github/workflows/publish.yaml). Every publication installs the locked dependencies, runs the tests, and builds the library before publishing the compiled JavaScript, TypeScript declarations, and stylesheet from `dist/`.
+
+Stable versions such as `1.3.3` are published under npm's `latest` tag. All prerelease versions, including `alpha`, `beta`, and `rc` versions, are published under `beta`, leaving `latest` unchanged. Each publication needs a unique version; npm versions cannot be overwritten. Versions must use SemVer without build metadata (`+...`). See [npm distribution tags](https://docs.npmjs.com/adding-dist-tags-to-packages/).
+
+### Publish a branch preview
+
+Use a prerelease to test branch changes in another project before merging or making a stable release:
+
+1. Push your branch, including the updated publishing workflow.
+2. On GitHub, open **Actions → Publish Package → Run workflow**.
+3. Select your branch in **Use workflow from**.
+4. Enter an unused prerelease version, for example `1.3.3-beta.0`, and run the workflow.
+
+The workflow uses the selected branch and changes the package version only in the CI checkout. It does not commit, create a Git tag, or merge the branch. Manual runs require a prerelease version. For another preview, increment the version, for example to `1.3.3-beta.1`.
+
+The manual trigger becomes available once this workflow is on the repository's default branch. See [GitHub's manual workflow documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onworkflow_dispatch).
+
+After publication succeeds, install the exact version in the consuming project:
+
+```bash
+yarn add --exact @jield/solodb-react-components@1.3.3-beta.0
+```
+
+This produces a dependency in `package.json` like:
+
+```json
+{
+  "dependencies": {
+    "@jield/solodb-react-components": "1.3.3-beta.0"
+  }
+}
+```
+
+Commit the consuming project's lockfile as well. Pinning the version makes installs reproducible; a newer preview is adopted by explicitly updating the dependency. You can also install the current preview with `yarn add --exact @jield/solodb-react-components@beta`, which resolves the current `beta` tag to an exact version.
+
+Consumer apps must also import the library stylesheet:
+
+```ts
+import "@jield/solodb-react-components/style.css";
+```
+
+Using a published prerelease gives consumers the built package without depending on Git branch build behavior or the freshness of committed `dist/` files.
+
+### Publish from a Git tag
+
+Pushing a `v*` tag also publishes the package. The tag must match the committed `package.json` version exactly: `v1.3.3` publishes version `1.3.3` under `latest`, while `v1.3.3-beta.0` publishes version `1.3.3-beta.0` under `beta`. A mismatch fails before publishing. A GitHub Release is not required.
+
+For a stable release, run the guided release script from the repository root:
 
 ```bash
 yarn release
 ```
 
 The script starts from `develop`, upgrades dependencies, shows the resulting changes, prompts for the next package version, optionally runs tests and a build, commits the release on `develop`, merges it into `main`, pushes `main`, creates an annotated `vX.Y.Z` tag on `main`, pushes the tag to GitHub, and switches back to `develop`.
+
+For branch previews, use the manual workflow above to publish directly from your branch.
+
+### Publishing authentication
+
+The workflow uses npm trusted publishing (OIDC), with `id-token: write` permission. The npm package must have a GitHub trusted publisher configured for owner `jield-webdev`, repository `solodb-react-components`, and workflow filename `publish.yaml`. No npm publishing token is stored in the workflow. See [npm trusted publishing setup](https://docs.npmjs.com/trusted-publishers/).

@@ -17,6 +17,8 @@
 - Run tests in watch mode: `yarn test:watch`
 - Generate coverage report: `yarn coverage`
 - Run guided release flow: `yarn release`
+- Deployment is documented in `README.md`. `.github/workflows/publish.yaml` tests, builds, and publishes on `v*` tag pushes or manual runs. Tags must match the committed package version; stable versions publish under `latest`, and all prereleases publish under `beta`.
+- For a branch preview, manually run `Publish Package` on the desired branch with a unique prerelease `version` input (for example `1.3.3-beta.0`). The version changes only in CI; no commit, tag, or merge is created. Manual runs reject stable versions. Publishing uses npm trusted publishing (OIDC).
 
 ## Architecture Map
 
