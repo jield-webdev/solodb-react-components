@@ -3,5 +3,5 @@ type SelectedRunListProps = {
     selectedRuns: Run[];
     onDeselect: (runId: number) => void;
 };
-export default function SelectedRunList({ selectedRuns, onDeselect }: SelectedRunListProps): import("react").JSX.Element;
+export default function SelectedRunList({ selectedRuns, onDeselect }: SelectedRunListProps): import('react').JSX.Element;
 export {};

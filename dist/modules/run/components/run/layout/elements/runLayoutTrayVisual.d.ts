@@ -5,4 +5,4 @@ export default function RunLayoutTrayVisual({ step, tray, parts, stepParts, }: {
     tray: RunTray;
     parts: RunPart[];
     stepParts: RunStepPart[];
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;

@@ -11,5 +11,5 @@ export default function FloorPlanView({ floorPlan, polygons, onClick, onPointerM
     onPointerLeave?: () => void;
     onPolygonClick?: (polygon: FloorPlanPolygonData) => void;
     children?: (unitsPerPixel: number) => ReactNode;
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;
 export {};

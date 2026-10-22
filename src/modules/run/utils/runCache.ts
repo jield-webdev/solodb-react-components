@@ -4,6 +4,12 @@ import { getExtraTrayId, type RunTray } from "@jield/solodb-react-components/mod
 
 export const getRunQueryKey = (runId: number) => ["run", runId] as const;
 
+export const removeRunTrayCache = (queryClient: QueryClient, runId: number, trayId: number): void => {
+  queryClient.setQueryData<Run>(getRunQueryKey(runId), (run) =>
+    run ? { ...run, run_trays: (run.run_trays ?? []).filter((tray) => tray.id !== trayId) } : run
+  );
+};
+
 export const upsertRunTrayCache = (queryClient: QueryClient, runId: number, tray: RunTray): void => {
   queryClient.setQueryData<Run>(getRunQueryKey(runId), (run) => {
     if (!run) return run;

@@ -9,4 +9,4 @@ export default function EditableFloorPlanShape({ polygon, points, isDragging, un
     groupProps: SVGProps<SVGGElement>;
     shapeProps: SVGProps<SVGPolygonElement>;
     children: ReactNode;
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;

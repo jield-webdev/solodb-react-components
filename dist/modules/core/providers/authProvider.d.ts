@@ -1,4 +1,4 @@
 import { ReactNode } from 'react';
 export declare const AuthProvider: ({ children }: {
     children: ReactNode;
-}) => import("react").JSX.Element;
+}) => import('react').JSX.Element;

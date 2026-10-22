@@ -16,4 +16,4 @@ export default function FloorPlanEditor({ floorPlan, polygons, selection, draft,
     onDelete: () => void;
     onRemove: () => void;
     isBusy: boolean;
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;

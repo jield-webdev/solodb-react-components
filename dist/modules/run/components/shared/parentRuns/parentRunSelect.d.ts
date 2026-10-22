@@ -5,5 +5,5 @@ type ParentRunSelectProps = {
     /** When given, only runs available as parent for this run are offered. */
     run?: Run;
 };
-export default function ParentRunSelect({ selection, run }: ParentRunSelectProps): import("react").JSX.Element;
+export default function ParentRunSelect({ selection, run }: ParentRunSelectProps): import('react').JSX.Element;
 export {};

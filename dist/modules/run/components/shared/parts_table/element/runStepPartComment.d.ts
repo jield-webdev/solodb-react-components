@@ -3,5 +3,5 @@ declare const RunStepPartComment: ({ runStepPart, setRunStepPart, editable, }: {
     runStepPart: RunStepPart;
     setRunStepPart: (runStepPart: RunStepPart) => void;
     editable?: boolean;
-}) => import("react").JSX.Element;
+}) => import('react').JSX.Element;
 export default RunStepPartComment;

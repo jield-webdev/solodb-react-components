@@ -27,6 +27,7 @@
 - `src/utils/`: general utility helpers and tests.
 - `src/style/`: package-level styles.
 - `example/src/`: integration harness that consumes this package.
+- Run layout extra trays are explicitly created and managed across the run. Tray mutations use `create/run/tray`, `update/run/tray/{id}`, and `delete/run/tray/{id}`; the PHP API must reject removal of trays referenced by any part or step.
 
 ## Public API and Export Rules
 

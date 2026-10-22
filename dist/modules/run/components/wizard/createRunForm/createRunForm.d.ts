@@ -19,5 +19,5 @@ type CreateRunFormProps = {
     onBack: () => void;
     onSubmit: (values: CreateRunFormValues) => void;
 };
-export default function CreateRunForm({ isSubmitting, errorMessage, selectedRuns, selectedSubstrates, partIdsByRunId, onBack, onSubmit, }: CreateRunFormProps): import("react").JSX.Element;
+export default function CreateRunForm({ isSubmitting, errorMessage, selectedRuns, selectedSubstrates, partIdsByRunId, onBack, onSubmit, }: CreateRunFormProps): import('react').JSX.Element;
 export {};

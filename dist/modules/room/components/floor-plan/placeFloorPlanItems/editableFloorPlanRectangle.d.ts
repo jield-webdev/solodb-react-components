@@ -5,4 +5,4 @@ export default function EditableFloorPlanRectangle({ floorPlan, polygon, unitsPe
     polygon: FloorPlanPolygonData;
     unitsPerPixel: number;
     onChange: (points: PolygonPoints) => void;
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;

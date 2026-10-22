@@ -5,4 +5,4 @@ export default function FloorPlanDraftPolygon({ points, pointer, canClose, units
     canClose: boolean;
     unitsPerPixel: number;
     onClose: () => void;
-}): import("react").JSX.Element | null;
+}): import('react').JSX.Element | null;

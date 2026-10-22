@@ -1,1 +1,1 @@
-export default function EditRunParents(): import("react").JSX.Element;
+export default function EditRunParents(): import('react').JSX.Element;

@@ -1,1 +1,1 @@
-export default function RunInformationElement(): import("react").JSX.Element;
+export default function RunInformationElement(): import('react').JSX.Element;

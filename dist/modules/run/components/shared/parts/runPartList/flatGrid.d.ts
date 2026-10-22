@@ -9,4 +9,4 @@ export declare const FlatGrid: ({ leveledParts, allNonTrayParts, isSplitLevel, c
     allNonTrayParts: RunPart[];
     isSplitLevel: boolean;
     context: RunPartRenderContext;
-}) => import("react").JSX.Element;
+}) => import('react').JSX.Element;

@@ -10,6 +10,8 @@ Reusable React components, providers, and hooks for building SoloDB-powered appl
 - TypeScript types exported for key domain entities
 - Example app included for local development and integration testing
 
+The run layout editor supports adding extra trays at any time. Use **Edit** beside an extra tray to rename it or remove it when empty. Trays and names apply to the whole run; removal is rejected if any run part or step still references the tray. This requires the PHP API endpoints `POST /api/create/run/tray` (`run_id`), `PATCH /api/update/run/tray/{id}` (`name`, 1–128 characters), and `DELETE /api/delete/run/tray/{id}`.
+
 ### Peer dependencies
 
 This library relies on the following peer dependencies in your app:

@@ -9,4 +9,4 @@ export declare const TrayBulkActions: ({ label, trayStepParts, runStep, children
     trayStepParts: RunStepPart[];
     runStep: RunStep;
     children: ReactNode;
-}) => import("react").JSX.Element;
+}) => import('react').JSX.Element;
