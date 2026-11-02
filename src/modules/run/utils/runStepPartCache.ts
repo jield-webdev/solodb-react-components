@@ -7,6 +7,7 @@ import {
   RunStep,
   RunStepPart,
   RunStepPartState,
+  RunStepPartStateEnum,
 } from "@jield/solodb-typescript-core";
 
 type UpdateRunStepPartCacheOptions = {
@@ -17,6 +18,9 @@ type UpdateRunStepPartCacheOptions = {
 type UpdateRunStepPartCacheByRunStepOptions =
   | UpdateRunStepPartCacheOptions
   | {
+      // The state response carries no step part ids, so the results are paired with the
+      // requested step parts by index (the backend returns them in request order).
+      runStepParts: RunStepPart[];
       latestActions: RunStepPartState[] | ApiFormattedResponse<RunStepPartState>;
     };
 
@@ -27,9 +31,18 @@ type UpsertRunStepPartCacheOptions = {
 // --- Item transformers ---
 
 const applyActionToRunStepPart = (runStepPart: RunStepPart, latestAction: RunStepPartState): RunStepPart => {
-  const { status, processed, failed, started, available_actions } = latestAction.updated_run_step_part_state;
-  return { ...runStepPart, status, processed, failed, started, available_actions };
+  const { type, comment, available_actions } = latestAction;
+  return {
+    ...runStepPart,
+    comment,
+    processed: type.is_finished_state,
+    failed: type.is_failed_state,
+    started: type.id !== RunStepPartStateEnum.IDLE,
+    available_actions,
+  };
 };
+
+export const applyRunStepPartState = applyActionToRunStepPart;
 
 // --- Data shape helpers ---
 
@@ -93,20 +106,20 @@ const normalizeLatestActions = (
 
 const applyBatchActions = (
   data: any,
+  runStepParts: RunStepPart[],
   latestActionsInput: RunStepPartState[] | ApiFormattedResponse<RunStepPartState>
 ): any => {
   const latestActions = normalizeLatestActions(latestActionsInput);
   if (latestActions.length === 0) return data;
-  const actionsByStepPartId = new Map<number, RunStepPartState>(
-    latestActions.map((action) => [action.updated_run_step_part_state.run_step_part_id, action])
-  );
-  const actionsByRunPartId = new Map<number, RunStepPartState>(
-    latestActions.map((action) => [action.updated_run_step_part_state.run_part_id, action])
-  );
+  const actionsByStepPartId = new Map<number, RunStepPartState>();
+  runStepParts.forEach((runStepPart, index) => {
+    const action = latestActions[index];
+    if (action) actionsByStepPartId.set(runStepPart.id, action);
+  });
 
   return mapOverItems<RunStepPart>(data, (items) =>
     items.map((item) => {
-      const latestAction = actionsByStepPartId.get(item.id) ?? actionsByRunPartId.get(item.part_id);
+      const latestAction = actionsByStepPartId.get(item.id);
       return latestAction ? applyActionToRunStepPart(item, latestAction) : item;
     })
   );
@@ -123,11 +136,7 @@ const shouldUpdateSubsequentTray = (
   const targetStep = runStepsById.get(item.step_id);
   if (!targetStep) return false;
 
-  return (
-    targetStep.run_id === runStep.run_id &&
-    targetStep.part_level === 0 &&
-    targetStep.sequence > runStep.sequence
-  );
+  return targetStep.run_id === runStep.run_id && targetStep.part_level === 0 && targetStep.sequence > runStep.sequence;
 };
 
 const upsertRunStepPartInData = (
@@ -270,17 +279,10 @@ export const updateRunStepPartCacheByRunStep = (
           query.queryKey[0] === "runStepParts" &&
           (query.queryKey.length === 1 || query.queryKey[1] === runStep.id),
       },
-      (data) => applyBatchActions(data, options.latestActions)
+      (data) => applyBatchActions(data, options.runStepParts, options.latestActions)
     );
 
-    const latestActions = normalizeLatestActions(options.latestActions);
-    const runStepParts = latestActions.map(
-      (action) =>
-        ({
-          id: action.updated_run_step_part_state.run_step_part_id,
-          part_id: action.updated_run_step_part_state.run_part_id,
-        }) as RunStepPart
-    );
+    const { runStepParts } = options;
 
     void refreshRunStepPartCacheForRunStepParts(queryClient, runStepParts).catch((error) => {
       console.error("Failed to refresh run step part cache from run parts.", error);

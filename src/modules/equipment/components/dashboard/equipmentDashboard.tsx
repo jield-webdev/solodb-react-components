@@ -38,42 +38,43 @@ export default function EquipmentDashboard() {
     useQueries({
       queries: [
         {
-          queryKey: ["runs", equipment.name, environment],
+          queryKey: ["runs", equipment.id, environment],
           queryFn: () =>
             listRuns({
               firstUnfinishedStepEquipment: equipment,
+              operator: true,
               environment: environment,
             }),
         },
         {
-          queryKey: ["monitors", equipment.name],
-          queryFn: () => listMonitors({ equipment: equipment }),
+          queryKey: ["monitors", equipment.id],
+          queryFn: () => listMonitors({ equipment: equipment, pageSize: 1000 }),
         },
         {
-          queryKey: ["ecn", equipment.name],
-          queryFn: () => listEcn({ equipment: equipment }),
+          queryKey: ["ecn", equipment.id],
+          queryFn: () => listEcn({ equipment: equipment, pageSize: 1000 }),
         },
 
         {
-          queryKey: ["issue", equipment.name],
-          queryFn: () => listIssues({ equipment: equipment }),
+          queryKey: ["issue", equipment.id],
+          queryFn: () => listIssues({ equipment: equipment, pageSize: 1000 }),
         },
         {
-          queryKey: ["module", equipment.name],
-          queryFn: () => listModules({ equipment: equipment }),
+          queryKey: ["module", equipment.id],
+          queryFn: () => listModules({ equipment: equipment, pageSize: 1000 }),
         },
         {
-          queryKey: ["ecn", "attachment", equipment.name],
+          queryKey: ["ecn", "attachment", equipment.id],
           queryFn: () => listEcnAttachments({ equipment: equipment }),
         },
         {
-          queryKey: ["issue", "attachment", equipment.name],
+          queryKey: ["issue", "attachment", equipment.id],
           queryFn: () => listIssueAttachments({ equipment: equipment }),
         },
       ],
     });
 
-  const reloadQueriesByKey = (key: string[]) => {
+  const reloadQueriesByKey = (key: (string | number)[]) => {
     queryClient.invalidateQueries({ queryKey: key });
   };
 
@@ -101,8 +102,8 @@ export default function EquipmentDashboard() {
         onClose={() => {
           setShowEcnModal(false);
           setTimeout(() => {
-            reloadQueriesByKey(["ecn", equipment.name]);
-            reloadQueriesByKey(["ecn", "attachment", equipment.name]);
+            reloadQueriesByKey(["ecn", equipment.id]);
+            reloadQueriesByKey(["ecn", "attachment", equipment.id]);
           }, 100);
         }}
       />
@@ -119,8 +120,8 @@ export default function EquipmentDashboard() {
         onClose={() => {
           setShowIssueModal(false);
           setTimeout(() => {
-            reloadQueriesByKey(["issue", equipment.name]);
-            reloadQueriesByKey(["issue", "attachment", equipment.name]);
+            reloadQueriesByKey(["issue", equipment.id]);
+            reloadQueriesByKey(["issue", "attachment", equipment.id]);
           }, 100);
         }}
       />
@@ -219,7 +220,7 @@ export default function EquipmentDashboard() {
               <div className="d-flex justify-content-between">
                 <h3>{module.id !== equipment.main_tool_module_id ? module.name : "Main tool"}</h3>
                 <div>
-                  <ModuleStatusElement module={module} refetchFn={() => reloadQueriesByKey(["module", equipment.name])} />
+                  <ModuleStatusElement module={module} refetchFn={() => reloadQueriesByKey(["module", equipment.id])} />
                 </div>
               </div>
 

@@ -1,8 +1,7 @@
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { RunStepPart } from "@jield/solodb-typescript-core";
+import { RunStepPart, updateRunStepPartComment } from "@jield/solodb-typescript-core";
 
 type Inputs = {
   comment: string | null;
@@ -28,19 +27,10 @@ const RunStepPartComment = ({
   const { isSubmitting, errors } = formState;
 
   const onSubmit = async (data: Inputs) => {
-    await axios
-      .create()
-      .patch("update/run/step/part/" + runStepPart.id, {
-        comment: data.comment,
-      })
-      .then((response) => {
-        setRunStepPart({
-          ...runStepPart,
-          ...{ comment: response.data.comment },
-        });
-        setComment(response.data.comment);
-        setShowForm(false);
-      });
+    const updated = await updateRunStepPartComment({ runStepPart, comment: data.comment ?? "" });
+    setRunStepPart({ ...runStepPart, comment: updated.comment });
+    setComment(updated.comment);
+    setShowForm(false);
   };
 
   if (!editable) {
@@ -59,12 +49,7 @@ const RunStepPartComment = ({
     return (
       <div className={"d-flex align-items-start gap-2"}>
         <div className={"text-break"}>{comment}</div>
-        <Button
-          variant={"link"}
-          size={"sm"}
-          className={"p-0 text-muted"}
-          onClick={() => setShowForm(true)}
-        >
+        <Button variant={"link"} size={"sm"} className={"p-0 text-muted"} onClick={() => setShowForm(true)}>
           Edit
         </Button>
       </div>

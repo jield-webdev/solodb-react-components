@@ -44,16 +44,32 @@ export default function Category({
 
     source.forEach((result: ServiceEventReportResult) => {
       const criterionVersion = result.criterion_version;
+      const inputType = criterionVersion.criterion.input_type;
+      const options = criterionVersion.criterion.values ?? {};
 
-      if (criterionVersion.criterion.input_type === "checkbox") {
-        const val = result.value || criterionVersion.default_value || "";
-        init[String(result.id)] = val ? val.toString().split(", ") : [];
-      } else if (
-        criterionVersion.criterion.input_type === "bool" ||
-        criterionVersion.criterion.input_type === "action"
-      ) {
+      // The API returns the option label for select/radio/checkbox, but the form works with the option keys
+      const labelToKey = (label: string): string | undefined =>
+        Object.entries(options).find(([, optionLabel]) => optionLabel === label)?.[0];
+
+      if (inputType === "checkbox") {
+        if (result.value !== null && result.value !== "") {
+          init[String(result.id)] = String(result.value)
+            .split(", ")
+            .map(labelToKey)
+            .filter((key): key is string => key !== undefined);
+        } else {
+          // default_value holds option keys
+          init[String(result.id)] = criterionVersion.default_value ? criterionVersion.default_value.split(", ") : [];
+        }
+      } else if (inputType === "select" || inputType === "radio") {
+        const key = result.value !== null && result.value !== "" ? labelToKey(String(result.value)) : undefined;
+        init[String(result.id)] = key ?? criterionVersion.default_value ?? "";
+      } else if (inputType === "action") {
+        // The API returns "Done" when the action is done and "" otherwise
+        init[String(result.id)] = result.value === "Done";
+      } else if (inputType === "bool") {
         const val = result.value ?? criterionVersion.default_value ?? "false";
-        init[String(result.id)] = val === "true";
+        init[String(result.id)] = val === "true" || val === "1";
       } else {
         const val = (result.value ?? criterionVersion.default_value ?? "") as string | number | null;
         init[String(result.id)] = normalizeToString(val) ?? "";

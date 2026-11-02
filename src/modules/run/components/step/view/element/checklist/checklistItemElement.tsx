@@ -1,17 +1,24 @@
 import React, { useState } from "react";
 import { Button, ListGroup } from "react-bootstrap";
-import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import DateFormat from "@jield/solodb-react-components/modules/partial/dateFormat";
 import ChecklistModal from "@jield/solodb-react-components/modules/run/components/step/view/element/checklist/checklistModal";
-import { RunStepChecklistItem } from "@jield/solodb-typescript-core";
+import { markChecklistItemDone, RunStepChecklistItem } from "@jield/solodb-typescript-core";
+
+// `can_finish` is computed client-side: only the first pending item of a step can be executed.
+export type ChecklistItem = RunStepChecklistItem & { can_finish: boolean };
+
+export const withCanFinish = (items: RunStepChecklistItem[]): ChecklistItem[] => {
+  const firstPendingIndex = items.findIndex((item) => !item.is_executed);
+  return items.map((item, index) => ({ ...item, can_finish: index === firstPendingIndex }));
+};
 
 function ChecklistItemAction({
   checklistItem,
   onOpenModal,
   onMarkDone,
 }: {
-  checklistItem: RunStepChecklistItem;
+  checklistItem: ChecklistItem;
   onOpenModal: () => void;
   onMarkDone: () => void;
 }) {
@@ -34,23 +41,11 @@ function ChecklistItemAction({
   );
 }
 
-const ChecklistItemElement = ({
-  checklistItem,
-  refetch,
-}: {
-  checklistItem: RunStepChecklistItem;
-  refetch: () => void;
-}) => {
+const ChecklistItemElement = ({ checklistItem, refetch }: { checklistItem: ChecklistItem; refetch: () => void }) => {
   const [modalShow, setModalShow] = useState(false);
 
-  const setChecklistItemAsDone = async (): Promise<RunStepChecklistItem> => {
-    const response = await axios.create().patch("update/run/step/checklist/done/" + checklistItem.id, {});
-
-    return response.data;
-  };
-
   const mutation = useMutation({
-    mutationFn: setChecklistItemAsDone,
+    mutationFn: () => markChecklistItemDone({ checklistItem }),
     onSuccess: (data) => {
       setModalShow(false);
       refetch();
@@ -62,7 +57,7 @@ const ChecklistItemElement = ({
       <div className={"d-flex flex-column"}>
         {checklistItem.task}
 
-        {checklistItem.is_executed && (
+        {checklistItem.is_executed && checklistItem.date_executed && (
           <small>
             Executed on <DateFormat format="DD-MM-YYYY">{checklistItem.date_executed}</DateFormat>
           </small>

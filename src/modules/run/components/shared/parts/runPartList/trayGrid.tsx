@@ -1,5 +1,5 @@
 import { type CSSProperties } from "react";
-import { RunPart, RunStepPart } from "@jield/solodb-typescript-core";
+import { TrayTypeOrientationEnum, RunPart, RunStepPart } from "@jield/solodb-typescript-core";
 import {
   getForbiddenSlotIndices,
   getSlotIndex,
@@ -11,9 +11,7 @@ import { MultiPartCell, PartBadge, SlotCell, type RunPartRenderContext } from ".
 import { TrayBulkActions } from "./trayBulkActions";
 
 const toTrayStepParts = (trayParts: RunPart[], stepPartsById: Map<number, RunStepPart>): RunStepPart[] =>
-  trayParts
-    .map((part) => stepPartsById.get(part.id))
-    .filter((sp): sp is RunStepPart => sp !== undefined);
+  trayParts.map((part) => stepPartsById.get(part.id)).filter((sp): sp is RunStepPart => sp !== undefined);
 
 export const TrayGrid = ({
   tray,
@@ -55,7 +53,7 @@ export const TrayGrid = ({
 
   const trayCapacity = trayType.rows * trayType.columns;
   const forbiddenSlotIndices = getForbiddenSlotIndices(trayType);
-  const trayOrientation = trayType.orientation === "ttb" ? "ttb" : "ltr";
+  const trayOrientation = trayType.orientation === TrayTypeOrientationEnum.TTB ? "ttb" : "ltr";
   const trayStyle: CSSProperties = {
     "--tray-columns": trayType.columns,
     "--tray-rows": trayType.rows,
@@ -66,11 +64,7 @@ export const TrayGrid = ({
     getOverrideSlotIndex: (runPart) => {
       const stepPart = stepPartByPartId.get(runPart.id);
       if (!stepPart || (stepPart.tray_row == null && stepPart.tray_column == null)) return null;
-      return getSlotIndex(
-        trayType,
-        stepPart.tray_row ?? runPart.tray_row,
-        stepPart.tray_column ?? runPart.tray_column
-      );
+      return getSlotIndex(trayType, stepPart.tray_row ?? runPart.tray_row, stepPart.tray_column ?? runPart.tray_column);
     },
     getDirectSlotIndex: (runPart) => getSlotIndex(trayType, runPart.tray_row, runPart.tray_column),
   });

@@ -47,7 +47,7 @@ export default function RunStepsElement() {
       },
       {
         queryKey: ["requirements", run.id],
-        queryFn: () => listRequirements({ run: run }),
+        queryFn: () => listRequirements({ run: run, pageSize: 1000 }),
       },
     ],
   });
@@ -221,7 +221,9 @@ export default function RunStepsElement() {
             data-toggle="toggle"
             onChange={() => setShowOnlyEmphasizedParameters(!showOnlyEmphasizedParameters)}
           />
-          <label htmlFor="showOnlyEmphasizedParameters" className="ms-2">Show only emphasized parameters</label>
+          <label htmlFor="showOnlyEmphasizedParameters" className="ms-2">
+            Show only emphasized parameters
+          </label>
         </div>
       </div>
 

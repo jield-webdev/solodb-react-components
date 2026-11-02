@@ -279,14 +279,18 @@ export default function ChemicalIntakeElement() {
                 <td>{label.id}</td>
                 <td>{label.label}</td>
                 <td>
-                  <a href={`/${environment}/chemical/container/details/${label.container.id}/general.html`}>
-                    {label.container.chemical.name}
-                  </a>
+                  {label.container && (
+                    <a href={`/${environment}/chemical/container/details/${label.container.id}/general.html`}>
+                      {label.container.chemical.name}
+                    </a>
+                  )}
                 </td>
                 <td>
-                  <a href={`/${environment}/location/details/${label.container.location.id}/general.html`}>
-                    {label.container.location.name}
-                  </a>
+                  {label.container && (
+                    <a href={`/${environment}/location/details/${label.container.location.id}/general.html`}>
+                      {label.container.location.name}
+                    </a>
+                  )}
                 </td>
               </tr>
             ))}

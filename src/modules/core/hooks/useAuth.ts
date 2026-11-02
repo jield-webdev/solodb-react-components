@@ -29,6 +29,7 @@ export const useAuth = () => {
 
     getMe()
       .then(setUser)
+      .catch(() => setUser(null))
       .finally(() => setIsLoadingUser(false));
   }, []);
 

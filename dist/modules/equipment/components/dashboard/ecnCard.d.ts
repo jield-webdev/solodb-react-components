@@ -4,5 +4,5 @@ export default function EcnCard({ ecn, equipment, ecnAttachments, reloadQueryFn,
     ecn: EquipmentModuleEcn;
     equipment: Equipment;
     ecnAttachments: EquipmentModuleEcnAttachment[];
-    reloadQueryFn: (key: string[]) => void;
+    reloadQueryFn: (key: (string | number)[]) => void;
 }): React.JSX.Element;

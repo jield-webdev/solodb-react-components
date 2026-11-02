@@ -37,14 +37,14 @@ export default function ParentRunSelect({ selection, run }: ParentRunSelectProps
   const { selectedRuns } = selection;
 
   const { data: runsData, isFetching: isRunsFetching } = useQuery({
-    queryKey: [environment],
-    queryFn: () => listRuns({ environment: environment, availableAsParentForRun: run }),
+    queryKey: ["parentRuns", environment, run?.id],
+    queryFn: () => listRuns({ environment: environment, availableAsParentForRun: run, pageSize: 1000 }),
   });
 
   // One parts query per selected run, index-aligned with selectedRuns.
   const partQueries = useQueries({
     queries: selectedRuns.map((selectedRun) => ({
-      queryKey: [selectedRun.id],
+      queryKey: ["parentRunParts", selectedRun.id],
       queryFn: () => listRunParts({ run: selectedRun }),
       select: selectPartGroups,
     })),

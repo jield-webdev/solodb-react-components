@@ -49,6 +49,7 @@ export const AMOUNT_UNITS = [
   { value: "qt", label: "Quart, US liquid" },
   { value: "yd3", label: "Cubic Yard" },
   { value: "µl", label: "Microliter" },
+  { value: "tablets", label: "Tablets" },
 ].sort((a, b) => a.label.localeCompare(b.label));
 
 export function getDefaultExpireDate(): string {

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, InputGroup, Modal, Toast, ToastContainer } from "react-bootstrap";
 import { useFieldArray, useForm } from "react-hook-form";
-import axios from "axios";
-import { MonitorRequirement, MonitorRequirementTarget } from "@jield/solodb-typescript-core";
+import {
+  createMonitorRequirementResult,
+  MonitorRequirement,
+  MonitorRequirementTarget,
+} from "@jield/solodb-typescript-core";
 
 interface ResultField {
   id: number;
@@ -91,8 +94,8 @@ const AddResultModal = ({
   }, [formValues, isValid]);
 
   async function saveMeasurementResult(data: FormValues) {
-    await axios.post("create/monitor/requirement/result", {
-      requirement: requirement.id,
+    await createMonitorRequirementResult({
+      requirement: requirement,
       date: data.date,
       values: data.results,
     });

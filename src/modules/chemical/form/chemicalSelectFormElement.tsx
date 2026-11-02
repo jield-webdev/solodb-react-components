@@ -95,7 +95,6 @@ export default function ChemicalSelectFormElement({
                   <tr>
                     <th scope="col">Chemical</th>
                     <th scope="col">CAS number</th>
-                    <th scope="col">Formula</th>
                     <th scope="col">CRMH</th>
                     <th scope="col">Standard product</th>
                     <th scope="col" className="text-end">
@@ -106,7 +105,7 @@ export default function ChemicalSelectFormElement({
                 <tbody>
                   {isLoading && (
                     <tr>
-                      <td colSpan={6} className="py-3 text-center text-muted">
+                      <td colSpan={5} className="py-3 text-center text-muted">
                         <span className="spinner-border spinner-border-sm me-2" aria-hidden="true" />
                         Loading chemicals…
                       </td>
@@ -115,7 +114,7 @@ export default function ChemicalSelectFormElement({
 
                   {!isLoading && loadError && (
                     <tr>
-                      <td colSpan={6} className="py-3 text-center text-danger">
+                      <td colSpan={5} className="py-3 text-center text-danger">
                         {loadError}
                       </td>
                     </tr>
@@ -123,7 +122,7 @@ export default function ChemicalSelectFormElement({
 
                   {!isLoading && !loadError && chemicals.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="py-3 text-center text-muted">
+                      <td colSpan={5} className="py-3 text-center text-muted">
                         No chemicals found.
                       </td>
                     </tr>
@@ -144,7 +143,6 @@ export default function ChemicalSelectFormElement({
                         >
                           <td className="fw-semibold">{chemical.name}</td>
                           <td>{chemical.cas_number || EMPTY_VALUE}</td>
-                          <td>{chemical.chemical_formula || EMPTY_VALUE}</td>
                           <td>{chemical.cmr.length > 0 ? chemical.cmr.join(", ") : EMPTY_VALUE}</td>
                           <td>{isStandardProduct(chemical) ? "Yes" : "No"}</td>
                           <td className="text-end">

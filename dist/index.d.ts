@@ -32,6 +32,7 @@ export { default as PlaceFloorPlanItems } from './modules/room/components/floor-
 export { default as GoldsteinClientsDashboard } from './modules/admin/components/goldsteinClientsDashboard';
 export { default as ReportResults } from './modules/service/components/ReportResult';
 export { default as IrisOperatorDashboard } from './modules/iris/components/IrisOperatorDashboard';
+export { default as PrimillaChatPage } from './modules/primilla/components/chat/chatPage';
 export { default as PaginationLinks } from './modules/partial/paginationLinks';
 export { default as InputModal } from './modules/partial/modal';
 export { default as DateFormat } from './modules/partial/dateFormat';

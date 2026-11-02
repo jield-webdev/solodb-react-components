@@ -87,6 +87,39 @@ All JavaScript and TypeScript exports are available from the package root (`@jie
 
 For the complete and up‑to‑date list, see `src/index.ts`.
 
+## Primilla chat
+
+`PrimillaChatPage` uses the SSE endpoint at `https://primilla.docker.localhost`
+through the development reverse proxy. Requests and attachment downloads use the
+SoloDB bearer token from `#root`'s `data-jwt` attribute and omit cookie credentials.
+Downloads use attachment filenames directly; they do not need exposed response headers.
+
+Each mounted chat keeps its transcript, attachments and one server conversation ID
+in memory. They are cleared when the page unmounts. Requests send only `message`
+and, for follow-ups, `conversation_id`; the local transcript is never sent as
+history. The ID from the first SSE `conversation` event is committed only after
+`done`. An error, an interrupted stream or leaving the page fails the turn; an
+unfinished new conversation ID is discarded. Leaving the page aborts its request.
+Only successful turns become part of the server's conversation.
+
+The input and retry buttons are disabled during a turn. A 409 conflict retries
+automatically once, then offers a manual retry. For a missing conversation (404)
+or a conversation that is too long (422), **Start fresh and retry** sends the
+failed message without an ID. The earlier transcript stays visible, but Primilla
+starts with no earlier context. Conversation ownership follows the exact bearer
+token, so a new login can cause a 404 for an earlier conversation.
+
+Failed messages remain visible with a retry action. A 401 asks the user to sign in
+to SoloDB again before retrying; 500, 502, timeouts (including nginx HTML 504s)
+and interrupted streams offer retry. A 502 also suggests rephrasing the message.
+Invalid requests (400) show the validation error without a retry action. Text,
+tool and attachment events are accepted only from an SSE response, and a stream
+must end with `done` to succeed.
+
+Attachments stay attached to the turn that produced them. Downloads require the
+same bearer token; older links may fail after a new login. A later report with
+the same filename replaces the file behind its earlier URL.
+
 ## Example application
 
 This repository includes an example app showing typical integration.

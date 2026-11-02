@@ -2,10 +2,17 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
 import Select, { StylesConfig } from "react-select";
-import axios from "axios";
 import UserFormElement from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
 import { StatusMailContext } from "@jield/solodb-react-components/modules/equipment/contexts/statusMailContext";
-import { LocationMessage, MessageType, Room } from "@jield/solodb-typescript-core";
+import {
+  createLocationMessage,
+  listLocationMessageTypes,
+  listRooms,
+  LocationMessage,
+  MessageType,
+  Room,
+  updateLocationMessage,
+} from "@jield/solodb-typescript-core";
 
 interface MessageModalFormProps {
   showModal: boolean;
@@ -101,11 +108,9 @@ const MessageModalForm: React.FC<MessageModalFormProps> = ({ showModal, onClose,
   let { statusMail } = useContext(StatusMailContext);
 
   useEffect(() => {
-    axios
-      .get(`/list/room`)
+    listRooms({ pageSize: 1000 })
       .then((response) => {
-        const rooms = (response.data._embedded.items as Room[]) || [];
-        const optionsParsed: RoomOption[] = rooms.map((room) => ({
+        const optionsParsed: RoomOption[] = response.items.map((room) => ({
           value: room,
           label: room.name,
         }));
@@ -116,14 +121,14 @@ const MessageModalForm: React.FC<MessageModalFormProps> = ({ showModal, onClose,
         setErrorMessage("Error fetching rooms:" + err);
       });
 
-    axios
-      .get("/list/location/message/type")
+    listLocationMessageTypes({ pageSize: 1000 })
       .then((response) => {
-        const statusMailTypes = new Set(statusMail.filter.messageType);
-        const types = (response.data._embedded.items as MessageType[]) || [];
+        // Without a message type filter on the status mail, all types are allowed
+        const messageTypeFilter = statusMail.filter?.messageType;
+        const statusMailTypes = messageTypeFilter ? new Set(messageTypeFilter.map(String)) : null;
         const optionsParsed: MessageTypeOption[] = [];
-        for (const type of types) {
-          if (!statusMailTypes.has(type.id.toString())) {
+        for (const type of response.items) {
+          if (statusMailTypes && !statusMailTypes.has(type.id.toString())) {
             continue;
           }
           optionsParsed.push({
@@ -132,7 +137,10 @@ const MessageModalForm: React.FC<MessageModalFormProps> = ({ showModal, onClose,
           });
         }
         setMessageTypes(optionsParsed);
-        setValue("type", message?.type || optionsParsed[0].value);
+        const defaultType = message?.type || optionsParsed[0]?.value;
+        if (defaultType) {
+          setValue("type", defaultType);
+        }
       })
       .catch((err) => {
         console.error("Error fetching message types:", err);
@@ -142,8 +150,9 @@ const MessageModalForm: React.FC<MessageModalFormProps> = ({ showModal, onClose,
 
   const getMissingData = (data: LocationMessage): string => {
     if (!data.title) return "title";
-    // @ts-ignore
-    else if (data?.owner.value === undefined && message?.owner === undefined) return "owner";
+    // The owner field holds a user option ({ value, label }) after selecting, or the existing user
+    else if ((data?.owner as unknown as { value?: number } | null)?.value === undefined && !message?.owner)
+      return "owner";
     else if (data.rooms === undefined || data.rooms.map((room) => room.id).length <= 0) return "room";
     else if (!data.type) return "type";
 
@@ -157,24 +166,27 @@ const MessageModalForm: React.FC<MessageModalFormProps> = ({ showModal, onClose,
       return;
     }
     try {
+      const ownerId: number | undefined =
+        (data?.owner as unknown as { value?: number } | null)?.value ?? message?.owner?.id;
+      if (ownerId === undefined) {
+        setErrorMessage("Please fill: owner");
+        return;
+      }
+
       const postData = {
         title: data.title,
-        description: data.description,
-        // @ts-ignore
-        owner: data?.owner.value || message?.owner.id,
+        description: data.description ?? undefined,
+        owner: ownerId,
         type: data.type.id,
         rooms: data.rooms.map((room) => room.id),
       };
 
-      let response;
-      if (message) {
-        response = await axios.patch(`/update/location/message/${message.id}`, postData);
-      } else {
-        response = await axios.post(`/create/location/message`, postData);
-      }
+      const response = message
+        ? await updateLocationMessage({ id: message.id, ...postData })
+        : await createLocationMessage(postData);
 
       if (response) {
-        onClose(response?.data);
+        onClose(response);
         reset();
         return;
       }

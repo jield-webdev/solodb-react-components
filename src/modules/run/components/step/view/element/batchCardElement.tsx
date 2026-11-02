@@ -4,7 +4,12 @@ import { TextWithLineBreaks } from "@jield/solodb-react-components/utils/text";
 import DateFormat from "@jield/solodb-react-components/modules/partial/dateFormat";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { Run, BatchCard } from "@jield/solodb-typescript-core";
+import {
+  Run,
+  BatchCard,
+  deleteBatchCard as deleteBatchCardRequest,
+  updateBatchCard,
+} from "@jield/solodb-typescript-core";
 
 type Inputs = {
   content: string;
@@ -22,9 +27,7 @@ const BatchCardElement = ({ run }: { run: Run }) => {
   const { isSubmitting, errors } = formState;
 
   const onSubmit = async (data: Inputs) => {
-    await axios.create().patch("update/run/batch-card/" + run.id, {
-      content: data.content,
-    });
+    await updateBatchCard({ run, content: data.content });
     setShowForm(false);
 
     const response = await axios.get("view/run/" + run.id);
@@ -32,7 +35,7 @@ const BatchCardElement = ({ run }: { run: Run }) => {
   };
 
   const deleteBatchCard = async () => {
-    await axios.create().delete("delete/run/batch-card/" + run.id);
+    await deleteBatchCardRequest({ run });
     setShowForm(false);
     setBatchCard(undefined);
 
@@ -54,12 +57,7 @@ const BatchCardElement = ({ run }: { run: Run }) => {
           <Card.Body>
             <div className="d-flex align-items-start justify-content-between gap-3">
               <Card.Title className="text-danger mb-0">Batch card</Card.Title>
-              <Button
-                variant="outline-primary"
-                size="sm"
-                className="text-nowrap"
-                onClick={() => setShowForm(true)}
-              >
+              <Button variant="outline-primary" size="sm" className="text-nowrap" onClick={() => setShowForm(true)}>
                 Update batch card
               </Button>
             </div>
@@ -70,8 +68,8 @@ const BatchCardElement = ({ run }: { run: Run }) => {
 
           <Card.Footer className="bg-transparent border-0 pt-0 pb-3">
             <div className="text-muted small">
-              Created <DateFormat format="DD-MM-YY">{batchCard.date_created}</DateFormat> by{" "}
-              {batchCard.user.first_name} {batchCard.user.last_name}
+              Created <DateFormat format="DD-MM-YY">{batchCard.date_created}</DateFormat> by {batchCard.user.first_name}{" "}
+              {batchCard.user.last_name}
               {batchCard.last_update && (
                 <span>
                   {" ("}

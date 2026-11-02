@@ -2,15 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, ListGroup } from "react-bootstrap";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
 import { useQuery } from "@tanstack/react-query";
-import ChecklistItemElement from "@jield/solodb-react-components/modules/run/components/step/view/element/checklist/checklistItemElement";
-import {
-  finishStep,
-  listRunStepChecklistItems,
-  Run,
-  RunStep,
-  RunStepChecklistItem,
-  startStep,
-} from "@jield/solodb-typescript-core";
+import ChecklistItemElement, {
+  withCanFinish,
+} from "@jield/solodb-react-components/modules/run/components/step/view/element/checklist/checklistItemElement";
+import { finishStep, listRunStepChecklistItems, Run, RunStep, startStep } from "@jield/solodb-typescript-core";
 import LoadingComponent from "@jield/solodb-react-components/modules/core/components/common/LoadingComponent";
 
 const statusMessages = {
@@ -48,7 +43,7 @@ export default function RunStepChecklistExecute({
   //Grab the checklist, via a tanstack query
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["checklist", resolvedRunStep?.id],
-    queryFn: () => listRunStepChecklistItems({ runStep: resolvedRunStep! }),
+    queryFn: () => listRunStepChecklistItems({ runStep: resolvedRunStep!, pageSize: 1000 }),
     enabled: Boolean(resolvedRunStep),
   });
 
@@ -90,7 +85,7 @@ export default function RunStepChecklistExecute({
 
       {data!.items.length > 0 && (
         <ListGroup>
-          {data!.items.map((checklistItem: RunStepChecklistItem) => (
+          {withCanFinish(data!.items).map((checklistItem) => (
             <ChecklistItemElement checklistItem={checklistItem} refetch={refetch} key={checklistItem.id} />
           ))}
         </ListGroup>

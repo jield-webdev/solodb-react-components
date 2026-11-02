@@ -2,10 +2,23 @@ import React, { useContext, useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import UserFormElement from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
 import { AuthContext } from "@jield/solodb-react-components/modules/core/contexts/authContext";
-import { Equipment, EquipmentModule, EquipmentModuleIssue, EquipmentModuleIssueAttachment, EquipmentModuleIssueStatus, EquipmentModuleIssueType, fileToBase64, listModules } from "@jield/solodb-typescript-core";
+import {
+  createIssue,
+  createIssueAttachment,
+  deleteIssue,
+  deleteIssueAttachment,
+  Equipment,
+  EquipmentModule,
+  EquipmentModuleIssue,
+  EquipmentModuleIssueAttachment,
+  EquipmentModuleIssueStatus,
+  EquipmentModuleIssueType,
+  fileToBase64,
+  listModules,
+  updateIssue,
+} from "@jield/solodb-typescript-core";
 
 interface IssueModalFormProps {
   equipment: Equipment;
@@ -29,7 +42,7 @@ const IssueModalForm: React.FC<IssueModalFormProps> = ({ equipment, showModal, o
       description: issue?.description || "",
       issue_type: issue?.issue_type || EquipmentModuleIssueType.DEFAULT,
       status: issue?.status || EquipmentModuleIssueStatus.ACTIVE,
-      forecast_up: issue?.forecast_up ? new Date(issue?.forecast_up).toISOString().split("T")[0] : "",
+      forecast_up: issue?.forecast_up ? issue.forecast_up.slice(0, 10) : "",
       actions: issue?.actions || "",
       owner: issue?.owner || {},
     },
@@ -44,7 +57,7 @@ const IssueModalForm: React.FC<IssueModalFormProps> = ({ equipment, showModal, o
         description: issue?.description || "",
         issue_type: issue?.issue_type || EquipmentModuleIssueType.DEFAULT,
         status: issue?.status || EquipmentModuleIssueStatus.ACTIVE,
-        forecast_up: issue?.forecast_up ? new Date(issue?.forecast_up).toISOString().split("T")[0] : "",
+        forecast_up: issue?.forecast_up ? issue.forecast_up.slice(0, 10) : "",
         actions: issue?.actions || "",
         owner: issue?.owner || {},
       });
@@ -80,14 +93,15 @@ const IssueModalForm: React.FC<IssueModalFormProps> = ({ equipment, showModal, o
   }, [equipment, showModal]);
 
   async function handleClose() {
-    await axios.delete(`/delete/equipment/module/issue/${issue?.id}`);
+    if (!issue) return;
+    await deleteIssue({ id: issue.id });
 
     //Closed means that the date_closed property is set on the updatedEcn, so we can do that here locally
     const updatedIssue = {
       ...issue,
       date_closed: new Date().toISOString(),
       last_update: new Date().toISOString(),
-      updated_by: user?.full_name,
+      updated_by: user,
     };
 
     onClose(updatedIssue as EquipmentModuleIssue);
@@ -108,30 +122,28 @@ const IssueModalForm: React.FC<IssueModalFormProps> = ({ equipment, showModal, o
   // Convert and upload attachments
   const uploadFiles = (filesToUpload: File[], ecnId: number) => {
     return new Promise<void>(async (resolve, reject) => {
-        try {
-          if (attachmentsUpdated && attachments && attachments != attachmentsUpdated) {
-            const updatedAttachmentIds = new Set(attachmentsUpdated.map((attachment) => attachment.id));
-            const deleteRequests = [];
-            for (const attachment of attachments) {
-              if (!updatedAttachmentIds.has(attachment.id)) {
-                deleteRequests.push(axios.delete(`/delete/equipment/module/issue/attachment/${attachment.id}`));
-              }
+      try {
+        if (attachmentsUpdated && attachments && attachments != attachmentsUpdated) {
+          const updatedAttachmentIds = new Set(attachmentsUpdated.map((attachment) => attachment.id));
+          const deleteRequests = [];
+          for (const attachment of attachments) {
+            if (!updatedAttachmentIds.has(attachment.id)) {
+              deleteRequests.push(deleteIssueAttachment({ id: attachment.id }));
             }
-            await Promise.all(deleteRequests);
           }
+          await Promise.all(deleteRequests);
+        }
 
         if (filesToUpload.length > 0 && ecnId) {
           await Promise.all(
             filesToUpload.map(async (file) => {
               const base64Content = await fileToBase64(file);
-              const attachement: any = {
+              await createIssueAttachment({
                 issue_id: ecnId,
                 filename: file.name,
                 type: file.type,
                 content: base64Content,
-              };
-
-              await axios.post(`/create/equipment/module/issue/attachment`, attachement);
+              });
             })
           );
         }
@@ -146,30 +158,30 @@ const IssueModalForm: React.FC<IssueModalFormProps> = ({ equipment, showModal, o
   // Submit logic
   const handleFormSubmit = async (data: any) => {
     try {
-      let updatedIssue;
+      let updatedIssue: EquipmentModuleIssue;
+
+      const ownerId: number | undefined = data?.owner?.value ?? issue?.owner?.id;
+      if (ownerId === undefined) {
+        return;
+      }
 
       const issueData = {
-        module_id: data.module_id,
         issue: data.issue,
         description: data.description,
-        owner: data?.owner.value || issue?.owner,
+        owner: ownerId,
         status: data.status,
-        issue_type: data.issue_type,
+        issueType: data.issue_type,
         actions: data.actions,
-        forecast_up: data.forecast_up,
+        forecastUp: data.forecast_up || null,
       };
 
       if (issue) {
         await uploadFiles(files, issue.id);
-        // Update the issue via Axios
-        const response = await axios.patch(`/update/equipment/module/issue/${issue?.id}`, issueData);
-        updatedIssue = response.data;
+        updatedIssue = await updateIssue({ id: issue.id, ...issueData });
       } else {
-        // Create the issue via Axios
-        const response = await axios.post(`/create/equipment/module/issue`, issueData);
-        updatedIssue = response.data;
+        updatedIssue = await createIssue({ moduleId: Number(data.module_id), ...issueData });
 
-        uploadFiles(files, updatedIssue.id);
+        await uploadFiles(files, updatedIssue.id);
 
         updatedIssue.attachments = files.length;
       }

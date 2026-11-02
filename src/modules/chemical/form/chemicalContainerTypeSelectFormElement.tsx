@@ -38,7 +38,7 @@ export default function ChemicalContainerTypeSelectFormElement({ control, errors
 
   return (
     <Controller
-      name="container_type"
+      name="type"
       control={control}
       render={({ field }) => (
         <AsyncSelect

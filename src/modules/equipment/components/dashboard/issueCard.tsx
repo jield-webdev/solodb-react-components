@@ -14,15 +14,15 @@ export default function IssueCard({
   issue: EquipmentModuleIssue;
   equipment: Equipment;
   issueAttachments: EquipmentModuleIssueAttachment[];
-  reloadQueryFn: (key: string[]) => void;
+  reloadQueryFn: (key: (string | number)[]) => void;
 }) {
   const [modalElement, setModalElement] = useState<React.ReactNode>(null);
   const [showModal, setShowModal] = useState(false);
   const [currentIssue, setCurrentIssue] = useState(issue);
 
   const reloadIssue = (updatedEcn: EquipmentModuleIssue) => {
-    reloadQueryFn(["issue", equipment.name]);
-    reloadQueryFn(["issue", "attachment", equipment.name]);
+    reloadQueryFn(["issue", equipment.id]);
+    reloadQueryFn(["issue", "attachment", equipment.id]);
     setCurrentIssue({
       ...currentIssue,
       ...updatedEcn,

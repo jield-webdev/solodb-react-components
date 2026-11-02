@@ -1,40 +1,36 @@
 import React from "react";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
-import axios from "axios";
-import { Run } from "@jield/solodb-typescript-core";
-import { HoldCode as RunHoldCode } from "@jield/solodb-typescript-core";
-import { RunHoldCode as HoldCode } from "@jield/solodb-typescript-core";
+import {
+  HoldCode as RunHoldCode,
+  listRunHoldCodes,
+  Run,
+  RunHoldCode as HoldCode,
+  updateRunHoldCode,
+} from "@jield/solodb-typescript-core";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import AsyncSelect from "react-select/async";
 
+type HoldCodeOption = { value: number; label: string; holdCode: HoldCode };
+
 type Inputs = {
-  holdCode: { value: number; label: string };
+  holdCode: HoldCodeOption | null;
   description: string;
 };
 
-type HoldCodeResponse = {
-  _embedded: {
-    items: HoldCode[];
-  };
-  page_count: number;
-  total_items: number;
-  page: number;
-};
-
-const loadOptions = (inputValue: string, callback: any) => {
-  axios
-    .get<HoldCodeResponse>("list/run/hold-code")
+const loadOptions = (inputValue: string, callback: (options: HoldCodeOption[]) => void) => {
+  listRunHoldCodes({ pageSize: 1000 })
     .then((response) => {
-      const { data } = response;
-      return data._embedded.items;
-    })
-    .then((holdCodes) => {
       callback(
-        holdCodes.map((holdCode) => ({
+        response.items.map((holdCode) => ({
           value: holdCode.id,
           label: holdCode.code,
+          holdCode,
         }))
       );
+    })
+    .catch((error) => {
+      console.error("Failed to load hold codes.", error);
+      callback([]);
     });
 };
 
@@ -59,21 +55,24 @@ const HoldCodeModal = ({
         ? {
             value: runHoldCode.hold_code.id,
             label: runHoldCode.hold_code.code,
+            holdCode: runHoldCode.hold_code,
           }
-        : {},
-      description: runHoldCode ? runHoldCode.description : "",
+        : null,
+      description: runHoldCode?.description ?? "",
     },
   });
   const { errors, isSubmitting } = formState;
 
   const onSubmit: SubmitHandler<Inputs> = async (values: Inputs) => {
     try {
-      const response = await axios.patch("update/run/hold-code/" + run.id, {
-        holdcode: toggleReset ? null : values.holdCode.value,
+      const response = await updateRunHoldCode({
+        run,
+        holdCode: toggleReset ? null : (values.holdCode?.holdCode ?? null),
         description: values.description,
       });
-      if (response.data.hold_code) {
-        setRunHoldCode(response.data);
+      if (!Array.isArray(response) && response.hold_code) {
+        // The API only returns the hold code and description, matching what the badge needs.
+        setRunHoldCode(response as unknown as RunHoldCode);
       } else {
         setRunHoldCode(undefined);
       }
@@ -102,7 +101,7 @@ const HoldCodeModal = ({
                   rules={{
                     validate: {
                       required: (value) => {
-                        return value.value !== undefined || toggleReset || "A hold code is required";
+                        return value !== null || toggleReset || "A hold code is required";
                       },
                     },
                   }}
@@ -154,7 +153,7 @@ const HoldCodeModal = ({
               variant="outline-danger"
               onClick={() => {
                 //Remove the default value of the description
-                setValue("description", !toggleReset ? "" : runHoldCode.description);
+                setValue("description", !toggleReset ? "" : (runHoldCode.description ?? ""));
                 setToggleReset(!toggleReset);
               }}
             >

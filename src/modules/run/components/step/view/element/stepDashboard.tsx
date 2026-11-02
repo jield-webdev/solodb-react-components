@@ -73,7 +73,7 @@ const StepDashboard = () => {
       },
       {
         queryKey: ["requirement", runStep.id],
-        queryFn: () => listRequirements({ run: run, step: runStep }),
+        queryFn: () => listRequirements({ run: run, step: runStep, pageSize: 1000 }),
       },
     ],
   });
@@ -198,7 +198,9 @@ const StepDashboard = () => {
                   data-toggle="toggle"
                   onChange={() => setShowOnlyEmphasizedParameters(!showOnlyEmphasizedParameters)}
                 />
-                <label htmlFor="showOnlyEmphasizedParameters" className="ms-2">Show only emphasized parametersss</label>
+                <label htmlFor="showOnlyEmphasizedParameters" className="ms-2">
+                  Show only emphasized parametersss
+                </label>
               </div>
               <RunStepParametersTable
                 runStep={runStep}

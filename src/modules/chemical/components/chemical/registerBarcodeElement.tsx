@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useId, useState } from "react";
 import { Alert, Button, Col, Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
-import axios from "axios";
 import LocationSelectFormElement from "@jield/solodb-react-components/modules/chemical/form/locationSelectFormElement";
 import ChemicalSelectFormElement from "@jield/solodb-react-components/modules/chemical/form/chemicalSelectFormElement";
 import { QRCodeSVG } from "qrcode.react";
@@ -10,6 +9,9 @@ import { AuthContext } from "@jield/solodb-react-components/modules/core/context
 import { useParams } from "react-router-dom";
 import {
   ChemicalContainer,
+  ChemicalContainerAmountUnitEnum,
+  createChemicalContainer,
+  createChemicalContainerExternalLabel,
   getLocation,
   Room,
   Location,
@@ -106,19 +108,26 @@ export default function RegisterBarcodeElement({
   }, [setValue]);
 
   const onSubmit = async (values: Inputs) => {
-    (values as any).user = values.owner.value;
-
     const existingBarcode = await listChemicalContainerExternalLabels({ qrCodeContent: barcode });
-    if (existingBarcode.items.length > 0) {
+    // The qr_code_content filter is a SQL LIKE, so verify the exact match client-side
+    if (existingBarcode.items.some((label) => label.qr_code_content === barcode)) {
       alert("This barcode is already registered to a container");
       return;
     }
 
-    const response = await axios.post("create/chemical/container", values);
-    setCreatedContainer(response.data);
+    const container = await createChemicalContainer({
+      chemical: values.chemical,
+      location: values.location,
+      user: values.owner.value,
+      concentration: values.concentration !== undefined ? String(values.concentration) : undefined,
+      amount: values.amount !== undefined ? String(values.amount) : undefined,
+      amount_unit: values.amount_unit ? (values.amount_unit as ChemicalContainerAmountUnitEnum) : null,
+      expire_date: values.expire_date,
+    });
+    setCreatedContainer(container);
 
-    await axios.post("create/chemical/container/external-label", {
-      container: response.data.id,
+    await createChemicalContainerExternalLabel({
+      container: container.id,
       qr_code_content: barcode,
     });
   };

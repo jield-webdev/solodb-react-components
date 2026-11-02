@@ -1,13 +1,7 @@
 import { useRef, useState, type ReactNode } from "react";
 import { Overlay } from "react-bootstrap";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  performRunStepPartActions,
-  RunStep,
-  RunStepPart,
-  RunStepPartActionEnum,
-  RunStepPartStateEnum,
-} from "@jield/solodb-typescript-core";
+import { performRunStepPartActions, RunStep, RunStepPart, RunStepPartActionEnum } from "@jield/solodb-typescript-core";
 import { updateRunStepPartCacheByRunStep } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import { PartActionsButtons } from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/partActionsButtons";
 
@@ -60,13 +54,10 @@ export const TrayBulkActions = ({
     const latestActions = await performRunStepPartActions({
       runStepPartActions: actionable.map((runStepPart) => ({
         runStepPart,
-        // NOTE: core library currently types this as `RunStepPartStateEnum` even though
-        // `available_actions` entries are `RunStepPartActionEnum`. Cast is safe until the
-        // core typing is corrected.
-        runStepPartAction: action as unknown as RunStepPartStateEnum,
+        runStepPartAction: action,
       })),
     });
-    updateRunStepPartCacheByRunStep(queryClient, runStep, { latestActions });
+    updateRunStepPartCacheByRunStep(queryClient, runStep, { runStepParts: actionable, latestActions });
   };
 
   return (

@@ -4,7 +4,11 @@ import IrisOperatorEventDetails from "./operatorDashboard/IrisOperatorEventDetai
 import IrisOperatorEventList from "./operatorDashboard/IrisOperatorEventList";
 import { getContentEntries } from "./irisOperatorDashboardUtils";
 import { useIrisStreamContextEvents } from "../hooks/useIrisStreamContextEvents";
+import { getErrorMessage } from "./operatorDashboard/irisOperatorEventDetailsUtils";
 import { getIrisServerUrl } from "../../core/config/runtimeConfig";
+
+const sortEventsByStart = (list: FileUploadEvent[]) =>
+  [...list].sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime());
 
 export default function IrisOperatorDashboard() {
   const [irisInputContext, setIrisInputContext] = useState("");
@@ -19,11 +23,16 @@ export default function IrisOperatorDashboard() {
     if (!irisContext) {
       return;
     }
-    irisListContextEvents({ irisServerUrl: irisServerUrl, context: irisContext }).then((response) => {
-      // TO DO: merge with current events in case a new event hapens before the data is fetched
-      setEvents(response);
-    });
-  }, [irisContext]);
+    if (!irisServerUrl) {
+      return;
+    }
+    irisListContextEvents({ irisServerUrl: irisServerUrl, context: irisContext })
+      .then((response) => {
+        // TO DO: merge with current events in case a new event hapens before the data is fetched
+        setEvents(sortEventsByStart(response));
+      })
+      .catch((error) => setErrorMessage(getErrorMessage(error)));
+  }, [irisContext, irisServerUrl]);
 
   const handleMessage = useCallback(
     (incomingEvent: FileUploadEvent) => {
@@ -41,7 +50,8 @@ export default function IrisOperatorDashboard() {
         incomingEvent,
         ...currentEvents.filter((event) => event.uid !== incomingEvent.uid),
       ]);
-      setSelectedEventUid(incomingEvent.uid);
+      // Keep the current selection; only select the incoming event if nothing is selected yet.
+      setSelectedEventUid((currentUid) => currentUid || incomingEvent.uid);
     },
     [irisContext]
   );
@@ -65,7 +75,7 @@ export default function IrisOperatorDashboard() {
 
   const { isConnected } = useIrisStreamContextEvents({
     irisEndpoint: irisServerUrl,
-    context: irisContext,
+    context: irisServerUrl ? irisContext : "",
     onMessage: handleMessage,
     onError: handleError,
   });
@@ -122,6 +132,9 @@ export default function IrisOperatorDashboard() {
             </div>
           </form>
 
+          {!irisServerUrl && (
+            <div className="alert alert-danger py-2 mb-4">Iris server is not configured (irisServerUri is empty).</div>
+          )}
           {errorMessage !== "" && <div className="alert alert-danger py-2 mb-4">{errorMessage}</div>}
           {!isConnected && <div className="alert alert-warning py-2 mb-4">Could not connect to the server</div>}
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Run, RunPart, RunStepPart, TrayType } from "@jield/solodb-typescript-core";
+import { Run, RunPart, RunStepPart, TrayType, TrayTypeOrientationEnum } from "@jield/solodb-typescript-core";
 import {
   buildPlaceholderExtraTray,
   buildTraySlots,
@@ -21,7 +21,7 @@ const makeTrayType = (overrides: Partial<TrayType> = {}): TrayType =>
     description: "",
     rows: 2,
     columns: 2,
-    orientation: "ltr",
+    orientation: TrayTypeOrientationEnum.LTR,
     forbidden_slots: [],
     ...overrides,
   }) as TrayType;
@@ -70,7 +70,7 @@ const makeStepPart = (overrides: Partial<RunStepPart>): RunStepPart =>
     processed: false,
     failed: false,
     started: false,
-    has_failed_in_previouse_state: false,
+    has_failed_in_previous_state: false,
     available_actions: [],
     ...overrides,
   }) as RunStepPart;
@@ -179,7 +179,7 @@ describe("buildTraySlots / isTrayFull", () => {
     const slots = buildTraySlots(
       trayType,
       parts,
-      stepParts.map((stepPart) => (stepPart.id === 4 ? { ...stepPart, has_failed_in_previouse_state: true } : stepPart))
+      stepParts.map((stepPart) => (stepPart.id === 4 ? { ...stepPart, has_failed_in_previous_state: true } : stepPart))
     );
 
     expect(slots[3]).toBeNull();

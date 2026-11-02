@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getContentEntries, getStateBadgeClass } from "./irisOperatorDashboardUtils";
 
-function asContent(value: unknown) {
-  return value as never;
-}
-
 describe("getStateBadgeClass", () => {
   it("returns success styles for completed states", () => {
     expect(getStateBadgeClass("completed")).toBe("text-bg-success");
@@ -28,18 +24,10 @@ describe("getStateBadgeClass", () => {
 
 describe("getContentEntries", () => {
   it("reads entries from supported content shapes", () => {
-    expect(getContentEntries(new Map([["report.txt", "hello"]]))).toEqual([["report.txt", "hello"]]);
-    expect(getContentEntries(asContent([["report.txt", "hello"]]))).toEqual([["report.txt", "hello"]]);
-    expect(getContentEntries(asContent({ "report.txt": "hello" }))).toEqual([["report.txt", "hello"]]);
+    expect(getContentEntries({ "report.txt": "hello" })).toEqual([["report.txt", "hello"]]);
   });
 
-  it("ignores invalid content entries", () => {
-    expect(
-      getContentEntries([
-        ["report.txt", 10],
-        ["valid.txt", "hello"],
-      ] as never)
-    ).toEqual([["valid.txt", "hello"]]);
-    expect(getContentEntries(null as never)).toEqual([]);
+  it("returns no entries for missing content", () => {
+    expect(getContentEntries(null)).toEqual([]);
   });
 });

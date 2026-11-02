@@ -84,7 +84,6 @@ describe("ChemicalSelectFormElement", () => {
     const acetoneRow = (await screen.findByText("Acetone")).closest("tr");
     expect(acetoneRow).not.toBeNull();
     expect(within(acetoneRow!).getByText("67-64-1")).toBeInTheDocument();
-    expect(within(acetoneRow!).getByText("C3H6O")).toBeInTheDocument();
     expect(within(acetoneRow!).getByText("H225, H319")).toBeInTheDocument();
     expect(within(acetoneRow!).getByText("Yes")).toBeInTheDocument();
     expect(within(acetoneRow!).getByRole("button", { name: "Select Acetone" })).toBeInTheDocument();

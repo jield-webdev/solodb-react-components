@@ -22,7 +22,7 @@
 
 - `src/index.ts`: package entrypoint; controls all public exports.
 - `src/modules/core/`: auth provider/context/hooks, shared primitives, runtime config.
-- `src/modules/equipment/`, `src/modules/monitor/`, `src/modules/run/`, `src/modules/chemical/`, `src/modules/room/`, `src/modules/admin/`, `src/modules/service/`: domain modules.
+- `src/modules/primilla/` (AI chat page, SSE streaming hook), `src/modules/equipment/`, `src/modules/monitor/`, `src/modules/run/`, `src/modules/chemical/`, `src/modules/room/`, `src/modules/admin/`, `src/modules/service/`: domain modules.
 - `src/modules/partial/`: shared cross-domain UI components.
 - `src/utils/`: general utility helpers and tests.
 - `src/style/`: package-level styles.
@@ -45,6 +45,18 @@
 
 - Current tests use Vitest + Testing Library.
 - Prefer targeted tests for hooks, utils, and stateful component behavior.
+
+## Primilla Client Rules
+
+- Use the reverse proxy at `https://primilla.docker.localhost` for development; preserve bearer authentication and omit cookie credentials.
+- Send only `message` and optional `conversation_id`. Never send the local transcript as `history`.
+- Keep one server conversation ID per mounted chat, alongside its in-memory transcript. Accept the first SSE `conversation` event provisionally and commit its ID only after `done`.
+- Check HTTP errors and the SSE content type before reading events. Treat streams without `done` or `error` as failed and discard provisional IDs on failure.
+- Allow one active turn per chat, including retries, and abort it on unmount.
+- Retry 409 once automatically. Require the explicit **Start fresh and retry** action for failed 404/422 turns; preserve the transcript while dropping server context.
+- Do not retry 400 automatically or offer its retry action. For 401, ask the user to sign in again; offer retries for server/model errors, timeouts and interrupted streams.
+- Keep attachments with their original successful turn; use authenticated downloads and the attachment's filename.
+- Cover conversation lifecycle, recovery, strict request fields and fragmented/interrupted streams in the Primilla hook and stream tests.
 
 ## Code Style and Scope
 

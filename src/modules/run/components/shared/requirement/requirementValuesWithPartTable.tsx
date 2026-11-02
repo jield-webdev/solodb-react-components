@@ -1,9 +1,23 @@
+import {
+  getMeasurementNumericValue,
+  isOutsideTarget,
+} from "@jield/solodb-react-components/modules/run/utils/measurementTarget";
 import { Alert, Button, Spinner, Table } from "react-bootstrap";
 import { useContext, useEffect, useState } from "react";
 import { FillValueModal } from "@jield/solodb-react-components/modules/run/components/shared/requirement/fillValueModal";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
-import { listMeasurementResults, listRunParts, listRunStepParts, MeasurementResult, MeasurementResultValue, Requirement, RunPart, RunStep, RunStepPart } from "@jield/solodb-typescript-core";
+import {
+  listMeasurementResults,
+  listRunParts,
+  listRunStepParts,
+  MeasurementResult,
+  MeasurementResultValue,
+  Requirement,
+  RunPart,
+  RunStep,
+  RunStepPart,
+} from "@jield/solodb-typescript-core";
 
 export default function RequirementValuesWithPartTable({
   requirement,
@@ -55,8 +69,8 @@ export default function RequirementValuesWithPartTable({
   });
 
   const reloadMeasurementResult = () => {
-        queryClient.refetchQueries({ queryKey: ["requirement", "measurementResults", requirement.measurement.id] });
-  }
+    queryClient.refetchQueries({ queryKey: ["requirement", "measurementResults", requirement.measurement.id] });
+  };
 
   const [runPartsQuery, runStepPartsQuery, measurementResultsQuery] = queries;
 
@@ -147,15 +161,12 @@ export default function RequirementValuesWithPartTable({
   }
 
   const getRowStatusClass = (value: MeasurementResultValue): string => {
-    if (!(value && !isNaN(parseFloat(value.string_value)))) return "";
-
-    const val = parseFloat(value.string_value);
+    const val = getMeasurementNumericValue(value);
+    if (val === null) return "";
     const target = requirement.targets.find((t) => t.logging_parameter.id === value.logging_parameter.id);
     if (!target) return "";
 
-    const failed = target.inclusive
-      ? !(target.min_value <= val && target.max_value >= val)
-      : !(target.min_value < val && target.max_value > val);
+    const failed = isOutsideTarget(target, val);
 
     return failed ? "table-danger" : "table-success";
   };
@@ -180,17 +191,13 @@ export default function RequirementValuesWithPartTable({
                   r.values.some((v) => v.step_part_id === stepPart.id)
                 );
 
-                const valuesForPart = (existingResult?.values ?? []).filter(
-                  (v) => v.step_part_id === stepPart.id
-                );
+                const valuesForPart = (existingResult?.values ?? []).filter((v) => v.step_part_id === stepPart.id);
 
                 const rowSpan = requirement.targets.length;
 
                 return requirement.targets.map((target, idx) => {
                   const value =
-                    valuesForPart.find(
-                      (v) => v.logging_parameter.id === target.logging_parameter.id
-                    ) ?? null;
+                    valuesForPart.find((v) => v.logging_parameter.id === target.logging_parameter.id) ?? null;
 
                   const rowClass = value ? getRowStatusClass(value) : "";
 
@@ -236,7 +243,7 @@ export default function RequirementValuesWithPartTable({
                   key={`modal:${stepPart.id}`}
                   requirement={requirement}
                   {...(existingResult
-                    ? { result: existingResult } 
+                    ? { result: existingResult }
                     : { part: finalParts.find((p) => p.id === stepPart.part_id), stepPart })}
                   show={openModalPartId === String(stepPart.id)}
                   setShow={(show) => {
@@ -255,4 +262,3 @@ export default function RequirementValuesWithPartTable({
     </>
   );
 }
-

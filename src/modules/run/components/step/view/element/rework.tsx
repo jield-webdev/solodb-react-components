@@ -1,9 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Alert, Button, Form } from "react-bootstrap";
 import { useQueries } from "@tanstack/react-query";
-import axios from "axios";
 import { RunStepContext } from "@jield/solodb-react-components/modules/run/contexts/runStepContext";
-import { Template, Recipe, getTemplateSteps, RunStep, TemplateStep, listRunSteps, listTemplates } from "@jield/solodb-typescript-core";
+import {
+  Template,
+  Recipe,
+  getTemplateSteps,
+  RunStep,
+  TemplateStep,
+  listRunSteps,
+  listTemplates,
+  reworkStep,
+} from "@jield/solodb-typescript-core";
 
 const Rework = () => {
   const { runStep, run } = useContext(RunStepContext);
@@ -23,7 +31,7 @@ const Rework = () => {
     queries: [
       {
         queryKey: ["templates", reworkRecipes],
-        queryFn: () => listTemplates({ reworkRecipes: reworkRecipes }),
+        queryFn: () => listTemplates({ reworkRecipes: reworkRecipes, pageSize: 1000 }),
         enabled: showForm && reworkRecipes.length > 0,
       },
       {
@@ -87,17 +95,21 @@ const Rework = () => {
     if (Object.keys(errors).length === 0) {
       setIsCreatingRework(true);
       //Do a post request to the backend to create the rework
-      axios
-        .create()
-        .patch("/update/run/step/rework/" + runStep.id, {
-          reworked_run_steps: reworkSteps,
-          template_steps: templateSteps,
-          comment: comment,
-        })
+      reworkStep({
+        runStep,
+        reworkedRunSteps: reworkSteps,
+        templateSteps,
+        comment,
+      })
         .then(() => {
           //Refresh the page
           setIsCreatingRework(false);
           window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Failed to create rework.", error);
+          setIsCreatingRework(false);
+          setFormErrors((formErrors) => ({ ...formErrors, comment: "Creating the rework failed, please try again" }));
         });
     }
   }
@@ -245,6 +257,7 @@ const Rework = () => {
                   isInvalid={!!formErrors["comment"]}
                 />
                 <small className={"text-muted"}>Optional comment for the rework</small>
+                {formErrors["comment"] && <div className={"text-danger"}>{formErrors["comment"]}</div>}
               </Form.Group>
             </div>
           </div>

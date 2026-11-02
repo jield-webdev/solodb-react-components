@@ -68,15 +68,13 @@ const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: nu
     isLoading: isRequirementsLoading,
   } = useQuery({
     queryKey: ["requirements", runId],
-    queryFn: () => listRequirements({ run }),
+    queryFn: () => listRequirements({ run, pageSize: 1000 }),
     enabled: !!runId,
     placeholderData: keepPreviousData,
   });
 
-  const isLoading =
-    isRunPartsLoading || isRunStepPartsLoading || isRunStepsLoading || isRequirementsLoading;
-  const isError =
-    isRunPartsError || isRunStepPartsError || isRunStepsError || isRequirementsError;
+  const isLoading = isRunPartsLoading || isRunStepPartsLoading || isRunStepsLoading || isRequirementsLoading;
+  const isError = isRunPartsError || isRunStepPartsError || isRunStepsError || isRequirementsError;
   const error = runPartsError || runStepPartsError || runStepsError || requirementsError;
 
   const runParts = runPartsData?.items ?? [];
@@ -152,11 +150,7 @@ const RunStepSimpleList = ({ pageSize = 25, hideLabel = false }: { pageSize?: nu
           ))}
         </div>
       )}
-      <PaginationLinks
-        data={runStepsData as any}
-        setPage={setPage}
-        isPlaceholderData={isRunStepsPlaceholderData}
-      />
+      <PaginationLinks data={runStepsData as any} setPage={setPage} isPlaceholderData={isRunStepsPlaceholderData} />
       {isRunStepsFetching ? <span> Loading...</span> : null}
     </div>
   );

@@ -47,9 +47,7 @@ export default function MonitorCard({ monitor }: { monitor: Monitor }) {
           <Card.Text>
             {requirement.title}
             {requirement.latest_result && (
-              <>
-                Latest measurement: {formatDateTime(requirement.latest_result.date_created, "DD-MM-YY HH:mm")}
-              </>
+              <>Latest measurement: {formatDateTime(requirement.latest_result.date_create, "DD-MM-YY HH:mm")}</>
             )}
           </Card.Text>
         </Card.Body>

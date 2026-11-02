@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useId, useState } from "react";
 import { Alert, Button, Col, Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
-import axios from "axios";
 import LocationSelectFormElement from "@jield/solodb-react-components/modules/chemical/form/locationSelectFormElement";
 import ChemicalSelectFormElement from "@jield/solodb-react-components/modules/chemical/form/chemicalSelectFormElement";
 import { QRCodeSVG } from "qrcode.react";
@@ -14,7 +13,14 @@ import {
   extractLabelNumber,
   scannedCodeIsLocationCode,
 } from "@jield/solodb-react-components/modules/chemical/utils/chemicalContainerUtils";
-import { ChemicalContainer, getLocation, Room, Location } from "@jield/solodb-typescript-core";
+import {
+  ChemicalContainer,
+  ChemicalContainerAmountUnitEnum,
+  createChemicalContainer,
+  getLocation,
+  Room,
+  Location,
+} from "@jield/solodb-typescript-core";
 import { useScannerContext } from "@jield/solodb-react-components/modules/core/contexts/scannerContext";
 import { ScannedKeysType } from "@jield/solodb-react-components/modules/core/utils/parseScannerType";
 
@@ -29,7 +35,7 @@ type Inputs = {
   expire_date: string;
   amount: number;
   amount_unit: string;
-  container_type: number;
+  type: number;
 };
 
 export default function RegisterContainerElement({
@@ -114,13 +120,19 @@ export default function RegisterContainerElement({
   }, [onScanKeys]);
 
   const onSubmit = async (values: Inputs) => {
-    //Append the user to the submission values, make sure the object accepts the new property
-    (values as any).user = values.owner.value;
-
-    const response = await axios.post("create/chemical/container", values);
+    const container = await createChemicalContainer({
+      chemical: values.chemical,
+      location: values.location,
+      user: values.owner.value,
+      type: values.type,
+      concentration: values.concentration !== undefined ? String(values.concentration) : undefined,
+      amount: values.amount !== undefined ? String(values.amount) : undefined,
+      amount_unit: values.amount_unit ? (values.amount_unit as ChemicalContainerAmountUnitEnum) : null,
+      expire_date: values.expire_date,
+    });
 
     //Store the created container in the state
-    setCreatedContainer(response.data);
+    setCreatedContainer(container);
   };
 
   return (
@@ -222,14 +234,12 @@ export default function RegisterContainerElement({
               <Form.Label>Container type</Form.Label>
               <ChemicalContainerTypeSelectFormElement
                 control={control}
-                {...register("container_type", {
+                {...register("type", {
                   required: "Container type is required",
                 })}
                 errors={errors}
               />
-              {errors.container_type && (
-                <Form.Control.Feedback type="invalid">{errors.container_type.message}</Form.Control.Feedback>
-              )}
+              {errors.type && <Form.Control.Feedback type="invalid">{errors.type.message}</Form.Control.Feedback>}
             </InputGroup>
 
             <Form.Group className={"mb-3 w-50 w-25-sm"}>
@@ -262,7 +272,7 @@ export default function RegisterContainerElement({
             <div>
               <a
                 className={"btn btn-primary"}
-                href={`${environment}/chemical/container/render/single-${createdContainer.id}.pdf`}
+                href={`/${environment}/chemical/container/render/single-${createdContainer.id}.pdf`}
               >
                 Print label
               </a>

@@ -1,6 +1,8 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Equipment,
+  createSetupEquipment,
+  deleteSetupEquipment,
   Facet,
   Filter,
   FilterData,
@@ -12,7 +14,6 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import SelectedEquipmentTable from "./setup/selectedEquipmentTable";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import SearchBox from "./setup/searchBox";
 import FilterFormColumn from "./setup/filterFormColum";
 import { useInView } from "react-intersection-observer";
@@ -81,16 +82,17 @@ export default function SetupUpdateEquipment() {
         filter: {
           name: "",
           label: null,
+          visibility: "",
           elements: [],
           fieldsets: {},
-        } as Filter,
+        } satisfies Filter,
         facet: {
           name: "",
           label: null,
           visibility: "",
           elements: [],
           fieldsets: {},
-        } as Facet,
+        } satisfies Facet,
       } as FilterFormData;
     }
 
@@ -170,9 +172,7 @@ export default function SetupUpdateEquipment() {
   const addEquipmentMutation = useMutation({
     mutationFn: async (equipment: Equipment) => {
       if (!setup) return;
-      await axios.post(`create/setup/equipment/${setup.id}`, {
-        equipment_id: equipment.id,
-      });
+      await createSetupEquipment({ setupId: setup.id, equipmentId: equipment.id });
     },
     onMutate: (equipment) => {
       let previous: Map<number, Equipment> | undefined;
@@ -201,7 +201,7 @@ export default function SetupUpdateEquipment() {
       if (!setupEquipmentId) {
         throw new Error(`Missing setup equipment id for removal: ${equipment.id}`);
       }
-      await axios.delete(`delete/setup/equipment/${setupEquipmentId}`);
+      await deleteSetupEquipment({ id: setupEquipmentId });
     },
     onMutate: (equipment) => {
       let previous: Map<number, Equipment> | undefined;

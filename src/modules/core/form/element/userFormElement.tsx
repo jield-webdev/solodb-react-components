@@ -11,11 +11,11 @@ const isDarkMode = () => {
 };
 
 const promiseOptions = (inputValue: string) =>
-  listUsers({ query: inputValue }).then((users) => {
+  listUsers({ query: inputValue, filter: { status: [1] }, pageSize: 100 }).then((users) => {
     return users.items.map((user) => {
       return {
         value: user.id,
-        label: `${user.full_name} (${user.email})`,
+        label: user.email ? `${user.full_name} (${user.email})` : user.full_name,
       };
     });
   });

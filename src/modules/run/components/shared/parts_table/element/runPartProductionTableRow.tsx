@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   RunPart,
@@ -7,8 +6,8 @@ import {
   RunStepPart,
   RunStepPartActionEnum,
   RunStepPartState,
-  RunStepPartStateEnum,
   performRunStepPartAction,
+  createRunStepPart as createRunStepPartRequest,
 } from "@jield/solodb-typescript-core";
 import RunStepPartComment from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runStepPartComment";
 import RunPartProductionActionsDropdown from "@jield/solodb-react-components/modules/run/components/shared/parts_table/element/runPartProductionActionsDropdown";
@@ -16,6 +15,7 @@ import RunPartProductionActionsButtons from "@jield/solodb-react-components/modu
 import {
   upsertRunStepPartCache,
   updateRunStepPartCacheByRunStep,
+  applyRunStepPartState,
 } from "@jield/solodb-react-components/modules/run/utils/runStepPartCache";
 import isRunStepReadyForProcessing from "@jield/solodb-react-components/modules/run/utils/isRunStepReadyForProcessing";
 
@@ -67,16 +67,10 @@ const RunStepPartProductionTableRow = ({
   const createRunStepPart = () => {
     if (canInit) return;
 
-    axios
-      .post("/create/run/step/part", {
-        run_part_id: runPart.id,
-        run_step_id: runStep.id,
-      })
-      .then((response) => {
-        const nextStepPart = { ...response.data } as RunStepPart;
-        setRunStepPart(nextStepPart);
-        upsertRunStepPartCache(queryClient, runStep, nextStepPart);
-      });
+    createRunStepPartRequest({ runPart, runStep }).then((nextStepPart) => {
+      setRunStepPart(nextStepPart);
+      upsertRunStepPartCache(queryClient, runStep, nextStepPart);
+    });
   };
 
   const doRunStepPartAction = async ({
@@ -88,26 +82,13 @@ const RunStepPartProductionTableRow = ({
   }) => {
     const latestAction: RunStepPartState = await performRunStepPartAction({
       runStepPart: targetStepPart,
-      // NOTE: the core library currently types this param as `RunStepPartStateEnum`
-      // even though `available_actions` entries are `RunStepPartActionEnum`.
-      // The numeric value is sent as-is to the backend, so this cast is safe until
-      // the core library's typing is corrected.
-      runStepPartAction: runStepPartAction as unknown as RunStepPartStateEnum,
+      runStepPartAction: runStepPartAction,
     });
 
     setRunStepPart((current) => {
       if (!current) return current;
 
-      const { status, processed, failed, started, available_actions } = latestAction.updated_run_step_part_state;
-
-      return {
-        ...current,
-        status,
-        processed,
-        failed,
-        started,
-        available_actions,
-      };
+      return applyRunStepPartState(current, latestAction);
     });
 
     updateRunStepPartCacheByRunStep(queryClient, runStep, {
