@@ -42,6 +42,7 @@
     "react-intersection-observer": "^11.0.1",
     "react-markdown": "^10.1.0",
     "react-select": "^5.10.2",
+    "remark-gfm": "^4.0.1",
     "yet-another-react-lightbox": "^3.32.2"
   },
   "peerDependencies": {

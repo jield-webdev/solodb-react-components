@@ -1,13 +1,8 @@
 export type ChatRole = "user" | "assistant";
 
-export interface HistoryMessage {
-  role: ChatRole;
-  content: string;
-}
-
 export interface PostMessageRequest {
   message: string;
-  history?: HistoryMessage[];
+  conversation_id?: string | null;
 }
 
 export interface Attachment {
@@ -18,6 +13,7 @@ export interface Attachment {
 }
 
 export interface PostMessageResponse {
+  conversation_id: string;
   message: string;
   attachments?: Attachment[];
 }
@@ -41,7 +37,9 @@ export interface ChatMessage {
   attachments?: Attachment[];
   toolCalls?: ToolCall[];
   isStreaming?: boolean;
+  isFailed?: boolean;
   error?: string;
+  retryAction?: "retry" | "start-fresh";
 }
 
 export interface SseEvent {

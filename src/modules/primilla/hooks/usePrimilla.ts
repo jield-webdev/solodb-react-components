@@ -4,9 +4,11 @@ import { StreamHandlers, streamMessage } from "../utils/streamMessage";
 
 interface SendMessageVariables extends StreamHandlers {
   request: PostMessageRequest;
+  signal?: AbortSignal;
 }
 
 export const usePrimilla = () =>
   useMutation<PostMessageResponse, Error, SendMessageVariables>({
-    mutationFn: ({ request, ...handlers }) => streamMessage(request, handlers),
+    mutationFn: ({ request, signal, ...handlers }) => streamMessage(request, handlers, signal),
+    retry: false,
   });

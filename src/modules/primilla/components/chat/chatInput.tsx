@@ -32,6 +32,7 @@ export default function ChatInput({ disabled, onSend }: ChatInputProps) {
       <Form.Control
         as="textarea"
         rows={2}
+        disabled={disabled}
         value={text}
         placeholder="Message Primilla..."
         onChange={(event) => setText(event.target.value)}

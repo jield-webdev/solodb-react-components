@@ -3,7 +3,13 @@ import { ChatMessage as ChatMessageType } from "../../interfaces/primilla";
 import ChatMessage from "./chatMessage";
 import PrimillaIcon from "./primillaIcon";
 
-export default function ChatMessageList({ messages }: { messages: ChatMessageType[] }) {
+interface ChatMessageListProps {
+  messages: ChatMessageType[];
+  isPending: boolean;
+  onRetry: (id: number) => void;
+}
+
+export default function ChatMessageList({ messages, isPending, onRetry }: ChatMessageListProps) {
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -21,7 +27,7 @@ export default function ChatMessageList({ messages }: { messages: ChatMessageTyp
         </div>
       )}
       {messages.map((message) => (
-        <ChatMessage key={message.id} message={message} />
+        <ChatMessage key={message.id} message={message} retryDisabled={isPending} onRetry={onRetry} />
       ))}
       <div ref={endRef} />
     </div>

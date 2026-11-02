@@ -13,8 +13,29 @@ export class PrimillaError extends Error {
 const getAuthToken = (): string => document.getElementById("root")?.dataset.jwt ?? "";
 
 const getErrorMessage = async (response: Response): Promise<string> => {
-  const body: { error?: string } | null = await response.json().catch(() => null);
-  return body?.error ?? `Primilla request failed (${response.status})`;
+  const body: unknown = await response.json().catch(() => null);
+  return body && typeof body === "object" && "error" in body && typeof body.error === "string"
+    ? body.error
+    : `Primilla request failed (${response.status})`;
+};
+
+export const getStreamErrorStatus = (message: string): number | undefined => {
+  switch (message) {
+    case "conversation not found":
+      return 404;
+    case "conversation was changed by another request":
+      return 409;
+    case "conversation is too long, start a new conversation":
+      return 422;
+    case "internal server error":
+      return 500;
+    case "the model did not finish its answer":
+      return 502;
+    case "request timed out":
+      return 504;
+    default:
+      return undefined;
+  }
 };
 
 export const getPrimillaPathUrl = (path: string): string => new URL(path, getPrimillaUrl()).href;
@@ -27,6 +48,7 @@ export async function primillaFetch(input: string, init: RequestInit = {}): Prom
 
   const response = await fetch(input, {
     ...init,
+    credentials: "omit",
     headers: { ...init.headers, Authorization: `Bearer ${token}` },
   });
 

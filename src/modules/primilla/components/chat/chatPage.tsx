@@ -4,7 +4,7 @@ import ChatMessageList from "./chatMessageList";
 import PrimillaIcon from "./primillaIcon";
 
 export default function PrimillaChatPage() {
-  const { messages, isPending, sendMessage } = usePrimillaChat();
+  const { messages, isPending, sendMessage, retryMessage } = usePrimillaChat();
 
   return (
     <div
@@ -18,7 +18,7 @@ export default function PrimillaChatPage() {
         <h1 className="h3 mb-0">Primilla</h1>
         <span className="text-body-secondary">Your SoloDB assistant</span>
       </header>
-      <ChatMessageList messages={messages} />
+      <ChatMessageList messages={messages} isPending={isPending} onRetry={retryMessage} />
       <ChatInput disabled={isPending} onSend={sendMessage} />
     </div>
   );

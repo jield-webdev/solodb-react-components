@@ -1,6 +1,6 @@
 import { SseEvent } from "../interfaces/primilla";
 
-const parseSseBlock = (block: string): SseEvent => {
+const parseSseBlock = (block: string): SseEvent | undefined => {
   let event = "message";
   const data: string[] = [];
 
@@ -9,7 +9,7 @@ const parseSseBlock = (block: string): SseEvent => {
     else if (line.startsWith("data:")) data.push(line.slice(5).replace(/^ /, ""));
   }
 
-  return { event, data: data.join("\n") };
+  return data.length ? { event, data: data.join("\n") } : undefined;
 };
 
 export async function* readSseEvents(stream: ReadableStream<Uint8Array>): AsyncGenerator<SseEvent> {
@@ -20,19 +20,21 @@ export async function* readSseEvents(stream: ReadableStream<Uint8Array>): AsyncG
   try {
     while (true) {
       const { done, value } = await reader.read();
-      buffer += decoder.decode(value, { stream: !done }).replace(/\r\n/g, "\n");
+      buffer = (buffer + decoder.decode(value, { stream: !done })).replace(/\r\n/g, "\n");
 
       let separator = buffer.indexOf("\n\n");
       while (separator !== -1) {
         const block = buffer.slice(0, separator);
         buffer = buffer.slice(separator + 2);
-        if (block.trim()) yield parseSseBlock(block);
+        const event = parseSseBlock(block);
+        if (event) yield event;
         separator = buffer.indexOf("\n\n");
       }
 
       if (done) break;
     }
   } finally {
+    await reader.cancel().catch(() => undefined);
     reader.releaseLock();
   }
 }
