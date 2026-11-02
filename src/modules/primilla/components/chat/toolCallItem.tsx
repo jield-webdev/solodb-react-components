@@ -1,21 +1,21 @@
 import { Spinner } from "react-bootstrap";
-import { ToolCall } from "../../interfaces/primilla";
+import { ToolCallGroup } from "../../interfaces/primilla";
 import ToolCallLabel from "./toolCallLabel";
 
-const STATE_ICONS: Record<Exclude<ToolCall["state"], "running">, string> = {
+const STATE_ICONS: Record<Exclude<ToolCallGroup["state"], "running">, string> = {
   done: "fa fa-check text-success",
   error: "fa fa-times text-danger",
 };
 
-export default function ToolCallItem({ call }: { call: ToolCall }) {
+export default function ToolCallItem({ group }: { group: ToolCallGroup }) {
   return (
     <span className="d-inline-flex align-items-center gap-2">
-      {call.state === "running" ? (
+      {group.state === "running" ? (
         <Spinner animation="border" size="sm" className="text-primary" />
       ) : (
-        <i className={STATE_ICONS[call.state]} aria-label={call.state} />
+        <i className={STATE_ICONS[group.state]} aria-label={group.state} />
       )}
-      <ToolCallLabel call={call} />
+      <ToolCallLabel call={group} count={group.count} />
     </span>
   );
 }

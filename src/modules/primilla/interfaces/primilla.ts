@@ -30,6 +30,10 @@ export interface ToolCall {
   awaitingStart?: boolean;
 }
 
+export interface ToolCallGroup extends Pick<ToolCall, "id" | "name" | "state"> {
+  count: number;
+}
+
 export interface ChatMessage {
   id: number;
   role: ChatRole;

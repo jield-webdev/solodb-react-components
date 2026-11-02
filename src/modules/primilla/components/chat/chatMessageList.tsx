@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ChatMessage as ChatMessageType } from "../../interfaces/primilla";
 import ChatMessage from "./chatMessage";
-import PrimillaIcon from "./primillaIcon";
 
 interface ChatMessageListProps {
   messages: ChatMessageType[];
@@ -17,15 +16,7 @@ export default function ChatMessageList({ messages, isPending, onRetry }: ChatMe
   }, [messages]);
 
   return (
-    <div className="d-flex flex-column gap-3 flex-grow-1 overflow-auto p-2" style={{ minHeight: 0 }}>
-      {messages.length === 0 && (
-        <div className="m-auto text-center text-body-secondary">
-          <span className="text-primary">
-            <PrimillaIcon size={64} />
-          </span>
-          <p className="mt-2 mb-0">Ask Primilla anything about your SoloDB data.</p>
-        </div>
-      )}
+    <div className="d-flex flex-column gap-4 flex-grow-1 overflow-auto py-3 px-1" style={{ minHeight: 0 }}>
       {messages.map((message) => (
         <ChatMessage key={message.id} message={message} retryDisabled={isPending} onRetry={onRetry} />
       ))}

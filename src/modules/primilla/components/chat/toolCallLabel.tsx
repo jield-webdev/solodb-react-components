@@ -1,7 +1,17 @@
 import { ToolCall } from "../../interfaces/primilla";
 
-export default function ToolCallLabel({ call }: { call: ToolCall }) {
-  const name = <code>{call.name}</code>;
+interface ToolCallLabelProps {
+  call: ToolCall;
+  count?: number;
+}
+
+export default function ToolCallLabel({ call, count = 1 }: ToolCallLabelProps) {
+  const name = (
+    <>
+      <code>{call.name}</code>
+      {count > 1 && ` ×${count}`}
+    </>
+  );
 
   if (call.state === "running") return <span>Calling {name}…</span>;
   return (

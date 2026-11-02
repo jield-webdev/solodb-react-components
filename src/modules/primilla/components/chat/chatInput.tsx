@@ -1,5 +1,5 @@
-import { FormEvent, KeyboardEvent, useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { FormEvent, KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
+import { Form } from "react-bootstrap";
 
 interface ChatInputProps {
   disabled: boolean;
@@ -8,9 +8,19 @@ interface ChatInputProps {
 
 export default function ChatInput({ disabled, onSend }: ChatInputProps) {
   const [text, setText] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const canSend = !disabled && text.trim().length > 0;
+
+  // Grow with the content; the CSS max-height caps it and enables scrolling.
+  useLayoutEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, [text]);
 
   const submit = () => {
-    if (!text.trim() || disabled) return;
+    if (!canSend) return;
     onSend(text);
     setText("");
   };
@@ -21,27 +31,33 @@ export default function ChatInput({ disabled, onSend }: ChatInputProps) {
   };
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "Enter" && !event.shiftKey) {
+    if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault();
       submit();
     }
   };
 
   return (
-    <Form className="d-flex align-items-end gap-2" onSubmit={handleSubmit}>
+    <Form className="primilla-composer d-flex align-items-end gap-2 border bg-body-tertiary" onSubmit={handleSubmit}>
       <Form.Control
+        ref={textareaRef}
         as="textarea"
-        rows={2}
-        disabled={disabled}
+        rows={1}
         value={text}
-        placeholder="Message Primilla..."
+        placeholder="Ask Primilla"
+        aria-label="Message Primilla"
         onChange={(event) => setText(event.target.value)}
         onKeyDown={handleKeyDown}
-        style={{ resize: "none" }}
+        className="primilla-composer-input border-0 bg-transparent shadow-none"
       />
-      <Button type="submit" disabled={disabled || !text.trim()}>
-        Send
-      </Button>
+      <button
+        type="submit"
+        className="btn btn-primary rounded-circle flex-shrink-0 primilla-composer-send"
+        disabled={!canSend}
+        aria-label="Send message"
+      >
+        <i className="fa fa-arrow-up" aria-hidden="true" />
+      </button>
     </Form>
   );
 }

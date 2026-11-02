@@ -1,4 +1,4 @@
-import { ToolCall, ToolEvent } from "../interfaces/primilla";
+import { ToolCall, ToolCallGroup, ToolEvent } from "../interfaces/primilla";
 
 const updateAt = (calls: ToolCall[], index: number, update: Partial<ToolCall>) =>
   calls.map((call, i) => (i === index ? { ...call, ...update } : call));
@@ -21,3 +21,12 @@ export const closeToolCalls = (calls?: ToolCall[]): ToolCall[] | undefined =>
 
 export const getLatestToolCall = (calls: ToolCall[]): ToolCall | undefined =>
   calls.findLast((call) => call.state === "running") ?? calls.at(-1);
+
+export const groupToolCalls = (calls: ToolCall[]): ToolCallGroup[] =>
+  calls.reduce<ToolCallGroup[]>((groups, { id, name, state }) => {
+    const last = groups.at(-1);
+    if (last?.name === name && last.state === state) {
+      return [...groups.slice(0, -1), { ...last, count: last.count + 1 }];
+    }
+    return [...groups, { id, name, state, count: 1 }];
+  }, []);
