@@ -4,5 +4,5 @@ export default function IssueCard({ issue, equipment, issueAttachments, reloadQu
     issue: EquipmentModuleIssue;
     equipment: Equipment;
     issueAttachments: EquipmentModuleIssueAttachment[];
-    reloadQueryFn: (key: string[]) => void;
+    reloadQueryFn: (key: (string | number)[]) => void;
 }): React.JSX.Element;
