@@ -89,8 +89,10 @@ For the complete and up‑to‑date list, see `src/index.ts`.
 
 ## Primilla chat
 
-`PrimillaChatPage` uses the SSE endpoint at `https://primilla.docker.localhost`
-through the development reverse proxy. Requests and attachment downloads use the
+`PrimillaChatPage` reads the Primilla hostname from `#root`'s
+`data-primilla-endpoint` attribute and adds `https://`, following Goldstein's
+endpoint convention. Set `data-primilla-endpoint="primilla.docker.localhost"`
+to use the development reverse proxy. Requests and attachment downloads use the
 SoloDB bearer token from `#root`'s `data-jwt` attribute and omit cookie credentials.
 Downloads use attachment filenames directly; they do not need exposed response headers.
 

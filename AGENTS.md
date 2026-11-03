@@ -48,7 +48,7 @@
 
 ## Primilla Client Rules
 
-- Use the reverse proxy at `https://primilla.docker.localhost` for development; preserve bearer authentication and omit cookie credentials.
+- Read the Primilla hostname from `#root`'s `data-primilla-endpoint` attribute and prepend `https://`, matching Goldstein's endpoint convention. For development, set it to `primilla.docker.localhost` to use the reverse proxy; preserve bearer authentication and omit cookie credentials.
 - Send only `message` and optional `conversation_id`. Never send the local transcript as `history`.
 - Keep one server conversation ID per mounted chat, alongside its in-memory transcript. Accept the first SSE `conversation` event provisionally and commit its ID only after `done`.
 - Check HTTP errors and the SSE content type before reading events. Treat streams without `done` or `error` as failed and discard provisional IDs on failure.
