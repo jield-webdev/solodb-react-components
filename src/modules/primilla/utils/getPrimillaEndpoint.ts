@@ -1,3 +1,4 @@
 export default function getPrimillaUrl(): string {
-  return "https://primilla.docker.localhost/";
+  const endpoint = document.getElementById("root")?.dataset.primillaEndpoint ?? "";
+  return `https://${endpoint}/`;
 }
