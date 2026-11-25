@@ -4,5 +4,5 @@ interface ChatMessageProps {
     retryDisabled: boolean;
     onRetry: (id: number) => void;
 }
-export default function ChatMessage({ message, retryDisabled, onRetry }: ChatMessageProps): import("react").JSX.Element;
+export default function ChatMessage({ message, retryDisabled, onRetry }: ChatMessageProps): import('react').JSX.Element;
 export {};

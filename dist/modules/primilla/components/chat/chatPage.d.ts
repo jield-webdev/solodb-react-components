@@ -1,1 +1,1 @@
-export default function PrimillaChatPage(): import("react").JSX.Element;
+export default function PrimillaChatPage(): import('react').JSX.Element;

@@ -1,1 +1,1 @@
-export default function TypingIndicator(): import("react").JSX.Element;
+export default function TypingIndicator(): import('react').JSX.Element;
