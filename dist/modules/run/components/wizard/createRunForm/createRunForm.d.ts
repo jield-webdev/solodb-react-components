@@ -16,8 +16,9 @@ type CreateRunFormProps = {
     selectedRuns: Run[];
     selectedSubstrates: SelectedSubstrate[];
     partIdsByRunId: Record<number, number[]>;
+    experimentalSplit?: number;
     onBack: () => void;
     onSubmit: (values: CreateRunFormValues) => void;
 };
-export default function CreateRunForm({ isSubmitting, errorMessage, selectedRuns, selectedSubstrates, partIdsByRunId, onBack, onSubmit, }: CreateRunFormProps): import('react').JSX.Element;
+export default function CreateRunForm({ isSubmitting, errorMessage, selectedRuns, selectedSubstrates, partIdsByRunId, experimentalSplit, onBack, onSubmit, }: CreateRunFormProps): import('react').JSX.Element;
 export {};

@@ -25870,6 +25870,20 @@ function YM({ runId: e, part: t, selection: n }) {
 	return /* @__PURE__ */ C("div", {
 		className: `list-group-item d-flex align-items-center gap-3 flex-wrap${r ? " border-primary border-top" : ""}`,
 		children: [
+			/* @__PURE__ */ S("label", {
+				htmlFor: o,
+				className: "flex-grow-1 mb-0 fw-semibold",
+				style: { cursor: "pointer" },
+				children: i
+			}),
+			/* @__PURE__ */ S(W.Check, {
+				id: o,
+				type: "checkbox",
+				checked: r,
+				onChange: () => n.togglePart(e, t.id),
+				"aria-label": `Select ${i}`,
+				className: "order-first"
+			}),
 			/* @__PURE__ */ C("div", {
 				className: "d-flex align-items-center gap-2",
 				children: [/* @__PURE__ */ S(W.Label, {
@@ -25888,42 +25902,35 @@ function YM({ runId: e, part: t, selection: n }) {
 					"aria-label": `Experimental split amount for ${i}`,
 					style: { maxWidth: "7rem" }
 				})]
-			}),
-			/* @__PURE__ */ S("label", {
-				htmlFor: o,
-				className: "flex-grow-1 mb-0",
-				style: { cursor: "pointer" },
-				children: i
-			}),
-			/* @__PURE__ */ S(W.Check, {
-				id: o,
-				type: "checkbox",
-				checked: r,
-				onChange: () => n.togglePart(e, t.id),
-				"aria-label": `Select ${i}`,
-				className: "ms-sm-auto"
 			})
 		]
 	});
 }
 function XM({ runId: e, part: t, selection: n }) {
 	let r = n.isPartSelected(e, t.id);
-	return /* @__PURE__ */ S(aa, {
-		as: "button",
+	return /* @__PURE__ */ C(H, {
 		type: "button",
-		bg: r ? "primary" : "dark",
+		variant: r ? "primary" : "outline-secondary",
 		onClick: () => n.togglePart(e, t.id),
 		"aria-pressed": r,
-		title: t.label ?? void 0,
-		className: `border-0 fs-6 fw-normal px-3 py-2${r ? " step-part-selected" : ""}`,
-		style: { cursor: "pointer" },
-		children: JM(t)
+		"aria-label": `Select ${JM(t)}`,
+		className: "d-flex align-items-center justify-content-between gap-3 text-start p-3",
+		children: [/* @__PURE__ */ C("span", { children: [/* @__PURE__ */ S("span", {
+			className: "d-block fw-semibold",
+			children: JM(t)
+		}), /* @__PURE__ */ C("span", {
+			className: "d-block small",
+			children: ["Split: ", n.getPartAmount(e, t.id)]
+		})] }), /* @__PURE__ */ S("span", {
+			className: "small",
+			children: r ? "✓ Selected" : "Select"
+		})]
 	});
 }
 function ZM({ runId: e, group: t, selection: n, experimentalEdit: r }) {
 	let i = t.parts.length > 0 && t.parts.every((t) => n.isPartSelected(e, t.id));
 	return /* @__PURE__ */ C("fieldset", {
-		className: "mb-4 border-0 p-0",
+		className: "mb-3 border rounded p-3",
 		children: [/* @__PURE__ */ C("legend", {
 			className: "d-flex align-items-center gap-2 fs-6 fw-semibold mb-2",
 			children: [
@@ -25952,7 +25959,11 @@ function ZM({ runId: e, group: t, selection: n, experimentalEdit: r }) {
 				selection: n
 			}, t.id))
 		}) : /* @__PURE__ */ S("div", {
-			className: "d-flex flex-wrap gap-2",
+			className: "d-grid gap-2",
+			style: {
+				gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 13rem), 1fr))",
+				gridAutoRows: "1fr"
+			},
 			children: t.parts.map((t) => /* @__PURE__ */ S(XM, {
 				runId: e,
 				part: t,
@@ -25963,78 +25974,90 @@ function ZM({ runId: e, group: t, selection: n, experimentalEdit: r }) {
 }
 // src/modules/run/components/shared/parentRuns/runPartPicker.tsx
 function QM({ run: e, selection: t, partGroups: n, isLoadingParts: r, experimentalEdit: i, onToggleExperimentalEdit: a }) {
-	let o = t.getSelectedPartIds(e.id);
-	return /* @__PURE__ */ C("div", { children: [
-		/* @__PURE__ */ C("div", {
-			className: "mb-4",
-			children: [/* @__PURE__ */ S("h3", { children: "Description" }), /* @__PURE__ */ S(W.Control, {
-				as: "textarea",
-				rows: 3,
-				value: t.descriptionsByRunId[e.id] ?? "",
-				onChange: (n) => t.setDescription(e.id, n.target.value),
-				placeholder: `Enter a description for ${e.label}`
+	let o = t.getSelectedPartIds(e.id), s = o.reduce((n, r) => n + t.getPartAmount(e.id, r), 0);
+	return /* @__PURE__ */ C(U, {
+		className: "mb-3",
+		children: [/* @__PURE__ */ C(U.Header, {
+			className: "d-flex align-items-center justify-content-between flex-wrap gap-3 py-3",
+			children: [/* @__PURE__ */ C("div", { children: [/* @__PURE__ */ C("h3", {
+				className: "h5 mb-1",
+				children: [
+					e.label,
+					" — ",
+					e.name
+				]
+			}), /* @__PURE__ */ S("span", {
+				className: "text-body-secondary small",
+				children: "Choose parent parts and configure their experimental split."
+			})] }), /* @__PURE__ */ C(aa, {
+				bg: "primary",
+				children: [
+					o.length,
+					" selected · Total split: ",
+					s
+				]
 			})]
-		}),
-		/* @__PURE__ */ C("div", {
-			className: "d-flex align-items-center justify-content-between mb-3",
-			children: [/* @__PURE__ */ C("div", { children: [
-				/* @__PURE__ */ S("h3", {
-					className: "mb-1",
+		}), /* @__PURE__ */ C(U.Body, { children: [
+			/* @__PURE__ */ C("div", {
+				className: "d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3",
+				children: [/* @__PURE__ */ C("div", { children: [/* @__PURE__ */ S("h4", {
+					className: "h5 mb-1",
 					children: "Select parts"
-				}),
-				/* @__PURE__ */ S(H, {
-					variant: i ? "outline-primary" : "primary",
-					size: "sm",
-					onClick: a,
-					"aria-pressed": i,
-					children: i ? "Done editing split" : "Edit experimental split"
-				}),
-				i && /* @__PURE__ */ S("p", {
-					className: "text-secondary small mb-0 mt-1",
-					children: "Amounts must be 1 or higher."
-				}),
-				/* @__PURE__ */ C("p", {
-					className: "text-secondary mb-0",
-					children: [
-						e.label,
-						" — ",
-						e.name
-					]
-				})
-			] }), /* @__PURE__ */ C("div", {
-				className: "d-flex align-items-center gap-2",
-				children: [o.length > 0 && /* @__PURE__ */ C("span", {
-					className: "text-secondary small",
-					children: [o.length, " selected"]
-				}), /* @__PURE__ */ S(H, {
-					variant: "link",
-					size: "sm",
-					className: "p-0",
-					onClick: () => t.setRunPartIds(e.id, []),
-					children: "Clear"
+				}), /* @__PURE__ */ S("p", {
+					className: "text-body-secondary small mb-0",
+					children: i ? "Set the split amount for each part, then select the parts to include." : "Click a part to select or deselect it. Each selected part contributes its split amount."
+				})] }), /* @__PURE__ */ C("div", {
+					className: "d-flex align-items-center gap-2",
+					children: [/* @__PURE__ */ S(H, {
+						variant: "outline-primary",
+						size: "sm",
+						onClick: a,
+						"aria-pressed": i,
+						children: i ? "Done editing split" : "Edit experimental split"
+					}), /* @__PURE__ */ S(H, {
+						variant: "outline-secondary",
+						size: "sm",
+						disabled: o.length === 0,
+						onClick: () => t.setRunPartIds(e.id, []),
+						children: "Clear selection"
+					})]
 				})]
-			})]
-		}),
-		r && /* @__PURE__ */ C("div", {
-			className: "d-flex align-items-center gap-2 text-secondary",
-			children: [/* @__PURE__ */ S(pd, {
-				animation: "border",
-				size: "sm",
-				role: "status",
-				"aria-hidden": "true"
-			}), /* @__PURE__ */ S("span", { children: "Loading parts…" })]
-		}),
-		!r && n.length === 0 && /* @__PURE__ */ S("p", {
-			className: "text-secondary mb-0",
-			children: "This run has no parts to select."
-		}),
-		!r && n.map((n) => /* @__PURE__ */ S(ZM, {
-			runId: e.id,
-			group: n,
-			selection: t,
-			experimentalEdit: i
-		}, n.level))
-	] });
+			}),
+			r && /* @__PURE__ */ C("div", {
+				className: "d-flex align-items-center gap-2 text-secondary",
+				children: [/* @__PURE__ */ S(pd, {
+					animation: "border",
+					size: "sm",
+					role: "status",
+					"aria-hidden": "true"
+				}), /* @__PURE__ */ S("span", { children: "Loading parts…" })]
+			}),
+			!r && n.length === 0 && /* @__PURE__ */ S("p", {
+				className: "text-secondary mb-0",
+				children: "This run has no parts to select."
+			}),
+			!r && n.map((n) => /* @__PURE__ */ S(ZM, {
+				runId: e.id,
+				group: n,
+				selection: t,
+				experimentalEdit: i
+			}, n.level)),
+			/* @__PURE__ */ C(W.Group, {
+				controlId: `parent-description-${e.id}`,
+				className: "border-top pt-3 mt-3",
+				children: [/* @__PURE__ */ C(W.Label, { children: ["Description ", /* @__PURE__ */ S("span", {
+					className: "text-body-secondary small",
+					children: "(optional)"
+				})] }), /* @__PURE__ */ S(W.Control, {
+					as: "textarea",
+					rows: 2,
+					value: t.descriptionsByRunId[e.id] ?? "",
+					onChange: (n) => t.setDescription(e.id, n.target.value),
+					placeholder: `Enter a description for ${e.label}`
+				})]
+			})
+		] })]
+	});
 }
 // src/modules/run/components/shared/parentRuns/selectedRunList.tsx
 function $M({ selectedRuns: e, onDeselect: t }) {
@@ -26092,70 +26115,82 @@ var eN = (e) => qM(e.items ?? []), tN = (e) => ({
 	run: e
 }), nN = NS;
 function rN({ selection: e, run: t }) {
-	let { environment: n } = I(), [r, i] = y(null), [a, o] = y(!1), { selectedRuns: s } = e, { data: c, isFetching: l } = j({
+	let { environment: n } = I(), [r, i] = y(null), [a, o] = y(!1), [s, c] = y(""), { selectedRuns: l } = e, { data: u, isFetching: d, hasNextPage: f, fetchNextPage: p, isError: m } = D({
 		queryKey: [
 			"parentRuns",
 			n,
-			t?.id
+			t?.id,
+			s
 		],
-		queryFn: () => xt({
+		initialPageParam: 1,
+		queryFn: ({ pageParam: e }) => xt({
 			environment: n,
 			availableAsParentForRun: t,
-			pageSize: 1e3
-		})
-	}), u = A({ queries: s.map((e) => ({
+			query: s || void 0,
+			pageSize: 50,
+			page: e
+		}),
+		getNextPageParam: (e) => e.hasMore ? e.currentPage + 1 : void 0
+	}), h = A({ queries: l.map((e) => ({
 		queryKey: ["parentRunParts", e.id],
 		queryFn: () => yt({ run: e }),
 		select: eN
-	})) }), d = g(() => c?.items ?? [], [c]), f = g(() => d.map(tN), [d]), p = r === null ? 0 : Math.max(0, s.findIndex((e) => e.id === r)), m = s[p] ?? null, h = u[p], _ = async (e) => {
-		let t = e.toLowerCase(), n = [];
-		for (let e of d) (!t || e.label.toLowerCase().includes(t) || e.name.toLowerCase().includes(t)) && n.push(tN(e));
-		return n;
-	}, v = (t) => {
+	})) }), _ = g(() => {
+		let e = /* @__PURE__ */ new Map();
+		for (let t of u?.pages ?? []) for (let n of t.items ?? []) e.set(n.id, n);
+		return Array.from(e.values(), tN);
+	}, [u]), v = r === null ? 0 : Math.max(0, l.findIndex((e) => e.id === r)), b = l[v] ?? null, w = h[v], T = (t) => {
 		e.selectRun(t), i(t.id);
 	};
 	return /* @__PURE__ */ C("div", { children: [
 		/* @__PURE__ */ C("div", {
 			className: "mb-4",
-			children: [/* @__PURE__ */ S("h3", { children: "Select parent runs" }), /* @__PURE__ */ S(AS, {
+			children: [/* @__PURE__ */ S("h3", { children: "Select parent runs" }), /* @__PURE__ */ S(mb, {
 				isSearchable: !0,
 				isClearable: !0,
-				defaultOptions: f,
+				options: _,
+				inputValue: s,
+				onInputChange: c,
 				placeholder: "— Select a run, or start typing",
-				loadOptions: _,
-				isLoading: l,
+				captureMenuScroll: !0,
+				onMenuScrollToBottom: () => {
+					f && !d && p();
+				},
+				noOptionsMessage: () => m ? "Unable to load runs. Try searching again." : "No runs found",
+				filterOption: null,
+				isLoading: d,
 				value: null,
 				styles: nN,
 				onChange: (e) => {
-					e && v(e.run);
+					e && T(e.run);
 				}
 			})]
 		}),
 		/* @__PURE__ */ S($M, {
-			selectedRuns: s,
+			selectedRuns: l,
 			onDeselect: e.deselectRun
 		}),
-		s.length > 0 && /* @__PURE__ */ C(x, { children: [/* @__PURE__ */ S(Pu, {
+		l.length > 0 && /* @__PURE__ */ C(x, { children: [/* @__PURE__ */ S(Pu, {
 			variant: "tabs",
-			activeKey: m === null ? void 0 : `run-${m.id}`,
+			activeKey: b === null ? void 0 : `run-${b.id}`,
 			onSelect: (e) => {
 				e?.startsWith("run-") && i(Number(e.replace("run-", "")));
 			},
 			className: "mb-3",
-			children: s.map((e) => /* @__PURE__ */ S(Pu.Item, { children: /* @__PURE__ */ S(Pu.Link, {
+			children: l.map((e) => /* @__PURE__ */ S(Pu.Item, { children: /* @__PURE__ */ S(Pu.Link, {
 				eventKey: `run-${e.id}`,
 				children: e.label
 			}) }, e.id))
 		}), /* @__PURE__ */ S("div", {
 			className: "ms-2 ps-2",
-			children: m && /* @__PURE__ */ S(QM, {
-				run: m,
+			children: b && /* @__PURE__ */ S(QM, {
+				run: b,
 				selection: e,
-				partGroups: h?.data ?? [],
-				isLoadingParts: h?.isFetching ?? !1,
+				partGroups: w?.data ?? [],
+				isLoadingParts: w?.isFetching ?? !1,
 				experimentalEdit: a,
 				onToggleExperimentalEdit: () => o((e) => !e)
-			}, m.id)
+			}, b.id)
 		})] })
 	] });
 }
@@ -26287,48 +26322,48 @@ function cN({ selectedRuns: e, selectedSubstrates: t, partIdsByRunId: n }) {
 	})] });
 }
 // src/modules/run/components/wizard/createRunForm/createRunForm.tsx
-function lN({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstrates: r, partIdsByRunId: i, onBack: a, onSubmit: o }) {
-	let { environment: s } = I(), [c, l] = y(""), [u, d] = y(""), [f, p] = y(null), [m, h] = y(null), [g, _] = y(null), [v, b] = y(an.RESEARCH), [x, w] = y(1), [T, E] = y(""), [D, O] = y(!1), { data: k, isError: A, isLoading: M } = j({
-		queryKey: ["organisation-groups", s],
+function lN({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstrates: r, partIdsByRunId: i, experimentalSplit: a, onBack: o, onSubmit: s }) {
+	let { environment: c } = I(), [l, u] = y(""), [d, f] = y(""), [p, m] = y(null), [h, g] = y(null), [_, v] = y(null), [b, x] = y(an.RESEARCH), [w, T] = y(1), [E, D] = y(""), [O, k] = y(!1), { data: A, isError: M, isLoading: N } = j({
+		queryKey: ["organisation-groups", c],
 		queryFn: () => st({
-			environment: s,
+			environment: c,
 			page_size: 1e3
 		})
-	}), { data: N, isError: ee, isLoading: P } = j({
+	}), { data: ee, isError: P, isLoading: F } = j({
 		queryKey: [
 			"organisation-teams",
-			s,
+			c,
 			ln.Run
 		],
 		queryFn: () => lt({
-			environment: s,
+			environment: c,
 			purpose: ln.Run,
 			page_size: 1e3
 		})
-	}), { data: F, isError: te, isLoading: ne } = j({
+	}), { data: te, isError: ne, isLoading: re } = j({
 		queryKey: [
 			"organisation-projects",
-			s,
+			c,
 			cn.Run
 		],
 		queryFn: () => ct({
-			environment: s,
+			environment: c,
 			purpose: cn.Run,
 			page_size: 1e3
 		})
-	}), re = c.trim(), ie = u.trim(), ae = M || P || ne, oe = A || ee || te, se = k?.items ?? [], ce = N?.items ?? [], le = F?.items ?? [], ue = f !== null && se.some((e) => e.id === f), de = m !== null && ce.some((e) => e.id === m), fe = g !== null && le.some((e) => e.id === g), pe = re === "", me = ie === "", he = D && pe, ge = D && me, _e = !pe && !me && ue && de && fe && !ae && !oe && !e;
+	}), ie = l.trim(), ae = d.trim(), oe = N || F || re, se = M || P || ne, ce = A?.items ?? [], le = ee?.items ?? [], ue = te?.items ?? [], de = p !== null && ce.some((e) => e.id === p), fe = h !== null && le.some((e) => e.id === h), pe = _ !== null && ue.some((e) => e.id === _), me = ie === "", he = ae === "", ge = O && me, _e = O && he, L = !me && !he && de && fe && pe && !oe && !se && !e;
 	return /* @__PURE__ */ C(W, {
 		noValidate: !0,
 		onSubmit: (e) => {
-			e.preventDefault(), O(!0), _e && o({
-				name: re,
-				motivation: ie,
-				groupId: f,
-				teamId: m,
-				projectId: g,
-				parts: Number.isFinite(x) ? Math.max(1, x) : 1,
-				location: T,
-				runType: v
+			e.preventDefault(), k(!0), L && s({
+				name: ie,
+				motivation: ae,
+				groupId: p,
+				teamId: h,
+				projectId: _,
+				parts: a ?? (Number.isFinite(w) ? Math.max(1, w) : 1),
+				location: E,
+				runType: b
 			});
 		},
 		className: "form-horizontal",
@@ -26352,14 +26387,14 @@ function lN({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstra
 							children: [
 								/* @__PURE__ */ S(W.Control, {
 									type: "text",
-									value: c,
-									onChange: (e) => l(e.target.value),
+									value: l,
+									onChange: (e) => u(e.target.value),
 									placeholder: "Give a run name",
 									required: !0,
 									disabled: e,
-									isInvalid: he
+									isInvalid: ge
 								}),
-								he && /* @__PURE__ */ S(W.Control.Feedback, {
+								ge && /* @__PURE__ */ S(W.Control.Feedback, {
 									type: "invalid",
 									children: "Run name is required."
 								}),
@@ -26382,8 +26417,8 @@ function lN({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstra
 							sm: 9,
 							children: [/* @__PURE__ */ S(W.Control, {
 								type: "text",
-								value: T,
-								onChange: (e) => E(e.target.value),
+								value: E,
+								onChange: (e) => D(e.target.value),
 								placeholder: "Location of the samples",
 								disabled: e
 							}), /* @__PURE__ */ S(W.Text, {
@@ -26409,14 +26444,14 @@ function lN({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstra
 								/* @__PURE__ */ S(W.Control, {
 									as: "textarea",
 									rows: 3,
-									value: u,
-									onChange: (e) => d(e.target.value),
+									value: d,
+									onChange: (e) => f(e.target.value),
 									placeholder: "Why is this run being created?",
 									required: !0,
 									disabled: e,
-									isInvalid: ge
+									isInvalid: _e
 								}),
-								ge && /* @__PURE__ */ S(W.Control.Feedback, {
+								_e && /* @__PURE__ */ S(W.Control.Feedback, {
 									type: "invalid",
 									children: "Motivation is required."
 								}),
@@ -26432,40 +26467,40 @@ function lN({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstra
 			/* @__PURE__ */ C(iN, {
 				title: "Organisation",
 				children: [
-					D && oe && /* @__PURE__ */ S(ia, {
+					O && se && /* @__PURE__ */ S(ia, {
 						variant: "warning",
 						children: "Could not load organisation values."
 					}),
 					/* @__PURE__ */ S(oN, {
 						controlId: "create-run-group",
 						label: "Group",
-						options: se,
-						isLoading: M,
-						value: f,
-						onChange: p,
-						showError: D && !ue,
+						options: ce,
+						isLoading: N,
+						value: p,
+						onChange: m,
+						showError: O && !de,
 						disabled: e,
 						helpText: "Select the group to which this run belongs"
 					}),
 					/* @__PURE__ */ S(oN, {
 						controlId: "create-run-team",
 						label: "Team",
-						options: ce,
-						isLoading: P,
-						value: m,
-						onChange: h,
-						showError: D && !de,
+						options: le,
+						isLoading: F,
+						value: h,
+						onChange: g,
+						showError: O && !fe,
 						disabled: e,
 						helpText: "Select the team to which this run belongs"
 					}),
 					/* @__PURE__ */ S(oN, {
 						controlId: "create-run-project",
 						label: "Project",
-						options: le,
-						isLoading: ne,
-						value: g,
-						onChange: _,
-						showError: D && !fe,
+						options: ue,
+						isLoading: re,
+						value: _,
+						onChange: v,
+						showError: O && !pe,
 						disabled: e,
 						helpText: "Select the project to which this run belongs"
 					})
@@ -26483,16 +26518,29 @@ function lN({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstra
 						children: "Experimental split"
 					}), /* @__PURE__ */ C(Oa, {
 						sm: 9,
-						children: [/* @__PURE__ */ S(W.Control, {
+						children: [a === void 0 ? /* @__PURE__ */ S(W.Control, {
 							type: "number",
 							min: 1,
 							step: 1,
-							value: x,
-							onChange: (e) => w(Number(e.target.value)),
+							value: w,
+							onChange: (e) => T(Number(e.target.value)),
 							disabled: e
+						}) : /* @__PURE__ */ C("div", {
+							className: "d-flex align-items-center flex-wrap gap-3",
+							children: [/* @__PURE__ */ S("output", {
+								id: "create-run-parts",
+								className: "fw-semibold",
+								children: a
+							}), /* @__PURE__ */ S(H, {
+								variant: "outline-secondary",
+								size: "sm",
+								onClick: o,
+								disabled: e,
+								children: "Edit parent parts"
+							})]
 						}), /* @__PURE__ */ S(W.Text, {
 							muted: !0,
-							children: "Select here the amount of parts (experimental split) this run has, give only the main amount of parts, individual parts can be split later"
+							children: a === void 0 ? "Choose the number of parts for this run. Individual parts can be split later." : "Total experimental split from all selected parent parts."
 						})]
 					})]
 				})
@@ -26510,8 +26558,8 @@ function lN({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstra
 					}), /* @__PURE__ */ S(Oa, {
 						sm: 9,
 						children: /* @__PURE__ */ C(W.Select, {
-							value: v,
-							onChange: (e) => b(Number(e.target.value)),
+							value: b,
+							onChange: (e) => x(Number(e.target.value)),
 							disabled: e,
 							children: [/* @__PURE__ */ S("option", {
 								value: an.RESEARCH,
@@ -26546,7 +26594,7 @@ function lN({ isSubmitting: e, errorMessage: t, selectedRuns: n, selectedSubstra
 				children: [/* @__PURE__ */ S(H, {
 					variant: "outline-secondary",
 					type: "button",
-					onClick: a,
+					onClick: o,
 					disabled: e,
 					children: "Back"
 				}), /* @__PURE__ */ S(H, {
@@ -26643,35 +26691,39 @@ function mN({ selectedSubstrates: e, setSelectedSubstrates: t }) {
 }
 // src/modules/run/components/wizard/wizardElement.tsx
 function hN() {
-	let { environment: e } = I(), t = ne(), n = M(), [r, i] = y("parts"), [a, o] = y([]), s = WM(), c = k({
+	let { environment: e } = I(), t = M(), [n, r] = y("parts"), [i, a] = y([]), o = WM(), s = o.selectedRuns.reduce((e, t) => e + o.getSelectedPartIds(t.id).length, 0), c = o.selectedRuns.reduce((e, t) => e + o.getSelectedPartIds(t.id).reduce((e, n) => e + o.getPartAmount(t.id, n), 0), 0), [l, u] = y(!1), d = k({
 		mutationFn: async ({ runValues: e, parentRuns: t, substrates: n }) => {
-			let r = await ut({
+			let r = t.selectedRuns.some((e) => (t.partIdsByRunId[e.id]?.length ?? 0) > 0), i = await ut({
 				name: e.name,
 				motivation: e.motivation,
 				group_id: e.groupId,
 				team_id: e.teamId,
 				project_id: e.projectId,
-				parts: e.parts,
+				parts: r ? 0 : e.parts,
 				location: e.location || null,
 				run_type: e.runType
-			}), i = GM(r.id, t).map((e) => dt(e)), a = n.map(({ substrate: e, amount: t }) => ft({
-				run_id: r.id,
+			});
+			for (let e of GM(i.id, t)) await dt(e);
+			let a = n.map(({ substrate: e, amount: t }) => ft({
+				run_id: i.id,
 				substrate_id: e.id,
 				amount: t
 			}));
-			return await Promise.all([...i, ...a]), r;
+			return await Promise.all(a), i;
 		},
-		onSuccess: (r, i) => {
-			n.invalidateQueries({ queryKey: [e] }), n.invalidateQueries({ queryKey: [r.id] }), i.parentRuns.selectedRuns.forEach((e) => {
-				n.invalidateQueries({ queryKey: [e.id] });
-			}), t(`/${e}/run/${r.id}/information.html`);
+		onSuccess: (n, r) => {
+			t.invalidateQueries({ queryKey: [e] }), t.invalidateQueries({ queryKey: [n.id] }), r.parentRuns.selectedRuns.forEach((e) => {
+				t.invalidateQueries({ queryKey: [e.id] });
+			});
+			let i = er().replace(/\/$/, "");
+			window.location.assign(`${i}/${e}/run/${n.id}/information.html`);
 		}
 	});
-	return /* @__PURE__ */ C("div", { children: [r !== "details" && /* @__PURE__ */ C(Pu, {
+	return /* @__PURE__ */ C("div", { children: [n !== "details" && /* @__PURE__ */ C(Pu, {
 		variant: "tabs",
-		activeKey: r,
+		activeKey: n,
 		onSelect: (e) => {
-			(e === "parts" || e === "substrate") && i(e);
+			(e === "parts" || e === "substrate") && r(e);
 		},
 		className: "mb-4",
 		children: [/* @__PURE__ */ S(Pu.Item, { children: /* @__PURE__ */ S(Pu.Link, {
@@ -26684,33 +26736,37 @@ function hN() {
 	}), /* @__PURE__ */ C("div", {
 		className: "m-3",
 		children: [
-			r === "parts" && /* @__PURE__ */ S(rN, { selection: s }),
-			r === "substrate" && /* @__PURE__ */ S(mN, {
-				selectedSubstrates: a,
-				setSelectedSubstrates: o
+			n === "parts" && /* @__PURE__ */ S(rN, { selection: o }),
+			n === "substrate" && /* @__PURE__ */ S(mN, {
+				selectedSubstrates: i,
+				setSelectedSubstrates: a
 			}),
-			r === "details" && /* @__PURE__ */ S(lN, {
-				isSubmitting: c.isPending,
-				errorMessage: c.isError ? uN(c.error) : void 0,
-				selectedRuns: s.selectedRuns,
-				selectedSubstrates: a,
-				partIdsByRunId: s.partIdsByRunId,
-				onBack: () => i("parts"),
-				onSubmit: (e) => {
-					c.mutate({
-						runValues: e,
-						parentRuns: s,
-						substrates: a
-					});
-				}
+			l && /* @__PURE__ */ S("div", {
+				hidden: n !== "details",
+				children: /* @__PURE__ */ S(lN, {
+					isSubmitting: d.isPending,
+					errorMessage: d.isError ? uN(d.error) : void 0,
+					selectedRuns: o.selectedRuns,
+					selectedSubstrates: i,
+					partIdsByRunId: o.partIdsByRunId,
+					experimentalSplit: s > 0 ? c : void 0,
+					onBack: () => r("parts"),
+					onSubmit: (e) => {
+						d.mutate({
+							runValues: e,
+							parentRuns: o,
+							substrates: i
+						});
+					}
+				})
 			}),
-			r !== "details" && /* @__PURE__ */ S("div", {
-				className: "d-flex justify-content-end mt-4",
+			n !== "details" && /* @__PURE__ */ S("div", {
+				className: "d-flex justify-content-start mt-4",
 				children: /* @__PURE__ */ S(H, {
 					variant: "primary",
-					disabled: c.isPending,
+					disabled: d.isPending,
 					onClick: () => {
-						i("details");
+						u(!0), r("details");
 					},
 					children: "Continue"
 				})
