@@ -14,5 +14,5 @@ type OrganisationSelectProps = {
     disabled: boolean;
     helpText: string;
 };
-export default function OrganisationSelect({ controlId, label, options, isLoading, value, onChange, showError, disabled, helpText, }: OrganisationSelectProps): import("react").JSX.Element;
+export default function OrganisationSelect({ controlId, label, options, isLoading, value, onChange, showError, disabled, helpText, }: OrganisationSelectProps): import('react').JSX.Element;
 export {};

@@ -8,5 +8,5 @@ export default function EditSortingPropertiesModal({ show, onClose, properties, 
     properties: Property[];
     blacklistedEquipmentProperties: string[];
     setBlacklistedEquipmentProperties: React.Dispatch<React.SetStateAction<string[]>>;
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;
 export {};

@@ -1,1 +1,1 @@
-export default function NullNotifications(): import("react").JSX.Element;
+export default function NullNotifications(): import('react').JSX.Element;

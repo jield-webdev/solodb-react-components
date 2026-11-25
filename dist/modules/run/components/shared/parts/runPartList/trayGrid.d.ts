@@ -8,4 +8,4 @@ export declare const TrayGrid: ({ tray, trayParts, trayAllParts, stepParts, isSp
     stepParts: RunStepPart[];
     isSplitLevel: boolean;
     context: RunPartRenderContext;
-}) => import("react").JSX.Element;
+}) => import('react').JSX.Element;

@@ -14,5 +14,5 @@ type RunPartPickerProps = {
  * level. Parts can be picked as plain badges or, in experimental-edit mode,
  * with a split amount per part.
  */
-export default function RunPartPicker({ run, selection, partGroups, isLoadingParts, experimentalEdit, onToggleExperimentalEdit, }: RunPartPickerProps): import("react").JSX.Element;
+export default function RunPartPicker({ run, selection, partGroups, isLoadingParts, experimentalEdit, onToggleExperimentalEdit, }: RunPartPickerProps): import('react').JSX.Element;
 export {};

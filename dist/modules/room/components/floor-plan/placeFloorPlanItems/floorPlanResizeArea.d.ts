@@ -4,4 +4,4 @@ export default function FloorPlanResizeArea({ area, cursor, onPointerDown, }: {
     area: RectangleArea;
     cursor: string;
     onPointerDown: (event: PointerEvent<SVGRectElement>) => void;
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;

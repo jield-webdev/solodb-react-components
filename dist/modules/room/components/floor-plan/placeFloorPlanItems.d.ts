@@ -1,1 +1,1 @@
-export default function PlaceFloorPlanItems(): import("react").JSX.Element;
+export default function PlaceFloorPlanItems(): import('react').JSX.Element;

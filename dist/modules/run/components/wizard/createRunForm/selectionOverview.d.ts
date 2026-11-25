@@ -5,5 +5,5 @@ type SelectionOverviewProps = {
     selectedSubstrates: SelectedSubstrate[];
     partIdsByRunId: Record<number, number[]>;
 };
-export default function SelectionOverview({ selectedRuns, selectedSubstrates, partIdsByRunId, }: SelectionOverviewProps): import("react").JSX.Element;
+export default function SelectionOverview({ selectedRuns, selectedSubstrates, partIdsByRunId, }: SelectionOverviewProps): import('react').JSX.Element;
 export {};

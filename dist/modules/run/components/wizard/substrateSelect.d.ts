@@ -8,5 +8,5 @@ type SubstrateSelectProps = {
     selectedSubstrates: SelectedSubstrate[];
     setSelectedSubstrates: Dispatch<SetStateAction<SelectedSubstrate[]>>;
 };
-export default function SubstrateSelect({ selectedSubstrates, setSelectedSubstrates }: SubstrateSelectProps): import("react").JSX.Element;
+export default function SubstrateSelect({ selectedSubstrates, setSelectedSubstrates }: SubstrateSelectProps): import('react').JSX.Element;
 export {};

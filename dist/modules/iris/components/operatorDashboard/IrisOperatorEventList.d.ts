@@ -5,5 +5,5 @@ interface IrisOperatorEventListProps {
     selectedEventUid: string;
     onSelectEvent: (uid: string) => void;
 }
-export default function IrisOperatorEventList({ activeContext, events, selectedEventUid, onSelectEvent, }: IrisOperatorEventListProps): import("react").JSX.Element;
+export default function IrisOperatorEventList({ activeContext, events, selectedEventUid, onSelectEvent, }: IrisOperatorEventListProps): import('react').JSX.Element;
 export {};

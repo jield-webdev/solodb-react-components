@@ -19278,7 +19278,7 @@ var zD = typeof self == "object" ? self : globalThis, BD = (e, t) => {
 }, YD = (e, { json: t, lossy: n } = {}) => {
 	let r = [];
 	return JD(!(t || n), !!t, /* @__PURE__ */ new Map(), r)(e), r;
-}, XD = typeof structuredClone == "function" ? 
+}, XD = typeof structuredClone == "function" ?
 /* c8 ignore start */
 (e, t) => t && ("json" in t || "lossy" in t) ? HD(YD(e, t)) : structuredClone(e) : (e, t) => HD(YD(e, t));
 //#endregion

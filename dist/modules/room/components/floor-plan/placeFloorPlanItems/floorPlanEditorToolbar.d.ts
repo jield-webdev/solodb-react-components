@@ -8,4 +8,4 @@ export default function FloorPlanEditorToolbar({ selection, draft, onCancel, onS
     onDelete: () => void;
     onRemove: () => void;
     isBusy: boolean;
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;

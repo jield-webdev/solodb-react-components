@@ -5,6 +5,7 @@ import { listRunParts, listRunSteps, RunPart, RunStep } from "@jield/solodb-type
 import { RunContext } from "@jield/solodb-react-components/modules/run/contexts/runContext";
 import PaginationLinks from "@jield/solodb-react-components/modules/partial/paginationLinks";
 import RunLayoutStep from "./elements/runStepInLayout";
+import AddExtraTrayButton from "./elements/addExtraTrayButton";
 
 const renderGroupHeader = (step: RunStep) => (
   <tr style={{ pointerEvents: "none" }}>
@@ -152,7 +153,10 @@ export default function RunLayoutElement() {
 
   return (
     <div>
-      <h2>Edit run layout</h2>
+      <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+        <h2 className="mb-0">Edit run layout</h2>
+        <AddExtraTrayButton />
+      </div>
       <Table borderless hover striped size="sm">
         <thead>
           <tr>

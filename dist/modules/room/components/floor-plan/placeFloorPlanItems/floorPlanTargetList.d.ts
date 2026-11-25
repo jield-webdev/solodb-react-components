@@ -10,4 +10,4 @@ export default function FloorPlanTargetList({ title, targets, selectedKey, stage
     disabled: boolean;
     onSelect: (target: FloorPlanTarget) => void;
     onPress: (target: FloorPlanTarget) => void;
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;

@@ -6,5 +6,5 @@ type PartLevelFieldsetProps = {
     selection: ParentRunSelection;
     experimentalEdit: boolean;
 };
-export default function PartLevelFieldset({ runId, group, selection, experimentalEdit }: PartLevelFieldsetProps): import("react").JSX.Element;
+export default function PartLevelFieldset({ runId, group, selection, experimentalEdit }: PartLevelFieldsetProps): import('react').JSX.Element;
 export {};

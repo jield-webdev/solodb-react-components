@@ -1,1 +1,1 @@
-export default function ListEquipmentReport(): import("react").JSX.Element;
+export default function ListEquipmentReport(): import('react').JSX.Element;

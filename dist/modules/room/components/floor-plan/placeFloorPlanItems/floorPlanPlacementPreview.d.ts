@@ -5,4 +5,4 @@ export default function FloorPlanPlacementPreview({ floorPlan, target, pointer, 
     target: FloorPlanTarget;
     pointer: PolygonPoint;
     unitsPerPixel: number;
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;

@@ -17,4 +17,4 @@ export default function FloorPlanPolygon({ points, label, targetType, variant, u
     groupProps?: SVGProps<SVGGElement>;
     shapeProps?: SVGProps<SVGPolygonElement>;
     children?: ReactNode;
-}): import("react").JSX.Element;
+}): import('react').JSX.Element;

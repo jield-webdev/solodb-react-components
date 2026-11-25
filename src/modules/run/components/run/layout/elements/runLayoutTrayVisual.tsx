@@ -21,6 +21,7 @@ import {
   type RunTray,
 } from "@jield/solodb-react-components/modules/run/utils/runTrays";
 import { notification } from "@jield/solodb-react-components/utils/notification";
+import RunLayoutTrayActions from "./runLayoutTrayActions";
 
 const handlePartDragStart = (event: DragEvent<HTMLSpanElement>, stepPart: RunStepPart) => {
   event.dataTransfer.effectAllowed = "move";
@@ -184,7 +185,10 @@ export default function RunLayoutTrayVisual({
       aria-label={tray.name}
       data-extra-tray-id={isExtraTray ? tray.extra_tray_id : undefined}
     >
-      <h4 className="h6 mb-2">{trayLabel}</h4>
+      <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
+        <h4 className="h6 mb-0">{trayLabel}</h4>
+        {isExtraTray && !isPlaceholderExtraTray(tray) && <RunLayoutTrayActions tray={tray} hasParts={parts.length > 0} />}
+      </div>
       <div className="tray-visual__frame">
         <div
           className="tray-visual__grid"
