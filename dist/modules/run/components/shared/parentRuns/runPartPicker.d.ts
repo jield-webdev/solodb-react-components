@@ -11,7 +11,7 @@ type RunPartPickerProps = {
 };
 /**
  * Description and part selection for a single parent run, grouped by part
- * level. Parts can be picked as plain badges or, in experimental-edit mode,
+ * level. Parts can be picked as cards or, in experimental-edit mode,
  * with a split amount per part.
  */
 export default function RunPartPicker({ run, selection, partGroups, isLoadingParts, experimentalEdit, onToggleExperimentalEdit, }: RunPartPickerProps): import('react').JSX.Element;
