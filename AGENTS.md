@@ -30,6 +30,8 @@
 - `src/style/`: package-level styles.
 - `example/src/`: integration harness that consumes this package.
 - Run layout extra trays are explicitly created and managed across the run. Tray mutations use `create/run/tray`, `update/run/tray/{id}`, and `delete/run/tray/{id}`; the PHP API must reject removal of trays referenced by any part or step.
+- The new-run wizard derives the run's experimental split from the sum of selected parent-part amounts (default 1 each). Show this total read-only with an edit/back action; preserve details when editing parents. Keep a manual split when no parent parts are selected. For parent-based runs send `parts: 0` to `create/run` (requires PHP support for zero initial parts), then await each `create/run/parent` request sequentially; parent linking creates the split parts and updates the total. On successful creation and linking, use full browser navigation to the information page on the configured SoloDB server.
+- Parent-run searches must call `listRuns` with `query`, preserving `environment` and `availableAsParentForRun`. Load suggestions and search results in pages of 50, fetching the next page on menu scroll using `hasMore` and `currentPage`; keep pages scoped to the search query.
 
 ## Public API and Export Rules
 

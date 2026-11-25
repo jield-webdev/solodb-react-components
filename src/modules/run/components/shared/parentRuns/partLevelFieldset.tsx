@@ -22,6 +22,17 @@ function PartSplitRow({ runId, part, selection }: { runId: number; part: RunPart
         selected ? " border-primary border-top" : ""
       }`}
     >
+      <label htmlFor={selectedInputId} className="flex-grow-1 mb-0 fw-semibold" style={{ cursor: "pointer" }}>
+        {partLabel}
+      </label>
+      <Form.Check
+        id={selectedInputId}
+        type="checkbox"
+        checked={selected}
+        onChange={() => selection.togglePart(runId, part.id)}
+        aria-label={`Select ${partLabel}`}
+        className="order-first"
+      />
       <div className="d-flex align-items-center gap-2">
         <Form.Label htmlFor={amountInputId} className="small text-secondary mb-0">
           Split
@@ -39,37 +50,28 @@ function PartSplitRow({ runId, part, selection }: { runId: number; part: RunPart
           style={{ maxWidth: "7rem" }}
         />
       </div>
-      <label htmlFor={selectedInputId} className="flex-grow-1 mb-0" style={{ cursor: "pointer" }}>
-        {partLabel}
-      </label>
-      <Form.Check
-        id={selectedInputId}
-        type="checkbox"
-        checked={selected}
-        onChange={() => selection.togglePart(runId, part.id)}
-        aria-label={`Select ${partLabel}`}
-        className="ms-sm-auto"
-      />
     </div>
   );
 }
 
-function PartToggleBadge({ runId, part, selection }: { runId: number; part: RunPart; selection: ParentRunSelection }) {
+function PartToggleCard({ runId, part, selection }: { runId: number; part: RunPart; selection: ParentRunSelection }) {
   const selected = selection.isPartSelected(runId, part.id);
 
   return (
-    <Badge
-      as="button"
+    <Button
       type="button"
-      bg={selected ? "primary" : "dark"}
+      variant={selected ? "primary" : "outline-secondary"}
       onClick={() => selection.togglePart(runId, part.id)}
       aria-pressed={selected}
-      title={part.label ?? undefined}
-      className={`border-0 fs-6 fw-normal px-3 py-2${selected ? " step-part-selected" : ""}`}
-      style={{ cursor: "pointer" }}
+      aria-label={`Select ${getPartLabel(part)}`}
+      className="d-flex align-items-center justify-content-between gap-3 text-start p-3"
     >
-      {getPartLabel(part)}
-    </Badge>
+      <span>
+        <span className="d-block fw-semibold">{getPartLabel(part)}</span>
+        <span className="d-block small">Split: {selection.getPartAmount(runId, part.id)}</span>
+      </span>
+      <span className="small">{selected ? "✓ Selected" : "Select"}</span>
+    </Button>
   );
 }
 
@@ -85,7 +87,7 @@ export default function PartLevelFieldset({ runId, group, selection, experimenta
   };
 
   return (
-    <fieldset className="mb-4 border-0 p-0">
+    <fieldset className="mb-3 border rounded p-3">
       <legend className="d-flex align-items-center gap-2 fs-6 fw-semibold mb-2">
         <span>Level {group.level}</span>
         <Badge bg="secondary" pill className="fw-normal">
@@ -103,9 +105,15 @@ export default function PartLevelFieldset({ runId, group, selection, experimenta
           ))}
         </div>
       ) : (
-        <div className="d-flex flex-wrap gap-2">
+        <div
+          className="d-grid gap-2"
+          style={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 13rem), 1fr))",
+            gridAutoRows: "1fr",
+          }}
+        >
           {group.parts.map((part) => (
-            <PartToggleBadge key={part.id} runId={runId} part={part} selection={selection} />
+            <PartToggleCard key={part.id} runId={runId} part={part} selection={selection} />
           ))}
         </div>
       )}

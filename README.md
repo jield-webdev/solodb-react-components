@@ -10,6 +10,10 @@ Reusable React components, providers, and hooks for building SoloDB-powered appl
 - TypeScript types exported for key domain entities
 - Example app included for local development and integration testing
 
+The parent-run selector loads runs in pages of 50 and fetches the next page when you scroll to the bottom. Typing searches the API from the first page; search results also support infinite scrolling. Searches preserve the current environment and, when editing a run, its parent eligibility filter.
+
+The new-run wizard shows parent parts as selectable cards with their split amounts and a per-run total. Continue is left-aligned. When parent parts are selected, the details page displays their summed experimental split with an **Edit parent parts** button; returning to edit preserves the details form. Runs without selected parent parts retain a manual split. Parent-based runs send `parts: 0` to `create/run`; sequential `create/run/parent` requests then create the selected split parts exactly once. This requires the PHP run-creation listener to accept zero initial parts. Runs without selected parent parts send their manual split as before. After creation and parent/substrate linking, the browser loads the information page on the SoloDB server configured with `initSolodbComponents({ serverUri })`.
+
 The run layout editor supports adding extra trays at any time. Use **Edit** beside an extra tray to rename it or remove it when empty. Trays and names apply to the whole run; removal is rejected if any run part or step still references the tray. This requires the PHP API endpoints `POST /api/create/run/tray` (`run_id`), `PATCH /api/update/run/tray/{id}` (`name`, 1–128 characters), and `DELETE /api/delete/run/tray/{id}`.
 
 ### Peer dependencies

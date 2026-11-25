@@ -33,6 +33,7 @@ type CreateRunFormProps = {
   selectedRuns: Run[];
   selectedSubstrates: SelectedSubstrate[];
   partIdsByRunId: Record<number, number[]>;
+  experimentalSplit?: number;
   onBack: () => void;
   onSubmit: (values: CreateRunFormValues) => void;
 };
@@ -43,6 +44,7 @@ export default function CreateRunForm({
   selectedRuns,
   selectedSubstrates,
   partIdsByRunId,
+  experimentalSplit,
   onBack,
   onSubmit,
 }: CreateRunFormProps) {
@@ -121,7 +123,7 @@ export default function CreateRunForm({
       groupId,
       teamId,
       projectId,
-      parts: Number.isFinite(parts) ? Math.max(1, parts) : 1,
+      parts: experimentalSplit ?? (Number.isFinite(parts) ? Math.max(1, parts) : 1),
       location,
       runType,
     });
@@ -236,17 +238,29 @@ export default function CreateRunForm({
             Experimental split
           </Form.Label>
           <Col sm={9}>
-            <Form.Control
-              type="number"
-              min={1}
-              step={1}
-              value={parts}
-              onChange={(event) => setParts(Number(event.target.value))}
-              disabled={isSubmitting}
-            />
+            {experimentalSplit !== undefined ? (
+              <div className="d-flex align-items-center flex-wrap gap-3">
+                <output id="create-run-parts" className="fw-semibold">
+                  {experimentalSplit}
+                </output>
+                <Button variant="outline-secondary" size="sm" onClick={onBack} disabled={isSubmitting}>
+                  Edit parent parts
+                </Button>
+              </div>
+            ) : (
+              <Form.Control
+                type="number"
+                min={1}
+                step={1}
+                value={parts}
+                onChange={(event) => setParts(Number(event.target.value))}
+                disabled={isSubmitting}
+              />
+            )}
             <Form.Text muted>
-              Select here the amount of parts (experimental split) this run has, give only the main amount of parts,
-              individual parts can be split later
+              {experimentalSplit !== undefined
+                ? "Total experimental split from all selected parent parts."
+                : "Choose the number of parts for this run. Individual parts can be split later."}
             </Form.Text>
           </Col>
         </Form.Group>

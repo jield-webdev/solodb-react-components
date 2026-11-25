@@ -2,7 +2,8 @@ import { createRun, createRunParent, createRunSubstrate, type Run } from "@jield
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button, Nav } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { getSolodbServerCleanUrl } from "../../../core/config/runtimeConfig";
 import { type ParentRunSelectionState, useParentRunSelection } from "../../hooks/useParentRunSelection";
 import { buildRunParentPayloads } from "../../utils/buildRunParentPayloads";
 import ParentRunSelect from "../shared/parentRuns/parentRunSelect";
@@ -20,28 +21,45 @@ type CreateRunVariables = {
 
 export default function NewRunWizard() {
   const { environment } = useParams();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activePage, setActivePage] = useState<WizardPage>("parts");
   const [selectedSubstrates, setSelectedSubstrates] = useState<SelectedSubstrate[]>([]);
   const parentRunSelection = useParentRunSelection();
+  const selectedPartCount = parentRunSelection.selectedRuns.reduce(
+    (total, run) => total + parentRunSelection.getSelectedPartIds(run.id).length,
+    0
+  );
+  const experimentalSplit = parentRunSelection.selectedRuns.reduce(
+    (total, run) =>
+      total +
+      parentRunSelection
+        .getSelectedPartIds(run.id)
+        .reduce((sum, partId) => sum + parentRunSelection.getPartAmount(run.id, partId), 0),
+    0
+  );
+  const [hasOpenedDetails, setHasOpenedDetails] = useState(false);
 
   const createRunMutation = useMutation({
     mutationFn: async ({ runValues, parentRuns, substrates }: CreateRunVariables): Promise<Run> => {
+      const hasParentParts = parentRuns.selectedRuns.some(
+        (parentRun) => (parentRuns.partIdsByRunId[parentRun.id]?.length ?? 0) > 0
+      );
       const createdRun = await createRun({
         name: runValues.name,
         motivation: runValues.motivation,
         group_id: runValues.groupId,
         team_id: runValues.teamId,
         project_id: runValues.projectId,
-        parts: runValues.parts,
+        // Parent linking materialises its own parts; do not also create standalone parts.
+        parts: hasParentParts ? 0 : runValues.parts,
         location: runValues.location || null,
         run_type: runValues.runType,
       });
 
-      const parentPromises = buildRunParentPayloads(createdRun.id, parentRuns).map((payload) =>
-        createRunParent(payload)
-      );
+      // Each link numbers new parts after the existing ones, so links must run in order.
+      for (const payload of buildRunParentPayloads(createdRun.id, parentRuns)) {
+        await createRunParent(payload);
+      }
 
       const substratePromises = substrates.map(({ substrate, amount }) =>
         createRunSubstrate({
@@ -51,7 +69,7 @@ export default function NewRunWizard() {
         })
       );
 
-      await Promise.all([...parentPromises, ...substratePromises]);
+      await Promise.all(substratePromises);
 
       return createdRun;
     },
@@ -61,7 +79,8 @@ export default function NewRunWizard() {
       variables.parentRuns.selectedRuns.forEach((parentRun) => {
         queryClient.invalidateQueries({ queryKey: [parentRun.id] });
       });
-      navigate(`/${environment}/run/${run.id}/information.html`);
+      const baseUrl = getSolodbServerCleanUrl().replace(/\/$/, "");
+      window.location.assign(`${baseUrl}/${environment}/run/${run.id}/information.html`);
     },
   });
 
@@ -94,30 +113,34 @@ export default function NewRunWizard() {
           <SubstrateSelect selectedSubstrates={selectedSubstrates} setSelectedSubstrates={setSelectedSubstrates} />
         )}
 
-        {activePage === "details" && (
-          <CreateRunForm
-            isSubmitting={createRunMutation.isPending}
-            errorMessage={createRunMutation.isError ? getCreateRunErrorMessage(createRunMutation.error) : undefined}
-            selectedRuns={parentRunSelection.selectedRuns}
-            selectedSubstrates={selectedSubstrates}
-            partIdsByRunId={parentRunSelection.partIdsByRunId}
-            onBack={() => setActivePage("parts")}
-            onSubmit={(runValues) => {
-              createRunMutation.mutate({
-                runValues,
-                parentRuns: parentRunSelection,
-                substrates: selectedSubstrates,
-              });
-            }}
-          />
+        {hasOpenedDetails && (
+          <div hidden={activePage !== "details"}>
+            <CreateRunForm
+              isSubmitting={createRunMutation.isPending}
+              errorMessage={createRunMutation.isError ? getCreateRunErrorMessage(createRunMutation.error) : undefined}
+              selectedRuns={parentRunSelection.selectedRuns}
+              selectedSubstrates={selectedSubstrates}
+              partIdsByRunId={parentRunSelection.partIdsByRunId}
+              experimentalSplit={selectedPartCount > 0 ? experimentalSplit : undefined}
+              onBack={() => setActivePage("parts")}
+              onSubmit={(runValues) => {
+                createRunMutation.mutate({
+                  runValues,
+                  parentRuns: parentRunSelection,
+                  substrates: selectedSubstrates,
+                });
+              }}
+            />
+          </div>
         )}
 
         {activePage !== "details" && (
-          <div className="d-flex justify-content-end mt-4">
+          <div className="d-flex justify-content-start mt-4">
             <Button
               variant="primary"
               disabled={createRunMutation.isPending}
               onClick={() => {
+                setHasOpenedDetails(true);
                 setActivePage("details");
               }}
             >

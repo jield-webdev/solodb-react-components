@@ -1,10 +1,9 @@
 import { listRunParts, listRuns, type Run } from "@jield/solodb-typescript-core";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Nav } from "react-bootstrap";
 import { useParams } from "react-router-dom";
-import { type StylesConfig } from "react-select";
-import AsyncSelect from "react-select/async";
+import Select, { type StylesConfig } from "react-select";
 import { customStyles } from "@jield/solodb-react-components/modules/core/form/element/userFormElement";
 import { type ParentRunSelection } from "../../../hooks/useParentRunSelection";
 import { groupPartsByLevel } from "./partGrouping";
@@ -34,11 +33,27 @@ export default function ParentRunSelect({ selection, run }: ParentRunSelectProps
   const { environment } = useParams();
   const [activeRunId, setActiveRunId] = useState<number | null>(null);
   const [experimentalEdit, setExperimentalEdit] = useState(false);
+  const [search, setSearch] = useState("");
   const { selectedRuns } = selection;
 
-  const { data: runsData, isFetching: isRunsFetching } = useQuery({
-    queryKey: ["parentRuns", environment, run?.id],
-    queryFn: () => listRuns({ environment: environment, availableAsParentForRun: run, pageSize: 1000 }),
+  const {
+    data: runsData,
+    isFetching: isRunsFetching,
+    hasNextPage,
+    fetchNextPage,
+    isError,
+  } = useInfiniteQuery({
+    queryKey: ["parentRuns", environment, run?.id, search],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      listRuns({
+        environment,
+        availableAsParentForRun: run,
+        query: search || undefined,
+        pageSize: 50,
+        page: pageParam,
+      }),
+    getNextPageParam: (lastPage) => (lastPage.hasMore ? lastPage.currentPage + 1 : undefined),
   });
 
   // One parts query per selected run, index-aligned with selectedRuns.
@@ -50,9 +65,15 @@ export default function ParentRunSelect({ selection, run }: ParentRunSelectProps
     })),
   });
 
-  const runs: Run[] = useMemo(() => runsData?.items ?? [], [runsData]);
-
-  const defaultRunOptions = useMemo(() => runs.map(toOption), [runs]);
+  const runOptions = useMemo(() => {
+    const runs = new Map<number, Run>();
+    for (const page of runsData?.pages ?? []) {
+      for (const candidate of page.items ?? []) {
+        runs.set(candidate.id, candidate);
+      }
+    }
+    return Array.from(runs.values(), toOption);
+  }, [runsData]);
 
   const visibleRunIndex =
     activeRunId === null
@@ -64,17 +85,6 @@ export default function ParentRunSelect({ selection, run }: ParentRunSelectProps
   const visibleRun = selectedRuns[visibleRunIndex] ?? null;
   const visiblePartsQuery = partQueries[visibleRunIndex];
 
-  const loadOptions = async (inputValue: string): Promise<RunOption[]> => {
-    const query = inputValue.toLowerCase();
-    const options: RunOption[] = [];
-    for (const candidate of runs) {
-      if (!query || candidate.label.toLowerCase().includes(query) || candidate.name.toLowerCase().includes(query)) {
-        options.push(toOption(candidate));
-      }
-    }
-    return options;
-  };
-
   const selectRun = (selected: Run) => {
     selection.selectRun(selected);
     setActiveRunId(selected.id);
@@ -84,12 +94,21 @@ export default function ParentRunSelect({ selection, run }: ParentRunSelectProps
     <div>
       <div className="mb-4">
         <h3>Select parent runs</h3>
-        <AsyncSelect<RunOption>
+        <Select<RunOption>
           isSearchable={true}
           isClearable={true}
-          defaultOptions={defaultRunOptions}
+          options={runOptions}
+          inputValue={search}
+          onInputChange={setSearch}
           placeholder={"— Select a run, or start typing"}
-          loadOptions={loadOptions}
+          captureMenuScroll={true}
+          onMenuScrollToBottom={() => {
+            if (hasNextPage && !isRunsFetching) {
+              void fetchNextPage();
+            }
+          }}
+          noOptionsMessage={() => (isError ? "Unable to load runs. Try searching again." : "No runs found")}
+          filterOption={null}
           isLoading={isRunsFetching}
           value={null}
           styles={runSelectStyles}
