@@ -66,20 +66,53 @@ export default function RegisterBarcodeElement({
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isSubmitting },
+    getValues,
+    formState: { errors, isSubmitting, submitCount },
   } = useForm<Inputs>({
     defaultValues: {
+      location: location?.id ?? 0,
       expire_date: getDefaultExpireDate(),
       owner: { value: user?.id, label: user?.full_name },
     },
   });
 
   const locationId = watch("location");
+  const chemical = watch("chemical");
+  const concentration = watch("concentration");
+  const amount = watch("amount");
+  const missingItems = [
+    ...(!location || Number(locationId) !== location.id ? ["Location"] : []),
+    ...(!Number(chemical) ? ["Chemical"] : []),
+    ...(concentration === undefined || String(concentration).trim() === "" ? ["Concentration"] : []),
+    ...(amount === undefined || String(amount).trim() === "" ? ["Amount"] : []),
+    ...Object.entries(errors)
+      .filter(([name]) => !["location", "chemical", "concentration", "amount"].includes(name))
+      .map(([, error]) => String(error?.message)),
+  ];
 
   useEffect(() => {
-    if (!locationId) return;
-    getLocation({ id: locationId }).then((loc) => setLocation(loc));
-  }, [locationId]);
+    setValue("location", location?.id ?? 0);
+  }, [location?.id, setValue]);
+
+  useEffect(() => {
+    // Read the current field after synchronizing a location supplied by the parent.
+    const selectedLocationId = Number(getValues("location"));
+    if (!selectedLocationId || selectedLocationId === location?.id) {
+      return;
+    }
+    let active = true;
+    getLocation({ id: selectedLocationId }).then((loadedLocation) => {
+      if (active) setLocation(loadedLocation);
+    });
+    return () => {
+      active = false;
+    };
+  }, [locationId, location?.id, setLocation, getValues]);
+
+  const resetScannedLocation = useCallback(() => {
+    setLocation(null);
+    setValue("location", 0);
+  }, [setLocation, setValue]);
 
   // Scanner: handle location QR scans
   const callbackId = useId();
@@ -89,25 +122,27 @@ export default function RegisterBarcodeElement({
       if (scannedCodeIsLocationCode(keys)) {
         const id = extractLabelNumber(keys);
         if (id !== null) {
-          getLocation({ id }).then((loc) => setLocation(loc));
           setValue("location", id);
         }
+        return;
       }
 
       if (keys.startsWith("reset-scan-location")) {
         resetScannedLocation();
       }
     },
-    [setValue]
+    [setValue, resetScannedLocation]
   );
 
   useEffect(() => {
     removeCallbackFn(ScannedKeysType.WILD_CARD, callbackId);
     addCallbackFn(ScannedKeysType.WILD_CARD, callbackId, onScanKeys);
     return () => removeCallbackFn(ScannedKeysType.WILD_CARD, callbackId);
-  }, [setValue]);
+  }, [onScanKeys]);
 
   const onSubmit = async (values: Inputs) => {
+    if (!location || Number(values.location) !== location.id) return;
+
     const existingBarcode = await listChemicalContainerExternalLabels({ qrCodeContent: barcode });
     // The qr_code_content filter is a SQL LIKE, so verify the exact match client-side
     if (existingBarcode.items.some((label) => label.qr_code_content === barcode)) {
@@ -115,9 +150,11 @@ export default function RegisterBarcodeElement({
       return;
     }
 
+    console.log(location);
+
     const container = await createChemicalContainer({
       chemical: values.chemical,
-      location: values.location,
+      location: location.id,
       user: values.owner.value,
       concentration: values.concentration !== undefined ? String(values.concentration) : undefined,
       amount: values.amount !== undefined ? String(values.amount) : undefined,
@@ -132,14 +169,15 @@ export default function RegisterBarcodeElement({
     });
   };
 
-  const resetScannedLocation = () => {
-    setLocation(null);
-    setValue("location", 0);
-  };
-
   return (
     <>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <input
+          type="hidden"
+          {...register("location", {
+            validate: (value) => (!!location && Number(value) === location.id) || "Location is required",
+          })}
+        />
         {!location && <LocationSelectFormElement room={room} control={control} name="location" />}
 
         {location && (
@@ -163,7 +201,10 @@ export default function RegisterBarcodeElement({
               control={control}
               errors={errors}
               setValue={setValue}
-              {...register("chemical", { required: "Chemical is required" })}
+              {...register("chemical", {
+                required: "Chemical is required",
+                validate: (value) => Number(value) > 0 || "Chemical is required",
+              })}
             />
 
             <Form.Group className="mb-3">
@@ -180,7 +221,10 @@ export default function RegisterBarcodeElement({
               <InputGroup className="mb-3 w-25" hasValidation>
                 <Form.Control
                   as="input"
-                  {...register("concentration", { required: "A concentration is required" })}
+                  {...register("concentration", {
+                    required: "A concentration is required",
+                    validate: (value) => String(value ?? "").trim() !== "" || "A concentration is required",
+                  })}
                   isInvalid={errors.concentration !== undefined}
                 />
                 {errors.concentration && (
@@ -194,7 +238,10 @@ export default function RegisterBarcodeElement({
               <InputGroup className="mb-3 w-25" hasValidation>
                 <Form.Control
                   as="input"
-                  {...register("amount", { required: "An amount is required" })}
+                  {...register("amount", {
+                    required: "An amount is required",
+                    validate: (value) => String(value ?? "").trim() !== "" || "An amount is required",
+                  })}
                   isInvalid={errors.amount !== undefined}
                 />
                 <Controller
@@ -232,13 +279,18 @@ export default function RegisterBarcodeElement({
                 <Form.Control.Feedback type="invalid">{errors.expire_date.message}</Form.Control.Feedback>
               )}
             </Form.Group>
-
-            <Button type="submit" variant="primary" disabled={isSubmitting}>
-              {isSubmitting && <span className="spinner-border spinner-border-sm me-1" />}
-              Register container
-            </Button>
           </>
         )}
+
+        {submitCount > 0 && missingItems.length > 0 && (
+          <Alert variant="warning" className="mt-3">
+            Please complete the following before registering: {missingItems.join(", ")}.
+          </Alert>
+        )}
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
+          {isSubmitting && <span className="spinner-border spinner-border-sm me-1" aria-hidden="true" />}
+          Register container
+        </Button>
       </Form>
 
       {createdContainer && (

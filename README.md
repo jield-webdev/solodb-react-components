@@ -16,6 +16,10 @@ The new-run wizard shows parent parts as selectable cards with their split amoun
 
 The run layout editor supports adding extra trays at any time. Use **Edit** beside an extra tray to rename it or remove it when empty. Trays and names apply to the whole run; removal is rejected if any run part or step still references the tray. This requires the PHP API endpoints `POST /api/create/run/tray` (`run_id`), `PATCH /api/update/run/tray/{id}` (`name`, 1–128 characters), and `DELETE /api/delete/run/tray/{id}`.
 
+The chemical picker collapses to the selected chemical after selection or creation. Hover or focus its Selected button to unselect and reopen the search table. Intake registration keeps its submit button available and shows missing location, chemical, concentration, and amount in a warning above it after submission is attempted.
+
+Chemical intake container and barcode registration use the resolved location passed by the parent for API submission. Prop changes, picker selections, and scans keep the form location synchronized; resetting the location cancels pending lookups and requires a new selection before registration.
+
 ### Peer dependencies
 
 This library relies on the following peer dependencies in your app:

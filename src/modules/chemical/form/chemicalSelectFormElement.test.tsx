@@ -95,13 +95,19 @@ describe("ChemicalSelectFormElement", () => {
 
     await user.click(await screen.findByRole("button", { name: "Select Acetone" }));
     expect(screen.getByLabelText("Selected chemical id")).toHaveTextContent("1");
-    expect(screen.getByRole("button", { name: "Selected Acetone" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Unselect Acetone" })).toBeEnabled();
+    expect(screen.queryByText("Water")).not.toBeInTheDocument();
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Unselect Acetone" }));
+    expect(screen.getByLabelText("Selected chemical id")).toHaveTextContent("0");
+    expect(screen.getByRole("searchbox")).toBeInTheDocument();
 
     const waterRow = screen.getByText("Water").closest("tr");
     expect(waterRow).not.toBeNull();
     await user.click(waterRow!);
 
     expect(screen.getByLabelText("Selected chemical id")).toHaveTextContent("2");
-    expect(screen.getByRole("button", { name: "Selected Water" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Unselect Water" })).toBeEnabled();
+    expect(screen.queryByText("Acetone")).not.toBeInTheDocument();
   });
 });
