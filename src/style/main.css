@@ -508,3 +508,14 @@
     font-size: 1.1rem;
     margin: 0.5rem 0 0.25rem;
 }
+
+.chemical-unselect-label,
+.chemical-unselect:hover .chemical-selected-label,
+.chemical-unselect:focus-visible .chemical-selected-label {
+    display: none;
+}
+
+.chemical-unselect:hover .chemical-unselect-label,
+.chemical-unselect:focus-visible .chemical-unselect-label {
+    display: inline;
+}

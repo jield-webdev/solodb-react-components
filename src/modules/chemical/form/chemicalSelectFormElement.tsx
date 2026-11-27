@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
-import { Controller } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
 import CreateChemicalModal from "@jield/solodb-react-components/modules/chemical/components/modal/createChemicalModal";
 import { Chemical, ChemicalStandardProductEnum, listChemicals } from "@jield/solodb-typescript-core";
 
@@ -22,6 +22,12 @@ export default function ChemicalSelectFormElement({
 }) {
   const searchInputId = useId();
   const [chemicals, setChemicals] = useState<Chemical[]>([]);
+  const selectedId = useWatch({ control, name });
+  const [selectedChemical, setSelectedChemical] = useState<Chemical | null>(null);
+  const selection = selectedId
+    ? (chemicals.find((chemical) => chemical.id === Number(selectedId)) ??
+      (selectedChemical?.id === Number(selectedId) ? selectedChemical : null))
+    : null;
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -66,6 +72,7 @@ export default function ChemicalSelectFormElement({
       chemical,
       ...currentChemicals.filter((currentChemical) => currentChemical.id !== chemical.id),
     ]);
+    setSelectedChemical(chemical);
     setShowModal(false);
     setValue(name, chemical.id, { shouldDirty: true, shouldValidate: true });
   };
@@ -75,15 +82,19 @@ export default function ChemicalSelectFormElement({
   return (
     <>
       <Form.Group className="mb-3">
-        <Form.Label htmlFor={searchInputId}>Search existing chemicals</Form.Label>
-        <Form.Control
-          id={searchInputId}
-          type="search"
-          value={query}
-          placeholder="Search by name or CAS number"
-          onChange={(event) => setQuery(event.target.value)}
-          className="mb-2"
-        />
+        {!selection && (
+          <>
+            <Form.Label htmlFor={searchInputId}>Search existing chemicals</Form.Label>
+            <Form.Control
+              id={searchInputId}
+              type="search"
+              value={query}
+              placeholder="Search by name or CAS number"
+              onChange={(event) => setQuery(event.target.value)}
+              className="mb-2"
+            />
+          </>
+        )}
 
         <Controller
           name={name}
@@ -103,7 +114,7 @@ export default function ChemicalSelectFormElement({
                   </tr>
                 </thead>
                 <tbody>
-                  {isLoading && (
+                  {!selection && isLoading && (
                     <tr>
                       <td colSpan={5} className="py-3 text-center text-muted">
                         <span className="spinner-border spinner-border-sm me-2" aria-hidden="true" />
@@ -112,7 +123,7 @@ export default function ChemicalSelectFormElement({
                     </tr>
                   )}
 
-                  {!isLoading && loadError && (
+                  {!selection && !isLoading && loadError && (
                     <tr>
                       <td colSpan={5} className="py-3 text-center text-danger">
                         {loadError}
@@ -120,7 +131,7 @@ export default function ChemicalSelectFormElement({
                     </tr>
                   )}
 
-                  {!isLoading && !loadError && chemicals.length === 0 && (
+                  {!selection && !isLoading && !loadError && chemicals.length === 0 && (
                     <tr>
                       <td colSpan={5} className="py-3 text-center text-muted">
                         No chemicals found.
@@ -128,41 +139,56 @@ export default function ChemicalSelectFormElement({
                     </tr>
                   )}
 
-                  {!isLoading &&
-                    !loadError &&
-                    chemicals.map((chemical) => {
-                      const isSelected = Number(field.value) === chemical.id;
+                  {(selection ? [selection] : !isLoading && !loadError ? chemicals : []).map((chemical) => {
+                    const isSelected = Number(field.value) === chemical.id;
 
-                      return (
-                        <tr
-                          key={chemical.id}
-                          className={isSelected ? "table-primary" : undefined}
-                          style={{ cursor: "pointer" }}
-                          aria-selected={isSelected}
-                          onClick={() => field.onChange(chemical.id)}
-                        >
-                          <td className="fw-semibold">{chemical.name}</td>
-                          <td>{chemical.cas_number || EMPTY_VALUE}</td>
-                          <td>{chemical.cmr.length > 0 ? chemical.cmr.join(", ") : EMPTY_VALUE}</td>
-                          <td>{isStandardProduct(chemical) ? "Yes" : "No"}</td>
-                          <td className="text-end">
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant={isSelected ? "success" : "outline-primary"}
-                              disabled={isSelected}
-                              aria-label={`${isSelected ? "Selected" : "Select"} ${chemical.name}`}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                field.onChange(chemical.id);
-                              }}
-                            >
-                              {isSelected ? "Selected" : "Select"}
-                            </Button>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    return (
+                      <tr
+                        key={chemical.id}
+                        className={isSelected ? "table-primary" : undefined}
+                        style={{ cursor: "pointer" }}
+                        aria-selected={isSelected}
+                        onClick={() => {
+                          if (!isSelected) {
+                            setSelectedChemical(chemical);
+                            field.onChange(chemical.id);
+                          }
+                        }}
+                      >
+                        <td className="fw-semibold">{chemical.name}</td>
+                        <td>{chemical.cas_number || EMPTY_VALUE}</td>
+                        <td>{chemical.cmr.length > 0 ? chemical.cmr.join(", ") : EMPTY_VALUE}</td>
+                        <td>{isStandardProduct(chemical) ? "Yes" : "No"}</td>
+                        <td className="text-end">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant={isSelected ? "success" : "outline-primary"}
+                            className={isSelected ? "chemical-unselect" : undefined}
+                            aria-label={`${isSelected ? "Unselect" : "Select"} ${chemical.name}`}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setSelectedChemical(isSelected ? null : chemical);
+                              field.onChange(isSelected ? 0 : chemical.id);
+                            }}
+                          >
+                            {isSelected ? (
+                              <>
+                                <span className="chemical-selected-label" aria-hidden="true">
+                                  Selected
+                                </span>
+                                <span className="chemical-unselect-label" aria-hidden="true">
+                                  Unselect
+                                </span>
+                              </>
+                            ) : (
+                              "Select"
+                            )}
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </Table>
             </div>
@@ -175,9 +201,11 @@ export default function ChemicalSelectFormElement({
           </Form.Control.Feedback>
         )}
 
-        <Button type="button" variant="primary" className="mt-2" onClick={() => setShowModal(true)}>
-          Create New Chemical
-        </Button>
+        {!selection && (
+          <Button type="button" variant="primary" className="mt-2" onClick={() => setShowModal(true)}>
+            Create New Chemical
+          </Button>
+        )}
       </Form.Group>
 
       <CreateChemicalModal show={showModal} setShow={setShowModal} onChemicalCreate={handleCreateChemical} />

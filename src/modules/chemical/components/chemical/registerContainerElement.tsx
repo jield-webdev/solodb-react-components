@@ -64,9 +64,11 @@ export default function RegisterContainerElement({
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isSubmitting },
+    getValues,
+    formState: { errors, isSubmitting, submitCount },
   } = useForm<Inputs>({
     defaultValues: {
+      location: location?.id ?? 0,
       expire_date: currentDate.toISOString().split("T")[0],
       owner: {
         value: user?.id,
@@ -76,16 +78,37 @@ export default function RegisterContainerElement({
   });
 
   const locationId = watch("location");
+  const chemical = watch("chemical");
+  const concentration = watch("concentration");
+  const amount = watch("amount");
+  const missingItems = [
+    ...(!location || Number(locationId) !== location.id ? ["Location"] : []),
+    ...(!Number(chemical) ? ["Chemical"] : []),
+    ...(concentration === undefined || String(concentration).trim() === "" ? ["Concentration"] : []),
+    ...(amount === undefined || String(amount).trim() === "" ? ["Amount"] : []),
+    ...Object.entries(errors)
+      .filter(([name]) => !["location", "chemical", "concentration", "amount"].includes(name))
+      .map(([, error]) => String(error?.message)),
+  ];
 
   useEffect(() => {
-    if (!locationId) {
+    setValue("location", location?.id ?? 0);
+  }, [location?.id, setValue]);
+
+  useEffect(() => {
+    // Read the current field after synchronizing a location supplied by the parent.
+    const selectedLocationId = Number(getValues("location"));
+    if (!selectedLocationId || selectedLocationId === location?.id) {
       return;
     }
-    //We have a location, call the API to find all information about it
-    getLocation({ id: locationId }).then((location) => {
-      setLocation(location);
+    let active = true;
+    getLocation({ id: selectedLocationId }).then((loadedLocation) => {
+      if (active) setLocation(loadedLocation);
     });
-  }, [locationId]);
+    return () => {
+      active = false;
+    };
+  }, [locationId, location?.id, setLocation, getValues]);
 
   const resetScannedLocation = useCallback(() => {
     setLocation(null);
@@ -93,14 +116,11 @@ export default function RegisterContainerElement({
   }, [setLocation, setValue]);
 
   const scanCallbackId = useId();
-
   const onScanKeys = useCallback(
-    async (keys: string) => {
+    (keys: string) => {
       if (scannedCodeIsLocationCode(keys)) {
         const parsedLocationId = extractLabelNumber(keys);
         if (parsedLocationId !== null) {
-          const loadedLocation = await getLocation({ id: parsedLocationId });
-          setLocation(loadedLocation);
           setValue("location", parsedLocationId);
         }
         return;
@@ -120,9 +140,11 @@ export default function RegisterContainerElement({
   }, [onScanKeys]);
 
   const onSubmit = async (values: Inputs) => {
+    if (!location || Number(values.location) !== location.id) return;
+
     const container = await createChemicalContainer({
       chemical: values.chemical,
-      location: values.location,
+      location: location.id,
       user: values.owner.value,
       type: values.type,
       concentration: values.concentration !== undefined ? String(values.concentration) : undefined,
@@ -137,7 +159,13 @@ export default function RegisterContainerElement({
 
   return (
     <>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <input
+          type="hidden"
+          {...register("location", {
+            validate: (value) => (!!location && Number(value) === location.id) || "Location is required",
+          })}
+        />
         {!location && <LocationSelectFormElement room={room} control={control} name={"location"} />}
 
         {location && (
@@ -164,6 +192,7 @@ export default function RegisterContainerElement({
               setValue={setValue}
               {...register("chemical", {
                 required: "Chemical is required",
+                validate: (value) => Number(value) > 0 || "Chemical is required",
               })}
             />
 
@@ -184,7 +213,8 @@ export default function RegisterContainerElement({
                 <Form.Control
                   as="input"
                   {...register("concentration", {
-                    required: "An concentration is required",
+                    required: "A concentration is required",
+                    validate: (value) => String(value ?? "").trim() !== "" || "A concentration is required",
                   })}
                   isInvalid={errors.concentration !== undefined}
                 ></Form.Control>
@@ -201,6 +231,7 @@ export default function RegisterContainerElement({
                   as="input"
                   {...register("amount", {
                     required: "An amount is required",
+                    validate: (value) => String(value ?? "").trim() !== "" || "An amount is required",
                   })}
                   isInvalid={errors.amount !== undefined}
                 ></Form.Control>
@@ -255,13 +286,18 @@ export default function RegisterContainerElement({
                 <Form.Control.Feedback type="invalid">{errors.expire_date.message}</Form.Control.Feedback>
               )}
             </Form.Group>
-
-            <Button type="submit" variant={"primary"} disabled={isSubmitting}>
-              {isSubmitting && <span className="spinner-border spinner-border-sm me-1"></span>}
-              Register container
-            </Button>
           </>
         )}
+
+        {submitCount > 0 && missingItems.length > 0 && (
+          <Alert variant="warning" className="mt-3">
+            Please complete the following before registering: {missingItems.join(", ")}.
+          </Alert>
+        )}
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
+          {isSubmitting && <span className="spinner-border spinner-border-sm me-1" aria-hidden="true" />}
+          Register container
+        </Button>
       </Form>
 
       {createdContainer && (
